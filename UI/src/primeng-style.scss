@@ -1111,6 +1111,38 @@ p-inputswitch.ng-dirty.ng-invalid > .p-inputswitch {
   }
 }
 
+#filterForm {
+  display: flex;
+  width: 100%;
+  max-width: 100%;
+
+}
+
+#filterParamSelector .p-dropdown {
+  border-left: none;
+  border-bottom-left-radius: 0;
+  border-top-left-radius: 0;
+}
+
+#filteringForm .small-label {
+  max-width: 100%;
+  padding: 1.3rem;
+}
+
+
+@media screen and (max-width: 991px) {
+  #filteringForm .small-label {
+    border-bottom-left-radius: 0;
+    border-top-left-radius: 0;
+  }
+  #filterParamSelector #filterVarSelector .p-dropdown .p-multiSelect .p-calendar {
+    max-width: 100%;
+    border-radius: 0;
+    border: 1px solid #ced4da;
+    border-top: none;
+  }
+}
+
 #anomaliesMethodSelector .p-dropdown, #intraAnnualMetricTypeSelector .p-dropdown, #intraAnnualMetricsSelector .p-dropdown {
   height: 2.5rem;
   border-left-style: none;

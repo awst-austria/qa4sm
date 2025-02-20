@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Input, OnDestroy, OnInit, Output, signal} from '@angular/core';
+import {Component, EventEmitter, Input, OnDestroy, OnInit, Output, signal, SimpleChanges} from '@angular/core';
 import {ValidationrunDto} from '../../../core/services/validation-run/validationrun.dto';
 import {DatasetConfigurationService} from '../../services/dataset-configuration.service';
 import {GlobalParamsService} from '../../../core/services/global/global-params.service';
@@ -24,6 +24,8 @@ export class ValidationrunRowComponent implements OnInit, OnDestroy {
   @Input() published = false;
   @Input() validationRun: ValidationrunDto;
   @Output() emitError = new EventEmitter();
+
+
   configurations$: Observable<any>;
   validationStatusInterval: any;
   validationStatus = signal<string | undefined>(undefined);
@@ -49,11 +51,13 @@ export class ValidationrunRowComponent implements OnInit, OnDestroy {
     if (this.validationRun.is_a_copy) {
       this.getOriginalDate(this.validationRun);
     }
+    
     this.updateConfig();
     this.valName.set(this.validationRun.name_tag);
     this.validationStatus.set(this.getStatusFromProgress(this.validationRun));
     this.refreshStatus();
   }
+
 
   private updateConfig(): void {
     this.configurations$ = combineLatest(

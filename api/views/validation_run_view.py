@@ -1,6 +1,9 @@
+from dateutil import parser
+from datetime import datetime
 from django.db.models import Q, ExpressionWrapper, F, BooleanField
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
+from django.utils import timezone
 
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes, authentication_classes
@@ -10,8 +13,6 @@ from rest_framework.authentication import TokenAuthentication
 
 from api.views.auxiliary_functions import get_fields_as_list
 from validator.models import ValidationRun, CopiedValidations
-
-
 
 @api_view(['GET'])
 @permission_classes([AllowAny])
@@ -74,6 +75,51 @@ def my_results(request):
         val_runs = ValidationRun.objects.filter(user=current_user)
     else:
         return JsonResponse({'message': 'Not appropriate order given'}, status=status.HTTP_400_BAD_REQUEST, safe=False)
+
+    print(request.query_params)
+
+    filter_name = request.query_params.get('name', None)
+    filter_statuses = request.query_params.getlist('statuses', None)
+    start_date_str = request.GET.get('start_time', None)
+    end_date_str = request.GET.get('endDate', None)
+
+    filter_spatialRef = request.query_params.getlist('spatialRef', None)
+    filter_temporalRef = request.query_params.getlist('temporalRef', None)
+    filter_scalingRef = request.query_params.getlist('scalingRef', None)
+
+    if filter_spatialRef:
+        dataset_filters = Q()
+        for dataset in filter_spatialRef:
+            dataset_filters |= Q(spatial_reference_configuration_id__dataset__pretty_name=dataset)
+        val_runs = val_runs.filter(dataset_filters)
+
+    if filter_temporalRef:
+        dataset_filters = Q()
+        for dataset in filter_temporalRef:
+            dataset_filters |= Q(temporal_reference_configuration_id__dataset__pretty_name=dataset)
+        val_runs = val_runs.filter(dataset_filters)
+
+    if filter_scalingRef:
+        dataset_filters = Q()
+        for dataset in filter_scalingRef:
+            dataset_filters |= Q(scaling_ref_id__dataset__pretty_name=dataset)
+        val_runs = val_runs.filter(dataset_filters)
+
+    if filter_name in (None, "null"):
+        val_runs = val_runs.all() # when no filter is applied
+    elif filter_name.strip() == "":
+        val_runs = val_runs.filter(name_tag="") # when filter is for non-named runs
+    else:
+        val_runs = val_runs.filter(name_tag__icontains=filter_name)
+
+    if filter_statuses:
+        status_filters = filter_by_job_statuses(filter_statuses)
+        val_runs = val_runs.filter(status_filters)
+
+
+    if start_date_str:
+        start_date = parser.parse(start_date_str).date()
+        val_runs = val_runs.filter(start_time__date=start_date)
 
     if limit and offset:
         limit = int(limit)
@@ -166,6 +212,25 @@ def is_validation_finished(request, **kwargs):
 
     ifFinished = (val_run.progress == 100 and val_run.end_time is not None)
     return JsonResponse({'validation_complete': ifFinished}, status=status.HTTP_200_OK)
+
+def filter_by_job_statuses(job_statuses):
+    #Horrible code to apply set of job status filters.
+    status_filters = Q()
+    for status in job_statuses:
+        if status == 'Scheduled':
+            status_filters |= Q(progress=0, end_time__isnull=True)
+        elif status == 'Done':
+            status_filters |= Q(progress=100, end_time__isnull=False)
+        elif status == 'Cancelled':
+            status_filters |= Q(progress__lt=0)
+        elif status == 'ERROR':
+            status_filters |= Q(end_time__isnull=False, total_points=0)
+            #status_filters |= Q(total_points=0)
+        elif status == 'Running':
+            status_filters |= Q(progress__gte=0, progress__lt=100, end_time__isnull=True, total_points__gt=0)
+        else:
+            print('Status didnt match')
+    return (status_filters)
 
 class ValidationRunSerializer(ModelSerializer):
     class Meta:
