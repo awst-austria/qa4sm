@@ -3,6 +3,27 @@
 import django.core.files.storage
 from django.db import migrations, models
 
+def backfill_status(apps, schema_editor):
+    #populate the status of previous validation runs
+    ValidationRun = apps.get_model('validator', 'ValidationRun')
+    for validation in ValidationRun.objects.all():
+        if validation.progress == 0 and not validation.end_time:
+            validation.status = 'SCHEDULED'
+        elif validation.progress == 100 and validation.end_time:
+            validation.status = 'DONE'
+        elif validation.progress < 0:
+            validation.status = 'CANCELLED'
+        elif validation.end_time and validation.progress < 100:
+            validation.status = 'ERROR'
+        else:
+            validation.status = 'RUNNING'
+        validation.save()
+
+def reverse_backfill(apps, schema_editor):
+    #reset the status of previous validation runs incase of rollback
+    ValidationRun = apps.get_model('validator', 'ValidationRun')
+    ValidationRun.objects.all().update(status='SCHEDULED')
+
 
 class Migration(migrations.Migration):
 
@@ -26,4 +47,5 @@ class Migration(migrations.Migration):
             name='file',
             field=models.FileField(blank=True, null=True, storage=django.core.files.storage.FileSystemStorage(location='DOCS_DIR'), upload_to='./user_manual'),
         ),
+        migrations.RunPython(backfill_status, reverse_backfill),
     ]
