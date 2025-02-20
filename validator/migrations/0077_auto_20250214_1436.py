@@ -13,7 +13,7 @@ class Migration(migrations.Migration):
     operations = [
         migrations.AddField(
             model_name='validationrun',
-            name='isRemoved',
+            name='is_removed',
             field=models.BooleanField(default=False),
         ),
         migrations.AddField(

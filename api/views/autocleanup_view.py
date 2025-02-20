@@ -29,7 +29,7 @@ def auto_cleanup():
     for user in users:
 
         # Filter out removed, archived or published validations
-        validations = ValidationRun.objects.filter(user=user).filter(isRemoved=False).filter(is_archived=False).filter(doi__exact = '')
+        validations = ValidationRun.objects.filter(user=user).filter(is_removed=False).filter(is_archived=False).filter(doi__exact = '')
         validations_near_expiring = []
 
         for validation in validations:
@@ -62,7 +62,7 @@ def auto_cleanup():
                 for task in celery_tasks:
                     task.delete()
 
-                validation.isRemoved = True
+                validation.is_removed = True
                 validation.user = None
                 validation.save()
                 validations_cleaned.append(str(validation.id))
@@ -78,7 +78,7 @@ def auto_cleanup():
         for task in celery_tasks:
             task.delete()
 
-        no_user_val.isRemoved = True    
+        no_user_val.is_removed = True    
         no_user_val.save()
         validations_cleaned.append(str(no_user_val.id))
     

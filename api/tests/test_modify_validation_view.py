@@ -490,7 +490,7 @@ class TestModifyValidationView(TestCase):
 
         assert response.status_code == 405
         assert len(ValidationRun.objects.filter(pk=self.run_id)) == 1  # validation still there
-        assert not ValidationRun.objects.filter(pk=self.run_id).isRemoved()  # validation isRemoved flag false  
+        assert not ValidationRun.objects.filter(pk=self.run_id)[0].is_removed  # validation is_removed flag false  
         assert os.path.exists(os.path.dirname(ValidationRun.objects.filter(pk=self.run_id).output_file.path))  # output files still there 
 
         self.run.doi = ''
@@ -502,7 +502,7 @@ class TestModifyValidationView(TestCase):
 
         assert response.status_code == 403
         assert len(ValidationRun.objects.filter(pk=self.run_id)) == 1  # validation still there
-        assert not ValidationRun.objects.filter(pk=self.run_id).isRemoved()  # validation isRemoved flag false  
+        assert not ValidationRun.objects.filter(pk=self.run_id)[0].is_removed  # validation is_removed flag false  
         assert os.path.exists(os.path.dirname(ValidationRun.objects.filter(pk=self.run_id).output_file.path))  # output files still there 
 
         # non-existing validation
@@ -511,7 +511,7 @@ class TestModifyValidationView(TestCase):
 
         assert response.status_code == 404
         assert len(ValidationRun.objects.filter(pk=self.run_id)) == 1  # validation still there
-        assert not ValidationRun.objects.filter(pk=self.run_id).isRemoved()  # validation isRemoved flag false  
+        assert not ValidationRun.objects.filter(pk=self.run_id)[0].is_removed  # validation is_removed flag false  
         assert os.path.exists(os.path.dirname(ValidationRun.objects.filter(pk=self.run_id).output_file.path))  # output files still there 
 
         # wrong method
@@ -519,7 +519,7 @@ class TestModifyValidationView(TestCase):
 
         assert response.status_code == 405
         assert len(ValidationRun.objects.filter(pk=self.run_id)) == 1  # validation still there
-        assert not ValidationRun.objects.filter(pk=self.run_id).isRemoved()  # validation isRemoved flag false  
+        assert not ValidationRun.objects.filter(pk=self.run_id)[0].is_removed  # validation is_removed flag false  
         assert os.path.exists(os.path.dirname(ValidationRun.objects.filter(pk=self.run_id).output_file.path))  # output files still there 
 
         # finally should work
@@ -527,7 +527,7 @@ class TestModifyValidationView(TestCase):
 
         assert response.status_code == 200
         assert len(ValidationRun.objects.filter(pk=self.run_id)) == 1  # validation config info still there 
-        assert ValidationRun.objects.filter(pk=self.run_id).isRemoved()  # validation isRemoved flag true  
+        assert ValidationRun.objects.filter(pk=self.run_id)[0].is_removed  # validation is_removed flag true  
         assert not os.path.exists(os.path.dirname(ValidationRun.objects.filter(pk=self.run_id).output_file.path))  # output files deleted properly
 
     def test_delete_multiple_results(self):
@@ -550,7 +550,7 @@ class TestModifyValidationView(TestCase):
 
         assert response.status_code == 200
         assert len(ValidationRun.objects.all()) == 4  # assert all 4 still exist
-        assert sum(run.isRemoved() for run in ValidationRun.objects.all()) == 2  # assert 2 have been removed 
+        assert sum(run.is_removed for run in ValidationRun.objects.all()) == 2  # assert 2 have been removed 
         assert sum(os.path.exists(os.path.dirname(run.output_file.path)) for run in ValidationRun.objects.all()) == 2 # assert 2 output files have been deleted 
 
 

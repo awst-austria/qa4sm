@@ -147,7 +147,7 @@ class ValidationRun(models.Model):
     stability_metrics = models.BooleanField(default=False)
 
     status = models.CharField(max_length=10, choices=JOB_STATUSES, default='SCHEDULED')
-    isRemoved = models.BooleanField(default=False)
+    is_removed = models.BooleanField(default=False)
 
     # many-to-one relationships coming from other models:
     # dataset_configurations from DatasetConfiguration
@@ -320,7 +320,7 @@ class ValidationRun(models.Model):
 def deleteOutput_onRemove(sender, instance, **kwargs):
     # delete output directory if validation run is selected to be removed
     
-    if instance.isRemoved and instance.output_file:
+    if instance.is_removed and instance.output_file:
         outputPath = instance.output_file.path
         folderPath = os.path.dirname(outputPath)
 
