@@ -146,6 +146,13 @@ export class ValidationrunService {
     saveAs(fileUrl, fileName);
   }
 
+  downloadValidationConfiguration(validationId: string, fileName: string): void {
+    const fileUrl = `${downloadResultsUrl}?validationId=${validationId}&fileType=json`;
+    console.log(fileUrl);
+    //saveAs(fileUrl, fileName);
+  }
+
+
   addValidation(validationId: string): Observable<any> {
     const addUrl = addValidationUrl.replace(zeroId, validationId);
     const data = {add_validation: true};

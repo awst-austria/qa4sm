@@ -1,0 +1,119 @@
+<div *ngIf="!showFilterForm" class="flex justify-content-start">
+    <p-button 
+      label="+ Add Filter"
+      (click)="showFilterForm = true"
+      [style]="{'height': '40px'}">
+    </p-button>
+</div>
+
+<!--  -->
+<div *ngIf="showFilterForm" class="flex flex-row lg:flex-nowrap flex-wrap" id="filteringForm">
+    <div class="small-label lg:w-2 w-12">
+      <div class="p-fluid" style="display: flex; align-items: center;">
+        <span> Filter By:</span>
+      </div>
+    </div>
+    <div class="lg:w-4 w-12">
+      <p-dropdown
+        id="filterVarSelector"
+        [options]="dropdownFilters"
+        [(ngModel)]="selectedFilterKey"
+        placeholder="Select a filter"
+        optionLabel="label"
+        optionValue="value"
+        [style]="{'width': '100%', 'border-radius': '0 0 0 0', 'height': '42px'}" >
+      </p-dropdown>
+    </div>  
+
+  <div *ngIf="!selectedFilterKey" class="lg:w-4 w-12">
+      <p-multiSelect 
+      placeholder="Filter parameters"
+      display="chip"
+      [disabled]="true"
+      [filter]="false"
+      showHeader="false"
+      [style]="{'width': '100%', 'border-radius': '0 0 0 0', 'height': '42px'}"></p-multiSelect>
+  </div>
+
+  <ng-container [ngSwitch]="filterConfigs[selectedFilterKey]?.type" class="lg:w-4 w-12" id="filterParamSelector">
+    
+    <p-multiSelect *ngSwitchCase="'multi-select'"
+      [options]="filterConfigs[selectedFilterKey].options"
+      [(ngModel)]="filterStates[selectedFilterKey].value"
+      display="chip"
+      [filter]="false"
+      showHeader="false"
+      [style]="{'width': '100%', 'border-radius': '0 0 0 0'}"/>
+
+    <input pInputText *ngSwitchCase="'string-input'"
+      [(ngModel)]="filterStates[selectedFilterKey].value"
+      placeholder="Enter name"
+      [style]="{'width': '100%', 'border-radius': '0 0 0 0', 'height': '42px'}" />
+    
+    <p-dropdown *ngSwitchCase="'dropdown'"
+      [options]="filterConfigs[selectedFilterKey].options"
+      [(ngModel)]="filterStates[selectedFilterKey].value"/>
+
+    <p-calendar *ngSwitchCase="'date-input'"
+      [(ngModel)]="filterStates[selectedFilterKey].value"
+      dateFormat="dd/mm/yy"
+      [inputStyle]="{'width': '100%', 'height': '42px',  'border-radius': '0 0 0 0'}"
+      placeholder="Select Date">
+  </p-calendar>
+
+  </ng-container>
+
+<!-- [pTooltip]="selectedFilterKey === 'Dataset' && !spatial && !temporal ? 'Please select at least one of referencing methods.' : null" -->
+  <div class="lg:w-2 w-12">
+    <div class="button-group flex flex-row">
+      <p-button
+        label="Add"
+        icon="pi pi-filter"
+        class="p-button-success p-button-rounded"
+        (click)="addFilter()"
+        [disabled]="!isFilterValid() || !selectedFilterKey"
+        tooltipPosition="right"
+        [style]="{'border-radius': '0 0 0 0', 'height': '42px'}">
+      </p-button>
+      <p-button
+        label="Cancel"
+        icon="pi pi-ban"
+        class="p-button-danger p-button-rounded"
+        (click)="cancelFilter()"
+        [style]="{'border-radius': '0 4px 4px 0', 'height': '42px'}">
+      </p-button>
+    </div>
+  </div>
+</div>
+
+<div *ngIf="activeFilters.length > 0" class="active-filters">
+<div class="filter-heading">Active Filters:</div>
+<div *ngFor="let filter of activeFilters; let i = index" class="p-m-2 p-shadow-2 filter-chip">
+  <div class="filter-item">
+    <div class="filter-text">
+      <ng-container *ngIf="filter.filter === 'Submission Date'">
+        {{ filter.filter | titlecase }}:
+        <div class="filter-values">
+          <span *ngFor="let value of filter.values; let j = index">
+            <span class="p-pill p-pill-info">{{ value | date:'dd/MM/yyyy' }}</span>
+            <span *ngIf="j < filter.values.length - 1"> - </span>
+          </span>
+        </div>
+      </ng-container>
+      <ng-container *ngIf="filter.filter !== 'Submission Date'">
+        {{ filter.filter | titlecase }}:
+        <div class="filter-values">
+          <span *ngFor="let value of filter.values; let j = index">
+            <span class="p-pill p-pill-info">{{ value }}</span>
+            <span *ngIf="j < filter.values.length - 1">, </span>
+          </span>
+        </div>
+      </ng-container>
+    </div>
+      <div class="button-group">
+        <button pButton icon="pi pi-pencil" class="p-button-rounded p-button-info" (click)="editFilter(i)"></button>
+        <button pButton icon="pi pi-times" class="p-button-rounded p-button-danger" (click)="removeFilter(i)"></button>
+      </div>
+    </div>
+  </div>
+</div>
