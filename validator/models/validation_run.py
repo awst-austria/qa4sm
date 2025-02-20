@@ -141,7 +141,7 @@ class ValidationRun(models.Model):
     # celery_tasks from CeleryTask
 
     @property
-    def job_status(self):
+    def validation_status(self):
         if (self.progress == 0) and (not self.end_time):
             return('Scheduled')
         elif (self.progress == 100) and (self.end_time):
