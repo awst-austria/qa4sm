@@ -38,14 +38,14 @@
     </div>
 
     <div *ngIf="(validations.length || areFiltersApplied()) && !dataFetchError()" class="w-12">
-      <qa-filtering-form/> 
+      <qa-filtering-form/>
 
     </div>
 
     <!-- Rows -->
     <div *ngIf="validations.length" class="w-12 py-2">
       <div *ngIf="!(isLoading && orderChange)">
-        <div *ngFor="let valrun of validations" 
+        <div *ngFor="let valrun of validations"
              class="validation-row-area">
         <!--- <div *ngIf="rowVisibility.get(valrun.id) !== undefined ? rowVisibility.get(valrun.id) : true" class="validation-row-area"> --->
         <div class="validation-row-area">
@@ -60,10 +60,8 @@
             [pTooltip]="!checkIfEnabled(valrun) ? 'This validation cannot be selected for current action' : null"
             inputId="{{valrun.id}}}">
           </p-checkbox>
-          <qa-validationrun-row [published]=published 
-                                [validationRun]="valrun" 
-                                [filterPayload]="filterPayload" 
-                                (matchesFilter)="handleRowFilter(valrun.id, $event)" 
+          <qa-validationrun-row [published]=published
+                                [validationRun]="valrun"
                                 (emitError)="dataFetchError.set($event)"/>
           <br/>
         </div>
