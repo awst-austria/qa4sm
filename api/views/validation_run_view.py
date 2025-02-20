@@ -75,8 +75,6 @@ def my_results(request):
     else:
         return JsonResponse({'message': 'Not appropriate order given'}, status=status.HTTP_400_BAD_REQUEST, safe=False)
 
-    val_runs = val_runs.filter(isRemoved=False)
-
     if limit and offset:
         limit = int(limit)
         offset = int(offset)

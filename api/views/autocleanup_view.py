@@ -26,10 +26,7 @@ def auto_cleanup():
     validations_cleaned = []
     validations_warned = []
 
-    userAccounts_cleaned = []
-
     for user in users:
-        #### validation cleanup ####
 
         # Filter out removed, archived or published validations
         validations = ValidationRun.objects.filter(user=user).filter(isRemoved=False).filter(is_archived=False).filter(doi__exact = '')
@@ -65,8 +62,9 @@ def auto_cleanup():
                 for task in celery_tasks:
                     task.delete()
 
-                #validation.isRemoved = True
-                #validation.save()
+                validation.isRemoved = True
+                validation.user = None
+                validation.save()
                 validations_cleaned.append(str(validation.id))
 
         if len(validations_near_expiring) != 0:
@@ -83,9 +81,9 @@ def auto_cleanup():
         no_user_val.isRemoved = True    
         no_user_val.save()
         validations_cleaned.append(str(no_user_val.id))
+    
+    print(f'Warnings sent for {len(validations_warned)} validations that are nearing expiry. Cleaned {len(validations_cleaned)} expired validations.')
 
-    print('Cleaned validations: ' + ', '.join(validations_cleaned))
-    print('warned validations: ' + ', '.join(validations_warned))
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated, IsAdminUser])

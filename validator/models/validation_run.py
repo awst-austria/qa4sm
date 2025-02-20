@@ -326,7 +326,7 @@ def deleteOutput_onRemove(sender, instance, **kwargs):
 
         if os.path.exists(folderPath):
             rmtree(folderPath)
-            print(f"Deleted output folder: {folderPath}")
+
 
 @receiver(post_delete, sender=ValidationRun)
 def auto_delete_file_on_delete(sender, instance, **kwargs):

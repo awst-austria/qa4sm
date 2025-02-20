@@ -231,6 +231,7 @@ def delete_result(request, result_uuid):
         return HttpResponse(status=status.HTTP_405_METHOD_NOT_ALLOWED)  # 405
 
     val_run.isRemoved = True    
+    val_run.user = None    
     val_run.save()
 
     return HttpResponse(status=status.HTTP_200_OK)
@@ -261,8 +262,10 @@ def delete_multiple_result(request):
                              .filter(user=request.user))
     
     updated_count = 0
+    
     for validation in validations_to_remove:
         validation.isRemoved = True    
+        validation.user = None
         validation.save()
         updated_count += 1
 
