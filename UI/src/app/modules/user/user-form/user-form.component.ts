@@ -1,15 +1,30 @@
 import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
-import {FormBuilder, Validators} from '@angular/forms';
+import {FormBuilder, Validators, AbstractControl, AsyncValidatorFn} from '@angular/forms';
 import {LocalApiService} from '../../core/services/auth/local-api.service';
 import {CountryDto} from '../../core/services/global/country.dto';
 import {UserDto} from '../../core/services/auth/user.dto';
 import {AuthService} from '../../core/services/auth/auth.service';
-import {Observable} from 'rxjs';
+import {Observable, of} from 'rxjs';
 import {Router} from '@angular/router';
+import {map} from 'rxjs/operators';
 import {ToastService} from '../../core/services/toast/toast.service';
 import {UserData} from '../../core/services/form-interfaces/UserDataForm';
 import {CustomHttpError} from '../../core/services/global/http-error.service';
 import {SettingsService} from "../../core/services/global/settings.service";
+
+
+export function emailUniquenessValidator(authService: AuthService, currentEmail?: string): AsyncValidatorFn {
+  return (control: AbstractControl): Observable<{ [key: string]: any } | null> => {
+    console.log('currentEmail', currentEmail);
+    if (currentEmail && control.value === currentEmail) {
+      return of(null);
+    }
+
+    return authService.checkUniqueEmail(control.value).pipe(
+      map(isUnique => isUnique ? null : {emailTaken: true})
+    );
+  };
+}
 
 @Component({
   selector: 'qa-user-form',
@@ -21,7 +36,9 @@ export class UserFormComponent implements OnInit {
     username: ['', [Validators.required, Validators.maxLength(150)]],
     password1: ['', [Validators.required]],
     password2: ['', [Validators.required]],
-    email: ['', [Validators.required, Validators.email]],
+    email: ['', {validators: [Validators.required, Validators.email], 
+                asyncValidators: [emailUniquenessValidator(this.userService)], 
+                updateOn: 'blur'}],
     first_name: [''],
     last_name: [''],
     organisation: [''],
@@ -69,6 +86,9 @@ export class UserFormComponent implements OnInit {
     this.countries$ = this.userFormService.getCountryList();
     if (this.userData) {
       this.setDefaultValues();
+      this.userForm.get('email').setAsyncValidators(
+        emailUniquenessValidator(this.userService, this.userData.email)
+      );
     }
     this.userForm.get('honeypot').valueChanges.subscribe(value => {
       this.handleSliderChange(value);

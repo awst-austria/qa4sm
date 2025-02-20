@@ -13,7 +13,8 @@ import {Router, Routes} from '@angular/router';
 })
 export class AuthService {
   private API_URL = environment.API_URL;
-
+  
+  private emailURL = this.API_URL + 'api/auth/check-email';
   private loginUrl = this.API_URL + 'api/auth/login';
   private logoutUrl = this.API_URL + 'api/auth/logout';
   private signUpUrl = this.API_URL + 'api/sign-up';
@@ -157,6 +158,24 @@ export class AuthService {
       .pipe(
         catchError(err => this.httpError.handleUserFormError(err))
       );
+  }
+
+  // Check that the provided email address is unique, avoid duplicate email addresses on different accounts
+  checkUniqueEmail(email: string): Observable<boolean> {
+    const encodedEmail = encodeURIComponent(email);
+    return this.httpClient.get(`${this.emailURL}/${encodedEmail}`, {
+      headers: {
+        'X-Requested-With': 'XMLHttpRequest'
+      },
+      responseType: 'text'
+    }).pipe(
+      map(response => {
+        return response === 'true';
+      }),
+      catchError(error => {
+        return of(false);
+      })
+    );
   }
 
   updateUser(userForm: any): Observable<any> {

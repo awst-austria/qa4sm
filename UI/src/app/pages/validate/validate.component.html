@@ -116,7 +116,7 @@
               </ng-template>
 
               <!--             spatial reference-->
-              <div class="pt-2 pb-0">
+              <div class="pt-2 pb-0 pb-0">
                 <label for="spatial-reference"
                        class="mb-4"
                        pTooltip="Choose the spatial reference dataset. If the ISMN dataset belongs to the dataset pool,
@@ -136,6 +136,8 @@
 
               <hr class="w-11 mt-2" style="opacity: 1.0;">
 
+              <hr class="w-11 mt-2" style="opacity: 1.;">
+
               <!--             temporal reference-->
                 <label for="temporal-reference"
                        class="mb-4"
@@ -150,7 +152,6 @@
                   [validationModel]="validationModel"
                   [referenceType]="'temporalReference$'"
                   (hoverOverDataset)="onHoverOverReferenceDataset($event)"/>
-
 
                 <!--      Temporal matching-->
                 <label  for="temporal-matching"
@@ -218,6 +219,7 @@
 
         <!--      Metrics-->
         <div class="w-10 p-2">
+          <qa-metrics [(validationModel)]="validationModel"/>
           <qa-metrics [(validationModel)]="validationModel"/>
         </div>
 

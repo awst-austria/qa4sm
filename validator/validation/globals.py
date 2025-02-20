@@ -4,9 +4,28 @@ import pandas as pd
 import numpy as np
 from validator.models import ValidationRun
 import qa4sm_reader.globals as qr_globals
+import qa4sm_reader.globals as qr_globals
 
 OUTPUT_FOLDER = settings.MEDIA_ROOT
 
+
+METRICS = qr_globals.METRICS
+
+NON_METRICS = qr_globals.NON_METRICS
+
+BAD_METRICS = qr_globals.BAD_METRICS
+
+METRIC_TEMPLATE = [
+    "overview_{id_ref}-{ds_ref}_and_{id_sat}-{ds_sat}_", "{metric}"
+]
+
+TEMPORAL_SUB_WINDOW_SEPARATOR = qr_globals.TEMPORAL_SUB_WINDOW_SEPARATOR
+
+INTRA_ANNUAL_METRIC_TEMPLATE = qr_globals.INTRA_ANNUAL_METRIC_TEMPLATE
+
+INTRA_ANNUAL_TCOL_METRIC_TEMPLATE = qr_globals.INTRA_ANNUAL_TCOL_METRIC_TEMPLATE
+
+TC_METRICS = qr_globals.TC_METRICS
 
 METRICS = qr_globals.METRICS
 
@@ -30,7 +49,15 @@ TC_METRIC_TEMPLATE = [
     "overview_{id_ref}-{ds_ref}_and_{id_sat}-{ds_sat}_and_{id_sat2}-{ds_sat2}",
     "_{metric}", "_for_{id_met}-{ds_met}"
 ]
+TC_METRIC_TEMPLATE = [
+    "overview_{id_ref}-{ds_ref}_and_{id_sat}-{ds_sat}_and_{id_sat2}-{ds_sat2}",
+    "_{metric}", "_for_{id_met}-{ds_met}"
+]
 
+STABILITY_METRICS = qr_globals.STABILITY_METRICS
+#-----------------------------------------------------------------------------------------------------------------------
+#TODO: If a new dataset is added here, make sure to add it to `qa4sm_reader.globals.DATASETS` as well
+#-----------------------------------------------------------------------------------------------------------------------
 STABILITY_METRICS = qr_globals.STABILITY_METRICS
 #-----------------------------------------------------------------------------------------------------------------------
 #TODO: If a new dataset is added here, make sure to add it to `qa4sm_reader.globals.DATASETS` as well
@@ -52,6 +79,11 @@ SMOS_L3 = 'SMOS_L3'
 SMOS_L2 = 'SMOS_L2'
 SMAP_L2 = 'SMAP_L2'
 SMOS_SBPCA = 'SMOS_SBPCA'
+#-----------------------------------------------------------------------------------------------------------------------
+
+DATASETS = qr_globals.DATASETS
+
+MAX_NUM_DS_PER_VAL_RUN = qr_globals.MAX_NUM_DS_PER_VAL_RUN
 #-----------------------------------------------------------------------------------------------------------------------
 
 DATASETS = qr_globals.DATASETS
@@ -139,6 +171,14 @@ VR_FIELDS = [
 DS_FIELDS = [
     'dataset', 'version', 'is_spatial_reference', 'is_temporal_reference'
 ]
+VR_FIELDS = [
+    'interval_from', 'interval_to', 'max_lat', 'min_lat', 'max_lon', 'min_lon',
+    'tcol', 'bootstrap_tcol_cis', 'anomalies', 'anomalies_from',
+    'anomalies_to', 'temporal_matching'
+]
+DS_FIELDS = [
+    'dataset', 'version', 'is_spatial_reference', 'is_temporal_reference'
+]
 
 IRREGULAR_GRIDS = {
     'SMAP_L3': 0.35,
@@ -164,6 +204,12 @@ METADATA_PLOT_NAMES = {
     "Soil type classification": "metadata_instrument_depth_and_soil_type",
     "FRM classification": "metadata_frm_class",
 }
+METADATA_PLOT_NAMES = {
+    "Land cover classification": "metadata_lc_2010",
+    "Climate classification": "metadata_climate_KG",
+    "Soil type classification": "metadata_instrument_depth_and_soil_type",
+    "FRM classification": "metadata_frm_class",
+}
 
 TEMP_MATCH_WINDOW = ValidationRun.TEMP_MATCH_WINDOW
 
@@ -173,6 +219,25 @@ SCALING_METHODS = ValidationRun.SCALING_METHODS
 USER_DATASET_MIN_ID = 200
 USER_DATASET_VERSION_MIN_ID = 500
 USER_DATASET_VARIABLE_MIN_ID = 500
+
+# netcdf compression means
+IMPLEMENTED_COMPRESSIONS = qr_globals.IMPLEMENTED_COMPRESSIONS
+ALLOWED_COMPRESSION_LEVELS = qr_globals.ALLOWED_COMPRESSION_LEVELS
+
+# intra-annual metrics related
+DEFAULT_TSW = qr_globals.DEFAULT_TSW
+TEMPORAL_SUB_WINDOW_NC_COORD_NAME = qr_globals.TEMPORAL_SUB_WINDOW_NC_COORD_NAME
+
+
+# default temporal sub windows
+TEMPORAL_SUB_WINDOWS = qr_globals.TEMPORAL_SUB_WINDOWS
+
+# overlap parameter interval definiton
+OVERLAP_MIN = 0
+OVERLAP_MAX = 185
+
+# max amount of datasets that can be compared in one validation run
+MAX_NUM_DS_PER_VAL_RUN = qr_globals.MAX_NUM_DS_PER_VAL_RUN
 
 # netcdf compression means
 IMPLEMENTED_COMPRESSIONS = qr_globals.IMPLEMENTED_COMPRESSIONS

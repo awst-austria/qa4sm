@@ -72,6 +72,51 @@ class ReaderWithTsExtension:
 
         return ts
 
+class ReaderWithTsExtension:
+    """
+    Concatenate 2 time series upon reading
+    """
+    def __init__(self, cls, path, path_ext, *args, **kwargs):
+        """
+        Parameters
+        ----------
+        cls: Callable
+            Reader class to wrap
+        path: str
+            Path to the main time series (not the extension dataset)
+        path_ext: str
+            Extension time series path
+        args, kwargs:
+            Additional arguments to set up the readers
+        """
+        self.base_reader = cls(path, *args, **kwargs)
+        try:
+            self.ext_reader = cls(path_ext, *args, **kwargs)
+        except FileNotFoundError:
+            logging.error(f"No extension dataset found in path {path_ext}")
+            self.ext_reader = None
+
+    @property
+    def grid(self):
+        return self.base_reader.grid
+
+    def read(self, *args, **kwargs) -> pd.DataFrame:
+        """
+        Read time series at location for both the base dataset and the
+        extension. If extension is read, concatenate both in time.
+        """
+        ts = self.base_reader.read(*args, **kwargs)
+        try:
+            if self.ext_reader is not None:
+                ext = self.ext_reader.read(*args, **kwargs)
+                ts = pd.concat([ts, ext], axis=0)
+                ts = ts[~ts.index.duplicated(keep='last')]  # prefer ext. data
+        except Exception as e:
+            logging.error(f"Extension reading failed for {args} {kwargs} with"
+                          f"error: {e}")
+
+        return ts
+
 class SBPCAReader(GriddedNcOrthoMultiTs):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -119,6 +164,7 @@ def create_reader(dataset, version) -> GriddedNcTs:
 
     folder_name = path.join(dataset.storage_path, version.short_name)
     ext_folder_name = path.join(dataset.storage_path, version.short_name + '-ext', 'timeseries')
+    ext_folder_name = path.join(dataset.storage_path, version.short_name + '-ext', 'timeseries')
 
     if dataset.short_name == globals.ISMN:
         if path.isfile(path.join(folder_name, 'frm_classification.csv')):
@@ -134,6 +180,9 @@ def create_reader(dataset, version) -> GriddedNcTs:
                                 custom_meta_reader=custom_meta_readers)
 
     if dataset.short_name == globals.C3SC:
+        c3s_data_folder = path.join(folder_name, 'TCDR', '063_images_to_ts', 'combined-daily')
+        reader = ReaderWithTsExtension(C3STs, c3s_data_folder, ext_folder_name,
+                                       ioclass_kws={'read_bulk': True})
         c3s_data_folder = path.join(folder_name, 'TCDR', '063_images_to_ts', 'combined-daily')
         reader = ReaderWithTsExtension(C3STs, c3s_data_folder, ext_folder_name,
                                        ioclass_kws={'read_bulk': True})
@@ -165,8 +214,12 @@ def create_reader(dataset, version) -> GriddedNcTs:
     if dataset.short_name == globals.ERA5:
         reader = ReaderWithTsExtension(ERATs, folder_name, ext_folder_name,
                                        ioclass_kws={'read_bulk': True})
+        reader = ReaderWithTsExtension(ERATs, folder_name, ext_folder_name,
+                                       ioclass_kws={'read_bulk': True})
 
     if dataset.short_name == globals.ERA5_LAND:
+        reader = ReaderWithTsExtension(ERATs, folder_name, ext_folder_name,
+                                       ioclass_kws={'read_bulk': True})
         reader = ReaderWithTsExtension(ERATs, folder_name, ext_folder_name,
                                        ioclass_kws={'read_bulk': True})
 
@@ -180,6 +233,11 @@ def create_reader(dataset, version) -> GriddedNcTs:
         reader = SMOSTs(folder_name, ioclass_kws={'read_bulk': True})
 
     if dataset.short_name == globals.SMOS_L2:
+        reader = ReaderWithTsExtension(
+            SMOSL2Reader, folder_name, ext_folder_name,
+            ioclass_kws={'read_bulk': True},
+            grid=load_grid(path.join(folder_name, "grid.nc"))
+        )
         reader = ReaderWithTsExtension(
             SMOSL2Reader, folder_name, ext_folder_name,
             ioclass_kws={'read_bulk': True},

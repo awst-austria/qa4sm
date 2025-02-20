@@ -19,6 +19,7 @@ from api.views.comparison_view import get_comparison_table, get_comparison_plots
 from api.views.user_view import signup_post, user_update, user_delete, password_update
 from api.views.validation_run_view import published_results, my_results, validation_run_by_id, \
     custom_tracked_validation_runs, get_validations_for_comparison, get_copied_validations, is_validation_finished
+    custom_tracked_validation_runs, get_validations_for_comparison, get_copied_validations, is_validation_finished
 from api.views.dataset_configuration_view import dataset_configuration, dataset_configuration_by_validation
 from api.views.global_params_view import global_params
 from api.views.modify_validation_view import *
@@ -30,6 +31,7 @@ from api.views.support_request_view import *
 from api.views.custom_dataset_view import *
 from rest_framework.authtoken import views
 from api.views.autocleanup_view import run_auto_cleanup_script
+from api.views.signup_view import check_email
 
 # schema_view = get_schema_view(
 #     openapi.Info(
@@ -71,6 +73,7 @@ urlpatterns = [
     path('published-results', published_results, name='Published results'),
     re_path(r'^validation-runs/(?P<id>.+)$', validation_run_by_id, name='Validation run by id'),
     re_path(r'^is-validation-finished/(?P<id>.+)$', is_validation_finished, name='Is validation finished'),
+    re_path(r'^is-validation-finished/(?P<id>.+)$', is_validation_finished, name='Is validation finished'),
     path('dataset-configuration', dataset_configuration, name='Configuration'),
     re_path(r'^dataset-configuration/(?P<validation_id>.+)$', dataset_configuration_by_validation,
             name='Configuration'),
@@ -106,6 +109,7 @@ urlpatterns = [
     path('validation-runs-for-comparison', get_validations_for_comparison, name='Get validations for comparison'),
     path('country-list', get_list_of_countries, name='List of countries'),
     path('sign-up', signup_post, name='Sign up'),
+    re_path(r'^auth/check-email/(?P<email>[\w.@+-]+)$', check_email, name='check-email'),
     path('user-update', user_update, name='User update'),
     path('user-delete', user_delete, name='User delete'),
     path('settings', backend_settings, name="Settings"),
