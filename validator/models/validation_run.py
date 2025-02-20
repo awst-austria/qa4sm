@@ -77,6 +77,9 @@ class ValidationRun(models.Model):
     # intra-annual metrics
 
 
+    # intra-annual metrics
+
+
     # fields
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)

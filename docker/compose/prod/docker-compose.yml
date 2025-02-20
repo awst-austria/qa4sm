@@ -22,7 +22,7 @@ services:
     restart: always
 
   web:
-    image: "awst/qa4sm:2.8.0"
+    image: "awst/qa4sm:2.9.0"
     restart: always
     environment:
       POSTGRES_PASSWORD: "${POSTGRES_PASSWORD}"
@@ -32,6 +32,7 @@ services:
       QA4SM_DB_PASSWORD: "${QA4SM_DB_PASSWORD}"
       QA4SM_DB_HOST: "${QA4SM_DB_HOST}"
       QA4SM_DATA_FOLDER: "${QA4SM_DATA_FOLDER}"
+      QA4SM_INSTANCE: "${QA4SM_INSTANCE}"
 
     volumes:
       - type: bind
@@ -57,20 +58,21 @@ services:
         target: /var/lib/qa4sm-web-val/valentina/cronjob-scripts
 
   proxy:
-    image: "awst/qa4sm-proxy:2.8.0"
+    image: "awst/qa4sm-proxy:2.9.0"
     restart: always
     ports:
       - "8080:80"
   ui:
-    image: "awst/qa4sm-ui:2.8.0"
+    image: "awst/qa4sm-ui:2.9.0"
     restart: always
 
   worker-1:
-    image: "awst/qa4sm-worker:2.8.0"
+    image: "awst/qa4sm-worker:2.9.0"
     restart: always
     environment:
       QA4SM_DB_HOST: "${QA4SM_DB_HOST}"
       QA4SM_CELERY_WORKERS: "${QA4SM_WORKER_THREAD_PER_NODE}"
+      QA4SM_INSTANCE: "${QA4SM_INSTANCE}"
     volumes:
       - type: bind
         source: "${QA4SM_WORKSPACE}celery-w1/log"
