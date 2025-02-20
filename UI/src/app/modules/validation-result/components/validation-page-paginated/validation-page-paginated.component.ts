@@ -1,15 +1,14 @@
-import {Component, HostListener, Input, OnInit, signal, WritableSignal} from '@angular/core';
+import {Component, HostListener, Input, OnInit, signal} from '@angular/core';
 import {ValidationrunService} from '../../../core/services/validation-run/validationrun.service';
 import {ValidationrunDto} from '../../../core/services/validation-run/validationrun.dto';
 import {HttpParams} from '@angular/common/http';
 import {BehaviorSubject, EMPTY, Observable} from 'rxjs';
 import {catchError} from 'rxjs/operators';
-import {FilterPayload} from 'src/app/modules/validation-result/components/filtering-form/filterPayload.interface';
-import {FilterService} from 'src/app/modules/validation-result/services/filter.service';
-
 import {
-  FilteringFormComponent
-} from 'src/app/modules/validation-result/components/filtering-form/filtering-form.component';
+  FilterConfig,
+  FilterPayload
+} from 'src/app/modules/validation-result/components/filtering-form/filterPayload.interface';
+import {FilterService} from 'src/app/modules/validation-result/services/filter.service';
 import {DatasetService} from "../../../core/services/dataset/dataset.service";
 import {DatasetDto} from "../../../core/services/dataset/dataset.dto";
 
@@ -21,6 +20,8 @@ import {DatasetDto} from "../../../core/services/dataset/dataset.dto";
 export class ValidationPagePaginatedComponent implements OnInit {
   @Input() published: boolean;
   validations: ValidationrunDto[] = [];
+
+  valFilters: FilterConfig[] = [];
 
   maxNumberOfPages: number;
   currentPage = 1;
@@ -37,7 +38,6 @@ export class ValidationPagePaginatedComponent implements OnInit {
   endOfPage: boolean = false;
 
   filterPayload: FilterPayload;
-  validationFilters: WritableSignal<FilterPayload[]>;
   datasets$: Observable<DatasetDto[]>;
 
 
@@ -90,7 +90,7 @@ export class ValidationPagePaginatedComponent implements OnInit {
       .set('order', String(this.order));
 
     // Add filters from payload to query parameters
-    Object.entries(FilteringFormComponent.FILTER_CONFIGS).forEach(([key, config]) => {
+    Object.entries(this.valFilters).forEach(([key, config]) => {
       const values = this.filterPayload[config.backendField];
       if (values) {
         if (config.isArray && Array.isArray(values) && values.length > 0) {

@@ -5,8 +5,12 @@
       [validations]="validations"
       [selectedValidationsId$]="selectedValidations$"
       (selectionActive)="handleMultipleSelection($event)"
-      *ngIf="!published && !dataFetchError()"/>
+      *ngIf="!dataFetchError()"/>
+    <qa-filtering-form *ngIf="(validations.length || areFiltersApplied()) && !dataFetchError()"
+                       [availableDatasetsSignal]="datasets$"
+                       [(validationFilters)]="valFilters"/>
   </div>
+
 
   <div class="flex flex-column w-12 align-content-center justify-content-center">
     <!-- custom -->
@@ -37,10 +41,9 @@
       <qa-sorting-form (orderQueryName)="getOrder($event)"/>
     </div>
 
-    <div *ngIf="(validations.length || areFiltersApplied()) && !dataFetchError()" class="w-12">
-      <qa-filtering-form/>
-
-    </div>
+    <!--    <div *ngIf="(validations.length || areFiltersApplied()) && !dataFetchError()" class="w-12">-->
+    <!--      <qa-filtering-form [availableDatasetsSignal]="datasets$" [(validationFilters)]="valFilters"/>-->
+    <!--    </div>-->
 
     <!-- Rows -->
     <div *ngIf="validations.length" class="w-12 py-2">

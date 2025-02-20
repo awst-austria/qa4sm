@@ -4080,6 +4080,13 @@ div.carousel-caption {
   box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
 }
 
+.side-panel .p-panel .p-panel-header {
+  border: 1px solid #dee2e6;
+  background: transparent;
+  font-size: 1rem;
+  box-shadow: none;
+}
+
 .p-panel .p-panel-header .p-panel-title {
   font-size: 1.5rem;
   font-weight: 400;
@@ -4094,6 +4101,10 @@ div.carousel-caption {
   background: transparent;
   border-radius: 50%;
   transition: box-shadow 0.15s;
+}
+
+.side-panel .p-panel .p-panel-header .p-panel-header-icon {
+  color: #495057;
 }
 
 .p-panel .p-panel-header .p-panel-header-icon:enabled:hover {

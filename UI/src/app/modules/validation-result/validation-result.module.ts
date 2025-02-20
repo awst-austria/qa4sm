@@ -10,7 +10,7 @@ import {
 import {RouterModule} from '@angular/router';
 import {SortingFormComponent} from './components/sorting-form/sorting-form.component';
 import {DropdownModule} from 'primeng/dropdown';
-import { MultiSelectModule } from 'primeng/multiselect';
+import {MultiSelectModule} from 'primeng/multiselect';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {ValidationSummaryComponent} from './components/validation-summary/validation-summary.component';
 import {ButtonsComponent} from './components/buttons/buttons.component';
@@ -36,6 +36,7 @@ import {MenuModule} from 'primeng/menu';
 import {CoreModule} from '../core/core.module';
 import {FilteringFormComponent} from './components/filtering-form/filtering-form.component';
 import {CalendarModule} from 'primeng/calendar';
+import {AccordionModule} from "primeng/accordion";
 
 @NgModule({
   declarations: [ValidationrunRowComponent,
@@ -82,7 +83,8 @@ import {CalendarModule} from 'primeng/calendar';
         SelectButtonModule,
         ToggleButtonModule,
         MenuModule,
-        CoreModule
+        CoreModule,
+        AccordionModule
     ]
 })
 export class ValidationResultModule {
