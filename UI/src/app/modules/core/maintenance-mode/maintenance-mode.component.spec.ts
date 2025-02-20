@@ -1,20 +1,18 @@
 import {ComponentFixture, TestBed} from '@angular/core/testing';
 
-import {LoginPageComponent} from './login-page.component';
+import {MaintenanceModeComponent} from './maintenance-mode.component';
 
-describe('LoginPageComponent', () => {
-  let component: LoginPageComponent;
-  let fixture: ComponentFixture<LoginPageComponent>;
+describe('MaintenanceModeComponent', () => {
+  let component: MaintenanceModeComponent;
+  let fixture: ComponentFixture<MaintenanceModeComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ LoginPageComponent ]
+      imports: [MaintenanceModeComponent]
     })
     .compileComponents();
-  });
 
-  beforeEach(() => {
-    fixture = TestBed.createComponent(LoginPageComponent);
+    fixture = TestBed.createComponent(MaintenanceModeComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

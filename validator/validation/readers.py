@@ -190,7 +190,14 @@ def create_reader(dataset, version) -> GriddedNcTs:
         reader = GriddedNcOrthoMultiTs(folder_name, ioclass_kws={'read_bulk': True})
 
     if dataset.short_name == globals.SMOS_SBPCA:
-        reader = SBPCAReader(folder_name, ioclass_kws={'read_bulk': True})
+        if version.short_name == globals.SMOS_SBPCA_v724:
+            reader = SBPCAReader(folder_name, ioclass_kws={'read_bulk': True})
+        elif version.short_name == globals.V781_FinalMetrics:
+            reader = SMOSL2Reader(folder_name,
+                                  grid=load_grid(path.join(folder_name, "grid.nc")),
+                                  ioclass_kws={'read_bulk': True})
+        else:
+            raise NotImplementedError("Unknown version of SMOS_DPGS_RC_L2SM")
 
     if dataset.user and len(dataset.user_dataset.all()):
         file = UserDatasetFile.objects.get(dataset=dataset)
@@ -216,7 +223,8 @@ def adapt_timestamp(reader, dataset, version):
             'base_time_reference': '2000-01-01',
         }
 
-    elif dataset.short_name == globals.SMOS_SBPCA:
+    elif ((dataset.short_name == globals.SMOS_SBPCA) and
+          (version.short_name == globals.SMOS_SBPCA_v724)):
         tadapt_kwargs = {
             'base_time_field': 'acquisition_time',
             'base_time_reference': '2000-01-01T00:00:00',

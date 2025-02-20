@@ -1,15 +1,24 @@
-QA4SM v2.8.0 - Release notes 2024-07-12
+QA4SM v2.9.0 - Release notes 2025-02-10
 =======================================================
 
-# Updates
-1. Angular updated to the version 18;
-2. SMOS data new format applied - reader updated;
-3. All ISMN networks are preselected by default.;
+# New features
+1. Stability Metrics added
+2. Intra Annual Metrics added
+3. Automatic update of available data on the service
+
+# Improvements
+1. Information about potential maintenance added
+2. Fixture folder treated as a submodule
+3. New CCI version available
+4. ERA Land version name changed to the 'latest'
+5. Temporal matching window settings moved from the 'Temporal Subsetting' to the 'Reference' section
 
 # Fixes
-1. Validation auto-cleanup fixed;
-2. Cancelling validation fixed;
-3. Handling output file when aborting a validation fixed;
+1. Reloading settings fixed
+2. Frontend bugs related to coordinates input fields and anomalies input fields fixed 
+
+# Other changes
+1. Comparison module disabled temporarily
 
 
 

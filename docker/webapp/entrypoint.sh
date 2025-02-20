@@ -4,9 +4,11 @@ set -x
 APP_DIR="/var/lib/qa4sm-web-val/valentina"
 PGPASSWORD="$POSTGRES_PASSWORD"
 ADMIN_PASS="12admin34"
+QA4SM_INSTANCE="$QA4SM_INSTANCE"
 
 . /opt/miniconda/etc/profile.d/conda.sh
 conda activate /var/lib/qa4sm-web-val/virtenv
+pip install --no-deps smos==0.3.1
 export LD_LIBRARY_PATH=/var/lib/qa4sm-web-val/virtenv/lib
 python $APP_DIR/manage.py collectstatic --noinput
 
@@ -16,9 +18,13 @@ cd $APP_DIR
 git config --global --add safe.directory $APP_DIR
 git config --global --add safe.directory "$APP_DIR/validator/fixtures"
 
-git submodule update --init --recursive  validator/fixtures
+git submodule update --init --remote  validator/fixtures
+
 cd "validator/fixtures"
-git checkout main
+if [[ "$QA4SM_INSTANCE" == "TEST" ]]; then
+    git fetch origin
+    git switch test-branch || git checkout -b test-branch origin/test-branch
+fi
 
 cd $APP_DIR
 chown www-data:www-data -R "$APP_DIR/validator/fixtures"
@@ -46,16 +52,37 @@ done
 # wait for the db to initialize
 sleep 10s
 NEW_DB="FALSE"
-if psql -h qa4sm-db -p 5432 -U postgres -lqt | cut -d \| -f 1 | grep -qw $QA4SM_DB_NAME; then
+if psql -h qa4sm-db -p 5432 -U postgres -tAc "SELECT datname FROM pg_database" | grep -qw "$QA4SM_DB_NAME"; then
     echo "DB exists"
 else
 	echo "DB does not exist, let's create it..."
-	psql -h qa4sm-db -p 5432 -U postgres -q -c '\set ON_ERROR_STOP on' -c "CREATE DATABASE $QA4SM_DB_NAME;" -c "CREATE USER $QA4SM_DB_USER WITH ENCRYPTED PASSWORD '$QA4SM_DB_PASSWORD';" -c "GRANT ALL PRIVILEGES ON DATABASE $QA4SM_DB_NAME TO $QA4SM_DB_USER;"
+  psql -h qa4sm-db -p 5432 -U postgres -q -c '\set ON_ERROR_STOP on' \
+    -c "CREATE DATABASE $QA4SM_DB_NAME;" \
+    -c "CREATE USER $QA4SM_DB_USER WITH ENCRYPTED PASSWORD '$QA4SM_DB_PASSWORD';" \
+    -c "GRANT ALL PRIVILEGES ON DATABASE $QA4SM_DB_NAME TO $QA4SM_DB_USER;"
+
+  psql -h qa4sm-db -p 5432 -U postgres -q -d $QA4SM_DB_NAME -c '\set ON_ERROR_STOP on' \
+    -c "GRANT USAGE, CREATE ON SCHEMA public TO $QA4SM_DB_USER;"
 	echo "DB has been created."
   NEW_DB="TRUE"
 fi
 
-if psql -h qa4sm-db -p 5432 -U postgres -lqt | cut -d \| -f 1 | grep -qw $QA4SM_DB_NAME; then
+# Check if DB_UPDATE is true and upload the dump if necessary
+if [ "$DB_UPDATE" = "TRUE" ]; then
+    echo "Updating DB from dump..."
+    if [ -f "/var/lib/qa4sm-web-val/valentina/db_dump/$DB_DUMP_NAME" ]; then
+        psql -h qa4sm-db -p 5432 -U postgres -d $QA4SM_DB_NAME -q -f "/var/lib/qa4sm-web-val/valentina/db_dump/$DB_DUMP_NAME"
+        NEW_DB="FALSE"
+        echo "DB dump uploaded successfully."
+    else
+        echo "DB dump file not found: /var/lib/qa4sm-web-val/valentina/db_dump/$DB_DUMP_NAME"
+        exit 1
+    fi
+fi
+
+
+
+if psql -h qa4sm-db -p 5432 -U postgres -tAc "SELECT datname FROM pg_database" | grep -qw "$QA4SM_DB_NAME"; then
 		echo "Running migrations"
 		python $APP_DIR/manage.py migrate
     echo "Loading fixtures"

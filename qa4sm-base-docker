@@ -1,8 +1,8 @@
-FROM ubuntu:20.04
+FROM ubuntu:24.04
 ARG DEBIAN_FRONTEND=noninteractive
 ENV TZ=Europe/Vienna
 RUN apt-get update && apt-get install -y tzdata
 RUN apt-get update && apt-get -y install apt-utils
-RUN apt-get -y install curl gfortran libgeos-dev build-essential qt5-default rsync libproj-dev wget git
+RUN apt-get -y install curl gfortran libgeos-dev build-essential qtbase5-dev qt5-qmake rsync libproj-dev wget git
 ADD ./ /tmp/qa4sm-git
 RUN bash /tmp/qa4sm-git/docker/base/install.sh

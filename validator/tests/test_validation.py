@@ -1552,6 +1552,7 @@ class TestValidation(TestCase):
         assert ts3.index.size == ts3.index.drop_duplicates().size
 
     def test_readers(self):
+
         start_time = time.time()
 
         datasets = Dataset.objects.all()
@@ -1706,7 +1707,7 @@ class TestValidation(TestCase):
             assert exact_tstamp.index.shape == \
                    midnight_tstamp[~np.isnan(midnight_tstamp[field])].index.shape
             # Check the index type
-            assert exact_tstamp.index.dtype == np.dtype('<M8[ns]')
+            assert exact_tstamp.index.dtype == np.dtype('<M8[s]')
             # Check that the offset field is not in the output
             assert field not in exact_tstamp.columns
 

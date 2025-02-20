@@ -10,6 +10,7 @@ import {map} from 'rxjs/operators';
 import {ToastService} from '../../core/services/toast/toast.service';
 import {UserData} from '../../core/services/form-interfaces/UserDataForm';
 import {CustomHttpError} from '../../core/services/global/http-error.service';
+import {SettingsService} from "../../core/services/global/settings.service";
 
 
 export function emailUniquenessValidator(authService: AuthService, currentEmail?: string): AsyncValidatorFn {
@@ -52,6 +53,7 @@ export class UserFormComponent implements OnInit {
   selectedCountry: CountryDto;
   formErrors: any;
   sliderValues = [];
+  maintenanceMode = false;
 
   signUpObserver = {
     next: () => this.onSignUpNext(),
@@ -76,7 +78,8 @@ export class UserFormComponent implements OnInit {
               private formBuilder: FormBuilder,
               private userService: AuthService,
               private router: Router,
-              private toastService: ToastService) {
+              private toastService: ToastService,
+              private settingsService: SettingsService) {
   }
 
   ngOnInit(): void {
@@ -89,6 +92,9 @@ export class UserFormComponent implements OnInit {
     }
     this.userForm.get('honeypot').valueChanges.subscribe(value => {
       this.handleSliderChange(value);
+    });
+    this.settingsService.getAllSettings().subscribe(setting => {
+      this.maintenanceMode = setting[0].maintenance_mode;
     });
   }
 
@@ -125,6 +131,8 @@ export class UserFormComponent implements OnInit {
   setDefaultValues(): void {
     this.userForm.patchValue(this.userData)
     this.userForm.controls.username.disable();
+    this.userForm.controls.password1.disable();
+    this.userForm.controls.password2.disable();
     this.userForm.controls.terms_consent.setValue(true);
   }
 
@@ -151,5 +159,8 @@ export class UserFormComponent implements OnInit {
     this.sliderValues.push(value)
   }
 
+  redirectToSetPassword(){
+    this.router.navigate(['/set-password'])
+  }
 
 }

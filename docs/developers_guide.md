@@ -156,6 +156,11 @@ Change into your cloned qa4sm directory and create an environment with:
 
     conda env create -f environment/qa4sm_env.yml -n valentina
 
+Please note, that due to the dependency conflicts it might be necessary to install the newest version of some packages separately. 
+Currently, it refers only to the smos package, so after creating conda, please install also the newest version of smos
+    
+    pip install --no-deps smos==0.3.1
+
 Then activate it with:
 
     conda activate valentina
@@ -220,7 +225,7 @@ Start a celery worker with the shell script:
 
 Run the following:
 
-    python manage.py runserver
+    python manage.py runserver 0.0.0.0:8000
 
 Check the output of this command for the URL to point your browser to - e.g. <http://127.0.0.1:8000/>.
 
