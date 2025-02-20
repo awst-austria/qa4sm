@@ -10,8 +10,6 @@ import {GlobalParamsService} from '../../../core/services/global/global-params.s
 import {ToastService} from '../../../core/services/toast/toast.service';
 import {CustomHttpError} from '../../../core/services/global/http-error.service';
 
-import {ValidationRunConfigService} from 'src/app/pages/validate/service/validation-run-config.service'
-
 @Component({
   selector: 'qa-buttons',
   templateUrl: './buttons.component.html',
@@ -46,8 +44,7 @@ export class ButtonsComponent implements OnInit {
               private validationService: ValidationrunService,
               public authService: AuthService,
               public globals: GlobalParamsService,
-              private toastService: ToastService,
-              private validationRunConfigService: ValidationRunConfigService) {
+              private toastService: ToastService) {
   }
 
   ngOnInit(): void {
