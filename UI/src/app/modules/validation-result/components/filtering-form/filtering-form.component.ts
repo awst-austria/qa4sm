@@ -1,4 +1,4 @@
-import {Component, input, OnInit} from '@angular/core';
+import {Component, input, model, OnInit} from '@angular/core';
 import {FilterConfig, FilterPayload} from './filterPayload.interface';
 
 import {DatasetDto} from 'src/app/modules/core/services/dataset/dataset.dto';
@@ -18,8 +18,11 @@ interface FilterState {
 })
 export class FilteringFormComponent implements OnInit {
 
-  public static readonly FILTER_CONFIGS: { [key: string]: FilterConfig } = {
-    'Status': {
+  validationFilters = model<FilterConfig[]>()
+  availableDatasetsSignal = input<Observable<DatasetDto[]>>();
+
+  public readonly FILTER_CONFIGS: FilterConfig[]  = [
+    {
       name: 'Status',
       type: 'multi-select',
       options: ['Done', 'ERROR', 'Cancelled', 'Running', 'Scheduled'], // at some point it should be fetched from backend
@@ -28,7 +31,7 @@ export class FilteringFormComponent implements OnInit {
       backendField: 'statuses',
       isArray: true
     },
-    'Validation Name': {
+    {
       name: 'Validation Name',
       type: 'string-input',
       validationFn: (state: FilterState) => true,
@@ -36,7 +39,7 @@ export class FilteringFormComponent implements OnInit {
       backendField: 'name',
       isArray: false
     },
-    'Submission Date': {
+    {
       name: 'Submission Date',
       type: 'date-input',
       validationFn: (state: FilterState) => true,
@@ -47,8 +50,8 @@ export class FilteringFormComponent implements OnInit {
       backendField: 'start_time',
       isArray: false
     },
-    'Spatial Reference Dataset': {
-      name: 'Spatial ref dataset',
+    {
+      name: 'Spatial Reference Dataset',
       type: 'multi-select',
       options: [],
       validationFn: (state: FilterState) => {return Array.isArray(state?.value) && state.value.length > 0},
@@ -56,16 +59,16 @@ export class FilteringFormComponent implements OnInit {
       backendField: 'spatialRef',
       isArray: true
     },
-    'Temporal Reference Dataset': {
-      name: 'Temporal ref dataset',
+  {
+      name: 'Temporal Reference Dataset',
       type: 'multi-select',
       options: [],
       validationFn: (state: FilterState) => {return Array.isArray(state?.value) && state.value.length > 0},
       formatValuesFn: (state: FilterState) => state.value,
       backendField: 'temporalRef',
       isArray: true
-    },
-    'Scaling Reference Dataset': {
+  },
+  {
       name: 'Scaling ref dataset',
       type: 'multi-select',
       options: [],
@@ -74,11 +77,11 @@ export class FilteringFormComponent implements OnInit {
       backendField: 'scalingRef',
       isArray: true
     }
-  };
+  ];
 
-  availableDatasetsSignal = input<Observable<DatasetDto[]>>();
+
   availableDatasets: string[] = [];
-  allFilters = Object.keys(FilteringFormComponent.FILTER_CONFIGS);
+  allFilters = Object.keys(this.FILTER_CONFIGS);
   availableFilters = [...this.allFilters];
 
   selectedFilterKey: string | null = null; // key of filter config
@@ -92,7 +95,7 @@ export class FilteringFormComponent implements OnInit {
 
 
   constructor(private filterService: FilterService) {
-    Object.keys(FilteringFormComponent.FILTER_CONFIGS).forEach(key => {
+    Object.keys(this.FILTER_CONFIGS).forEach(key => {
       this.filterStates[key] = {
         value: null,
       };
@@ -102,6 +105,7 @@ export class FilteringFormComponent implements OnInit {
 
 
   ngOnInit(): void {
+    this.validationFilters.set(this.FILTER_CONFIGS)
     this.fetchPrettyNames();
   }
 
@@ -112,9 +116,9 @@ export class FilteringFormComponent implements OnInit {
         this.availableDatasets = datasets
           .map(dataset => dataset.pretty_name)
 
-        FilteringFormComponent.FILTER_CONFIGS['Spatial Reference Dataset'].options = this.availableDatasets;  // should change these so not hardcoded
-        FilteringFormComponent.FILTER_CONFIGS['Temporal Reference Dataset'].options = this.availableDatasets;
-        FilteringFormComponent.FILTER_CONFIGS['Scaling Reference Dataset'].options = this.availableDatasets;
+        this.FILTER_CONFIGS['Spatial Reference Dataset'].options = this.availableDatasets;  // should change these so not hardcoded
+        this.FILTER_CONFIGS['Temporal Reference Dataset'].options = this.availableDatasets;
+        this.FILTER_CONFIGS['Scaling Reference Dataset'].options = this.availableDatasets;
       },
       error: (error) => {
         console.error('Error fetching datasets:', error);
@@ -125,20 +129,20 @@ export class FilteringFormComponent implements OnInit {
 
   get filterConfigs() {
     // get the filters
-    return FilteringFormComponent.FILTER_CONFIGS;
+    return this.FILTER_CONFIGS;
   }
 
   isFilterValid(): boolean {
     // check the validity of the given filter input using its validation function
     if (!this.selectedFilterKey) return false;
-    return FilteringFormComponent.FILTER_CONFIGS[this.selectedFilterKey]
+    return this.FILTER_CONFIGS[this.selectedFilterKey]
       .validationFn(this.filterStates[this.selectedFilterKey]);
   }
 
   addFilter() {
     // Check if filter is valid and add it to active filters
     if (!this.isFilterValid()) return;
-    const config = FilteringFormComponent.FILTER_CONFIGS[this.selectedFilterKey];
+    const config = this.FILTER_CONFIGS[this.selectedFilterKey];
     const filterValues = config.formatValuesFn(this.filterStates[this.selectedFilterKey]);
 
     this.updateActiveFilters(filterValues);
@@ -221,7 +225,7 @@ export class FilteringFormComponent implements OnInit {
 
   updateDropdownFilters() {
     // update dropdown filter list to show filters that are not active
-    const availableFilters = Object.keys(FilteringFormComponent.FILTER_CONFIGS)
+    const availableFilters = Object.keys(this.FILTER_CONFIGS)
     .filter(filter => {
       return (this.isEditing && filter === this.selectedFilterKey) ||
              !this.activeFilters.some(af => af.filter === filter);

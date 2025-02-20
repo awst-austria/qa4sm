@@ -1,5 +1,5 @@
 <div *ngIf="!showFilterForm" class="flex justify-content-start">
-    <p-button 
+    <p-button
       label="+ Add Filter"
       (click)="showFilterForm = true"
       [style]="{'height': '40px'}">
@@ -16,17 +16,16 @@
     <div class="lg:w-4 w-12">
       <p-dropdown
         id="filterVarSelector"
-        [options]="dropdownFilters"
+        [options]="FILTER_CONFIGS"
         [(ngModel)]="selectedFilterKey"
         placeholder="Select a filter"
-        optionLabel="label"
-        optionValue="value"
+        optionLabel="name"
         [style]="{'width': '100%', 'border-radius': '0 0 0 0', 'height': '42px'}" >
       </p-dropdown>
-    </div>  
+    </div>
 
   <div *ngIf="!selectedFilterKey" class="lg:w-4 w-12">
-      <p-multiSelect 
+      <p-multiSelect
       placeholder="Filter parameters"
       display="chip"
       [disabled]="true"
@@ -36,7 +35,7 @@
   </div>
 
   <ng-container [ngSwitch]="filterConfigs[selectedFilterKey]?.type" class="lg:w-4 w-12" id="filterParamSelector">
-    
+
     <p-multiSelect *ngSwitchCase="'multi-select'"
       [options]="filterConfigs[selectedFilterKey].options"
       [(ngModel)]="filterStates[selectedFilterKey].value"
@@ -49,7 +48,7 @@
       [(ngModel)]="filterStates[selectedFilterKey].value"
       placeholder="Enter name"
       [style]="{'width': '100%', 'border-radius': '0 0 0 0', 'height': '42px'}" />
-    
+
     <p-dropdown *ngSwitchCase="'dropdown'"
       [options]="filterConfigs[selectedFilterKey].options"
       [(ngModel)]="filterStates[selectedFilterKey].value"/>
