@@ -1,13 +1,17 @@
-import {Component, HostListener, Input, OnInit, signal} from '@angular/core';
+import {Component, HostListener, Input, OnInit, signal, WritableSignal} from '@angular/core';
 import {ValidationrunService} from '../../../core/services/validation-run/validationrun.service';
 import {ValidationrunDto} from '../../../core/services/validation-run/validationrun.dto';
 import {HttpParams} from '@angular/common/http';
-import {BehaviorSubject, combineLatest, EMPTY, forkJoin, Observable} from 'rxjs';
-import {catchError, map} from 'rxjs/operators';
-import {FilterPayload, FilterConfig} from 'src/app/modules/validation-result/components/filtering-form/filterPayload.interface';
+import {BehaviorSubject, EMPTY, Observable} from 'rxjs';
+import {catchError} from 'rxjs/operators';
+import {FilterPayload} from 'src/app/modules/validation-result/components/filtering-form/filterPayload.interface';
 import {FilterService} from 'src/app/modules/validation-result/services/filter.service';
 
-import {FilteringFormComponent} from 'src/app/modules/validation-result/components/filtering-form/filtering-form.component';
+import {
+  FilteringFormComponent
+} from 'src/app/modules/validation-result/components/filtering-form/filtering-form.component';
+import {DatasetService} from "../../../core/services/dataset/dataset.service";
+import {DatasetDto} from "../../../core/services/dataset/dataset.dto";
 
 @Component({
   selector: 'qa-validation-page-paginated',
@@ -32,12 +36,16 @@ export class ValidationPagePaginatedComponent implements OnInit {
   orderChange: boolean = false;
   endOfPage: boolean = false;
 
-  filterPayload: FilterPayload; 
+  filterPayload: FilterPayload;
+  validationFilters: WritableSignal<FilterPayload[]>;
+  datasets$: Observable<DatasetDto[]>;
+
 
   dataFetchError = signal(false);
 
 
-  constructor(private validationrunService: ValidationrunService, 
+  constructor(private validationrunService: ValidationrunService,
+              private datasetService: DatasetService,
               private filterService: FilterService) {
     //initialise empty filterPayload with empty array or null for filters with/without isArray
     this.filterService.filterState$.subscribe(filters => {
@@ -46,9 +54,9 @@ export class ValidationPagePaginatedComponent implements OnInit {
       this.getValidationsAndItsNumber(this.published);
     });
   }
-  
 
   ngOnInit(): void {
+    this.datasets$ = this.datasetService.getAllDatasets(true, false)
     this.getValidationsAndItsNumber(this.published);
     this.validationrunService.doRefresh$.subscribe(value => {
       if (value && value !== 'page') {
@@ -115,12 +123,12 @@ export class ValidationPagePaginatedComponent implements OnInit {
           });
     }
   }
-  
+
   handleFetchedValidations(serverResponse: { validations: ValidationrunDto[]; length: number; }): void {
     const {validations, length} = serverResponse;
-    
+
     this.maxNumberOfPages = Math.ceil(length / this.limit);
-  
+
     if (this.orderChange) {
       this.validations = validations;
     } else {
@@ -240,10 +248,10 @@ export class ValidationPagePaginatedComponent implements OnInit {
     if (!this.filterPayload) {
       return false;
     }
-    
+
     return (
-      this.filterPayload.statuses.length > 0 || 
-      this.filterPayload.name !== null 
+      this.filterPayload.statuses.length > 0 ||
+      this.filterPayload.name !== null
       //(this.filterPayload.prettyName && this.filterPayload.prettyName.length > 0)
     );
   }

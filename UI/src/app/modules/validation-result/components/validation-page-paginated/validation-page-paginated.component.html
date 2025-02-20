@@ -47,24 +47,26 @@
       <div *ngIf="!(isLoading && orderChange)">
         <div *ngFor="let valrun of validations"
              class="validation-row-area">
-        <!--- <div *ngIf="rowVisibility.get(valrun.id) !== undefined ? rowVisibility.get(valrun.id) : true" class="validation-row-area"> --->
-        <div class="validation-row-area">
+          <!--- <div *ngIf="rowVisibility.get(valrun.id) !== undefined ? rowVisibility.get(valrun.id) : true" class="validation-row-area"> --->
+          <div class="validation-row-area">
 
-          <p-checkbox
-            class="modify-checkbox"
-            *ngIf="(selectionActive$|async)"
-            [disabled]="!checkIfEnabled(valrun)"
-            [value]="valrun.id"
-            [ngModel]="selectedValidations$ | async"
-            (ngModelChange)="updateSelectedValidations($event, valrun.id)"
-            [pTooltip]="!checkIfEnabled(valrun) ? 'This validation cannot be selected for current action' : null"
-            inputId="{{valrun.id}}}">
-          </p-checkbox>
-          <qa-validationrun-row [published]=published
-                                [validationRun]="valrun"
-                                (emitError)="dataFetchError.set($event)"/>
-          <br/>
-        </div>
+            <p-checkbox
+              class="modify-checkbox"
+              *ngIf="(selectionActive$|async)"
+              [disabled]="!checkIfEnabled(valrun)"
+              [value]="valrun.id"
+              [ngModel]="selectedValidations$ | async"
+              (ngModelChange)="updateSelectedValidations($event, valrun.id)"
+              [pTooltip]="!checkIfEnabled(valrun) ? 'This validation cannot be selected for current action' : null"
+              inputId="{{valrun.id}}}">
+            </p-checkbox>
+            <qa-validationrun-row
+              [datasets]="datasets$"
+              [published]=published
+              [validationRun]="valrun"
+              (emitError)="dataFetchError.set($event)"/>
+            <br/>
+          </div>
         </div>
       </div>
 
@@ -78,7 +80,8 @@
         <em> You have run {{ validations.length }} {{ validations.length === 1 ? 'validation ' : 'validations' }}.</em>
       </div>
       <div *ngIf="endOfPage && !published && areFiltersApplied()" class="val-number-information">
-        <em> Showing {{  validations.length }} {{ validations.length === 1 ? 'validation ' : 'validations' }} that {{ validations.length === 1 ? 'meets ' : 'meet' }} the filter criteria.</em>
+        <em> Showing {{ validations.length }} {{ validations.length === 1 ? 'validation ' : 'validations' }}
+          that {{ validations.length === 1 ? 'meets ' : 'meet' }} the filter criteria.</em>
       </div>
     </div>
 
