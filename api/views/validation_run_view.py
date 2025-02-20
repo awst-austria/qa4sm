@@ -113,7 +113,7 @@ def my_results(request):
         val_runs = val_runs.filter(name_tag__icontains=filter_name)
 
     if filter_statuses:
-        status_filters = filter_by_job_statuses(filter_statuses)
+        status_filters = filter_by_validation_statuses(filter_statuses)
         val_runs = val_runs.filter(status_filters)
 
 
@@ -213,10 +213,10 @@ def is_validation_finished(request, **kwargs):
     ifFinished = (val_run.progress == 100 and val_run.end_time is not None)
     return JsonResponse({'validation_complete': ifFinished}, status=status.HTTP_200_OK)
 
-def filter_by_job_statuses(job_statuses):
+def filter_by_validation_statuses(validation_statuses):
     #Horrible code to apply set of job status filters.
     status_filters = Q()
-    for status in job_statuses:
+    for status in validation_statuses:
         if status == 'Scheduled':
             status_filters |= Q(progress=0, end_time__isnull=True)
         elif status == 'Done':
