@@ -1,9 +1,9 @@
-import {Component, EventEmitter, OnInit, Output } from '@angular/core';
-import { FilterPayload, FilterConfig } from './filterPayload.interface';
+import {Component, input, OnInit} from '@angular/core';
+import {FilterConfig, FilterPayload} from './filterPayload.interface';
 
 import {DatasetDto} from 'src/app/modules/core/services/dataset/dataset.dto';
-import {DatasetService} from 'src/app/modules/core/services/dataset/dataset.service';
 import {FilterService} from 'src/app/modules/validation-result/services/filter.service';
+import {Observable} from "rxjs";
 
 interface FilterState {
   // contains the runtime values of filters
@@ -22,14 +22,14 @@ export class FilteringFormComponent implements OnInit {
     'Status': {
       name: 'Status',
       type: 'multi-select',
-      options: ['Done', 'ERROR', 'Cancelled', 'Running', 'Scheduled'],
+      options: ['Done', 'ERROR', 'Cancelled', 'Running', 'Scheduled'], // at some point it should be fetched from backend
       validationFn: (state: FilterState) => {return Array.isArray(state?.value) && state.value.length > 0},
       formatValuesFn: (state: FilterState) => state.value,
       backendField: 'statuses',
       isArray: true
     },
     'Validation Name': {
-      name: 'Validation Name', 
+      name: 'Validation Name',
       type: 'string-input',
       validationFn: (state: FilterState) => true,
       formatValuesFn: (state: FilterState) => [state.value],
@@ -37,7 +37,7 @@ export class FilteringFormComponent implements OnInit {
       isArray: false
     },
     'Submission Date': {
-      name: 'Submission Date', 
+      name: 'Submission Date',
       type: 'date-input',
       validationFn: (state: FilterState) => true,
       formatValuesFn: (state: FilterState) => {
@@ -48,7 +48,7 @@ export class FilteringFormComponent implements OnInit {
       isArray: false
     },
     'Spatial Reference Dataset': {
-      name: 'Spatial ref dataset', 
+      name: 'Spatial ref dataset',
       type: 'multi-select',
       options: [],
       validationFn: (state: FilterState) => {return Array.isArray(state?.value) && state.value.length > 0},
@@ -57,7 +57,7 @@ export class FilteringFormComponent implements OnInit {
       isArray: true
     },
     'Temporal Reference Dataset': {
-      name: 'Temporal ref dataset', 
+      name: 'Temporal ref dataset',
       type: 'multi-select',
       options: [],
       validationFn: (state: FilterState) => {return Array.isArray(state?.value) && state.value.length > 0},
@@ -66,7 +66,7 @@ export class FilteringFormComponent implements OnInit {
       isArray: true
     },
     'Scaling Reference Dataset': {
-      name: 'Scaling ref dataset', 
+      name: 'Scaling ref dataset',
       type: 'multi-select',
       options: [],
       validationFn: (state: FilterState) => {return Array.isArray(state?.value) && state.value.length > 0},
@@ -75,24 +75,23 @@ export class FilteringFormComponent implements OnInit {
       isArray: true
     }
   };
-  
-  //@Output() filterPayload =  new EventEmitter<FilterPayload>();
 
+  availableDatasetsSignal = input<Observable<DatasetDto[]>>();
   availableDatasets: string[] = [];
   allFilters = Object.keys(FilteringFormComponent.FILTER_CONFIGS);
   availableFilters = [...this.allFilters];
 
   selectedFilterKey: string | null = null; // key of filter config
   activeFilters: { filter: string, values: string[] }[] = []; // active filters and their values
-  filterStates: { [key: string]: FilterState } = {}; // current/runtime values of filters 
+  filterStates: { [key: string]: FilterState } = {}; // current/runtime values of filters
   dropdownFilters: { label: string, value: string }[] = []; // filters still available after applied ones are removed from list
 
   showFilterForm: boolean = false;
-  isEditing: boolean = false; //to define if editing filter, required to properly show filter in dropdown when editing active filter 
+  isEditing: boolean = false; //to define if editing filter, required to properly show filter in dropdown when editing active filter
 
 
 
-  constructor(private filterService: FilterService, private datasetService: DatasetService) {
+  constructor(private filterService: FilterService) {
     Object.keys(FilteringFormComponent.FILTER_CONFIGS).forEach(key => {
       this.filterStates[key] = {
         value: null,
@@ -108,13 +107,13 @@ export class FilteringFormComponent implements OnInit {
 
   private fetchPrettyNames(): void {
     // get all dataset names to provide list for filter choice
-    this.datasetService.getAllDatasets().subscribe({
+    this.availableDatasetsSignal().subscribe({
       next: (datasets: DatasetDto[]) => {
         this.availableDatasets = datasets
           .map(dataset => dataset.pretty_name)
-          .filter((name, index, self) => name && self.indexOf(name) === index); 
+          .filter((name, index, self) => name && self.indexOf(name) === index);
 
-        FilteringFormComponent.FILTER_CONFIGS['Spatial Reference Dataset'].options = this.availableDatasets;  // should change these so not hardcoded 
+        FilteringFormComponent.FILTER_CONFIGS['Spatial Reference Dataset'].options = this.availableDatasets;  // should change these so not hardcoded
         FilteringFormComponent.FILTER_CONFIGS['Temporal Reference Dataset'].options = this.availableDatasets;
         FilteringFormComponent.FILTER_CONFIGS['Scaling Reference Dataset'].options = this.availableDatasets;
       },
@@ -142,7 +141,7 @@ export class FilteringFormComponent implements OnInit {
     if (!this.isFilterValid()) return;
     const config = FilteringFormComponent.FILTER_CONFIGS[this.selectedFilterKey];
     const filterValues = config.formatValuesFn(this.filterStates[this.selectedFilterKey]);
-    
+
     this.updateActiveFilters(filterValues);
     this.onFilteringChange();
     this.resetFilterState();
@@ -155,19 +154,19 @@ export class FilteringFormComponent implements OnInit {
     const existingIndex = this.activeFilters
       .findIndex(f => f.filter === this.selectedFilterKey);
     if (existingIndex !== -1) {
-      this.activeFilters[existingIndex].values = filterValues; 
+      this.activeFilters[existingIndex].values = filterValues;
     } else {
-      this.activeFilters.push({ 
+      this.activeFilters.push({
         filter: String(this.selectedFilterKey),
-        values: filterValues 
+        values: filterValues
       });
     }
   }
 
   private resetFilterState() {
     // reset filter state after successfully adding filter
-    this.filterStates[this.selectedFilterKey] = { 
-      value: null, 
+    this.filterStates[this.selectedFilterKey] = {
+      value: null,
     };
     this.selectedFilterKey = null;
     this.showFilterForm = false;
@@ -179,7 +178,7 @@ export class FilteringFormComponent implements OnInit {
     return filter ? filter.values : [];
   }
 
-  onFilteringChange(): void { 
+  onFilteringChange(): void {
     // build filter payload and emit to validation page component
 
     //////// neeeds to be made more generic ///////////
@@ -209,15 +208,15 @@ export class FilteringFormComponent implements OnInit {
     this.showFilterForm = true;
     const filterToEdit = this.activeFilters[index];
     this.selectedFilterKey = filterToEdit.filter;
-    this.updateDropdownFilters(); 
+    this.updateDropdownFilters();
   }
 
   removeFilter(index: number) {
     // remove filter from active filters and add it back to available filters to update dropdown list
-    const removedFilter = this.activeFilters[index]; 
-    this.availableFilters.push(this.activeFilters[index].filter); 
-    this.activeFilters.splice(index, 1); 
-    this.updateDropdownFilters(); 
+    const removedFilter = this.activeFilters[index];
+    this.availableFilters.push(this.activeFilters[index].filter);
+    this.activeFilters.splice(index, 1);
+    this.updateDropdownFilters();
     this.onFilteringChange()
   }
 
@@ -225,7 +224,7 @@ export class FilteringFormComponent implements OnInit {
     // update dropdown filter list to show filters that are not active
     const availableFilters = Object.keys(FilteringFormComponent.FILTER_CONFIGS)
     .filter(filter => {
-      return (this.isEditing && filter === this.selectedFilterKey) || 
+      return (this.isEditing && filter === this.selectedFilterKey) ||
              !this.activeFilters.some(af => af.filter === filter);
     });
 
