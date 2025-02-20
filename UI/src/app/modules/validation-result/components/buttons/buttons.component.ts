@@ -163,26 +163,6 @@ export class ButtonsComponent implements OnInit {
     this.validationService.downloadResultFile(validationId, fileType, fileName);
   }
 
-  downloadValidationConfiguration(validationId: string): void {
-    this.validationRunConfigService.getValidationConfig(validationId).subscribe((data) => {
-      const blob = new Blob([JSON.stringify(data, null, 2)], {type: 'application/json'});
-
-      // Create a URL for the Blob
-      const url = URL.createObjectURL(blob);
-      console.log(blob)
-      // Create an anchor element and trigger a download
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `validation-config-${validationId}.json`;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-
-      // Clean up the URL object
-      URL.revokeObjectURL(url);
-    });
-  }
-
   addValidation(validationId: string): void {
     this.validationService.addValidation(validationId).subscribe(this.addValidationObserver);
   }

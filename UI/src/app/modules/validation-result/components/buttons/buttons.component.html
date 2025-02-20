@@ -70,15 +70,6 @@
         <button pButton
                 type="button"
                 class="dropdown-item"
-                icon="pi pi-download"
-                label="Download validation config"
-                (click)="downloadValidationConfiguration(validationRun.id)"
-                pTooltip="Download validation configuration as a .json file"
-                [life]="globals.tooltipLifetime">
-        </button>
-        <button pButton
-                type="button"
-                class="dropdown-item"
                 label="Download NetCDF File"
                 (click)="downloadResultFile(validationRun.id, 'netCDF', validationRun.output_file_name)"
                 pTooltip="Download validation run results as a .nc file"
