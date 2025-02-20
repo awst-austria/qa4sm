@@ -12,11 +12,6 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.AddField(
-            model_name='datasetversion',
-            name='usage_count',
-            field=models.IntegerField(default=0),
-        ),
-        migrations.AddField(
             model_name='validationrun',
             name='isRemoved',
             field=models.BooleanField(default=False),
@@ -25,10 +20,5 @@ class Migration(migrations.Migration):
             model_name='validationrun',
             name='status',
             field=models.CharField(choices=[('DONE', 'Done'), ('SCHEDULED', 'Scheduled'), ('ERROR', 'Error'), ('RUNNING', 'Running'), ('CANCELLED', 'Cancelled')], default='SCHEDULED', max_length=10),
-        ),
-        migrations.AlterField(
-            model_name='usermanual',
-            name='file',
-            field=models.FileField(blank=True, null=True, storage=django.core.files.storage.FileSystemStorage(location='DOCS_DIR'), upload_to='./user_manual'),
         ),
     ]
