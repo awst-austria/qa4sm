@@ -111,7 +111,6 @@ export class FilteringFormComponent implements OnInit {
       next: (datasets: DatasetDto[]) => {
         this.availableDatasets = datasets
           .map(dataset => dataset.pretty_name)
-          .filter((name, index, self) => name && self.indexOf(name) === index);
 
         FilteringFormComponent.FILTER_CONFIGS['Spatial Reference Dataset'].options = this.availableDatasets;  // should change these so not hardcoded
         FilteringFormComponent.FILTER_CONFIGS['Temporal Reference Dataset'].options = this.availableDatasets;
