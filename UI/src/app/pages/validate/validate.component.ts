@@ -91,7 +91,6 @@ export class ValidateComponent implements OnInit, AfterViewInit {
   defMinLat = 34.0;
 
   highlightedDataset: DatasetConfigModel;
-  logInToValidate = false;
 
   getValidationConfigObserver = {
     next: valrun => this.onGetValidationConfigNext(valrun),
@@ -728,6 +727,13 @@ export class ValidateComponent implements OnInit, AfterViewInit {
   }
 
   public startValidation(checkForExistingValidation: boolean): void {
+    
+    if (!this.authService.authenticated.value) {
+      this.toastService.showErrorWithHeader('Cannot start validation', 'You must be logged in to start a validation.');
+      this.authService.switchLoginModal(true, 'Please log in to start validation');
+      return;
+    }
+
     // prepare the dataset dtos (dataset, version, variable and filter settings)
     const datasets: ValidationRunDatasetConfigDto[] = [];
     this.validationModel.datasetConfigurations.forEach(datasetConfig => {
@@ -786,15 +792,7 @@ export class ValidateComponent implements OnInit, AfterViewInit {
     if (this.authService.authenticated.getValue()) {
       const validationErrorMessage = this.messageAboutValidationErrors(error);
       this.toastService.showErrorWithHeader('Error', 'Your validation could not be started. \n\n' + validationErrorMessage);
-    } else {
-      this.logInToValidate = !this.authService.authenticated.getValue();
-    }
-  }
-
-  setLoggedIn(): void {
-    this.authService.authenticated.subscribe(authenticated => {
-      this.logInToValidate = !authenticated;
-    });
+    } 
   }
 
   setDefaultGeographicalRange(): void {

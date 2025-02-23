@@ -4259,6 +4259,62 @@ div.carousel-caption {
   border: 1px solid rgba(0, 0, 0, 0.2);
 }
 
+.p-dialog.login-dialog {
+  &.home-page-modal {
+    .p-dialog-content {
+      background-color: $main-page-color-3;
+      a {
+        color: white;
+
+        &:hover {
+          color: $button-hover-color;
+        }
+      }
+    }
+    .p-dialog-header {
+      background-color: $main-page-color-1;
+      border-bottom-color: $main-page-color-1;
+    }
+
+    .p-float-label label {
+      color: $main-page-color-2;
+    }
+
+    .p-button {
+      background-color: $main-page-color-1;
+      color: white;
+
+      &:hover {
+        background-color: $button-hover-color;
+      }
+    }
+  }
+
+  .p-dialog-content {
+      min-width: 450px;
+      min-height: 350px;
+      padding: 2rem;
+  }
+
+  .p-dialog-header {
+      padding: 1.5rem;
+  }
+
+  form {
+      width: 100%;
+
+      .p-float-label {
+          margin-bottom: 1.5rem;
+      }
+
+      .p-button {
+          width: 100%;
+          margin-top: 1rem;
+      }
+  }
+}
+
+
 #ismn-depth-selector .p-dialog {
   width: 550px;
 }
