@@ -83,25 +83,25 @@ def my_results(request):
     start_date_str = request.GET.get('start_time', None)
     end_date_str = request.GET.get('endDate', None)
 
-    filter_spatialRef = request.query_params.getlist('spatialRef', None)
-    filter_temporalRef = request.query_params.getlist('temporalRef', None)
-    filter_scalingRef = request.query_params.getlist('scalingRef', None)
+    filter_spatial_ref = request.query_params.getlist('spatialRef', None)
+    filter_temporal_ref = request.query_params.getlist('temporalRef', None)
+    filter_temporal_ref = request.query_params.getlist('scalingRef', None)
 
-    if filter_spatialRef:
+    if filter_spatial_ref:
         dataset_filters = Q()
-        for dataset in filter_spatialRef:
+        for dataset in filter_spatial_ref:
             dataset_filters |= Q(spatial_reference_configuration_id__dataset__pretty_name=dataset)
         val_runs = val_runs.filter(dataset_filters)
 
-    if filter_temporalRef:
+    if filter_temporal_ref:
         dataset_filters = Q()
-        for dataset in filter_temporalRef:
+        for dataset in filter_temporal_ref:
             dataset_filters |= Q(temporal_reference_configuration_id__dataset__pretty_name=dataset)
         val_runs = val_runs.filter(dataset_filters)
 
-    if filter_scalingRef:
+    if filter_temporal_ref:
         dataset_filters = Q()
-        for dataset in filter_scalingRef:
+        for dataset in filter_temporal_ref:
             dataset_filters |= Q(scaling_ref_id__dataset__pretty_name=dataset)
         val_runs = val_runs.filter(dataset_filters)
 
@@ -215,6 +215,7 @@ def is_validation_finished(request, **kwargs):
 
 def filter_by_validation_statuses(validation_statuses):
     #Horrible code to apply set of job status filters.
+    # this function will be replaced with a simple filtering when we create a proper field
     status_filters = Q()
     for status in validation_statuses:
         if status == 'Scheduled':
@@ -230,7 +231,7 @@ def filter_by_validation_statuses(validation_statuses):
             status_filters |= Q(progress__gte=0, progress__lt=100, end_time__isnull=True, total_points__gt=0)
         else:
             print('Status didnt match')
-    return (status_filters)
+    return status_filters
 
 class ValidationRunSerializer(ModelSerializer):
     class Meta:
