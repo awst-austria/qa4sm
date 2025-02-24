@@ -1,5 +1,5 @@
 export class SortOrderModel {
   constructor(public direction: string,
-              public queryPrependix: string) {
+              public queryPrefix: string) {
   }
 }
