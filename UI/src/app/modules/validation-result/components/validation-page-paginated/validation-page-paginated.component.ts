@@ -7,7 +7,7 @@ import {catchError} from 'rxjs/operators';
 import {
   FilterConfig,
   FilterPayload
-} from 'src/app/modules/validation-result/components/filtering-form/filterPayload.interface';
+} from 'src/app/modules/validation-result/components/filtering-form/filter-payload.interface';
 import {FilterService} from 'src/app/modules/validation-result/services/filter.service';
 import {DatasetService} from "../../../core/services/dataset/dataset.service";
 import {DatasetDto} from "../../../core/services/dataset/dataset.dto";

@@ -1,6 +1,6 @@
-import { Injectable } from '@angular/core';
-import { BehaviorSubject } from 'rxjs';
-import { FilterPayload } from '../components/filtering-form/filterPayload.interface';
+import {Injectable} from '@angular/core';
+import {BehaviorSubject} from 'rxjs';
+import {FilterPayload} from '../components/filtering-form/filter-payload.interface';
 
 @Injectable({
   providedIn: 'root'
@@ -19,6 +19,6 @@ export class FilterService {
   filterState$ = this.filterState.asObservable();
 
   updateFilters(newFilters: FilterPayload): void {
-    this.filterState.next({...newFilters}); 
+    this.filterState.next({...newFilters});
   }
 }

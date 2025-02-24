@@ -1,5 +1,5 @@
 import {Component, input, model, OnInit} from '@angular/core';
-import {FilterConfig, FilterPayload} from './filterPayload.interface';
+import {FilterConfig, FilterPayload} from './filter-payload.interface';
 
 import {DatasetDto} from 'src/app/modules/core/services/dataset/dataset.dto';
 import {FilterService} from 'src/app/modules/validation-result/services/filter.service';
