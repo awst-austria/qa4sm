@@ -272,7 +272,7 @@ dependencies:
     - pytz==2024.1
     - pyyaml==6.0.2
     - qa4sm-reader==0.11
-    - git+https://github.com/awst-austria/qa4sm-preprocessing.git@update-env
+    - qa4sm-preprocessing==0.4
     - redis==5.2.0
     - requests==2.32.3
     - scipy==1.15.1
