@@ -14,7 +14,7 @@
 
   <div class="flex flex-column w-12 align-content-center justify-content-center">
     <!-- custom -->
-    <div *ngIf="!published && !dataFetchError()" class="text-center w-12">
+    <div *ngIf="!published() && !dataFetchError()" class="text-center w-12">
       <h1>My validations</h1>
       <p *ngIf="!validations.length && !areFiltersApplied()" class="lead text-muted">
         You have not started any validations yet. Visit the <a routerLink="/validate">validation page</a>
@@ -23,7 +23,7 @@
     </div>
 
     <!-- published -->
-    <div *ngIf="published && !dataFetchError()" class="text-center w-12 my-2">
+    <div *ngIf="published() && !dataFetchError()" class="text-center w-12 my-2">
       <h1>Published validations</h1>
       <p class="lead text-muted">
         The QA4SM validations below have been published by their owners to
@@ -67,7 +67,7 @@
               [datasets]="datasets$"
               [versions]="versions$"
               [variables]="variables$"
-              [published]=published
+              [published]=published()
               [validationRun]="valrun"
               (emitError)="dataFetchError.set($event)"/>
             <br/>
@@ -81,10 +81,10 @@
         Loading... </em>
       </div>
 
-      <div *ngIf="endOfPage && !published && !areFiltersApplied()" class="val-number-information">
+      <div *ngIf="endOfPage && !published() && !areFiltersApplied()" class="val-number-information">
         <em> You have run {{ validations.length }} {{ validations.length === 1 ? 'validation ' : 'validations' }}.</em>
       </div>
-      <div *ngIf="endOfPage && !published && areFiltersApplied()" class="val-number-information">
+      <div *ngIf="endOfPage && !published() && areFiltersApplied()" class="val-number-information">
         <em> Showing {{ validations.length }} {{ validations.length === 1 ? 'validation ' : 'validations' }}
           that {{ validations.length === 1 ? 'meets ' : 'meet' }} the filter criteria.</em>
       </div>

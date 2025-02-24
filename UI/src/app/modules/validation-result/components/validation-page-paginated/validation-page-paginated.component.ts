@@ -1,4 +1,4 @@
-import {Component, HostListener, Input, OnInit, signal} from '@angular/core';
+import {Component, effect, HostListener, input, OnInit, signal} from '@angular/core';
 import {ValidationrunService} from '../../../core/services/validation-run/validationrun.service';
 import {ValidationrunDto} from '../../../core/services/validation-run/validationrun.dto';
 import {HttpParams} from '@angular/common/http';
@@ -15,6 +15,7 @@ import {DatasetVersionService} from "../../../core/services/dataset/dataset-vers
 import {DatasetVariableService} from "../../../core/services/dataset/dataset-variable.service";
 import {DatasetVersionDto} from "../../../core/services/dataset/dataset-version.dto";
 import {DatasetVariableDto} from "../../../core/services/dataset/dataset-variable.dto";
+import {ValidationSetDto} from "../../services/validation.set.dto";
 
 @Component({
   selector: 'qa-validation-page-paginated',
@@ -22,7 +23,7 @@ import {DatasetVariableDto} from "../../../core/services/dataset/dataset-variabl
   styleUrls: ['./validation-page-paginated.component.scss']
 })
 export class ValidationPagePaginatedComponent implements OnInit {
-  @Input() published: boolean;
+  published = input<boolean>();
   validations: ValidationrunDto[] = [];
 
   valFilters: FilterConfig[] = [];
@@ -47,6 +48,22 @@ export class ValidationPagePaginatedComponent implements OnInit {
   variables$: Observable<DatasetVariableDto[]>;
 
 
+  // ==========================================================================================
+  validationSet$: Observable<ValidationSetDto>;
+
+  // Signals for state management
+  validations$ = signal<ValidationrunDto[]>([]);
+  order$ = signal<string>('default');
+  isLoading$ = signal<boolean>(false);
+  offset$ = signal<number>(0);
+  limit$ = signal<number>(20);
+  maxNumberOfPages$ = signal<number>(1);
+  currentPage$ = signal<number>(0);
+  allValsSelected$ = signal<boolean>(false);
+  published$ = signal<boolean>(false);
+  selectedVals$ = signal<number[]>([]);
+
+
   dataFetchError = signal(false);
 
 
@@ -56,19 +73,20 @@ export class ValidationPagePaginatedComponent implements OnInit {
               private datasetVariableService: DatasetVariableService,
               private filterService: FilterService) {
     //initialise empty filterPayload with empty array or null for filters with/without isArray
-    this.filterService.filterState$.subscribe(filters => {
-      this.filterPayload = filters;
-      this.orderChange = true;
-      this.getValidationsAndItsNumber(this.published);
+    effect(() => {
+      this.getValidationsAndItsNumber();
     });
   }
+
+
 
   ngOnInit(): void {
     this.datasets$ = this.datasetService.getAllDatasets(true, false)
     this.versions$ = this.datasetVersionService.getAllVersions();
     this.variables$ = this.datasetVariableService.getAllVariables();
 
-    this.getValidationsAndItsNumber(this.published);
+    this.getValidationsAndItsNumber();
+
     this.validationrunService.doRefresh$.subscribe(value => {
       if (value && value !== 'page') {
         this.updateData(value);
@@ -88,11 +106,11 @@ export class ValidationPagePaginatedComponent implements OnInit {
     if ((windowBottom / docHeight) >= scrollThreshold && !this.isLoading && !this.endOfPage) {
       this.currentPage++;
       this.offset = (this.currentPage - 1) * this.limit;
-      this.getValidationsAndItsNumber(this.published);
+      this.getValidationsAndItsNumber();
     }
   }
 
-  getValidationsAndItsNumber(published: boolean): void {
+  getValidationsAndItsNumber(): void {
     this.isLoading = true;
 
     let parameters = new HttpParams()
@@ -114,25 +132,19 @@ export class ValidationPagePaginatedComponent implements OnInit {
     //     }
     //   }
     // });
-    if (!published) {
-      this.validationrunService.getMyValidationruns(parameters)
-        .pipe(
-          catchError(() => this.onDataFetchError())
-        )
-        .subscribe(
-          response => {
-            this.handleFetchedValidations(response);
-          });
+    if (!this.published()) {
+      this.validationSet$ = this.validationrunService.getMyValidationruns(parameters)
     } else {
-      this.validationrunService.getPublishedValidationruns(parameters)
-        .pipe(
-          catchError(() => this.onDataFetchError())
-        )
-        .subscribe(
-          response => {
-            this.handleFetchedValidations(response);
-          });
+      this.validationSet$ = this.validationrunService.getPublishedValidationruns(parameters)
     }
+
+    this.validationSet$.pipe(
+      catchError(() => this.onDataFetchError())
+    )
+      .subscribe(
+        response => {
+          this.handleFetchedValidations(response);
+        });
   }
 
   handleFetchedValidations(serverResponse: { validations: ValidationrunDto[]; length: number; }): void {
@@ -175,15 +187,15 @@ export class ValidationPagePaginatedComponent implements OnInit {
   getOrder(order): void {
     this.order = order;
     this.orderChange = true;
-    this.getValidationsAndItsNumber(this.published);
+    this.getValidationsAndItsNumber();
   }
 
   getFilter(): void {
-    this.orderChange =true;
+    this.orderChange = true;
     this.currentPage = 1;
     this.offset = 0;
     this.endOfPage = false;
-    this.getValidationsAndItsNumber(this.published);
+    this.getValidationsAndItsNumber();
   }
 
   setEndOfPage() {
@@ -211,7 +223,7 @@ export class ValidationPagePaginatedComponent implements OnInit {
       .set('limit', String(this.limit))
       .set('order', String(this.order));
 
-      this.validationrunService.getMyValidationruns(parameters)
+    this.validationrunService.getMyValidationruns(parameters)
       .pipe(
         catchError(() => this.onDataFetchError())
       )
@@ -243,7 +255,7 @@ export class ValidationPagePaginatedComponent implements OnInit {
     let condition = valrun.is_unpublished && !valrun.is_archived;
 
     if (this.action$.value === 'unarchive') {
-      condition = valrun.is_unpublished  && valrun.is_archived;
+      condition = valrun.is_unpublished && valrun.is_archived;
     }
 
     return condition;
