@@ -11,6 +11,10 @@ import {
 import {FilterService} from 'src/app/modules/validation-result/services/filter.service';
 import {DatasetService} from "../../../core/services/dataset/dataset.service";
 import {DatasetDto} from "../../../core/services/dataset/dataset.dto";
+import {DatasetVersionService} from "../../../core/services/dataset/dataset-version.service";
+import {DatasetVariableService} from "../../../core/services/dataset/dataset-variable.service";
+import {DatasetVersionDto} from "../../../core/services/dataset/dataset-version.dto";
+import {DatasetVariableDto} from "../../../core/services/dataset/dataset-variable.dto";
 
 @Component({
   selector: 'qa-validation-page-paginated',
@@ -39,6 +43,8 @@ export class ValidationPagePaginatedComponent implements OnInit {
 
   filterPayload: FilterPayload;
   datasets$: Observable<DatasetDto[]>;
+  versions$: Observable<DatasetVersionDto[]>;
+  variables$: Observable<DatasetVariableDto[]>;
 
 
   dataFetchError = signal(false);
@@ -46,6 +52,8 @@ export class ValidationPagePaginatedComponent implements OnInit {
 
   constructor(private validationrunService: ValidationrunService,
               private datasetService: DatasetService,
+              private datasetVersionService: DatasetVersionService,
+              private datasetVariableService: DatasetVariableService,
               private filterService: FilterService) {
     //initialise empty filterPayload with empty array or null for filters with/without isArray
     this.filterService.filterState$.subscribe(filters => {
@@ -57,6 +65,9 @@ export class ValidationPagePaginatedComponent implements OnInit {
 
   ngOnInit(): void {
     this.datasets$ = this.datasetService.getAllDatasets(true, false)
+    this.versions$ = this.datasetVersionService.getAllVersions();
+    this.variables$ = this.datasetVariableService.getAllVariables();
+
     this.getValidationsAndItsNumber(this.published);
     this.validationrunService.doRefresh$.subscribe(value => {
       if (value && value !== 'page') {

@@ -65,6 +65,8 @@
             </p-checkbox>
             <qa-validationrun-row
               [datasets]="datasets$"
+              [versions]="versions$"
+              [variables]="variables$"
               [published]=published
               [validationRun]="valrun"
               (emitError)="dataFetchError.set($event)"/>
