@@ -101,19 +101,19 @@ export class ValidationPagePaginatedComponent implements OnInit {
       .set('order', String(this.order));
 
     // Add filters from payload to query parameters
-    Object.entries(this.valFilters).forEach(([key, config]) => {
-      const values = this.filterPayload[config.backendField];
-      if (values) {
-        if (config.isArray && Array.isArray(values) && values.length > 0) {
-          values.forEach(value => {
-            parameters = parameters.append(config.backendField, value);
-          });
-        } else if (!config.isArray && values) {
-          const paramValue = Array.isArray(values) ? values[0] : values;
-          parameters = parameters.set(config.backendField, String(paramValue));
-        }
-      }
-    });
+    // Object.entries(this.valFilters).forEach(([key, config]) => {
+    //   const values = this.filterPayload[config.backendField];
+    //   if (values) {
+    //     if (config.isArray && Array.isArray(values) && values.length > 0) {
+    //       values.forEach(value => {
+    //         parameters = parameters.append(config.backendField, value);
+    //       });
+    //     } else if (!config.isArray && values) {
+    //       const paramValue = Array.isArray(values) ? values[0] : values;
+    //       parameters = parameters.set(config.backendField, String(paramValue));
+    //     }
+    //   }
+    // });
     if (!published) {
       this.validationrunService.getMyValidationruns(parameters)
         .pipe(
