@@ -8,9 +8,9 @@ export interface FilterPayload {
 export interface FilterConfig {
   name: string;
   type: FilterType;
-  options?: string[];
+  value: string[];
   validationFn: (value: any) => boolean;
   formatValuesFn: (value: any) => string[];
   backendField: string; // Field name used in backend query
-  isArray?: boolean;    // Whether backend expects array of values
+  options?: string[];
 }
