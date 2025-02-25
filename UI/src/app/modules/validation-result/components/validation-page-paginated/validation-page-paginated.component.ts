@@ -15,7 +15,6 @@ import {DatasetVersionService} from "../../../core/services/dataset/dataset-vers
 import {DatasetVariableService} from "../../../core/services/dataset/dataset-variable.service";
 import {DatasetVersionDto} from "../../../core/services/dataset/dataset-version.dto";
 import {DatasetVariableDto} from "../../../core/services/dataset/dataset-variable.dto";
-import {ValidationSetDto} from "../../services/validation.set.dto";
 
 @Component({
   selector: 'qa-validation-page-paginated',
@@ -49,20 +48,6 @@ export class ValidationPagePaginatedComponent implements OnInit {
 
 
   // ==========================================================================================
-  validationSet$: Observable<ValidationSetDto>;
-
-  // Signals for state management
-  validations$ = signal<ValidationrunDto[]>([]);
-  order$ = signal<string>('default');
-  isLoading$ = signal<boolean>(false);
-  offset$ = signal<number>(0);
-  limit$ = signal<number>(20);
-  maxNumberOfPages$ = signal<number>(1);
-  currentPage$ = signal<number>(0);
-  allValsSelected$ = signal<boolean>(false);
-  published$ = signal<boolean>(false);
-  selectedVals$ = signal<number[]>([]);
-
 
   dataFetchError = signal(false);
 
@@ -77,7 +62,6 @@ export class ValidationPagePaginatedComponent implements OnInit {
       this.getValidationsAndItsNumber();
     });
   }
-
 
 
   ngOnInit(): void {
@@ -118,27 +102,13 @@ export class ValidationPagePaginatedComponent implements OnInit {
       .set('limit', String(this.limit))
       .set('order', String(this.order));
 
-    // Add filters from payload to query parameters
-    // Object.entries(this.valFilters).forEach(([key, config]) => {
-    //   const values = this.filterPayload[config.backendField];
-    //   if (values) {
-    //     if (config.isArray && Array.isArray(values) && values.length > 0) {
-    //       values.forEach(value => {
-    //         parameters = parameters.append(config.backendField, value);
-    //       });
-    //     } else if (!config.isArray && values) {
-    //       const paramValue = Array.isArray(values) ? values[0] : values;
-    //       parameters = parameters.set(config.backendField, String(paramValue));
-    //     }
-    //   }
-    // });
-    if (!this.published()) {
-      this.validationSet$ = this.validationrunService.getMyValidationruns(parameters)
-    } else {
-      this.validationSet$ = this.validationrunService.getPublishedValidationruns(parameters)
-    }
 
-    this.validationSet$.pipe(
+    const validationSet$ = this.published()
+      ? this.validationrunService.getPublishedValidationruns(parameters)
+      : this.validationrunService.getMyValidationruns(parameters)
+
+
+    validationSet$.pipe(
       catchError(() => this.onDataFetchError())
     )
       .subscribe(
