@@ -1,4 +1,4 @@
-import {Component, input, model, OnInit} from '@angular/core';
+import {Component, input, model} from '@angular/core';
 import {BehaviorSubject} from 'rxjs';
 import {ValidationrunDto} from '../../../core/services/validation-run/validationrun.dto';
 import {ValidationrunService} from '../../../core/services/validation-run/validationrun.service';
@@ -12,57 +12,45 @@ import {MultipleValidationAction} from "./multiple-validation-action";
   templateUrl: './handle-multiple-validations.component.html',
   styleUrls: ['./handle-multiple-validations.component.scss']
 })
-export class HandleMultipleValidationsComponent implements OnInit {
+export class HandleMultipleValidationsComponent {
   validations = input([] as ValidationrunDto[]);
   multipleValidationAction = model({} as MultipleValidationAction);
 
   selectionActive$ = new BehaviorSubject(false);
 
-  deleteItems: {};
-  archiveItems: {};
-  unArchiveItems: {};
+  deleteItems =
+    {
+      action: 'delete',
+      label: 'Delete',
+      icon: 'pi pi-fw pi-trash',
+    };
+
+  archiveItems =
+    {
+      action: 'archive',
+      label: 'Archive',
+      icon: 'pi pi-fw pi-folder',
+    };
+  unArchiveItems =
+    {
+      action: 'unarchive',
+      label: 'Un-Archive',
+      icon: 'pi pi-calendar',
+    };
+
+  actions = [
+    this.deleteItems,
+    this.archiveItems,
+    this.unArchiveItems
+  ];
 
   selectOptions: MenuItem[];
 
   action: string = null;
   buttonLabel: string;
-  allSelected: boolean;
-  actions: any[];
-  numberOfAllValidations: number;
 
   constructor(private validationrunService: ValidationrunService,
               private toastService: ToastService) {
-  }
-
-  ngOnInit() {
-
-    this.deleteItems =
-      {
-        action: 'delete',
-        label: 'Delete',
-        icon: 'pi pi-fw pi-trash',
-      };
-
-    this.archiveItems =
-      {
-        action: 'archive',
-        label: 'Archive',
-        icon: 'pi pi-fw pi-folder',
-      };
-
-    this.unArchiveItems =
-      {
-        action: 'unarchive',
-        label: 'Un-Archive',
-        icon: 'pi pi-calendar',
-      };
-
-    this.actions = [
-      this.deleteItems,
-      this.archiveItems,
-      this.unArchiveItems
-    ];
-
     this.selectOptions = [{
       label: 'Select validations',
       items: [
@@ -83,7 +71,6 @@ export class HandleMultipleValidationsComponent implements OnInit {
 
   selectValidationsIds(select: boolean, action: string): string[] {
     const selectedValidations = [];
-    const select_archived = action === 'unarchive';
     if (select) {
       this.validations().forEach(val => {
         if (this.checkIfActionApplicable(val, action)) {
@@ -91,8 +78,6 @@ export class HandleMultipleValidationsComponent implements OnInit {
         }
       })
     }
-    this.numberOfAllValidations = selectedValidations.length;
-    console.log('form', selectedValidations);
     return selectedValidations;
   }
 
@@ -122,8 +107,6 @@ export class HandleMultipleValidationsComponent implements OnInit {
     if (!this.selectionActive$.value) {
       this.selectionActive$.next(true);
     }
-
-
     this.multipleValidationAction.update(item => {
       item.active = true;
       item.allSelected = false;
