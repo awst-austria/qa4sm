@@ -55,11 +55,11 @@
             <p-checkbox
               class="modify-checkbox"
               *ngIf="(multipleValidationAction.active)"
-              [disabled]="!checkIfEnabled(valrun)"
+              [disabled]="!checkIfActionApplies(valrun)"
               [value]="valrun.id"
               [ngModel]="multipleValidationAction.selectedValidationIds"
               (ngModelChange)="updateSelectedValidations($event, valrun.id)"
-              [pTooltip]="!checkIfEnabled(valrun) ? 'This validation cannot be selected for current action' : null"
+              [pTooltip]="!checkIfActionApplies(valrun) ? 'This validation cannot be selected for current action' : null"
               inputId="{{valrun.id}}}">
             </p-checkbox>
             <qa-validationrun-row

@@ -136,14 +136,9 @@ export class ValidationPagePaginatedComponent implements OnInit {
 
   checkIfValidationShouldBeSelected(){
     if (this.multipleValidationAction.allSelected) {
-      const selectedValidations = [];
-      const select_archived = this.multipleValidationAction.action === 'unarchive';
-      this.validations.forEach(val => {
-        if (val.is_archived === select_archived && val.is_unpublished) {
-          selectedValidations.push(val.id);
-        }
-      })
-      this.multipleValidationAction.selectedValidationIds = selectedValidations;
+      this.multipleValidationAction.selectedValidationIds = this.validations
+        .filter(val => this.checkIfActionApplies(val))
+        .map(val => val.id);
     }
   }
 
@@ -198,7 +193,7 @@ export class ValidationPagePaginatedComponent implements OnInit {
     this.multipleValidationAction.selectedValidationIds = selectedValidations;
   }
 
-  checkIfEnabled(valrun: ValidationrunDto): boolean {
+  checkIfActionApplies(valrun: ValidationrunDto): boolean {
     return (this.multipleValidationAction.action === 'unarchive') ? valrun.is_unpublished && valrun.is_archived :  !valrun.is_archived;
   }
 
