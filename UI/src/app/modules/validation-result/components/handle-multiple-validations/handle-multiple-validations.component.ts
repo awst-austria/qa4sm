@@ -5,6 +5,7 @@ import {ValidationrunService} from '../../../core/services/validation-run/valida
 import {MenuItem} from 'primeng/api';
 import {CustomHttpError} from '../../../core/services/global/http-error.service';
 import {ToastService} from '../../../core/services/toast/toast.service';
+import {MultipleValidationAction} from "./multiple-validation-action";
 
 @Component({
   selector: 'qa-handle-multiple-validations',
@@ -13,12 +14,7 @@ import {ToastService} from '../../../core/services/toast/toast.service';
 })
 export class HandleMultipleValidationsComponent implements OnInit {
   validations = input([] as ValidationrunDto[]);
-  multipleValidationAction = model({} as {
-    active: boolean,
-    action: string,
-    allSelected: boolean,
-    selectedValidationIds: string[]
-  });
+  multipleValidationAction = model({} as MultipleValidationAction);
 
   selectionActive$ = new BehaviorSubject(false);
 
@@ -83,22 +79,6 @@ export class HandleMultipleValidationsComponent implements OnInit {
       ]
 
     }];
-  }
-
-
-  selectValidations(select: boolean, action: string): BehaviorSubject<string[]> {
-    const selectedValidations = [];
-    const select_archived = action === 'unarchive';
-    if (select) {
-      this.validations().forEach(val => {
-        if (this.checkIfActionApplicable(val, action)) {
-          selectedValidations.push(val.id)
-        }
-      })
-    }
-    console.log('event', selectedValidations);
-    this.numberOfAllValidations = selectedValidations.length;
-    return new BehaviorSubject(selectedValidations)
   }
 
   selectValidationsIds(select: boolean, action: string): string[] {

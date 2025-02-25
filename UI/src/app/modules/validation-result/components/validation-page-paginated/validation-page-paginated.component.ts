@@ -11,7 +11,10 @@ import {DatasetVersionService} from "../../../core/services/dataset/dataset-vers
 import {DatasetVariableService} from "../../../core/services/dataset/dataset-variable.service";
 import {DatasetVersionDto} from "../../../core/services/dataset/dataset-version.dto";
 import {DatasetVariableDto} from "../../../core/services/dataset/dataset-variable.dto";
-import {MultipleValidationAction} from "../handle-multiple-validations/multiple-validation-action";
+import {
+  getDefaultValidationActionState,
+  MultipleValidationAction
+} from "../handle-multiple-validations/multiple-validation-action";
 
 @Component({
   selector: 'qa-validation-page-paginated',
@@ -38,12 +41,7 @@ export class ValidationPagePaginatedComponent implements OnInit {
   versions$: Observable<DatasetVersionDto[]>;
   variables$: Observable<DatasetVariableDto[]>;
 
-  multipleValidationAction: MultipleValidationAction = {
-    active: false,
-    action: '',
-    allSelected: false,
-    selectedValidationIds: [],
-  }
+  multipleValidationAction: MultipleValidationAction = getDefaultValidationActionState()
 
   // ==========================================================================================
 
