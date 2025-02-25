@@ -31,7 +31,7 @@ export class ValidationPagePaginatedComponent implements OnInit {
   selectionActive$ = new BehaviorSubject(false);
   allSelected$ = new BehaviorSubject(false);
   action$ = new BehaviorSubject(null);
-  selectedValidations$: BehaviorSubject<any> = new BehaviorSubject<any>([]);
+  selectedValidationIds = signal([] as string[])
 
   isLoading: boolean = false;
   orderChange: boolean = false;
@@ -143,7 +143,7 @@ export class ValidationPagePaginatedComponent implements OnInit {
           selectedValidations.push(val.id);
         }
       })
-      this.selectedValidations$.next(selectedValidations);
+      this.selectedValidationIds.set(selectedValidations);
     }
   }
 
@@ -191,18 +191,18 @@ export class ValidationPagePaginatedComponent implements OnInit {
   handleMultipleSelection(event): void {
     this.selectionActive$.next(event.active);
     this.action$.next(event.action);
-    this.selectedValidations$.next(event.selected.value);
+    this.selectedValidationIds.set(event.selected.value);
     this.allSelected$.next(event.allSelected);
   }
 
   updateSelectedValidations(checked: string[], id: string): void {
-    let selectedValidations = this.selectedValidations$.getValue();
+    let selectedValidations = this.selectedValidationIds();
     if (checked.includes(id)) {
       selectedValidations = [...selectedValidations, id];
     } else {
       selectedValidations = selectedValidations.filter((selectedId: string) => selectedId !== id);
     }
-    this.selectedValidations$.next(selectedValidations);
+    this.selectedValidationIds.set(selectedValidations);
   }
 
   checkIfEnabled(valrun: ValidationrunDto): boolean {

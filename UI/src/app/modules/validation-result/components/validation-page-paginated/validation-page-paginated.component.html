@@ -3,7 +3,7 @@
   <div class="side-panel-area mb-3">
     <qa-handle-multiple-validations
       [validations]="validations"
-      [selectedValidationsId$]="selectedValidations$"
+      [selectedValidationsId]="selectedValidationIds()"
       (selectionActive)="handleMultipleSelection($event)"
       *ngIf="!dataFetchError()"/>
     <qa-filtering-form *ngIf="(validations.length) && !dataFetchError()"

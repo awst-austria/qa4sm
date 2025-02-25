@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
+import {Component, EventEmitter, input, OnInit, Output} from '@angular/core';
 import {BehaviorSubject} from 'rxjs';
 import {ValidationrunDto} from '../../../core/services/validation-run/validationrun.dto';
 import {ValidationrunService} from '../../../core/services/validation-run/validationrun.service';
@@ -13,9 +13,10 @@ import {ToastService} from '../../../core/services/toast/toast.service';
 })
 export class HandleMultipleValidationsComponent implements OnInit {
   @Output() selectionActive = new EventEmitter();
-  @Input() validations: ValidationrunDto[];
-  @Input() selectedValidationsId$: BehaviorSubject<string[]>;
   @Output() doUpdate = new EventEmitter();
+
+  validations = input([] as ValidationrunDto[]);
+  selectedValidationsId = input([] as string[]);
 
   selectionActive$ = new BehaviorSubject(false);
 
@@ -87,7 +88,7 @@ export class HandleMultipleValidationsComponent implements OnInit {
     const selectedValidations = [];
     const select_archived = action === 'unarchive';
     if (select) {
-      this.validations.forEach(val => {
+      this.validations().forEach(val => {
         if (this.checkIfActionApplicable(val, action)) {
           selectedValidations.push(val.id)
         }
@@ -146,12 +147,12 @@ export class HandleMultipleValidationsComponent implements OnInit {
 
 
   deleteMultipleValidations(): void {
-    this.validationrunService.removeMultipleValidation(this.selectedValidationsId$.getValue())
+    this.validationrunService.removeMultipleValidation(this.selectedValidationsId())
       .subscribe(this.multipleValidationActionObserver)
   }
 
   archiveMultipleValidations(archive: boolean): void {
-    this.validationrunService.archiveMultipleValidation(this.selectedValidationsId$.getValue(), archive)
+    this.validationrunService.archiveMultipleValidation(this.selectedValidationsId(), archive)
       .subscribe(this.multipleValidationActionObserver)
   }
 
