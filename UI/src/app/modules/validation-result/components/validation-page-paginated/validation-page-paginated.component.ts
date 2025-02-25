@@ -2,7 +2,7 @@ import {Component, effect, HostListener, input, OnInit, signal} from '@angular/c
 import {ValidationrunService} from '../../../core/services/validation-run/validationrun.service';
 import {ValidationrunDto} from '../../../core/services/validation-run/validationrun.dto';
 import {HttpParams} from '@angular/common/http';
-import {BehaviorSubject, EMPTY, Observable} from 'rxjs';
+import {EMPTY, Observable} from 'rxjs';
 import {catchError} from 'rxjs/operators';
 import {FilterConfig,} from 'src/app/modules/validation-result/components/filtering-form/filter-payload.interface';
 import {DatasetService} from "../../../core/services/dataset/dataset.service";
@@ -11,6 +11,7 @@ import {DatasetVersionService} from "../../../core/services/dataset/dataset-vers
 import {DatasetVariableService} from "../../../core/services/dataset/dataset-variable.service";
 import {DatasetVersionDto} from "../../../core/services/dataset/dataset-version.dto";
 import {DatasetVariableDto} from "../../../core/services/dataset/dataset-variable.dto";
+import {MultipleValidationAction} from "../handle-multiple-validations/multiple-validation-action";
 
 @Component({
   selector: 'qa-validation-page-paginated',
@@ -28,10 +29,6 @@ export class ValidationPagePaginatedComponent implements OnInit {
   limit = 10;
   offset = 0;
   order = signal('-start_time');
-  selectionActive$ = new BehaviorSubject(false);
-  allSelected$ = new BehaviorSubject(false);
-  action$ = new BehaviorSubject(null);
-  selectedValidationIds = signal([] as string[])
 
   isLoading: boolean = false;
   orderChange: boolean = false;
@@ -40,6 +37,13 @@ export class ValidationPagePaginatedComponent implements OnInit {
   datasets$: Observable<DatasetDto[]>;
   versions$: Observable<DatasetVersionDto[]>;
   variables$: Observable<DatasetVariableDto[]>;
+
+  multipleValidationAction: MultipleValidationAction = {
+    active: false,
+    action: '',
+    allSelected: false,
+    selectedValidationIds: [],
+  }
 
   // ==========================================================================================
 
@@ -135,15 +139,15 @@ export class ValidationPagePaginatedComponent implements OnInit {
   }
 
   checkIfValidationShouldBeSelected(){
-    if (this.allSelected$.value) {
+    if (this.multipleValidationAction.allSelected) {
       const selectedValidations = [];
-      const select_archived = this.action$.value === 'unarchive';
+      const select_archived = this.multipleValidationAction.action === 'unarchive';
       this.validations.forEach(val => {
         if (val.is_archived === select_archived && val.is_unpublished) {
           selectedValidations.push(val.id);
         }
       })
-      this.selectedValidationIds.set(selectedValidations);
+      this.multipleValidationAction.selectedValidationIds = selectedValidations;
     }
   }
 
@@ -188,27 +192,20 @@ export class ValidationPagePaginatedComponent implements OnInit {
         });
   }
 
-  handleMultipleSelection(event): void {
-    this.selectionActive$.next(event.active);
-    this.action$.next(event.action);
-    this.selectedValidationIds.set(event.selected.value);
-    this.allSelected$.next(event.allSelected);
-  }
-
   updateSelectedValidations(checked: string[], id: string): void {
-    let selectedValidations = this.selectedValidationIds();
+    let selectedValidations = this.multipleValidationAction.selectedValidationIds;
     if (checked.includes(id)) {
       selectedValidations = [...selectedValidations, id];
     } else {
       selectedValidations = selectedValidations.filter((selectedId: string) => selectedId !== id);
     }
-    this.selectedValidationIds.set(selectedValidations);
+    this.multipleValidationAction.selectedValidationIds = selectedValidations;
   }
 
   checkIfEnabled(valrun: ValidationrunDto): boolean {
     let condition = valrun.is_unpublished && !valrun.is_archived;
 
-    if (this.action$.value === 'unarchive') {
+    if (this.multipleValidationAction.action === 'unarchive') {
       condition = valrun.is_unpublished && valrun.is_archived;
     }
 

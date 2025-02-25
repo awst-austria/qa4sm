@@ -1,4 +1,4 @@
-import {Component, EventEmitter, input, OnInit, Output} from '@angular/core';
+import {Component, input, model, OnInit} from '@angular/core';
 import {BehaviorSubject} from 'rxjs';
 import {ValidationrunDto} from '../../../core/services/validation-run/validationrun.dto';
 import {ValidationrunService} from '../../../core/services/validation-run/validationrun.service';
@@ -12,11 +12,13 @@ import {ToastService} from '../../../core/services/toast/toast.service';
   styleUrls: ['./handle-multiple-validations.component.scss']
 })
 export class HandleMultipleValidationsComponent implements OnInit {
-  @Output() selectionActive = new EventEmitter();
-  @Output() doUpdate = new EventEmitter();
-
   validations = input([] as ValidationrunDto[]);
-  selectedValidationsId = input([] as string[]);
+  multipleValidationAction = model({} as {
+    active: boolean,
+    action: string,
+    allSelected: boolean,
+    selectedValidationIds: string[]
+  });
 
   selectionActive$ = new BehaviorSubject(false);
 
@@ -94,16 +96,32 @@ export class HandleMultipleValidationsComponent implements OnInit {
         }
       })
     }
+    console.log('event', selectedValidations);
     this.numberOfAllValidations = selectedValidations.length;
     return new BehaviorSubject(selectedValidations)
   }
 
-  checkIfActionApplicable(valrun: ValidationrunDto, action: string): boolean{
+  selectValidationsIds(select: boolean, action: string): string[] {
+    const selectedValidations = [];
+    const select_archived = action === 'unarchive';
+    if (select) {
+      this.validations().forEach(val => {
+        if (this.checkIfActionApplicable(val, action)) {
+          selectedValidations.push(val.id)
+        }
+      })
+    }
+    this.numberOfAllValidations = selectedValidations.length;
+    console.log('form', selectedValidations);
+    return selectedValidations;
+  }
+
+  checkIfActionApplicable(valrun: ValidationrunDto, action: string): boolean {
     let condition = valrun.is_unpublished
 
-    if (action === 'unarchive'){
+    if (action === 'unarchive') {
       condition = condition && valrun.is_archived
-    } else if (action === 'archive'){
+    } else if (action === 'archive') {
       condition = condition && !valrun.is_archived
     }
     return condition;
@@ -111,30 +129,42 @@ export class HandleMultipleValidationsComponent implements OnInit {
 
 
   emitSelection(select: boolean): void {
-    this.selectionActive.emit({
-      active: true,
-      selected: this.selectValidations(select, this.action),
-      allSelected: select,
-      action: this.action
+    this.multipleValidationAction.update(item => {
+      item.active = true;
+      item.allSelected = select;
+      item.action = this.action;
+      item.selectedValidationIds = this.selectValidationsIds(select, this.action);
+      return item
     })
   }
 
-  actionChange(): void{
-    if (!this.selectionActive$.value){
+  actionChange(): void {
+    if (!this.selectionActive$.value) {
       this.selectionActive$.next(true);
     }
-    this.selectionActive.emit({
-      active: true,
-      selected: new BehaviorSubject([]),
-      allSelected: false,
-      action: this.action
+
+
+    this.multipleValidationAction.update(item => {
+      item.active = true;
+      item.allSelected = false;
+      item.action = this.action;
+      item.selectedValidationIds = [];
+      return item
     })
 
     this.buttonLabel = this.actions.find(element => element.action == this.action).label
   }
 
   closeAndCleanSelection(): void {
-    this.selectionActive.emit({activate: false, selected: this.selectValidations(false, null)})
+    this.multipleValidationAction.update(item => {
+      item.active = false;
+      item.allSelected = false;
+      item.action = null;
+      item.selectedValidationIds = this.selectValidationsIds(false, null);
+      return item
+    })
+
+
     this.selectionActive$.next(false)
     this.action = null;
   }
@@ -147,12 +177,12 @@ export class HandleMultipleValidationsComponent implements OnInit {
 
 
   deleteMultipleValidations(): void {
-    this.validationrunService.removeMultipleValidation(this.selectedValidationsId())
+    this.validationrunService.removeMultipleValidation(this.multipleValidationAction().selectedValidationIds)
       .subscribe(this.multipleValidationActionObserver)
   }
 
   archiveMultipleValidations(archive: boolean): void {
-    this.validationrunService.archiveMultipleValidation(this.selectedValidationsId(), archive)
+    this.validationrunService.archiveMultipleValidation(this.multipleValidationAction().selectedValidationIds, archive)
       .subscribe(this.multipleValidationActionObserver)
   }
 

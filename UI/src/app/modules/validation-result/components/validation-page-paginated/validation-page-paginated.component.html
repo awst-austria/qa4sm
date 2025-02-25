@@ -3,8 +3,7 @@
   <div class="side-panel-area mb-3">
     <qa-handle-multiple-validations
       [validations]="validations"
-      [selectedValidationsId]="selectedValidationIds()"
-      (selectionActive)="handleMultipleSelection($event)"
+      [(multipleValidationAction)]="multipleValidationAction"
       *ngIf="!dataFetchError()"/>
     <qa-filtering-form *ngIf="(validations.length) && !dataFetchError()"
                        [availableDatasetsSignal]="datasets$"
@@ -55,10 +54,10 @@
 
             <p-checkbox
               class="modify-checkbox"
-              *ngIf="(selectionActive$|async)"
+              *ngIf="(multipleValidationAction.active)"
               [disabled]="!checkIfEnabled(valrun)"
               [value]="valrun.id"
-              [ngModel]="selectedValidationIds()"
+              [ngModel]="multipleValidationAction.selectedValidationIds"
               (ngModelChange)="updateSelectedValidations($event, valrun.id)"
               [pTooltip]="!checkIfEnabled(valrun) ? 'This validation cannot be selected for current action' : null"
               inputId="{{valrun.id}}}">
