@@ -4,11 +4,7 @@ import {ValidationrunDto} from '../../../core/services/validation-run/validation
 import {HttpParams} from '@angular/common/http';
 import {BehaviorSubject, EMPTY, Observable} from 'rxjs';
 import {catchError} from 'rxjs/operators';
-import {
-  FilterConfig,
-  FilterPayload
-} from 'src/app/modules/validation-result/components/filtering-form/filter-payload.interface';
-import {FilterService} from 'src/app/modules/validation-result/services/filter.service';
+import {FilterConfig,} from 'src/app/modules/validation-result/components/filtering-form/filter-payload.interface';
 import {DatasetService} from "../../../core/services/dataset/dataset.service";
 import {DatasetDto} from "../../../core/services/dataset/dataset.dto";
 import {DatasetVersionService} from "../../../core/services/dataset/dataset-version.service";
@@ -31,7 +27,7 @@ export class ValidationPagePaginatedComponent implements OnInit {
   currentPage = 1;
   limit = 10;
   offset = 0;
-  order = '-start_time';
+  order = signal('-start_time');
   selectionActive$ = new BehaviorSubject(false);
   allSelected$ = new BehaviorSubject(false);
   action$ = new BehaviorSubject(null);
@@ -41,11 +37,9 @@ export class ValidationPagePaginatedComponent implements OnInit {
   orderChange: boolean = false;
   endOfPage: boolean = false;
 
-  filterPayload: FilterPayload;
   datasets$: Observable<DatasetDto[]>;
   versions$: Observable<DatasetVersionDto[]>;
   variables$: Observable<DatasetVariableDto[]>;
-
 
   // ==========================================================================================
 
@@ -55,21 +49,17 @@ export class ValidationPagePaginatedComponent implements OnInit {
   constructor(private validationrunService: ValidationrunService,
               private datasetService: DatasetService,
               private datasetVersionService: DatasetVersionService,
-              private datasetVariableService: DatasetVariableService,
-              private filterService: FilterService) {
-    //initialise empty filterPayload with empty array or null for filters with/without isArray
+              private datasetVariableService: DatasetVariableService) {
+
     effect(() => {
-      this.getValidationsAndItsNumber();
+        this.getValidationsAndItsNumber();
     });
   }
-
 
   ngOnInit(): void {
     this.datasets$ = this.datasetService.getAllDatasets(true, false)
     this.versions$ = this.datasetVersionService.getAllVersions();
     this.variables$ = this.datasetVariableService.getAllVariables();
-
-    this.getValidationsAndItsNumber();
 
     this.validationrunService.doRefresh$.subscribe(value => {
       if (value && value !== 'page') {
@@ -89,6 +79,7 @@ export class ValidationPagePaginatedComponent implements OnInit {
     const scrollThreshold = 0.9; //Load further results at 90% scroll - more robust
     if ((windowBottom / docHeight) >= scrollThreshold && !this.isLoading && !this.endOfPage) {
       this.currentPage++;
+      console.log((this.currentPage - 1) * this.limit)
       this.offset = (this.currentPage - 1) * this.limit;
       this.getValidationsAndItsNumber();
     }
@@ -100,7 +91,7 @@ export class ValidationPagePaginatedComponent implements OnInit {
     let parameters = new HttpParams()
       .set('offset', String(this.offset))
       .set('limit', String(this.limit))
-      .set('order', String(this.order));
+      .set('order', String(this.order()));
 
 
     const validationSet$ = this.published()
@@ -118,28 +109,17 @@ export class ValidationPagePaginatedComponent implements OnInit {
   }
 
   handleFetchedValidations(serverResponse: { validations: ValidationrunDto[]; length: number; }): void {
-    const {validations, length} = serverResponse;
-
-    this.maxNumberOfPages = Math.ceil(length / this.limit);
+    this.maxNumberOfPages = Math.ceil(serverResponse.length / this.limit);
 
     if (this.orderChange) {
-      this.validations = validations;
+      this.validations = serverResponse.validations;
     } else {
-      if (validations.length) {
-        this.validations = this.validations.concat(validations);
+      if (serverResponse.validations.length) {
+        this.validations = this.validations.concat(serverResponse.validations);
 
-        if (this.allSelected$.value) {
-          const selectedValidations = [];
-          const select_archived = this.action$.value === 'unarchive';
-          this.validations.forEach(val => {
-            if (val.is_archived === select_archived && val.is_unpublished) {
-              selectedValidations.push(val.id);
-            }
-          })
-          this.selectedValidations$.next(selectedValidations);
-        }
+        this.checkIfValidationShouldBeSelected();
 
-        if (this.validations.length < length) {
+        if (this.validations.length < serverResponse.length) {
           this.currentPage = Math.floor(this.validations.length / this.limit);
         }
 
@@ -154,24 +134,28 @@ export class ValidationPagePaginatedComponent implements OnInit {
     this.isLoading = false;
   }
 
-  getOrder(order): void {
-    this.order = order;
-    this.orderChange = true;
-    this.getValidationsAndItsNumber();
+  checkIfValidationShouldBeSelected(){
+    if (this.allSelected$.value) {
+      const selectedValidations = [];
+      const select_archived = this.action$.value === 'unarchive';
+      this.validations.forEach(val => {
+        if (val.is_archived === select_archived && val.is_unpublished) {
+          selectedValidations.push(val.id);
+        }
+      })
+      this.selectedValidations$.next(selectedValidations);
+    }
   }
 
-  getFilter(): void {
+  getOrder(order): void {
+    this.order.set(order);
     this.orderChange = true;
-    this.currentPage = 1;
-    this.offset = 0;
-    this.endOfPage = false;
-    this.getValidationsAndItsNumber();
   }
 
   setEndOfPage() {
     this.endOfPage = true;
-    this.limit = this.validations.length;
     this.offset = 0;
+    this.limit = this.validations.length;
   }
 
 
@@ -191,7 +175,7 @@ export class ValidationPagePaginatedComponent implements OnInit {
     const parameters = new HttpParams()
       .set('offset', String(this.offset))
       .set('limit', String(this.limit))
-      .set('order', String(this.order));
+      .set('order', String(this.order()));
 
     this.validationrunService.getMyValidationruns(parameters)
       .pipe(
@@ -236,17 +220,5 @@ export class ValidationPagePaginatedComponent implements OnInit {
     return EMPTY;
   }
 
-  areFiltersApplied(): boolean {
-    // check if any filters have been applied, used to define message in case of no validation results found
-    if (!this.filterPayload) {
-      return false;
-    }
-
-    return (
-      this.filterPayload.statuses.length > 0 ||
-      this.filterPayload.name !== null
-      //(this.filterPayload.prettyName && this.filterPayload.prettyName.length > 0)
-    );
-  }
 
 }
