@@ -1,11 +1,10 @@
 import {Component, input, model} from '@angular/core';
-import {BehaviorSubject} from 'rxjs';
 import {ValidationrunDto} from '../../../core/services/validation-run/validationrun.dto';
 import {ValidationrunService} from '../../../core/services/validation-run/validationrun.service';
 import {MenuItem} from 'primeng/api';
 import {CustomHttpError} from '../../../core/services/global/http-error.service';
 import {ToastService} from '../../../core/services/toast/toast.service';
-import {MultipleValidationAction} from "./multiple-validation-action";
+import {getDefaultValidationActionState, MultipleValidationAction} from "./multiple-validation-action";
 
 @Component({
   selector: 'qa-handle-multiple-validations',
@@ -16,7 +15,6 @@ export class HandleMultipleValidationsComponent {
   validations = input([] as ValidationrunDto[]);
   multipleValidationAction = model({} as MultipleValidationAction);
 
-  selectionActive$ = new BehaviorSubject(false);
 
   deleteItems =
     {
@@ -78,6 +76,7 @@ export class HandleMultipleValidationsComponent {
         }
       })
     }
+
     return selectedValidations;
   }
 
@@ -104,11 +103,7 @@ export class HandleMultipleValidationsComponent {
   }
 
   actionChange(): void {
-    if (!this.selectionActive$.value) {
-      this.selectionActive$.next(true);
-    }
     this.multipleValidationAction.update(item => {
-      item.active = true;
       item.allSelected = false;
       item.action = this.action;
       item.selectedValidationIds = [];
@@ -120,15 +115,10 @@ export class HandleMultipleValidationsComponent {
 
   closeAndCleanSelection(): void {
     this.multipleValidationAction.update(item => {
-      item.active = false;
-      item.allSelected = false;
-      item.action = null;
-      item.selectedValidationIds = this.selectValidationsIds(false, null);
+      item = getDefaultValidationActionState();
       return item
     })
 
-
-    this.selectionActive$.next(false)
     this.action = null;
   }
 

@@ -15,5 +15,5 @@ export const DEFAULT_VALIDATION_ACTION_STATE: MultipleValidationAction = {
 
 // Define a function in case you need a fresh copy each time
 export function getDefaultValidationActionState(): MultipleValidationAction {
-  return DEFAULT_VALIDATION_ACTION_STATE;
+  return {...DEFAULT_VALIDATION_ACTION_STATE};
 }
