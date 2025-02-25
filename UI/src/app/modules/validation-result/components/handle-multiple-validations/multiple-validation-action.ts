@@ -8,7 +8,7 @@ export interface MultipleValidationAction {
 // Define the default state as a constant
 export const DEFAULT_VALIDATION_ACTION_STATE: MultipleValidationAction = {
   active: false,
-  action: '',
+  action: null,
   allSelected: false,
   selectedValidationIds: []
 };
