@@ -159,12 +159,17 @@ class ValidationRun(models.Model):
             return None
 
         if self.progress == -1:
-            initial_date = self.start_time
+            #If the validation run is cancelled, expiry date is 2 months after start date
+            expiry_date = self.start_time + timedelta(days=settings.VALIDATION_EXPIRY_DAYS)
+        elif self.last_extended:
+            #if validation run is extended, expiry date is 7 days after extension -> make sure full warning time is given
+            expiry_date = self.last_extended + timedelta(days=settings.VALIDATION_EXPIRY_WARNING_DAYS)
         else:
-            initial_date = self.last_extended if self.last_extended else self.end_time
+            #nominal expiry date is 2 months after job finished. 
+            expiry_date = self.end_time + timedelta(days=settings.VALIDATION_EXPIRY_DAYS)
 
-        return initial_date + timedelta(days=settings.VALIDATION_EXPIRY_DAYS)
-
+        return expiry_date
+    
     @property
     def is_expired(self):
         e = self.expiry_date

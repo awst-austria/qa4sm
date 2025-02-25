@@ -20,7 +20,6 @@ def auto_cleanup():
     Iterate over all users and checks if their validations are expired/near expiry. 
     Furthermore check if user has been inactive, if so send notification.
     '''
-
     users = User.objects.all()
 
     validations_cleaned = []
@@ -56,8 +55,7 @@ def auto_cleanup():
                 continue
 
             # if validation is expired and user was notified, get rid of it
-            elif validation.is_expired and validation.expiry_notified:
-
+            elif validation.is_expired and validation.expiry_notified and not validation.is_removed:
                 celery_tasks = CeleryTask.objects.filter(validation_id=validation.id)
                 for task in celery_tasks:
                     task.delete()
@@ -73,16 +71,17 @@ def auto_cleanup():
     #### cleanup validations with no user ####
     no_user_validations = ValidationRun.objects.filter(user=None)
     for no_user_val in no_user_validations:
-        
-        celery_tasks = CeleryTask.objects.filter(validation_id=no_user_val.id)
-        for task in celery_tasks:
-            task.delete()
+        if not no_user_val.is_removed:
+            
+            celery_tasks = CeleryTask.objects.filter(validation_id=no_user_val.id)
+            for task in celery_tasks:
+                task.delete()
 
-        no_user_val.is_removed = True    
-        no_user_val.save()
-        validations_cleaned.append(str(no_user_val.id))
+            no_user_val.is_removed = True    
+            no_user_val.save()
+            validations_cleaned.append(str(no_user_val.id))
     
-    print(f'Warnings sent for {len(validations_warned)} validations that are nearing expiry. Cleaned {len(validations_cleaned)} expired validations.')
+    print(f'Warnings sent for {len(validations_warned)} validations that are nearing expiry. Cleaned {validations_cleaned} expired validations.')
 
 
 @api_view(['POST'])
