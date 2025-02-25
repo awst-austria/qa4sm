@@ -4,7 +4,7 @@ import {ValidationrunService} from '../../../core/services/validation-run/valida
 import {MenuItem} from 'primeng/api';
 import {CustomHttpError} from '../../../core/services/global/http-error.service';
 import {ToastService} from '../../../core/services/toast/toast.service';
-import {getDefaultValidationActionState, MultipleValidationAction} from "./multiple-validation-action";
+import {ActionMenuItem, getDefaultValidationActionState, MultipleValidationAction} from "./multiple-validation-action";
 
 @Component({
   selector: 'qa-handle-multiple-validations',
@@ -16,20 +16,20 @@ export class HandleMultipleValidationsComponent {
   multipleValidationAction = model({} as MultipleValidationAction);
 
 
-  deleteItems =
+  deleteItems: ActionMenuItem =
     {
       action: 'delete',
       label: 'Delete',
       icon: 'pi pi-fw pi-trash',
     };
 
-  archiveItems =
+  archiveItems: ActionMenuItem =
     {
       action: 'archive',
       label: 'Archive',
       icon: 'pi pi-fw pi-folder',
     };
-  unArchiveItems =
+  unArchiveItems: ActionMenuItem =
     {
       action: 'unarchive',
       label: 'Un-Archive',
@@ -45,8 +45,8 @@ export class HandleMultipleValidationsComponent {
   selectOptions: MenuItem[];
 
   action: string = null;
-  buttonLabel: string;
 
+  selectedAction: ActionMenuItem;
   constructor(private validationrunService: ValidationrunService,
               private toastService: ToastService) {
     this.selectOptions = [{
@@ -70,7 +70,7 @@ export class HandleMultipleValidationsComponent {
   selectValidationsIds(): string[] {
     const selectedValidations = [];
     this.validations().forEach(val => {
-      if (this.checkIfActionApplicable(val, this.action)) {
+      if (this.checkIfActionApplicable(val, this.selectedAction.action)) {
         selectedValidations.push(val.id)
       }
     })
@@ -85,7 +85,7 @@ export class HandleMultipleValidationsComponent {
   emitSelection(select: boolean): void {
     this.multipleValidationAction.update(item => {
       item.allSelected = select;
-      item.action = this.action;
+      item.action = this.selectedAction.action;
       item.selectedValidationIds = this.selectValidationsIds();
       return item
     })
@@ -95,12 +95,10 @@ export class HandleMultipleValidationsComponent {
     this.multipleValidationAction.update(item => {
       item.active = true;
       item.allSelected = false;
-      item.action = this.action;
+      item.action = this.selectedAction.action;
       item.selectedValidationIds = [];
       return item
     })
-
-    this.buttonLabel = this.actions.find(element => element.action == this.action).label
   }
 
   closeAndCleanSelection(): void {
@@ -109,7 +107,7 @@ export class HandleMultipleValidationsComponent {
       return item
     })
 
-    this.action = null;
+    this.selectedAction.action = null;
   }
 
   multipleValidationActionObserver = {
@@ -130,13 +128,13 @@ export class HandleMultipleValidationsComponent {
   }
 
   handleMultipleValidations(): void {
-    if (!confirm(`Do you really want to ${this.action} selected validations?`)) {
+    if (!confirm(`Do you really want to ${this.selectedAction.action} selected validations?`)) {
       return;
     }
-    if (this.action === 'delete') {
+    if (this.selectedAction.action === 'delete') {
       this.deleteMultipleValidations()
-    } else if (this.action === 'archive' || this.action === 'unarchive') {
-      this.archiveMultipleValidations(this.action === 'archive')
+    } else if (this.selectedAction.action === 'archive' || this.selectedAction.action === 'unarchive') {
+      this.archiveMultipleValidations(this.selectedAction.action === 'archive')
     }
     this.closeAndCleanSelection()
   }

@@ -17,3 +17,10 @@ export const DEFAULT_VALIDATION_ACTION_STATE: MultipleValidationAction = {
 export function getDefaultValidationActionState(): MultipleValidationAction {
   return {...DEFAULT_VALIDATION_ACTION_STATE};
 }
+
+export interface ActionMenuItem {
+  action: string,
+  label: string,
+  icon: string,
+  command?: () => void;
+}

@@ -10,10 +10,9 @@
   <p-dropdown
     id="selectAction"
     [options]="actions"
-    [(ngModel)]="action"
+    [(ngModel)]="selectedAction"
     (onChange)="actionChange()"
     optionLabel="label"
-    optionValue="action"
     placeholder="Select action"
     [style]="{'width': '100%'}">
   </p-dropdown>
@@ -41,8 +40,8 @@
       <p-button
         [style]="{'width': '100%'}"
         styleClass="p-button-outlined p-button-warning"
-        [label]="buttonLabel"
-        [pTooltip]="buttonLabel + ' selected validations'"
+        [label]="this.selectedAction.label"
+        [pTooltip]="this.selectedAction.label + ' selected validations'"
         (onClick)="handleMultipleValidations()">
       </p-button>
     </div>
