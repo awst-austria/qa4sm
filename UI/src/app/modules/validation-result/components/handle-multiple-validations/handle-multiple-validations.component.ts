@@ -16,7 +16,6 @@ export class HandleMultipleValidationsComponent {
   multipleValidationAction = model({} as MultipleValidationAction);
 
 
-
   actions: ActionMenuItem[];
 
   selectOptions: MenuItem[];
@@ -24,9 +23,9 @@ export class HandleMultipleValidationsComponent {
   action: string = null;
 
   selectedAction: ActionMenuItem;
+
   constructor(private validationrunService: ValidationrunService,
               private toastService: ToastService) {
-
 
     this.actions = [
       {
@@ -56,12 +55,12 @@ export class HandleMultipleValidationsComponent {
         {
           label: 'All',
           icon: 'pi pi-fw pi-check-square',
-          command: () => this.emitSelection(true),
+          command: () => this.updateMultipleValidationAction(true),
         },
         {
           label: "Clear selection",
           icon: 'pi pi-fw pi-stop',
-          command: () => this.emitSelection(false)
+          command: () => this.updateMultipleValidationAction(false)
         }
       ]
 
@@ -69,35 +68,20 @@ export class HandleMultipleValidationsComponent {
   }
 
   selectValidationsIds(): string[] {
-    const selectedValidations = [];
-    this.validations().forEach(val => {
-      if (this.checkIfActionApplicable(val, this.selectedAction.action)) {
-        selectedValidations.push(val.id)
-      }
-    })
-    return selectedValidations;
+    return this.validations().filter(val => this.checkIfActionApplicable(val, this.selectedAction.action))
+      .map(val => val.id);
   }
 
   checkIfActionApplicable(valrun: ValidationrunDto, action: string): boolean {
     return (action === 'unarchive') ? valrun.is_unpublished && valrun.is_archived : !valrun.is_archived
   }
 
-
-  emitSelection(select: boolean): void {
-    this.multipleValidationAction.update(item => {
-      item.allSelected = select;
-      item.action = this.selectedAction.action;
-      item.selectedValidationIds = this.selectValidationsIds();
-      return item
-    })
-  }
-
-  actionChange(): void {
+  updateMultipleValidationAction(allSelected: boolean): void {
     this.multipleValidationAction.update(item => {
       item.active = true;
-      item.allSelected = false;
+      item.allSelected = allSelected;
       item.action = this.selectedAction.action;
-      item.selectedValidationIds = [];
+      item.selectedValidationIds = allSelected ? this.selectValidationsIds() : [];
       return item
     })
   }
@@ -107,7 +91,6 @@ export class HandleMultipleValidationsComponent {
       item = getDefaultValidationActionState();
       return item
     })
-
     this.selectedAction = null;
   }
 

@@ -11,7 +11,7 @@
     id="selectAction"
     [options]="actions"
     [(ngModel)]="selectedAction"
-    (onChange)="actionChange()"
+    (onChange)="updateMultipleValidationAction(false)"
     optionLabel="label"
     placeholder="Select action"
     [style]="{'width': '100%'}">
