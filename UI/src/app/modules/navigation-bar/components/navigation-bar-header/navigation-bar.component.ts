@@ -1,7 +1,7 @@
 import {Component, HostListener, OnInit, signal, ViewChild} from '@angular/core';
 import {MenuItem} from 'primeng/api';
 import {AuthService} from '../../../core/services/auth/auth.service';
-import {Event, NavigationEnd, Router} from '@angular/router';
+import {Event, NavigationEnd, Router, ActivatedRoute} from '@angular/router';
 import {ToastService} from '../../../core/services/toast/toast.service';
 import {SettingsService} from '../../../core/services/global/settings.service';
 import {LoginComponent} from 'src/app/modules/user/login/login.component';
@@ -123,6 +123,7 @@ export class NavigationBarComponent implements OnInit {
 
   constructor(private authService: AuthService,
               private router: Router,
+              private route: ActivatedRoute,
               private toastService: ToastService,
               private settingsService: SettingsService) {
 
@@ -136,6 +137,16 @@ export class NavigationBarComponent implements OnInit {
       (state: {show: boolean, message?: string}) => this.showLoginModal = state.show
     );
     this.updateLogo(window.innerWidth);
+
+    this.route.queryParams.subscribe(params => {
+      if (params['showLogin']) {
+        this.authService.switchLoginModal(true, params['message']);
+      }
+      if (params['error']) {
+        this.toastService.showErrorWithHeader('Error', params['error']);
+      }
+    });
+
   }
 
 

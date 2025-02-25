@@ -116,7 +116,7 @@ def send_new_user_signed_up(user):
     url = settings.SITE_URL + reverse('admin:user_change_status', kwargs={'user_id': user.id})
 
     subject = '[QA4SM] New user signed up'
-    body = 'Dear admins,\n\nnew user {} {} ({}) has signed up.\nTo activate their account go to: {}\n\nBest regards,\nYour webapp'.format(
+    body = 'Dear admins,\n\nnew user {} {} ({}) has signed up and a verification email has been sent to their provided address\n Kind regards,\nYour webapp'.format(
         user.first_name,
         user.last_name,
         user.username,
@@ -126,6 +126,35 @@ def send_new_user_signed_up(user):
                 subject=subject,
                 body=body)
 
+def send_new_user_verification(user, token):
+    __logger.info('Sending email verification to user {}...'.format(user.id))
+
+    help_url = settings.SITE_URL + get_angular_url('help')
+    #verification_url = settings.SITE_URL + get_angular_url('verify', token)
+    verification_url = f"{settings.SITE_URL}/api/verify-email/{user.id}/{token}"
+
+    subject = '[QA4SM] Verify your email address'
+    body = f'''Dear {user.first_name or user.username},
+    thank you for signing up to QA4SM. To complete your registration, please verify your email address by clicking the following link: 
+    
+    {verification_url}
+
+    This link will expire in 24 hours. If you have any problems please contact the admins at {help_url}.
+
+    Kind regards,
+    QA4SM team
+    '''
+    print(user.email)
+    print(subject)
+    print(body)
+
+    try:
+        _send_email(recipients=[user.email],
+                    subject=subject,
+                    body=body)
+    except Exception as e:
+        __logger.error(f'Failed to send verification email to user {user.id}: {str(e)}')
+        raise
 
 def send_autocleanup_failed(message):
     __logger.info('Sending mail about failing cleanup')

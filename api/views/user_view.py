@@ -1,13 +1,20 @@
-from django.contrib.auth import logout, password_validation
-from django.http import HttpResponse, QueryDict, JsonResponse
+from validator.services.auth import account_activation_token
+
+from api.frontend_urls import get_angular_url
+
+from django.contrib.auth import logout, password_validation, get_user_model
+from django.http import HttpResponse, QueryDict, JsonResponse, HttpResponseRedirect
 from django.middleware.csrf import get_token
 from rest_framework import status, serializers
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from validator.forms import SignUpForm, UserProfileForm
-from validator.mailer import send_new_user_signed_up, send_user_account_removal_request, send_user_status_changed
+from validator.mailer import send_new_user_signed_up, send_user_account_removal_request, \
+    send_user_status_changed, send_new_user_verification
 from django.contrib.auth import update_session_auth_hash
+from django.conf import settings
 
+User = get_user_model()
 
 def _get_querydict_from_user_data(request, userdata):
     user_data_dict = QueryDict(mutable=True)
@@ -25,19 +32,39 @@ def signup_post(request):
         if form.data.get('active') or form.data.get('honeypot') < 100:
             return JsonResponse({"message": ''}, status=status.HTTP_400_BAD_REQUEST)
         newuser = form.save(commit=False)
-        # new user should not be active by default, admin needs to confirm
+
         newuser.is_active = False
         newuser.save()
+        
+        token = account_activation_token.make_token(newuser)
+        send_new_user_verification(newuser, token)
 
         # notify the admins
-        send_new_user_signed_up(newuser)
-        response = JsonResponse({'response': 'New user registered'}, status=200)
+        send_new_user_signed_up(newuser) # still keep this for now I guess? 
+        response = JsonResponse({'response': 'New user registered, verification email sent.'}, status=200)
     else:
         errors = form.errors.get_json_data()
         response = JsonResponse(errors, status=400, safe=False)
 
     return response
 
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def verify_email(request, user_id, token):
+    try:
+        user = User.objects.get(pk=user_id)
+    except User.DoesNotExist:
+        return JsonResponse({'error': 'User not found.'}, status=status.HTTP_404_NOT_FOUND)
+    if account_activation_token.check_token(user, token):
+        user.is_active = True
+        user.save()
+
+        frontend_url = settings.SITE_URL + get_angular_url('home')
+
+        return HttpResponseRedirect(f"{frontend_url}?showLogin=true&message=Email verified successfully")
+    else:
+        frontend_url = settings.SITE_URL + get_angular_url('home')
+        return HttpResponseRedirect(f"{frontend_url}?error=Invalid or expired verification link")
 
 @api_view(['PATCH'])
 @permission_classes([IsAuthenticated])
