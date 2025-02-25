@@ -42,7 +42,7 @@
         styleClass="p-button-outlined p-button-warning"
         [label]="this.selectedAction.label"
         [pTooltip]="this.selectedAction.label + ' selected validations'"
-        (onClick)="handleMultipleValidations()">
+        (onClick)="this.selectedAction.command()">
       </p-button>
     </div>
 

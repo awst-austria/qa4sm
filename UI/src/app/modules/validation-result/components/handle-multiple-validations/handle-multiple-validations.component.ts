@@ -16,31 +16,8 @@ export class HandleMultipleValidationsComponent {
   multipleValidationAction = model({} as MultipleValidationAction);
 
 
-  deleteItems: ActionMenuItem =
-    {
-      action: 'delete',
-      label: 'Delete',
-      icon: 'pi pi-fw pi-trash',
-    };
 
-  archiveItems: ActionMenuItem =
-    {
-      action: 'archive',
-      label: 'Archive',
-      icon: 'pi pi-fw pi-folder',
-    };
-  unArchiveItems: ActionMenuItem =
-    {
-      action: 'unarchive',
-      label: 'Un-Archive',
-      icon: 'pi pi-calendar',
-    };
-
-  actions = [
-    this.deleteItems,
-    this.archiveItems,
-    this.unArchiveItems
-  ];
+  actions: ActionMenuItem[];
 
   selectOptions: MenuItem[];
 
@@ -49,6 +26,30 @@ export class HandleMultipleValidationsComponent {
   selectedAction: ActionMenuItem;
   constructor(private validationrunService: ValidationrunService,
               private toastService: ToastService) {
+
+
+    this.actions = [
+      {
+        action: 'delete',
+        label: 'Delete',
+        icon: 'pi pi-fw pi-trash',
+        command: () => this.deleteMultipleValidations()
+      },
+      {
+        action: 'archive',
+        label: 'Archive',
+        icon: 'pi pi-fw pi-folder',
+        command: () => this.archiveMultipleValidations(true)
+      },
+      {
+        action: 'unarchive',
+        label: 'Un-Archive',
+        icon: 'pi pi-calendar',
+        command: () => this.archiveMultipleValidations(false)
+      }
+    ];
+
+
     this.selectOptions = [{
       label: 'Select validations',
       items: [
@@ -107,11 +108,17 @@ export class HandleMultipleValidationsComponent {
       return item
     })
 
-    this.selectedAction.action = null;
+    this.selectedAction = null;
   }
 
   multipleValidationActionObserver = {
-    next: () => this.validationrunService.refreshComponent('page'),
+    next: () => {
+      if (!confirm(`Do you really want to ${this.selectedAction.action} selected validations?`)) {
+        return;
+      }
+      this.validationrunService.refreshComponent('page');
+      this.closeAndCleanSelection();
+    },
     error: (error: CustomHttpError) =>
       this.toastService.showErrorWithHeader(error.errorMessage.header, error.errorMessage.message)
   }
@@ -126,18 +133,5 @@ export class HandleMultipleValidationsComponent {
     this.validationrunService.archiveMultipleValidation(this.multipleValidationAction().selectedValidationIds, archive)
       .subscribe(this.multipleValidationActionObserver)
   }
-
-  handleMultipleValidations(): void {
-    if (!confirm(`Do you really want to ${this.selectedAction.action} selected validations?`)) {
-      return;
-    }
-    if (this.selectedAction.action === 'delete') {
-      this.deleteMultipleValidations()
-    } else if (this.selectedAction.action === 'archive' || this.selectedAction.action === 'unarchive') {
-      this.archiveMultipleValidations(this.selectedAction.action === 'archive')
-    }
-    this.closeAndCleanSelection()
-  }
-
 
 }
