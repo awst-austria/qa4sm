@@ -58,7 +58,7 @@
               *ngIf="(selectionActive$|async)"
               [disabled]="!checkIfEnabled(valrun)"
               [value]="valrun.id"
-              [ngModel]="selectedValidations$ | async"
+              [ngModel]="selectedValidationIds()"
               (ngModelChange)="updateSelectedValidations($event, valrun.id)"
               [pTooltip]="!checkIfEnabled(valrun) ? 'This validation cannot be selected for current action' : null"
               inputId="{{valrun.id}}}">
