@@ -81,7 +81,6 @@ export class ValidationPagePaginatedComponent implements OnInit {
     const scrollThreshold = 0.9; //Load further results at 90% scroll - more robust
     if ((windowBottom / docHeight) >= scrollThreshold && !this.isLoading && !this.endOfPage) {
       this.currentPage++;
-      console.log((this.currentPage - 1) * this.limit)
       this.offset = (this.currentPage - 1) * this.limit;
       this.getValidationsAndItsNumber();
     }
@@ -112,7 +111,6 @@ export class ValidationPagePaginatedComponent implements OnInit {
 
   handleFetchedValidations(serverResponse: { validations: ValidationrunDto[]; length: number; }): void {
     this.maxNumberOfPages = Math.ceil(serverResponse.length / this.limit);
-
     if (this.orderChange) {
       this.validations = serverResponse.validations;
     } else {
@@ -201,13 +199,7 @@ export class ValidationPagePaginatedComponent implements OnInit {
   }
 
   checkIfEnabled(valrun: ValidationrunDto): boolean {
-    let condition = valrun.is_unpublished && !valrun.is_archived;
-
-    if (this.multipleValidationAction.action === 'unarchive') {
-      condition = valrun.is_unpublished && valrun.is_archived;
-    }
-
-    return condition;
+    return (this.multipleValidationAction.action === 'unarchive') ? valrun.is_unpublished && valrun.is_archived :  !valrun.is_archived;
   }
 
   onDataFetchError(): Observable<never> {

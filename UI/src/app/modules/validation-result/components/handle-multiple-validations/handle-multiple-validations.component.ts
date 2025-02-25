@@ -67,43 +67,33 @@ export class HandleMultipleValidationsComponent {
     }];
   }
 
-  selectValidationsIds(select: boolean, action: string): string[] {
+  selectValidationsIds(): string[] {
     const selectedValidations = [];
-    if (select) {
-      this.validations().forEach(val => {
-        if (this.checkIfActionApplicable(val, action)) {
-          selectedValidations.push(val.id)
-        }
-      })
-    }
-
+    this.validations().forEach(val => {
+      if (this.checkIfActionApplicable(val, this.action)) {
+        selectedValidations.push(val.id)
+      }
+    })
     return selectedValidations;
   }
 
   checkIfActionApplicable(valrun: ValidationrunDto, action: string): boolean {
-    let condition = valrun.is_unpublished
-
-    if (action === 'unarchive') {
-      condition = condition && valrun.is_archived
-    } else if (action === 'archive') {
-      condition = condition && !valrun.is_archived
-    }
-    return condition;
+    return (action === 'unarchive') ? valrun.is_unpublished && valrun.is_archived : !valrun.is_archived
   }
 
 
   emitSelection(select: boolean): void {
     this.multipleValidationAction.update(item => {
-      item.active = true;
       item.allSelected = select;
       item.action = this.action;
-      item.selectedValidationIds = this.selectValidationsIds(select, this.action);
+      item.selectedValidationIds = this.selectValidationsIds();
       return item
     })
   }
 
   actionChange(): void {
     this.multipleValidationAction.update(item => {
+      item.active = true;
       item.allSelected = false;
       item.action = this.action;
       item.selectedValidationIds = [];
