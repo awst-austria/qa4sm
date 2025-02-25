@@ -15,18 +15,12 @@ export class HandleMultipleValidationsComponent {
   validations = input([] as ValidationrunDto[]);
   multipleValidationAction = model({} as MultipleValidationAction);
 
-
   actions: ActionMenuItem[];
-
   selectOptions: MenuItem[];
-
-  action: string = null;
-
   selectedAction: ActionMenuItem;
 
   constructor(private validationrunService: ValidationrunService,
               private toastService: ToastService) {
-
     this.actions = [
       {
         action: 'delete',
