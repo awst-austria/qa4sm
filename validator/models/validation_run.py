@@ -278,10 +278,17 @@ class ValidationRun(models.Model):
         user_data = [conf for conf in self.dataset_configurations.all() if conf.dataset.user_dataset.all()]
         return len(user_data) > 0
 
-    def delete(self, using=None, keep_parents=False):
+    def delete(self, permanently=True, using=None, keep_parents=False):
         global DATASETS_WITHOUT_FILES
         DATASETS_WITHOUT_FILES = list(self.get_dataset_configs_without_file().values_list('dataset', flat=True))
-        super().delete(using=using, keep_parents=keep_parents)
+        if permanently:
+            super().delete(using=using, keep_parents=keep_parents)
+        else:
+            self.user = None
+            self.output_file = None
+            self.name_tag = ''
+            self.save()
+            auto_delete_file_on_delete(sender=self.__class__, instance=self)  # Manually trigger cleanup
 
     # delete model output directory on disk when model is deleted
 
