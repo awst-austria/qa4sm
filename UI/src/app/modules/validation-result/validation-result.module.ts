@@ -37,6 +37,9 @@ import {CoreModule} from '../core/core.module';
 import {FilteringFormComponent} from './components/filtering-form/filtering-form.component';
 import {CalendarModule} from 'primeng/calendar';
 import {AccordionModule} from "primeng/accordion";
+import {ChipModule} from "primeng/chip";
+import {CardModule} from "primeng/card";
+import {Ripple} from "primeng/ripple";
 
 @NgModule({
   declarations: [ValidationrunRowComponent,
@@ -61,31 +64,34 @@ import {AccordionModule} from "primeng/accordion";
         PublishingComponent,
         ExistingValidationComponent,
     ],
-    imports: [
-        CommonModule,
-        PanelModule,
-        TooltipModule,
-        FontAwesomeModule,
-        RouterModule,
-        DropdownModule,
-        MultiSelectModule,
-        CalendarModule,
-        FormsModule,
-        InputTextModule,
-        NgDompurifyModule,
-        ButtonModule,
-        ReactiveFormsModule,
-        GalleriaModule,
-        DialogModule,
-        PanelMenuModule,
-        FieldsetModule,
-        CheckboxModule,
-        SelectButtonModule,
-        ToggleButtonModule,
-        MenuModule,
-        CoreModule,
-        AccordionModule
-    ]
+  imports: [
+    CommonModule,
+    PanelModule,
+    TooltipModule,
+    FontAwesomeModule,
+    RouterModule,
+    DropdownModule,
+    MultiSelectModule,
+    CalendarModule,
+    FormsModule,
+    InputTextModule,
+    NgDompurifyModule,
+    ButtonModule,
+    ReactiveFormsModule,
+    GalleriaModule,
+    DialogModule,
+    PanelMenuModule,
+    FieldsetModule,
+    CheckboxModule,
+    SelectButtonModule,
+    ToggleButtonModule,
+    MenuModule,
+    CoreModule,
+    AccordionModule,
+    ChipModule,
+    CardModule,
+    Ripple
+  ]
 })
 export class ValidationResultModule {
 }

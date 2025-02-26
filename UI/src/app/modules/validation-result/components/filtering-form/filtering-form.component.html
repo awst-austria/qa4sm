@@ -1,105 +1,99 @@
 <p-panel [toggleable]="true" class="side-panel" collapsed="true">
-    <ng-template pTemplate="header">
-        <div class="side-menu-header my-3 ml-2">
-            Filter validations
-            <span class="pi pi-question-circle"
-                  pTooltip="Select filter from the list.">
+  <ng-template pTemplate="header">
+    <div class="side-menu-header my-3 ml-2">
+      Filter validations
+      <span class="pi pi-question-circle"
+            pTooltip="Select filter from the list.">
       </span>
-        </div>
-    </ng-template>
+    </div>
+  </ng-template>
 
-    <span class="p-float-label">
-        <p-dropdown
-                id="filterVarSelector"
-                [options]="FILTER_CONFIGS"
-                [(ngModel)]="selectedFilter"
-                placeholder="Select a filter"
-                optionLabel="displayName"
-                [style]="{'width': '100%', 'border-radius': '0 0 0 0', 'height': '42px'}">
-        </p-dropdown>
-        <label for="{{'filterVarSelector'}}">Select a filter</label>
+    <span class="p-float-label mb-1">
+          <p-dropdown
+            id="filterVarSelector"
+            [options]="FILTER_CONFIGS"
+            [(ngModel)]="selectedFilter"
+            placeholder="Select a filter"
+            optionLabel="label"
+            [style]="{'width': '100%'}">
+          </p-dropdown>
+          <label for="{{'filterVarSelector'}}">Select a filter</label>
     </span>
 
     <!--  -->
     <ng-container *ngIf="selectedFilter" [ngSwitch]="selectedFilter.type" class="lg:w-4 w-12" id="filterParamSelector">
-        <p-multiSelect *ngSwitchCase="'multi-select'"
-                       [options]="selectedFilter.options|async"
-                       [(ngModel)]="selectedFilter.value"
-                       display="chip"
-                       [filter]="false"
-                       showHeader="false"
-                       [style]="{'width': '100%', 'border-radius': '0 0 0 0'}"/>
+      <p-multiSelect *ngSwitchCase="'multi-select'"
+                     [options]="selectedFilter.options|async"
+                     [(ngModel)]="selectedFilter.value"
+                     [placeholder]="selectedFilter.optionPlaceHolder"
+                     [filter]="true"
+                     maxSelectedLabels="2"
+                     display="chip"
+                     showHeader="false"
+                     [style]="{'width': '100%'}"/>
 
-        <input pInputText *ngSwitchCase="'string'"
-               [(ngModel)]="selectedFilter.value"
-               placeholder="Enter name"
-               [style]="{'width': '100%', 'border-radius': '0 0 0 0', 'height': '42px'}"/>
+      <input pInputText
+             *ngSwitchCase="'string'"
+             [(ngModel)]="selectedFilter.value"
+             [placeholder]="selectedFilter.optionPlaceHolder"
+             [style]="{'width': '100%'}"/>
 
-        <p-calendar *ngSwitchCase="'date'"
-                    [(ngModel)]="selectedFilter.value"
-                    dateFormat="dd/mm/yy"
-                    [inputStyle]="{'width': '100%', 'height': '42px',  'border-radius': '0 0 0 0'}"
-                    placeholder="Select Date">
-        </p-calendar>
-
+      <p-calendar *ngSwitchCase="'date'"
+                  [(ngModel)]="selectedFilter.value"
+                  dateFormat="dd/mm/yy"
+                  [inputStyle]="{'width': '100%'}"
+                  [placeholder]="selectedFilter.optionPlaceHolder">
+      </p-calendar>
+      <div class="flex flex-column w-12">
+        <p-button
+          [style]="{'width': '100%'}"
+          styleClass="p-button-outlined p-button-primary"
+          label="Add Filter"
+          pTooltip="Click to apply all"
+          (onClick)="addFilter()">
+        </p-button>
+      </div>
     </ng-container>
 
-    <!-- [pTooltip]="selectedFilterKey === 'Dataset' && !spatial && !temporal ? 'Please select at least one of referencing methods.' : null" -->
-    <!--    <div class="lg:w-2 w-12">-->
-    <!--      <div class="button-group flex flex-row">-->
-    <!--        <p-button-->
-    <!--          label="Add"-->
-    <!--          icon="pi pi-filter"-->
-    <!--          class="p-button-success p-button-rounded"-->
-    <!--          (click)="addFilter()"-->
-    <!--          [disabled]="!isFilterValid() || !selectedFilterKey"-->
-    <!--          tooltipPosition="right"-->
-    <!--          [style]="{'border-radius': '0 0 0 0', 'height': '42px'}">-->
-    <!--        </p-button>-->
-    <!--        <p-button-->
-    <!--          label="Cancel"-->
-    <!--          icon="pi pi-ban"-->
-    <!--          class="p-button-danger p-button-rounded"-->
-    <!--          (click)="cancelFilter()"-->
-    <!--          [style]="{'border-radius': '0 4px 4px 0', 'height': '42px'}">-->
-    <!--        </p-button>-->
-    <!--      </div>-->
-    <!--    </div>-->
+    <p-fieldset *ngIf="validationFilters().length" legend="Selected Filters">
+      <div class="flex md:flex-column flex-row align-content-start justify-content-center p-0">
+        <p-chip
+          class="flex w-12"
+          *ngFor="let filter of validationFilters()"
+          [pTooltip]="filter.value.toString()"
+          [removable]="true"
+          (onRemove)="removeFilter(filter)">
+          <span class="mr-2">
+            {{ filter.label }}
+          </span>
+          <span *ngIf="filter.value.length"
+                class="bg-primary border-circle w-2rem h-2rem flex align-items-center justify-content-center">
+            {{ filter.value.length }}
+          </span>
+        </p-chip>
+      </div>
+    </p-fieldset>
+  <div
+    class="mt-3 flex flex-row lg:flex-nowrap column-gap-1 justify-content-center align-content-center w-12">
+    <div class="flex flex-column w-6">
+      <p-button
+        [style]="{'width': '100%'}"
+        label="Cancel"
+        icon="pi pi-ban"
+        pTooltip="Remove all"
+        (onClick)="cleanFilters()">
+      </p-button>
+    </div>
+    <div class="flex flex-column w-6">
+      <p-button
+        [style]="{'width': '100%'}"
+        styleClass="p-button-outlined p-button-warning"
+        label="Apply Filters"
+        pTooltip="Click to apply all"
+        (onClick)="filterValidations()">
+      </p-button>
+    </div>
 
-    <!--    <div *ngIf="activeFilters.length > 0" class="active-filters">-->
-    <!--        <div class="filter-heading">Active Filters:</div>-->
-    <!--        <div *ngFor="let filter of activeFilters; let i = index" class="p-m-2 p-shadow-2 filter-chip">-->
-    <!--            <div class="filter-item">-->
-    <!--                <div class="filter-text">-->
-    <!--                    <ng-container *ngIf="filter.filter === 'Submission Date'">-->
-    <!--                        {{ filter.filter | titlecase }}:-->
-    <!--                        <div class="filter-values">-->
-    <!--            <span *ngFor="let value of filter.values; let j = index">-->
-    <!--              <span class="p-pill p-pill-info">{{ value | date:'dd/MM/yyyy' }}</span>-->
-    <!--              <span *ngIf="j < filter.values.length - 1"> - </span>-->
-    <!--            </span>-->
-    <!--                        </div>-->
-    <!--                    </ng-container>-->
-    <!--                    <ng-container *ngIf="filter.filter !== 'Submission Date'">-->
-    <!--                        {{ filter.filter | titlecase }}:-->
-    <!--                        <div class="filter-values">-->
-    <!--            <span *ngFor="let value of filter.values; let j = index">-->
-    <!--              <span class="p-pill p-pill-info">{{ value }}</span>-->
-    <!--              <span *ngIf="j < filter.values.length - 1">, </span>-->
-    <!--            </span>-->
-    <!--                        </div>-->
-    <!--                    </ng-container>-->
-    <!--                </div>-->
-    <!--                <div class="button-group">-->
-    <!--                    <button pButton icon="pi pi-pencil" class="p-button-rounded p-button-info"-->
-    <!--                            (click)="editFilter(i)"></button>-->
-    <!--                    <button pButton icon="pi pi-times" class="p-button-rounded p-button-danger"-->
-    <!--                            (click)="removeFilter(i)"></button>-->
-    <!--                </div>-->
-    <!--            </div>-->
-    <!--        </div>-->
-    <!--    </div>-->
-
-
+  </div>
 </p-panel>
 

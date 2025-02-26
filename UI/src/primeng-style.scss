@@ -4029,10 +4029,10 @@ div.carousel-caption {
 
 .p-fieldset .p-fieldset-legend {
   padding: 1rem 1.25rem;
-  border: 1px solid #dee2e6;
+  border: none;
   color: #212529;
-  background: #efefef;
-  font-weight: 600;
+  background: transparent;
+  font-weight: 400;
   border-radius: 4px;
 }
 
@@ -6317,16 +6317,18 @@ div.carousel-caption {
 }
 
 .p-chip {
-  background-color: #dee2e6;
-  color: #212529;
-  border-radius: 16px;
-  padding: 0 0.75rem;
+  background-color: transparent;
+  color: $base-font-color;
+  padding: 0.75rem;
+  border: 1px solid #dee2e6;
+  border-radius: 4px;
 }
 
 .p-chip .p-chip-text {
   line-height: 1.5;
   margin-top: 0.25rem;
   margin-bottom: 0.25rem;
+  font-size: 1rem;
 }
 
 .p-chip .p-chip-icon {

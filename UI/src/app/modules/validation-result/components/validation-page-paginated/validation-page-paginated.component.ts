@@ -47,7 +47,6 @@ export class ValidationPagePaginatedComponent implements OnInit {
 
   dataFetchError = signal(false);
 
-
   constructor(private validationrunService: ValidationrunService,
               private datasetService: DatasetService,
               private datasetVersionService: DatasetVersionService,
@@ -94,6 +93,8 @@ export class ValidationPagePaginatedComponent implements OnInit {
       .set('limit', String(this.limit))
       .set('order', String(this.order()));
 
+    const filters = this.valFilters;
+    console.log('there are the filters', filters)
 
     const validationSet$ = this.published()
       ? this.validationrunService.getPublishedValidationruns(parameters)

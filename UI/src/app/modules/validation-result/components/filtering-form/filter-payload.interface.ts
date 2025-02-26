@@ -8,10 +8,11 @@ export interface FilterPayload {
 
 export interface FilterConfig {
   name: string;
-  displayName: string;
+  label: string;
+  optionPlaceHolder: string;
   type: FilterType;
-  value: string[];
-  validationFn: (value: any) => boolean;
-  formatValuesFn: (value: any) => string[];
+  validationFn?: (value: any) => boolean;
+  formatValuesFn?: (value: any) => string[];
   options?: string[] | Observable<string[]>;
+  value?: string[];
 }
