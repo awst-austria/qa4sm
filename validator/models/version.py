@@ -1,7 +1,6 @@
 from django.db import models
 from validator.models.filter import DataFilter
 
-
 class DatasetVersion(models.Model):
     id = models.AutoField(primary_key=True)
     short_name = models.CharField(max_length=30)
