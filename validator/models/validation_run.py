@@ -8,7 +8,7 @@ from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
-from django.db.models.signals import post_delete
+from django.db.models.signals import post_delete, post_save
 from django.dispatch.dispatcher import receiver
 from django.utils import timezone
 
@@ -36,6 +36,13 @@ class ValidationRun(models.Model):
         (MEAN_STD, 'Mean/standard deviation'),
         (BETA_SCALING, 'CDF matching with beta distribution fitting'),
     )
+
+    JOB_STATUSES = (
+        ('DONE', 'Done'),
+        ('SCHEDULED', 'Scheduled'),
+        ('ERROR', 'Error'),
+        ('RUNNING', 'Running'),
+        ('CANCELLED', 'Cancelled'))
 
     # scale to
     SCALE_TO_REF = 'ref'
@@ -66,6 +73,9 @@ class ValidationRun(models.Model):
 
     # temporal matching window size:
     TEMP_MATCH_WINDOW = 12
+
+    # intra-annual metrics
+
 
     # intra-annual metrics
 
@@ -136,6 +146,9 @@ class ValidationRun(models.Model):
 
     stability_metrics = models.BooleanField(default=False)
 
+    status = models.CharField(max_length=10, choices=JOB_STATUSES, default='SCHEDULED')
+    is_removed = models.BooleanField(default=False)
+
     # many-to-one relationships coming from other models:
     # dataset_configurations from DatasetConfiguration
     # celery_tasks from CeleryTask
@@ -146,12 +159,17 @@ class ValidationRun(models.Model):
             return None
 
         if self.progress == -1:
-            initial_date = self.start_time
+            #If the validation run is cancelled, expiry date is 2 months after start date
+            expiry_date = self.start_time + timedelta(days=settings.VALIDATION_EXPIRY_DAYS)
+        elif self.last_extended:
+            #if validation run is extended, expiry date is 7 days after extension -> make sure full warning time is given
+            expiry_date = self.last_extended + timedelta(days=settings.VALIDATION_EXPIRY_WARNING_DAYS)
         else:
-            initial_date = self.last_extended if self.last_extended else self.end_time
+            #nominal expiry date is 2 months after job finished. 
+            expiry_date = self.end_time + timedelta(days=settings.VALIDATION_EXPIRY_DAYS)
 
-        return initial_date + timedelta(days=settings.VALIDATION_EXPIRY_DAYS)
-
+        return expiry_date
+    
     @property
     def is_expired(self):
         e = self.expiry_date
@@ -169,6 +187,22 @@ class ValidationRun(models.Model):
     @property
     def all_files_exist(self):
         return len(self.get_dataset_configs_without_file()) == 0
+
+    def save(self, *args, **kwargs):
+        # this is definitely a bad idea to override save with extra logic to fill status
+        # I will change it once things are working. 
+        if self.progress == 0 and not self.end_time:
+            self.status = 'SCHEDULED'
+        elif self.progress == 100 and self.end_time:
+            self.status = 'DONE'
+        elif self.progress < 0:
+            self.status = 'CANCELLED'
+        elif self.end_time and self.progress < 100:
+            self.status = 'ERROR'
+        else:
+            self.status = 'RUNNING'
+
+        super().save(*args, **kwargs)
 
     def get_graphics_path(self):
         return self.output_file.path.replace(self.output_file.name, f'{self.id}/graphs.zip')
@@ -284,6 +318,19 @@ class ValidationRun(models.Model):
         super().delete(using=using, keep_parents=keep_parents)
 
     # delete model output directory on disk when model is deleted
+
+
+
+@receiver(post_save, sender=ValidationRun)
+def deleteOutput_onRemove(sender, instance, **kwargs):
+    # delete output directory if validation run is selected to be removed
+    
+    if instance.is_removed and instance.output_file:
+        outputPath = instance.output_file.path
+        folderPath = os.path.dirname(outputPath)
+
+        if os.path.exists(folderPath):
+            rmtree(folderPath)
 
 
 @receiver(post_delete, sender=ValidationRun)
