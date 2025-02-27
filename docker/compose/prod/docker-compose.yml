@@ -12,7 +12,10 @@ services:
       - type: bind
         source: "${QA4SM_WORKSPACE}db/data"
         target: /var/lib/postgresql/data
-        
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "300m"
   qa4sm-redis:
     image: "redis:alpine"
     restart: always
@@ -22,7 +25,7 @@ services:
     restart: always
 
   web:
-    image: "awst/qa4sm:3.0.0"
+    image: "awst/qa4sm:3.0.1"
     restart: always
     environment:
       POSTGRES_PASSWORD: "${POSTGRES_PASSWORD}"
@@ -61,18 +64,22 @@ services:
       - type: bind
         source: "${QA4SM_WORKSPACE}db/dump"
         target: /var/lib/qa4sm-web-val/valentina/db_dump  
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "300m"
 
   proxy:
-    image: "awst/qa4sm-proxy:3.0.0"
+    image: "awst/qa4sm-proxy:3.0.1"
     restart: always
     ports:
       - "8080:80"
   ui:
-    image: "awst/qa4sm-ui:3.0.0"
+    image: "awst/qa4sm-ui:3.0.1"
     restart: always
 
   worker-1:
-    image: "awst/qa4sm-worker:3.0.0"
+    image: "awst/qa4sm-worker:3.0.1"
     restart: always
     environment:
       QA4SM_DB_HOST: "${QA4SM_DB_HOST}"
@@ -91,6 +98,10 @@ services:
       - type: bind
         source: "${QA4SM_WORKSPACE}webapp/user_data"
         target: /var/lib/qa4sm-web-val/valentina/data/user_data
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "300m"
     deploy:
       resources:
         limits:
