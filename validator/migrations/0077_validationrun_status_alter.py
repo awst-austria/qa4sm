@@ -3,7 +3,6 @@
 import django.core.files.storage
 from django.db import migrations, models
 from validator.validation.util import determine_status
- # ✅ Import inside function (avoids circular import)
 
 
 class Migration(migrations.Migration):
