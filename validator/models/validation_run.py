@@ -67,11 +67,14 @@ class ValidationRun(models.Model):
     # temporal matching window size:
     TEMP_MATCH_WINDOW = 12
 
-    # intra-annual metrics
-
-
+    STATUS_CHOICES = [
+        ('SCHEDULED', 'Scheduled'),
+        ('RUNNING', 'Running'),
+        ('DONE', 'Done'),
+        ('CANCELLED', 'Cancelled'),
+        ('ERROR', 'Error'),
+    ]
     # fields
-
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name_tag = models.CharField(max_length=80, blank=True)
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True)
@@ -135,6 +138,7 @@ class ValidationRun(models.Model):
     intra_annual_overlap = models.IntegerField(blank=True, null=True)
 
     stability_metrics = models.BooleanField(default=False)
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='SCHEDULED')
 
     # many-to-one relationships coming from other models:
     # dataset_configurations from DatasetConfiguration
@@ -192,6 +196,10 @@ class ValidationRun(models.Model):
 
         if commit:
             self.save()
+
+    def update_status(self):
+        from validator.validation.util import determine_status  # Delayed Import to avoid circular imports
+        self.status = determine_status(self.progress, self.end_time, self.status)
 
     def clean(self):
         super(ValidationRun, self).clean()
@@ -277,6 +285,11 @@ class ValidationRun(models.Model):
     def contains_user_data(self):
         user_data = [conf for conf in self.dataset_configurations.all() if conf.dataset.user_dataset.all()]
         return len(user_data) > 0
+
+    def save(self, *args, **kwargs):
+        """Override save to automatically update status."""
+        self.update_status()
+        super().save(*args, **kwargs)
 
     def delete(self, permanently=True, using=None, keep_parents=False):
         global DATASETS_WITHOUT_FILES
