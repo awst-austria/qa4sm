@@ -53,7 +53,7 @@ def auto_cleanup():
             send_val_expiry_notification(validations_near_expiring)
 
     # this part refer to validations that have already no user assigned but there might be some remaining celery tasks
-    no_user_validations = ValidationRun.objects.filter(user=None).filter(doi='')
+    no_user_validations = ValidationRun.objects.filter(user=None).filter(doi='').exclude('is_removed')
     for no_user_val in no_user_validations:
         celery_tasks = CeleryTask.objects.filter(validation_id=no_user_val.id)
         for task in celery_tasks:
