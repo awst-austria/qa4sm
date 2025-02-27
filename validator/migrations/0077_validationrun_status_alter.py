@@ -27,5 +27,10 @@ class Migration(migrations.Migration):
                                             ('CANCELLED', 'Cancelled'), ('ERROR', 'Error')], default='SCHEDULED',
                                    max_length=10),
         ),
+        migrations.AddField(
+            model_name='validationrun',
+            name='is_removed',
+            field=models.BooleanField(default=False),
+        ),
         migrations.RunPython(update_existing_statuses)
     ]

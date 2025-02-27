@@ -140,6 +140,8 @@ class ValidationRun(models.Model):
     stability_metrics = models.BooleanField(default=False)
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='SCHEDULED')
 
+    is_removed = models.BooleanField(default=False)
+
     # many-to-one relationships coming from other models:
     # dataset_configurations from DatasetConfiguration
     # celery_tasks from CeleryTask
@@ -170,6 +172,7 @@ class ValidationRun(models.Model):
     def is_unpublished(self):
         return not self.doi
 
+
     @property
     def all_files_exist(self):
         return len(self.get_dataset_configs_without_file()) == 0
@@ -196,10 +199,6 @@ class ValidationRun(models.Model):
 
         if commit:
             self.save()
-
-    def update_status(self):
-        from validator.validation.util import determine_status  # Delayed Import to avoid circular imports
-        self.status = determine_status(self.progress, self.end_time, self.status)
 
     def clean(self):
         super(ValidationRun, self).clean()
@@ -286,10 +285,23 @@ class ValidationRun(models.Model):
         user_data = [conf for conf in self.dataset_configurations.all() if conf.dataset.user_dataset.all()]
         return len(user_data) > 0
 
+    def update_status(self):
+        from validator.validation.util import determine_status  # Delayed Import to avoid circular imports
+        self.status = determine_status(self.progress, self.end_time, self.status)
+
     def save(self, *args, **kwargs):
         """Override save to automatically update status."""
         self.update_status()
         super().save(*args, **kwargs)
+
+
+    def __remove_validation(self):
+        self.user = None
+        self.output_file = None
+        self.name_tag = ''
+        self.is_removed = True
+        self.save()
+        auto_delete_file_on_delete(sender=self.__class__, instance=self)  # Manually trigger cleanup
 
     def delete(self, permanently=True, using=None, keep_parents=False):
         global DATASETS_WITHOUT_FILES
@@ -297,11 +309,7 @@ class ValidationRun(models.Model):
         if permanently:
             super().delete(using=using, keep_parents=keep_parents)
         else:
-            self.user = None
-            self.output_file = None
-            self.name_tag = ''
-            self.save()
-            auto_delete_file_on_delete(sender=self.__class__, instance=self)  # Manually trigger cleanup
+            self.__remove_validation()
 
     # delete model output directory on disk when model is deleted
 
