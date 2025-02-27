@@ -46,7 +46,7 @@ def auto_cleanup():
                 celery_tasks = CeleryTask.objects.filter(validation_id=validation.id)
                 for task in celery_tasks:
                     task.delete()
-                validation.delete(permanent=False)
+                validation.delete(permanently=False)
                 cleaned_up.append(vid)
 
         if len(validations_near_expiring) != 0:
@@ -59,7 +59,7 @@ def auto_cleanup():
         for task in celery_tasks:
             task.delete()
             # we still need to clean it, because there might be a situation when the user got removed
-        no_user_val.delete(permanent=False)
+        no_user_val.delete(permanently=False)
         cleaned_up.append(str(no_user_val.id))
 
 
