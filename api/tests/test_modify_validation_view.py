@@ -519,7 +519,7 @@ class TestModifyValidationView(TestCase):
         assert response.status_code == 200
         val_record = ValidationRun.objects.filter(pk=self.run_id)
         assert len(val_record) == 1  # record still there
-        assert val_record.first().is_deleted
+        assert val_record.first().is_removed
 
     def test_delete_multiple_results(self):
         create_default_validation_without_running(self.test_user)
