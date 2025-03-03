@@ -52,6 +52,11 @@ services:
       - type: bind
         source: "${QA4SM_WORKSPACE}webapp/cronjob-scripts"
         target: /var/lib/qa4sm-web-val/valentina/cronjob-scripts
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "300m"
+        max-file: "3"
   proxy:
     image: "awst/qa4sm-proxy:latest-2"
     restart: always
@@ -84,6 +89,11 @@ services:
       - type: bind
         source: "${QA4SM_USERMANUAL_FOLDER}"
         target: /var/lib/qa4sm-web-val/valentina/docs
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "300m"
+        max-file: "3"
     deploy:
       resources:
         limits:
