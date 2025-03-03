@@ -202,8 +202,8 @@ def get_used_variables(filters, dataset, variable):
                 continue
 
             if fil.name in (
-                "FIL_SMOSL2_RFI_high_confidence",
-                "FIL_SMOSL2_RFI_good_confidence",
+                    "FIL_SMOSL2_RFI_high_confidence",
+                    "FIL_SMOSL2_RFI_good_confidence",
             ):
                 variables.append('RFI_Prob')
                 variables.append('N_RFI_X')
@@ -212,11 +212,14 @@ def get_used_variables(filters, dataset, variable):
                 continue
 
             if fil.name in (
-                "FIL_SMOSL2_ORBIT_ASC",
-                "FIL_SMOSL2_ORBIT_DES"
+                    "FIL_SMOSL2_ORBIT_ASC",
+                    "FIL_SMOSL2_ORBIT_DES",
+                    "FIL_SMAP_L3_V9_ORBIT_ASC",
+                    "FIL_SMAP_L3_V9_ORBIT_DSC"
             ):
                 variables.append('Overpass')
                 continue
+
 
     # meaning these are parametrized filters
     except AttributeError:
@@ -227,6 +230,13 @@ def get_used_variables(filters, dataset, variable):
 
             if fil.filter.name == "FIL_SMOSL2_CHI2P":
                 variables.append('Chi_2_P')
+                continue
+            if fil.filter.name == "FIL_SMAP_L3_V9_VWC":
+                variables.append('vegetation_water_content')
+                continue
+
+            if fil.filter.name == "FIL_SMAP_L3_V9_static_water_body":
+                variables.append('static_water_body_fraction')
                 continue
 
     return variables
@@ -254,7 +264,7 @@ def setup_filtering(reader, filters, param_filters, dataset, variable) -> tuple:
 
     masking_filters = []
     adapter_kwargs = dict()
-
+    # TODO Adapt filters
     for pfil in param_filters:
         __logger.debug(
             f"Setting up parametrised filter {pfil.filter.name} for "
@@ -269,6 +279,16 @@ def setup_filtering(reader, filters, param_filters, dataset, variable) -> tuple:
         if pfil.filter.name == "FIL_SMOSL2_CHI2P":
             param = regex_sub(r'[ ]+,[ ]+', ',', pfil.parameters)
             masking_filters.append(('Chi_2_P', '>=', float(param)))
+            continue
+
+        if pfil.filter.name == "FIL_SMAP_L3_V9_VWC":
+            param = regex_sub(r'[ ]+,[ ]+', ',', pfil.parameters)
+            masking_filters.append(('vegetation_water_content', '<=', float(param)))
+            continue
+
+        if pfil.filter.name == "FIL_SMAP_L3_V9_static_water_body":
+            param = regex_sub(r'[ ]+,[ ]+', ',', pfil.parameters)
+            masking_filters.append(('static_water_body_fraction', '>=', float(param)))
             continue
 
         inner_reader = filtered_reader
@@ -492,6 +512,13 @@ def setup_filtering(reader, filters, param_filters, dataset, variable) -> tuple:
         if fil.name == "FIL_ERA5_LAND_TEMP_UNFROZEN":
             era_temp_variable = variable.short_name.replace("wv", "t")
             masking_filters.append((era_temp_variable, '>', 274.15))
+            continue
+        # Select Ascending or descending mode for SMAP L3 Version 9 Data
+        if fil.name == "FIL_SMAP_L3_V9_ORBIT_ASC":
+            masking_filters.append(('Overpass', '==', 2))
+            continue
+        if fil.name == "FIL_SMAP_L3_V9_ORBIT_DSC":
+            masking_filters.append(('Overpass', '==', 1))
             continue
 
     if len(masking_filters):

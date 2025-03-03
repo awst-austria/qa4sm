@@ -8,7 +8,7 @@ from pygeobase.io_base import GriddedBase
 
 from validator.models import DataFilter
 from validator.validation import globals
-from validator.validation.readers import ReaderWithTsExtension
+from validator.validation.readers import ReaderWithTsExtension, SMAPL3_AM_PM
 
 __logger = logging.getLogger(__name__)
 
@@ -26,12 +26,13 @@ def get_depths_params(param_filters):
         depth_from = float(param_filters[ind].parameters.split(',')[0])
         depth_to = float(param_filters[ind].parameters.split(',')[1])
 
-    if depth_to < 0 or depth_from <0:
+    if depth_to < 0 or depth_from < 0:
         raise ValueError("the depth range can not be negative")
     if depth_to < depth_from:
         raise ValueError("depth_to can not be less than depth_from")
 
     return [depth_from, depth_to]
+
 
 def get_meta_filter_dict(filters) -> Union[dict, None]:
     """
@@ -128,7 +129,7 @@ def create_jobs(
     total_points = 0
 
     # if we've got data on a grid, process one cell at a time
-    if isinstance(reader, GriddedBase) or isinstance(reader, ReaderWithTsExtension):
+    if isinstance(reader, GriddedBase) or isinstance(reader, ReaderWithTsExtension) or isinstance(reader, SMAPL3_AM_PM):
         cells = reader.grid.get_cells()
 
         jobs = []
@@ -247,8 +248,8 @@ def create_upscaling_lut(
     lut = {}
     # a bit of a kack to match dataset name and configuation
     for other_name, other_config in zip(
-        datasets.keys(),
-        validation_run.dataset_configurations.all(),
+            datasets.keys(),
+            validation_run.dataset_configurations.all(),
     ):
         if other_name == spatial_ref_name:
             continue
@@ -277,7 +278,8 @@ def create_upscaling_lut(
                     gpis, lons, lats = other_points[0], other_points[1], other_points[2]
                     for gpi, lon, lat in zip(gpis, lons, lats):
                         # list all non-ref points under the same ref gpi
-                        ref_gpi = ref_grid.find_nearest_gpi(lon, lat)[0]  # todo: implement methods here to combine irregular grids
+                        ref_gpi = ref_grid.find_nearest_gpi(lon, lat)[
+                            0]  # todo: implement methods here to combine irregular grids
                         if ref_gpi in other_lut.keys():
                             other_lut[ref_gpi].append((gpi, lon, lat))
                         else:

@@ -2,7 +2,6 @@ import logging
 from os import path
 import numpy as np
 
-
 from ascat.read_native.cdr import AscatGriddedNcTs
 from c3s_sm.interface import C3STs
 from ecmwf_models.interface import ERATs
@@ -27,10 +26,45 @@ import pandas as pd
 
 __logger = logging.getLogger(__name__)
 
+
+class SMAPL3_AM_PM:
+    """
+    Concatenate 2 time series upon reading
+    """
+
+    def __init__(self, cls, path, *args, **kwargs):
+        """
+        Parameters
+        ----------
+        cls: Callable
+            Reader class to wrap
+        path: str
+            Path to the main time series (not the extension dataset)
+        path_ext: str
+            Extension time series path
+        args, kwargs:
+            Additional arguments to set up the readers
+        """
+        self.base_reader = cls(path, *args, **kwargs)
+
+    @property
+    def grid(self):
+        return self.base_reader.grid
+
+    def read(self, *args, **kwargs) -> pd.DataFrame:
+        """
+        Read time series at location for both the base dataset and the
+        extension. If extension is read, concatenate both in time.
+        """
+        ts = self.base_reader.read(*args, **kwargs)
+        return ts
+
+
 class ReaderWithTsExtension:
     """
     Concatenate 2 time series upon reading
     """
+
     def __init__(self, cls, path, path_ext, *args, **kwargs):
         """
         Parameters
@@ -72,6 +106,7 @@ class ReaderWithTsExtension:
 
         return ts
 
+
 class SBPCAReader(GriddedNcOrthoMultiTs):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -107,6 +142,24 @@ class SMOSL2Reader(GriddedNcIndexedRaggedTs):
                 ts = ts.dropna(subset='Soil_Moisture')
             if 'acquisition_time' in ts.columns:
                 ts = ts.dropna(subset='acquisition_time')
+        return ts
+
+
+class SMAPL3_V9Reader(GriddedNcIndexedRaggedTs):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+    def read(self, *args, **kwargs) -> pd.DataFrame:
+        ts = super().read(*args, **kwargs)
+        if (ts is not None) and not ts.empty:
+            ts = ts[ts.index.notnull()]
+            for col in ['soil_moisture_error', "retrieval_qual_flag", "freeze_thaw_fraction", "surface_flag",
+                        "surface_temperature", "vegetation_opacity", "vegetation_water_content", "landcover_class",
+                        'static_water_body_fraction']:
+                if col in ts.columns:
+                    ts[col] = ts[col].fillna(0)
+            if 'soil_moisture' in ts.columns:
+                ts = ts.dropna(subset='soil_moisture')
         return ts
 
 
@@ -146,7 +199,7 @@ def create_reader(dataset, version) -> GriddedNcTs:
     if dataset.short_name == globals.GLDAS:
         reader = GLDASTs(folder_name, ioclass_kws={'read_bulk': True})
 
-    if dataset.short_name == globals.SMAP_L3:
+    if dataset.short_name == globals.SMAP_L3 and version.short_name != 'SMAP_V9_AM_PM':
         smap_data_folder = path.join(folder_name, 'netcdf')
         reader = SMAPTs(smap_data_folder, ioclass_kws={'read_bulk': True})
 
@@ -188,7 +241,14 @@ def create_reader(dataset, version) -> GriddedNcTs:
 
     if dataset.short_name == globals.SMAP_L2:
         reader = GriddedNcOrthoMultiTs(folder_name, ioclass_kws={'read_bulk': True})
-
+        # and version.short_name == globals.SMAP_V9_AM_PM
+    if dataset.short_name == globals.SMAP_L3 and version.short_name == 'SMAP_V9_AM_PM':
+        smap_data_folder = path.join(folder_name, 'netcdf')
+        # ext_path = path.join(dataset.storage_path, version.short_name + '/netcdf-ext', 'timeseries')
+        reader = SMAPL3_AM_PM(
+            SMAPL3_V9Reader, smap_data_folder, ioclass_kws={'read_bulk': True},
+            grid=load_grid(path.join(smap_data_folder, "grid.nc"))
+        )
     if dataset.short_name == globals.SMOS_SBPCA:
         if version.short_name == globals.SMOS_SBPCA_v724:
             reader = SBPCAReader(folder_name, ioclass_kws={'read_bulk': True})
