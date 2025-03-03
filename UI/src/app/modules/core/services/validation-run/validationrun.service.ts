@@ -35,7 +35,7 @@ const addValidationUrl = urlPrefix + '/add-validation/' + zeroId
 const removeValidationUrl = urlPrefix + '/remove-validation/' + zeroId;
 const removeMultipleValidationUrl = urlPrefix + '/delete-multiple-validations';
 const archiveMultipleValidationUrl = urlPrefix + '/archive-multiple-validations';
-const deleteResultUrl = urlPrefix + '/delete-validation/' + zeroId;
+const deleteResultUrl = urlPrefix + '/delete-validation/' + zeroId + '/';
 const stopValidationUrl = urlPrefix + '/stop-validation/' + zeroId;
 const headers = new HttpHeaders({'X-CSRFToken': csrfToken});
 
