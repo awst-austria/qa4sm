@@ -17,7 +17,6 @@ from validator.mailer import send_autocleanup_failed
 
 def auto_cleanup():
     users = User.objects.all()
-    cleaned_up = []
     notified = []
     for user in users:
         # no, you can't filter for is_expired because it isn't in the database. but you can exclude running validations
@@ -46,22 +45,19 @@ def auto_cleanup():
                 celery_tasks = CeleryTask.objects.filter(validation_id=validation.id)
                 for task in celery_tasks:
                     task.delete()
-                validation.delete()
-                cleaned_up.append(vid)
+                validation.delete(permanently=False)
 
         if len(validations_near_expiring) != 0:
             send_val_expiry_notification(validations_near_expiring)
 
-    # this part refer to validations that belong to a non-existing user -> there is no user to send a notification
-    # to, so we can just remove those validations (apart from published ones)
-    no_user_validations = ValidationRun.objects.filter(user=None)
+    # this part refer to validations that have already no user assigned but there might be some remaining celery tasks
+    no_user_validations = ValidationRun.objects.filter(user=None).filter(doi='').exclude(is_removed=True)
     for no_user_val in no_user_validations:
         celery_tasks = CeleryTask.objects.filter(validation_id=no_user_val.id)
         for task in celery_tasks:
             task.delete()
-        if no_user_val.doi == '':
-            no_user_val.delete()
-            cleaned_up.append(str(no_user_val.id))
+            # we still need to clean it, because there might be a situation when the user got removed
+        no_user_val.delete(permanently=False)
 
 
 @api_view(['POST'])

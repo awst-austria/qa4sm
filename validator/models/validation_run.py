@@ -67,11 +67,14 @@ class ValidationRun(models.Model):
     # temporal matching window size:
     TEMP_MATCH_WINDOW = 12
 
-    # intra-annual metrics
-
-
+    STATUS_CHOICES = [
+        ('SCHEDULED', 'Scheduled'),
+        ('RUNNING', 'Running'),
+        ('DONE', 'Done'),
+        ('CANCELLED', 'Cancelled'),
+        ('ERROR', 'Error'),
+    ]
     # fields
-
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name_tag = models.CharField(max_length=80, blank=True)
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True)
@@ -135,6 +138,9 @@ class ValidationRun(models.Model):
     intra_annual_overlap = models.IntegerField(blank=True, null=True)
 
     stability_metrics = models.BooleanField(default=False)
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='SCHEDULED')
+
+    is_removed = models.BooleanField(default=False)
 
     # many-to-one relationships coming from other models:
     # dataset_configurations from DatasetConfiguration
@@ -177,6 +183,7 @@ class ValidationRun(models.Model):
     @property
     def is_unpublished(self):
         return not self.doi
+
 
     @property
     def all_files_exist(self):
@@ -290,10 +297,31 @@ class ValidationRun(models.Model):
         user_data = [conf for conf in self.dataset_configurations.all() if conf.dataset.user_dataset.all()]
         return len(user_data) > 0
 
-    def delete(self, using=None, keep_parents=False):
+    def update_status(self):
+        from validator.validation.util import determine_status  # Delayed Import to avoid circular imports
+        self.status = determine_status(self.progress, self.end_time, self.status)
+
+    def save(self, *args, **kwargs):
+        """Override save to automatically update status."""
+        self.update_status()
+        super().save(*args, **kwargs)
+
+
+    def __remove_validation(self):
+        self.user = None
+        self.output_file = None
+        self.name_tag = ''
+        self.is_removed = True
+        self.save()
+        auto_delete_file_on_delete(sender=self.__class__, instance=self)  # Manually trigger cleanup
+
+    def delete(self, permanently=True, using=None, keep_parents=False):
         global DATASETS_WITHOUT_FILES
         DATASETS_WITHOUT_FILES = list(self.get_dataset_configs_without_file().values_list('dataset', flat=True))
-        super().delete(using=using, keep_parents=keep_parents)
+        if permanently:
+            super().delete(using=using, keep_parents=keep_parents)
+        else:
+            self.__remove_validation()
 
     # delete model output directory on disk when model is deleted
 
