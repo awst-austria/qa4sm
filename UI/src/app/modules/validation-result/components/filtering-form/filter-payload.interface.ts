@@ -14,5 +14,6 @@ export interface FilterConfig {
   validationFn?: (value: any) => boolean;
   formatValuesFn?: (value: any) => string[];
   options?: string[] | Observable<string[]>;
-  value?: string[];
+  value?: string;
+  selectedOptions?: string[];
 }

@@ -8,7 +8,7 @@
     </div>
   </ng-template>
 
-    <span class="p-float-label mb-1">
+  <span class="p-float-label mb-1">
           <p-dropdown
             id="filterVarSelector"
             [options]="FILTER_CONFIGS"
@@ -20,59 +20,62 @@
           <label for="{{'filterVarSelector'}}">Select a filter</label>
     </span>
 
-    <!--  -->
-    <ng-container *ngIf="selectedFilter" [ngSwitch]="selectedFilter.type" class="lg:w-4 w-12" id="filterParamSelector">
-      <p-multiSelect *ngSwitchCase="'multi-select'"
-                     [options]="selectedFilter.options|async"
-                     [(ngModel)]="selectedFilter.value"
-                     [placeholder]="selectedFilter.optionPlaceHolder"
-                     [filter]="true"
-                     maxSelectedLabels="2"
-                     display="chip"
-                     showHeader="false"
-                     [style]="{'width': '100%'}"/>
+  <!--  -->
+  <ng-container *ngIf="selectedFilter" [ngSwitch]="selectedFilter.type" class="lg:w-4 w-12" id="filterParamSelector">
+    <p-multiSelect *ngSwitchCase="'multi-select'"
+                   [options]="selectedFilter.options|async"
+                   [(ngModel)]="selectedFilter.selectedOptions"
+                   [placeholder]="selectedFilter.optionPlaceHolder"
+                   [filter]="true"
+                   (onChange)="updateFilters()"
+                   showHeader="false"
+                   [style]="{'width': '100%'}"/>
 
-      <input pInputText
-             *ngSwitchCase="'string'"
-             [(ngModel)]="selectedFilter.value"
-             [placeholder]="selectedFilter.optionPlaceHolder"
-             [style]="{'width': '100%'}"/>
+    <input pInputText
+           *ngSwitchCase="'string'"
+           [(ngModel)]="selectedFilter.value"
+           [placeholder]="selectedFilter.optionPlaceHolder"
+           [style]="{'width': '100%'}"/>
 
-      <p-calendar *ngSwitchCase="'date'"
-                  [(ngModel)]="selectedFilter.value"
-                  dateFormat="dd/mm/yy"
-                  [inputStyle]="{'width': '100%'}"
-                  [placeholder]="selectedFilter.optionPlaceHolder">
-      </p-calendar>
-      <div class="flex flex-column w-12">
-        <p-button
-          [style]="{'width': '100%'}"
-          styleClass="p-button-outlined p-button-primary"
-          label="Add Filter"
-          pTooltip="Click to add the selected filter"
-          (onClick)="addFilter()">
-        </p-button>
-      </div>
-    </ng-container>
+    <p-calendar *ngSwitchCase="'date'"
+                [(ngModel)]="selectedFilter.value"
+                dateFormat="dd/mm/yy"
+                [inputStyle]="{'width': '100%'}"
+                [placeholder]="selectedFilter.optionPlaceHolder">
+    </p-calendar>
+    <div class="flex flex-column w-12" *ngIf="!(selectedFilter.type==='multi-select')">
+      <p-button
+        [style]="{'width': '100%'}"
+        styleClass="p-button-outlined p-button-primary"
+        label="Add option"
+        pTooltip="Click to add value to the selected filter"
+        [disabled]="!selectedFilter.value"
+        (onClick)="addOption()">
+      </p-button>
+    </div>
+  </ng-container>
 
-    <p-fieldset *ngIf="validationFilters().length" legend="Selected Filters">
-      <div class="flex md:flex-column flex-row align-content-start justify-content-center p-0">
-        <p-chip
-          class="flex w-12"
-          *ngFor="let filter of validationFilters()"
-          [pTooltip]="filter.value.toString()"
-          [removable]="true"
-          (onRemove)="removeFilter(filter)">
-          <span class="mr-2">
-            {{ filter.label }}
-          </span>
-          <span *ngIf="filter.value.length"
-                class="bg-primary border-circle w-2rem h-2rem flex align-items-center justify-content-center">
-            {{ filter.value.length }}
-          </span>
-        </p-chip>
-      </div>
-    </p-fieldset>
+  <p-fieldset *ngIf="validationFilters().length" legend="Selected Filters">
+    <div class="flex md:flex-column flex-row align-content-start justify-content-center p-0">
+      <p-chip
+        class="flex w-12"
+        *ngFor="let filter of validationFilters()"
+        [pTooltip]=""
+        [removable]="true"
+        (onRemove)="removeFilter(filter)">
+        <div class="mr-2">
+          {{ filter.label }}
+        </div>
+        <div *ngIf="filter.selectedOptions.length"
+             class="flex md:flex-column flex-row align-content-start justify-content-center p-0">
+          <p-chip *ngFor="let option of filter.selectedOptions"
+                  [label]="option"
+                  [removable]="true"
+                  (onRemove)="removeOption(filter, option)"/>
+        </div>
+      </p-chip>
+    </div>
+  </p-fieldset>
 
   <div
     class="mt-3 flex flex-row lg:flex-nowrap column-gap-1 justify-content-center align-content-center w-12">
@@ -85,15 +88,15 @@
         (onClick)="cleanFilters()">
       </p-button>
     </div>
-    <div class="flex flex-column w-6">
-      <p-button
-        [style]="{'width': '100%'}"
-        styleClass="p-button-outlined p-button-warning"
-        label="Apply Filters"
-        pTooltip="Click to apply all"
-        (onClick)="filterValidations()">
-      </p-button>
-    </div>
+<!--    <div class="flex flex-column w-6">-->
+<!--      <p-button-->
+<!--        [style]="{'width': '100%'}"-->
+<!--        styleClass="p-button-outlined p-button-warning"-->
+<!--        label="Apply Filters"-->
+<!--        pTooltip="Click to apply all"-->
+<!--        (onClick)="filterValidations()">-->
+<!--      </p-button>-->
+<!--    </div>-->
 
   </div>
 </p-panel>

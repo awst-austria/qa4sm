@@ -5,12 +5,6 @@ import {DatasetDto} from 'src/app/modules/core/services/dataset/dataset.dto';
 import {Observable, of} from "rxjs";
 import {catchError, debounceTime, map} from "rxjs/operators";
 
-interface FilterState {
-  // contains the runtime values of filters
-  value: any;
-}
-
-
 @Component({
   selector: 'qa-filtering-form',
   templateUrl: './filtering-form.component.html',
@@ -25,8 +19,7 @@ export class FilteringFormComponent implements OnInit {
   loading = signal<boolean>(false);  // Signal to manage loading state
   error = signal<string | null>(null);  // Signal to manage error state
 
-
-  public FILTER_CONFIGS: FilterConfig[] = [
+  public readonly FILTER_CONFIGS: FilterConfig[] = [
     {
       name: 'validationStatuses',
       label: 'Validation Status',
@@ -39,12 +32,14 @@ export class FilteringFormComponent implements OnInit {
       label: 'Validation Name',
       optionPlaceHolder: 'Enter validation name',
       type: 'string',
+      selectedOptions: []
     },
     {
       name: 'startTime',
       label: 'Submission Date',
       optionPlaceHolder: 'Select date',
       type: 'date',
+      selectedOptions: []
     },
     {
       name: 'spatialRef',
@@ -69,19 +64,9 @@ export class FilteringFormComponent implements OnInit {
     }
   ];
 
-  selectedFilterKey: string | null = null; // key of filter config
   selectedFilter: FilterConfig;
 
-
-  activeFilters: { filter: string, values: string[] }[] = []; // active filters and their values
-
-
-  constructor() {
-  }
-
-
   ngOnInit(): void {
-    // this.validationFilters.set(this.FILTER_CONFIGS)
     this.fetchPrettyNames();
   }
 
@@ -91,42 +76,33 @@ export class FilteringFormComponent implements OnInit {
     );
 
     ['spatialRef', 'temporalRef', 'scalingRef'].forEach(field => {
-      this.FILTER_CONFIGS.find(filter => filter.name === field).options = prettyNames;
-    })
-
-  }
-
-  cleanFilters(): void {
-    this.selectedFilter = null;
-    this.validationFilters.set([]);
-  }
-
-  // addFilter() {
-  //   this.validationFilters.update(filters => {
-  //       if (!filters.find(filter => filter.name === this.selectedFilter.name)) {
-  //         filters.push(this.selectedFilter);
-  //       }
-  //       return filters;
-  //     }
-  //   )
-  // }
-
-  addFilter(): void {
-    this.validationFilters.update(filters => {
-      const filterForUpdate = filters.find(filter => filter.name === this.selectedFilter.name)
-
-      if (!filterForUpdate) {
-        filters.push(this.selectedFilter);
-      } else if (filterForUpdate && !filterForUpdate.options) {
-        console.log(filterForUpdate.value);
-        // filterForUpdate.value.push()
+      const filter = this.FILTER_CONFIGS.find(filter => filter.name === field);
+      if (filter) {
+        filter.options = prettyNames;
       }
-      console.log(filters, filterForUpdate)
+    });
+  }
+
+
+
+  updateFilters(): void {
+    this.validationFilters.update(filters => {
+      const filterForUpdate = filters.find(filter => filter.name === this.selectedFilter.name);
+      if (filterForUpdate) {
+        // Remove filter if multi-select has no selected options
+        if (filterForUpdate.type === 'multi-select' && filterForUpdate.selectedOptions.length === 0) {
+          return filters.filter(filter => filter.name !== filterForUpdate.name);
+        }
+      } else {
+        filters.push(this.selectedFilter);
+      }
       return filters;
     });
-    this.applyFilters();
+    // this.applyFilters();
   }
 
+
+  //
   private applyFilters(): void {
     this.loading.set(true);
     this.error.set(null);
@@ -159,12 +135,59 @@ export class FilteringFormComponent implements OnInit {
     });
   }
 
+  addOption(): void {
+    // For multiselect this step is done automatically, because the ngModel updates selected options
+    if (this.selectedFilter && this.selectedFilter.value) {
+      this.selectedFilter.selectedOptions.push(this.selectedFilter.value);
+      this.updateFilters();
+    }
+  }
 
+  removeOption(filter: FilterConfig, option: any): void {
+    filter.selectedOptions = filter.selectedOptions.filter(opt => opt !== option);
+    if (filter.selectedOptions.length === 0) {
+      this.removeFilter(filter);
+    }
+  }
 
-  removeFilter(filterToRemove: FilterConfig) {
+  // removeFilter(filterToRemove: FilterConfig) {
+  //   this.validationFilters.update(filters => {
+  //     return filters.filter(filter => filter.name !== filterToRemove.name);
+  //   });
+  //   const filterConfig = this.FILTER_CONFIGS.find(filter => filter.name === filterToRemove.name);
+  //   if (filterConfig) {
+  //     filterConfig.value = null;
+  //     filterConfig.selectedOptions = [];
+  //   }
+  //   if (this.validationFilters().length === 0) {
+  //     this.selectedFilter = null;
+  //   } else {
+  //     this.selectedFilter = this.validationFilters()[0];
+  //   }
+  // }
+
+  removeFilter(filterToRemove: FilterConfig): void {
     this.validationFilters.update(filters => {
       return filters.filter(filter => filter.name !== filterToRemove.name);
     });
+    this.resetFilter(filterToRemove);
+    if (this.validationFilters().length === 0) {
+      this.selectedFilter = null;
+    } else {
+      this.selectedFilter = this.validationFilters()[0];
+    }
+  }
+
+  private resetFilter(filter: FilterConfig): void {
+    filter.value = null;
+    filter.selectedOptions = [];
+  }
+
+  cleanFilters(): void {
+    this.selectedFilter = null;
+    this.validationFilters.set([]);
+    // Clean the selectedOptions of all filters
+    this.FILTER_CONFIGS.forEach(this.resetFilter.bind(this));
   }
 
   filterValidations(): void {
