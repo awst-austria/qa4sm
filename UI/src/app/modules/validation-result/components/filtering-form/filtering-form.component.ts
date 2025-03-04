@@ -83,8 +83,6 @@ export class FilteringFormComponent implements OnInit {
     });
   }
 
-
-
   updateFilters(): void {
     this.validationFilters.update(filters => {
       const filterForUpdate = filters.find(filter => filter.name === this.selectedFilter.name);
@@ -99,7 +97,6 @@ export class FilteringFormComponent implements OnInit {
       return filters;
     });
   }
-
 
   addOption(): void {
     // For multiselect this step is done automatically, because the ngModel updates selected options
