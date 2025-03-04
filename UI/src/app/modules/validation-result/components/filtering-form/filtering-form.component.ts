@@ -3,7 +3,7 @@ import {FilterConfig} from './filter-payload.interface';
 
 import {DatasetDto} from 'src/app/modules/core/services/dataset/dataset.dto';
 import {Observable, of} from "rxjs";
-import {catchError, debounceTime, map} from "rxjs/operators";
+import {map} from "rxjs/operators";
 
 @Component({
   selector: 'qa-filtering-form',
@@ -98,42 +98,8 @@ export class FilteringFormComponent implements OnInit {
       }
       return filters;
     });
-    // this.applyFilters();
   }
 
-
-  //
-  private applyFilters(): void {
-    this.loading.set(true);
-    this.error.set(null);
-
-    const filterPayload = this.validationFilters().reduce((payload, filter) => {
-      payload[filter.name] = filter.value;
-      return payload;
-    }, {});
-
-    // Simulate backend request with debounce
-    of(filterPayload).pipe(
-      debounceTime(300),  // Apply debounce
-      map(payload => {
-        // console.log('Filter payload:', payload);
-        // Simulate successful backend response
-        return payload;
-      }),
-      catchError(err => {
-        this.error.set('An error occurred while applying filters.');
-        throw err;
-      })
-    ).subscribe({
-      next: response => {
-        this.loading.set(false);
-        // console.log('Filters applied successfully:', response);
-      },
-      error: () => {
-        this.loading.set(false);
-      }
-    });
-  }
 
   addOption(): void {
     // For multiselect this step is done automatically, because the ngModel updates selected options
@@ -149,22 +115,6 @@ export class FilteringFormComponent implements OnInit {
       this.removeFilter(filter);
     }
   }
-
-  // removeFilter(filterToRemove: FilterConfig) {
-  //   this.validationFilters.update(filters => {
-  //     return filters.filter(filter => filter.name !== filterToRemove.name);
-  //   });
-  //   const filterConfig = this.FILTER_CONFIGS.find(filter => filter.name === filterToRemove.name);
-  //   if (filterConfig) {
-  //     filterConfig.value = null;
-  //     filterConfig.selectedOptions = [];
-  //   }
-  //   if (this.validationFilters().length === 0) {
-  //     this.selectedFilter = null;
-  //   } else {
-  //     this.selectedFilter = this.validationFilters()[0];
-  //   }
-  // }
 
   removeFilter(filterToRemove: FilterConfig): void {
     this.validationFilters.update(filters => {
@@ -190,13 +140,4 @@ export class FilteringFormComponent implements OnInit {
     this.FILTER_CONFIGS.forEach(this.resetFilter.bind(this));
   }
 
-  filterValidations(): void {
-    const filterPayload = this.validationFilters().reduce((payload, filter) => {
-      // console.log(payload, filter)
-      payload[filter.name] = filter.value;
-      return payload;
-    }, {});
-    // console.log('Filter payload:', filterPayload);
-    // Send filterPayload to the backend here
-  }
 }
