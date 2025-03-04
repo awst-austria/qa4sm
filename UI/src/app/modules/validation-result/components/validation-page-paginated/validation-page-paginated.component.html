@@ -7,7 +7,9 @@
       *ngIf="!dataFetchError()"/>
     <qa-filtering-form *ngIf="(validations.length) && !dataFetchError()"
                        [availableDatasetsSignal]="datasets$"
-                       [(validationFilters)]="valFilters"/>
+                       [validationFilters]="valFilters()"
+                       (validationFiltersChange)="valFilters.set($event)"
+    />
   </div>
 
 
