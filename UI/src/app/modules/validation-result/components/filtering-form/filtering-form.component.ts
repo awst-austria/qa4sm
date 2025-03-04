@@ -85,23 +85,34 @@ export class FilteringFormComponent implements OnInit {
 
   updateFilters(): void {
     this.validationFilters.update(filters => {
-      const filterForUpdate = filters.find(filter => filter.name === this.selectedFilter.name);
+      // Create a new array for filters
+      const updatedFilters = [...filters];
+      const filterForUpdate = updatedFilters.find(filter => filter.name === this.selectedFilter.name);
+
       if (filterForUpdate) {
         // Remove filter if multi-select has no selected options
         if (filterForUpdate.type === 'multi-select' && filterForUpdate.selectedOptions.length === 0) {
-          return filters.filter(filter => filter.name !== filterForUpdate.name);
+          return updatedFilters.filter(filter => filter.name !== filterForUpdate.name);
+        } else {
+          // Create a new object for the updated filter to ensure immutability
+          const newFilter = {...filterForUpdate, selectedOptions: [...this.selectedFilter.selectedOptions]};
+          return updatedFilters.map(filter => filter.name === newFilter.name ? newFilter : filter);
         }
       } else {
-        filters.push(this.selectedFilter);
+        // Add a new filter by creating a new object
+        const newFilter = {...this.selectedFilter, selectedOptions: [...this.selectedFilter.selectedOptions]};
+        updatedFilters.push(newFilter);
       }
-      return filters;
+
+      return updatedFilters;
     });
   }
 
   addOption(): void {
     // For multiselect this step is done automatically, because the ngModel updates selected options
     if (this.selectedFilter && this.selectedFilter.value) {
-      this.selectedFilter.selectedOptions.push(this.selectedFilter.value);
+      // Create a new selectedOptions array to ensure immutability
+      this.selectedFilter.selectedOptions = [...this.selectedFilter.selectedOptions, this.selectedFilter.value];
       this.updateFilters();
     }
   }
