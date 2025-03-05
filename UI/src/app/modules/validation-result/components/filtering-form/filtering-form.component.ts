@@ -2,7 +2,7 @@ import {Component, input, model, signal} from '@angular/core';
 import {FilterConfig} from './filter-payload.interface';
 
 import {DatasetDto} from 'src/app/modules/core/services/dataset/dataset.dto';
-import {Observable, of} from "rxjs";
+import {Observable} from "rxjs";
 
 @Component({
   selector: 'qa-filtering-form',
@@ -20,49 +20,43 @@ export class FilteringFormComponent {
 
   public readonly FILTER_CONFIGS: FilterConfig[] = [
     {
-      name: 'validationStatuses',
-      label: 'Validation Status',
       backendName: 'status',
+      label: 'Validation Status',
       optionPlaceHolder: 'Select statuses',
       type: 'multi-select',
-      options: of(['Done', 'ERROR', 'Cancelled', 'Running', 'Scheduled']), // at some point it should be fetched from backend
+      options: ['Done', 'ERROR', 'Cancelled', 'Running', 'Scheduled'], // at some point it should be fetched from backend
     },
     {
-      name: 'validationName',
-      label: 'Validation Name',
       backendName: 'name',
+      label: 'Validation Name',
       optionPlaceHolder: 'Enter validation name',
       type: 'string',
       selectedOptions: []
     },
     {
-      name: 'startTime',
+      backendName: 'start_time',
       label: 'Submission Date',
       optionPlaceHolder: 'Select date',
-      backendName: 'start_time',
       type: 'date',
       selectedOptions: []
     },
     {
-      name: 'spatialRef',
-      label: 'Spatial Reference Dataset',
       backendName: 'spatial_reference',
+      label: 'Spatial Reference Dataset',
       optionPlaceHolder: 'Select datasets',
       type: 'string',
       selectedOptions: []
     },
     {
-      name: 'temporalRef',
-      label: 'Temporal Reference Dataset',
       backendName: 'temporal_reference',
+      label: 'Temporal Reference Dataset',
       optionPlaceHolder: 'Select datasets',
       type: 'string',
       selectedOptions: []
     },
     {
-      name: 'scalingRef',
-      label: 'Scaling Reference Dataset',
       backendName: 'scaling_reference',
+      label: 'Scaling Reference Dataset',
       optionPlaceHolder: 'Select datasets',
       type: 'string',
       selectedOptions: []
@@ -76,16 +70,16 @@ export class FilteringFormComponent {
     this.validationFilters.update(filters => {
       // Create a new array for filters
       const updatedFilters = [...filters];
-      const filterForUpdate = updatedFilters.find(filter => filter.name === this.selectedFilter.name);
+      const filterForUpdate = updatedFilters.find(filter => filter.backendName === this.selectedFilter.backendName);
 
       if (filterForUpdate) {
         // Remove filter if multi-select has no selected options
         if (filterForUpdate.type === 'multi-select' && filterForUpdate.selectedOptions.length === 0) {
-          return updatedFilters.filter(filter => filter.name !== filterForUpdate.name);
+          return updatedFilters.filter(filter => filter.backendName !== filterForUpdate.backendName);
         } else {
           // Create a new object for the updated filter to ensure immutability
           const newFilter = {...filterForUpdate, selectedOptions: [...this.selectedFilter.selectedOptions]};
-          return updatedFilters.map(filter => filter.name === newFilter.name ? newFilter : filter);
+          return updatedFilters.map(filter => filter.backendName === newFilter.backendName ? newFilter : filter);
         }
       } else {
         // Add a new filter by creating a new object
@@ -115,7 +109,7 @@ export class FilteringFormComponent {
 
   removeFilter(filterToRemove: FilterConfig): void {
     this.validationFilters.update(filters => {
-      return filters.filter(filter => filter.name !== filterToRemove.name);
+      return filters.filter(filter => filter.backendName !== filterToRemove.backendName);
     });
     this.resetFilter(filterToRemove);
     if (this.validationFilters().length === 0) {

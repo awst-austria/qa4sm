@@ -21,10 +21,11 @@
     </span>
 
   <!--  -->
-  <ng-container *ngIf="selectedFilter" [ngSwitch]="selectedFilter.type" class="lg:w-4 w-12" id="filterParamSelector">
+  <ng-container *ngIf="selectedFilter" [ngSwitch]="selectedFilter.type"
+                class="lg:w-4 w-12" id="filterParamSelector">
     <p-multiSelect *ngSwitchCase="'multi-select'"
-                   [options]="selectedFilter.options|async"
-                   [(ngModel)]="selectedFilter.selectedOptions"
+                   [options]="selectedFilter.options"
+                   [(ngModel)]="selectedFilter.value"
                    [placeholder]="selectedFilter.optionPlaceHolder"
                    [filter]="true"
                    (onChange)="updateFilters()"
