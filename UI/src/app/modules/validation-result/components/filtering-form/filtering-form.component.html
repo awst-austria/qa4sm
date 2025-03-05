@@ -40,6 +40,7 @@
     <p-calendar *ngSwitchCase="'date'"
                 [(ngModel)]="selectedFilter.value"
                 dateFormat="dd/mm/yy"
+                selectionMode="range"
                 [inputStyle]="{'width': '100%'}"
                 [placeholder]="selectedFilter.optionPlaceHolder">
     </p-calendar>

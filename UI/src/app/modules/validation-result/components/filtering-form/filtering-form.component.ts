@@ -1,16 +1,15 @@
-import {Component, input, model, OnInit, signal} from '@angular/core';
+import {Component, input, model, signal} from '@angular/core';
 import {FilterConfig} from './filter-payload.interface';
 
 import {DatasetDto} from 'src/app/modules/core/services/dataset/dataset.dto';
 import {Observable, of} from "rxjs";
-import {map} from "rxjs/operators";
 
 @Component({
   selector: 'qa-filtering-form',
   templateUrl: './filtering-form.component.html',
   styleUrl: './filtering-form.component.scss'
 })
-export class FilteringFormComponent implements OnInit {
+export class FilteringFormComponent {
 
   validationFilters = model<FilterConfig[]>()
   availableDatasetsSignal = input<Observable<DatasetDto[]>>();
@@ -49,45 +48,29 @@ export class FilteringFormComponent implements OnInit {
       label: 'Spatial Reference Dataset',
       backendName: 'spatial_reference',
       optionPlaceHolder: 'Select datasets',
-      type: 'multi-select',
-      options: [],
+      type: 'string',
+      selectedOptions: []
     },
     {
       name: 'temporalRef',
       label: 'Temporal Reference Dataset',
       backendName: 'temporal_reference',
       optionPlaceHolder: 'Select datasets',
-      type: 'multi-select',
-      options: [],
+      type: 'string',
+      selectedOptions: []
     },
     {
       name: 'scalingRef',
       label: 'Scaling Reference Dataset',
       backendName: 'scaling_reference',
       optionPlaceHolder: 'Select datasets',
-      type: 'multi-select',
-      options: [],
+      type: 'string',
+      selectedOptions: []
     }
   ];
 
   selectedFilter: FilterConfig;
 
-  ngOnInit(): void {
-    this.fetchPrettyNames();
-  }
-
-  private fetchPrettyNames(): void {
-    const prettyNames = this.availableDatasetsSignal().pipe(
-      map(dataset => dataset.map(item => item.pretty_name))
-    );
-
-    ['spatialRef', 'temporalRef', 'scalingRef'].forEach(field => {
-      const filter = this.FILTER_CONFIGS.find(filter => filter.name === field);
-      if (filter) {
-        filter.options = prettyNames;
-      }
-    });
-  }
 
   updateFilters(): void {
     this.validationFilters.update(filters => {
