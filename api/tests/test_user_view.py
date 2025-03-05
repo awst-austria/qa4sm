@@ -143,6 +143,34 @@ class TestUserView(TestCase):
         assert new_user
         assert not new_user.is_active # the account has been created but not activated
 
+        verification_email = mail.outbox[0]
+
+        # check content of verification email
+        assert verification_email
+        assert verification_email.subject
+        assert verification_email.body
+        assert verification_email.from_email == settings.EMAIL_FROM
+        assert self.test_user.email in verification_email.to
+        assert any(name in verification_email.body for name in [new_user.first_name, new_user.username]) # can be either name or username
+
+
+        urls = regex_find(r'http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+',
+                           verification_email.body)
+        verification_url = urls[0]
+        
+        # Test verification endpoint
+        response = self.client.get(verification_url)
+        assert response.status_code == 302  
+        
+        # Check user activation worked
+        new_user.refresh_from_db()
+        assert new_user.is_active
+
+        # Assert token is invalid after activation
+        response = self.client.get(verification_url)
+        assert response.status_code == 302
+        assert 'error' in response.url  
+
         # correct full user form - but the user already exists
         user_form_correct = {'username': 'geralt_of_rivia',
                              'password1':'roachRoach',

@@ -130,12 +130,13 @@ def send_new_user_verification(user, token):
     __logger.info('Sending email verification to user {}...'.format(user.id))
 
     help_url = settings.SITE_URL + get_angular_url('help')
+
     verification_url = settings.SITE_URL + get_angular_url('verify', token)
     #verification_url = f"{settings.SITE_URL}/api/verify-email/{user.id}/{token}/"
 
     subject = '[QA4SM] Verify your email address'
     body = f'''Dear {user.first_name or user.username},
-    thank you for signing up to QA4SM. To complete your registration, please verify your email address by clicking the following link: 
+    Thank you for signing up to QA4SM. To complete your registration, please verify your email address by clicking the following link: 
     
     {verification_url}
 
@@ -144,9 +145,6 @@ def send_new_user_verification(user, token):
     Kind regards,
     QA4SM team
     '''
-    print(user.email)
-    print(subject)
-    print(body)
 
     try:
         _send_email(recipients=[user.email],

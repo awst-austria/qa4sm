@@ -40,7 +40,7 @@ def signup_post(request):
         send_new_user_verification(newuser, token)
 
         # notify the admins
-        send_new_user_signed_up(newuser) # still keep this for now I guess? 
+        send_new_user_signed_up(newuser)
         response = JsonResponse({'response': 'New user registered, verification email sent.'}, status=200)
     else:
         errors = form.errors.get_json_data()
