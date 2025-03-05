@@ -3,13 +3,6 @@ import {SortChoicesModel} from './sort-choices-model';
 import {SortOrderModel} from './sort-order-model';
 
 
-export const ORDER_DIRECTION_DESC = 'descending';
-export const ORDER_DIRECTION_DESC_PREP = '-';
-
-export const ORDER_DIRECTION_ASC = 'ascending';
-export const ORDER_DIRECTION_ASC_PREP = '';
-
-
 @Component({
   selector: 'qa-sorting-form',
   templateUrl: './sorting-form.component.html',
@@ -21,7 +14,7 @@ export class SortingFormComponent {
   public sortingChoices: SortChoicesModel[] = [
     {
       displayName: 'Date',
-      queryName: 'start_time:asc'
+      queryName: 'start_time'
     },
     {
       displayName: 'Name',
