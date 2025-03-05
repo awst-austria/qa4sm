@@ -109,7 +109,6 @@ export class AuthService {
 
   switchLoginModal(switchOn: boolean, message: string | null = null) {
     // Toggle the login modal window with an optional header message
-    console.log('Switching login modal:', switchOn, message);
     this.showLoginModalSubject.next({show: switchOn, message});
   }
 

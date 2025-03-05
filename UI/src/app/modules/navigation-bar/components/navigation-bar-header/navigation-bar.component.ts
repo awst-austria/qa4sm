@@ -138,12 +138,13 @@ export class NavigationBarComponent implements OnInit {
     );
     this.updateLogo(window.innerWidth);
 
+    // handle opening the login modal window when directed from user email verification
     this.route.queryParams.subscribe(params => {
-      if (params['showLogin']) {
+      if (params['showLogin'] && !params['error']) {
         this.authService.switchLoginModal(true, params['message']);
       }
       if (params['error']) {
-        this.toastService.showErrorWithHeader('Error', params['error']);
+        this.toastService.showErrorWithHeader('Verification error', 'Something went wrong with the verification. Please try again or contact our support team.');
       }
     });
 
