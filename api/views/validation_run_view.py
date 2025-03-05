@@ -1,9 +1,6 @@
-from dateutil import parser
-from datetime import datetime
 from django.db.models import Q, ExpressionWrapper, F, BooleanField
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
-from django.utils import timezone
 
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes, authentication_classes
@@ -14,7 +11,7 @@ from rest_framework.authentication import TokenAuthentication
 from api.views.auxiliary_functions import get_fields_as_list
 from validator.models import ValidationRun, CopiedValidations
 
-ORDER_LIST = {
+ORDER_DICT = {
     'name:asc': 'name_tag',
     'name:desc': '-name_tag',
     'start_time:asc': 'start_time',
@@ -25,15 +22,15 @@ ORDER_LIST = {
     'spatial_reference_dataset:desc': '-spatial_reference_configuration_id__dataset__pretty_name'
 }
 
-# ORDER_LIST = ['name_tag',
-#               '-name_tag',
-#               'start_time',
-#               '-start_time',
-#               'progress',
-#               '-progress',
-#               'spatial_reference_configuration_id__dataset__pretty_name',
-#               '-spatial_reference_configuration_id__dataset__pretty_name'
-#               ]
+FILTER_DICT = {
+    'status': 'status',
+    'name': 'name_tag',
+    'start_time': 'start_time',
+    'spatial_reference': 'spatial_reference_configuration_id__dataset__pretty_name',
+    'temporal_reference': 'temporal_reference_configuration_id__dataset__pretty_name',
+    'scaling_reference': 'scaling_reference_configuration_id__dataset__pretty_name',
+}
+
 
 @api_view(['GET'])
 @permission_classes([AllowAny])
@@ -41,12 +38,12 @@ def published_results(request):
     limit = request.query_params.get('limit', None)
     offset = request.query_params.get('offset', None)
     order_name = request.query_params.get('order', None)
-    order = ORDER_LIST.get(order_name, None)
+    order = ORDER_DICT.get(order_name, None)
 
-    if order and order in ORDER_LIST:
-        val_runs = ValidationRun.objects.exclude(doi='').order_by(order)
-    elif not order:
-        val_runs = ValidationRun.objects.exclude(doi='')
+    val_runs = ValidationRun.objects.exclude(doi='')
+
+    if order:
+        val_runs = val_runs.order_by(order)
     else:
         return JsonResponse({'message': 'Not appropriate order given'}, status=status.HTTP_400_BAD_REQUEST, safe=False)
 
@@ -64,6 +61,7 @@ def published_results(request):
 
     return JsonResponse(response, status=status.HTTP_200_OK, safe=False)
 
+
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def my_results(request):
@@ -71,22 +69,27 @@ def my_results(request):
     limit = request.query_params.get('limit', None)
     offset = request.query_params.get('offset', None)
     order_name = request.query_params.get('order', None)
-    order = ORDER_LIST.get(order_name, None)
-
+    order = ORDER_DICT.get(order_name, None)
 
     user_validations = ValidationRun.objects.filter(user=current_user)
 
+    filters = {}
     for parameter in request.query_params:
         if parameter.startswith('filter'):
-            filter_query = parameter.split(':')[1]
-            values = request.query_params.get(parameter, None).split(',')
-            print(filter_query, values)
 
+            filter_name = parameter.split(':')[1]
+            filter_field = FILTER_DICT.get(filter_name, None)
+            if filter_field:
+                values = request.query_params.get(parameter, None).split(',')
+                filter_query = f'{filter_field}__in'
+                filters[filter_query] = values
+    if filters:
+        user_validations = user_validations.filter(**filters)
+        print(user_validations.filter(**filters))
 
-
-    if order and order in ORDER_LIST :
+    if order:
         user_validations = user_validations.order_by(order)
-    elif order not in ORDER_LIST:
+    else:
         return JsonResponse({'message': 'Not appropriate order given'}, status=status.HTTP_400_BAD_REQUEST, safe=False)
 
     if limit and offset:
@@ -98,8 +101,9 @@ def my_results(request):
 
     response = {'validations': serializer.data, 'length': len(user_validations)}
 
-    return JsonResponse(response, status=status.HTTP_200_OK, safe=False)
+    print('the response is', response)
 
+    return JsonResponse(response, status=status.HTTP_200_OK, safe=False)
 
 
 @api_view(['GET'])
@@ -174,7 +178,6 @@ def get_copied_validations(request, **kwargs):
 @api_view(['GET'])
 @authentication_classes([TokenAuthentication])
 def is_validation_finished(request, **kwargs):
-
     val_run = get_object_or_404(ValidationRun, pk=kwargs['id'])
     if not val_run:
         return JsonResponse(status=status.HTTP_404_NOT_FOUND)
@@ -182,25 +185,6 @@ def is_validation_finished(request, **kwargs):
     ifFinished = (val_run.progress == 100 and val_run.end_time is not None)
     return JsonResponse({'validation_complete': ifFinished}, status=status.HTTP_200_OK)
 
-def filter_by_validation_statuses(validation_statuses):
-    #Horrible code to apply set of job status filters.
-    # this function will be replaced with a simple filtering when we create a proper field
-    status_filters = Q()
-    for status in validation_statuses:
-        if status == 'Scheduled':
-            status_filters |= Q(progress=0, end_time__isnull=True)
-        elif status == 'Done':
-            status_filters |= Q(progress=100, end_time__isnull=False)
-        elif status == 'Cancelled':
-            status_filters |= Q(progress__lt=0)
-        elif status == 'ERROR':
-            status_filters |= Q(end_time__isnull=False, total_points=0)
-            #status_filters |= Q(total_points=0)
-        elif status == 'Running':
-            status_filters |= Q(progress__gte=0, progress__lt=100, end_time__isnull=True, total_points__gt=0)
-        else:
-            print('Status didnt match')
-    return status_filters
 
 class ValidationRunSerializer(ModelSerializer):
     class Meta:

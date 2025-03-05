@@ -16,5 +16,5 @@ export interface FilterConfig {
   options?: string[] | Observable<string[]>;
   value?: string;
   selectedOptions?: string[];
-  backendQuery: string;
+  backendName: string;
 }

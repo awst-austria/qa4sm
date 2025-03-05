@@ -99,8 +99,7 @@ export class ValidationPagePaginatedComponent implements OnInit {
       .set('order', String(this.order()));
 
     this.valFilters().forEach(filter => {
-      console.log(filter);
-      parameters = parameters.set('filter:' + filter.backendQuery, filter.selectedOptions.toString());
+      parameters = parameters.set('filter:' + filter.backendName, filter.selectedOptions.toString());
     });
 
 
@@ -185,7 +184,7 @@ export class ValidationPagePaginatedComponent implements OnInit {
       )
       .subscribe(
         response => {
-          const { validations, length } = response;
+          const {validations, length} = response;
           this.validations = validations;
         });
   }
