@@ -55,13 +55,14 @@ def verify_email(request, user_id, token):
         user = User.objects.get(pk=user_id)
     except User.DoesNotExist:
         return JsonResponse({'error': 'User not found.'}, status=status.HTTP_404_NOT_FOUND)
+    
     if account_activation_token.check_token(user, token):
         user.is_active = True
         user.save()
 
         frontend_url = settings.SITE_URL + get_angular_url('home')
 
-        return HttpResponseRedirect(f"{frontend_url}?showLogin=true&message=Email verified successfully")
+        return HttpResponseRedirect(f"{frontend_url}?showLogin=true&message=Login to complete registration")
     else:
         frontend_url = settings.SITE_URL + get_angular_url('home')
         return HttpResponseRedirect(f"{frontend_url}?error=Invalid or expired verification link")

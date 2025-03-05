@@ -131,7 +131,7 @@ def send_new_user_verification(user, token):
 
     help_url = settings.SITE_URL + get_angular_url('help')
     #verification_url = settings.SITE_URL + get_angular_url('verify', token)
-    verification_url = f"{settings.SITE_URL}/api/verify-email/{user.id}/{token}"
+    verification_url = f"{settings.SITE_URL}/api/verify-email/{user.id}/{token}/"
 
     subject = '[QA4SM] Verify your email address'
     body = f'''Dear {user.first_name or user.username},
