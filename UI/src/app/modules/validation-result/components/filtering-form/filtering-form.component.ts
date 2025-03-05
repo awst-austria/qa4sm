@@ -23,6 +23,7 @@ export class FilteringFormComponent implements OnInit {
     {
       name: 'validationStatuses',
       label: 'Validation Status',
+      backendQuery: 'status',
       optionPlaceHolder: 'Select statuses',
       type: 'multi-select',
       options: of(['Done', 'ERROR', 'Cancelled', 'Running', 'Scheduled']), // at some point it should be fetched from backend
@@ -30,6 +31,7 @@ export class FilteringFormComponent implements OnInit {
     {
       name: 'validationName',
       label: 'Validation Name',
+      backendQuery: 'name_tag',
       optionPlaceHolder: 'Enter validation name',
       type: 'string',
       selectedOptions: []
@@ -38,12 +40,14 @@ export class FilteringFormComponent implements OnInit {
       name: 'startTime',
       label: 'Submission Date',
       optionPlaceHolder: 'Select date',
+      backendQuery: 'start_time',
       type: 'date',
       selectedOptions: []
     },
     {
       name: 'spatialRef',
       label: 'Spatial Reference Dataset',
+      backendQuery: 'spatial_reference_configuration_id__dataset__pretty_name',
       optionPlaceHolder: 'Select datasets',
       type: 'multi-select',
       options: [],
@@ -51,6 +55,7 @@ export class FilteringFormComponent implements OnInit {
     {
       name: 'temporalRef',
       label: 'Temporal Reference Dataset',
+      backendQuery: 'temporal_reference_configuration_id__dataset__pretty_name',
       optionPlaceHolder: 'Select datasets',
       type: 'multi-select',
       options: [],
@@ -58,6 +63,7 @@ export class FilteringFormComponent implements OnInit {
     {
       name: 'scalingRef',
       label: 'Scaling Reference Dataset',
+      backendQuery: 'scaling_reference_configuration_id__dataset__pretty_name',
       optionPlaceHolder: 'Select datasets',
       type: 'multi-select',
       options: [],

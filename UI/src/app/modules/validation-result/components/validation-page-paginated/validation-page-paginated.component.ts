@@ -57,9 +57,9 @@ export class ValidationPagePaginatedComponent implements OnInit {
       this.getValidationsAndItsNumber();
     });
 
-    effect(() => {
-      console.log('Filter changes:', this.valFilters());
-    });
+    // effect(() => {
+    //   console.log('Filter changes:', this.valFilters());
+    // });
   }
 
   ngOnInit(): void {
@@ -98,8 +98,11 @@ export class ValidationPagePaginatedComponent implements OnInit {
       .set('limit', String(this.limit))
       .set('order', String(this.order()));
 
-    // const filters = this.valFilters;
-    // console.log('there are the filters', filters);
+    this.valFilters().forEach(filter => {
+      console.log(filter);
+      parameters = parameters.set('filter:' + filter.backendQuery, filter.selectedOptions.toString());
+    });
+
 
     const validationSet$ = this.published()
       ? this.validationrunService.getPublishedValidationruns(parameters)
