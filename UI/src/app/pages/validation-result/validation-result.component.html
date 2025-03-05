@@ -30,15 +30,13 @@
         </div>
 
       </div>
-      <div *ngIf="!validationRun"
-           class="flex flex-column align-content-center justify-content-center w-12">
+    </div>
+    <div *ngIf="dataFetchError()">
+      <div class="flex flex-column align-content-center justify-content-center w-12">
         <p class="lead text-muted">
           Sorry, looks like the validation you are trying to open does not exist anymore.
         </p>
       </div>
-    </div>
-    <div *ngIf="dataFetchError()">
-      <qa-error></qa-error>
     </div>
   </div>
   <!--  </div>-->
