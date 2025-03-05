@@ -110,7 +110,7 @@ def my_results(request):
 @permission_classes([AllowAny])
 def validation_run_by_id(request, **kwargs):
     val_run = get_object_or_404(ValidationRun, pk=kwargs['id'])
-    if val_run is None:
+    if val_run is None and not val_run.is_removed:
         return JsonResponse(None, status=status.HTTP_404_NOT_FOUND, safe=False)
 
     serializer = ValidationRunSerializer(val_run)
