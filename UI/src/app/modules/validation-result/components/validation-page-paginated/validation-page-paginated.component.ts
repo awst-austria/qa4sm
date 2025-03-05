@@ -32,7 +32,7 @@ export class ValidationPagePaginatedComponent implements OnInit {
   currentPage = 1;
   limit = 10;
   offset = 0;
-  order = signal('-start_time');
+  order = signal('start_time:desc');
 
   isLoading: boolean = false;
   orderChange: boolean = false;

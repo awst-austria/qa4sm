@@ -21,11 +21,11 @@ export class SortingFormComponent {
   public sortingChoices: SortChoicesModel[] = [
     {
       displayName: 'Date',
-      queryName: 'start_time'
+      queryName: 'start_time:asc'
     },
     {
       displayName: 'Name',
-      queryName: 'name_tag'
+      queryName: 'name'
     },
     {
       displayName: "Status",
@@ -33,18 +33,18 @@ export class SortingFormComponent {
     },
     {
       displayName: 'Spatial reference dataset',
-      queryName: 'spatial_reference_configuration_id__dataset__pretty_name'
+      queryName: 'spatial_reference_dataset'
     }
   ];
 
   public orderChoices: SortOrderModel[] = [
     {
       direction: 'descending',
-      queryPrefix: '-'
+      querySuffix: 'desc'
     },
     {
       direction: 'ascending',
-      queryPrefix: ''
+      querySuffix: 'asc'
     }
 
   ];
@@ -56,7 +56,7 @@ export class SortingFormComponent {
   }
 
   onSortingChange(): void {
-    const order = this.selectedOrderModel.queryPrefix + this.selectedChoicesModel.queryName;
+    const order = `${this.selectedChoicesModel.queryName}:${this.selectedOrderModel.querySuffix}`;
     this.orderQueryName.emit(order);
   }
 

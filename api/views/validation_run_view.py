@@ -14,22 +14,34 @@ from rest_framework.authentication import TokenAuthentication
 from api.views.auxiliary_functions import get_fields_as_list
 from validator.models import ValidationRun, CopiedValidations
 
-ORDER_LIST = ['name_tag',
-              '-name_tag',
-              'start_time',
-              '-start_time',
-              'progress',
-              '-progress',
-              'spatial_reference_configuration_id__dataset__pretty_name',
-              '-spatial_reference_configuration_id__dataset__pretty_name'
-              ]
+ORDER_LIST = {
+    'name:asc': 'name_tag',
+    'name:desc': '-name_tag',
+    'start_time:asc': 'start_time',
+    'start_time:desc': '-start_time',
+    'progress:asc': 'progress',
+    'progress:desc': '-progress',
+    'spatial_reference_dataset:asc': 'spatial_reference_configuration_id__dataset__pretty_name',
+    'spatial_reference_dataset:desc': '-spatial_reference_configuration_id__dataset__pretty_name'
+}
+
+# ORDER_LIST = ['name_tag',
+#               '-name_tag',
+#               'start_time',
+#               '-start_time',
+#               'progress',
+#               '-progress',
+#               'spatial_reference_configuration_id__dataset__pretty_name',
+#               '-spatial_reference_configuration_id__dataset__pretty_name'
+#               ]
 
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def published_results(request):
     limit = request.query_params.get('limit', None)
     offset = request.query_params.get('offset', None)
-    order = request.query_params.get('order', None)
+    order_name = request.query_params.get('order', None)
+    order = ORDER_LIST.get(order_name, None)
 
     if order and order in ORDER_LIST:
         val_runs = ValidationRun.objects.exclude(doi='').order_by(order)
@@ -58,7 +70,8 @@ def my_results(request):
     current_user = request.user
     limit = request.query_params.get('limit', None)
     offset = request.query_params.get('offset', None)
-    order = request.query_params.get('order', None)
+    order_name = request.query_params.get('order', None)
+    order = ORDER_LIST.get(order_name, None)
 
 
     user_validations = ValidationRun.objects.filter(user=current_user)
