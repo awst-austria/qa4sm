@@ -57,7 +57,7 @@ idna==3.10
 importlib_metadata==8.5.0
 iniconfig==2.0.0
 ismn==1.5.1
-Jinja2==3.1.4
+Jinja2==3.1.6
 joblib==1.4.2
 kiwisolver==1.4.7
 kombu==5.4.2
