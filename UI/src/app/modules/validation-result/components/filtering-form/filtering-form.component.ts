@@ -95,7 +95,7 @@ export class FilteringFormComponent {
     // For multiselect this step is done automatically, because the ngModel updates selected options
     if (this.selectedFilter && this.selectedFilter.value) {
       // Create a new selectedOptions array to ensure immutability
-      this.selectedFilter.selectedOptions = [...this.selectedFilter.selectedOptions, this.selectedFilter.value];
+      this.selectedFilter.selectedOptions = [this.selectedFilter.value];
       this.updateFilters();
     }
   }
