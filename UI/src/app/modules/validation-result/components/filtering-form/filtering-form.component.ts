@@ -24,7 +24,7 @@ export class FilteringFormComponent {
       label: 'Validation Status',
       optionPlaceHolder: 'Select statuses',
       type: 'multi-select',
-      options: ['Done', 'ERROR', 'Cancelled', 'Running', 'Scheduled'], // at some point it should be fetched from backend
+      options: ['DONE', 'ERROR', 'CANCELED', 'RUNNING', 'SCHEDULED'], // at some point it should be fetched from backend
     },
     {
       backendName: 'name',
