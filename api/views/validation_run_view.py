@@ -22,13 +22,31 @@ ORDER_DICT = {
     'spatial_reference_dataset:desc': '-spatial_reference_configuration_id__dataset__pretty_name'
 }
 
-FILTER_DICT = {
-    'status': 'status',
-    'name': 'name_tag',
-    'start_time': 'start_time',
-    'spatial_reference': 'spatial_reference_configuration_id__dataset__pretty_name',
-    'temporal_reference': 'temporal_reference_configuration_id__dataset__pretty_name',
-    'scaling_reference': 'scaling_reference_configuration_id__dataset__pretty_name',
+FILTER_CONFIG = {
+    'status': {
+        'field': 'status__in',
+        'type': 'in',
+    },
+    'name': {
+        'field': 'name_tag__icontains',
+        'type': 'contains',
+    },
+    'start_time': {
+        'field': 'start_time',
+        'type': 'range',
+    },
+    'spatial_reference': {
+        'field': 'spatial_reference_configuration_id__dataset__pretty_name__icontains',
+        'type': 'contains',
+    },
+    'temporal_reference': {
+        'field': 'temporal_reference_configuration_id__dataset__pretty_name__icontains',
+        'type': 'contains',
+    },
+    'scaling_reference': {
+        'field': 'scaling_ref_id__dataset__pretty_name__icontains',
+        'type': 'contains',
+    }
 }
 
 
@@ -76,14 +94,19 @@ def my_results(request):
     filters = {}
     for parameter in request.query_params:
         if parameter.startswith('filter'):
-
             filter_name = parameter.split(':')[1]
-            filter_field = FILTER_DICT.get(filter_name, None)
-            if filter_field:
+            filter_config = FILTER_CONFIG.get(filter_name, None)
+            if filter_config:
                 values = request.query_params.get(parameter, None).split(',')
-                filter_query = f'{filter_field}__in'
-                filters[filter_query] = values
+                if filter_config['type'] == 'range' and len(values) == 2:
+                    filters[f'{filter_config["field"]}__gte'] = values[0]
+                    filters[f'{filter_config["field"]}__lte'] = values[1]
+                elif filter_config['type'] == 'in':
+                    filters[filter_config['field']] = values
+                elif filter_config['type'] == 'contains':
+                    filters[filter_config['field']] = values[0]
     if filters:
+        print(filters)
         user_validations = user_validations.filter(**filters)
         print(user_validations.filter(**filters))
 
@@ -98,11 +121,8 @@ def my_results(request):
         serializer = ValidationRunSerializer(user_validations[offset:(offset + limit)], many=True)
     else:
         serializer = ValidationRunSerializer(user_validations, many=True)
-
+    print('response on its way')
     response = {'validations': serializer.data, 'length': len(user_validations)}
-
-    print('the response is', response)
-
     return JsonResponse(response, status=status.HTTP_200_OK, safe=False)
 
 
