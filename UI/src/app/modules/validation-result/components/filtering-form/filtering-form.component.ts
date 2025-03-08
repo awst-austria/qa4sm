@@ -25,41 +25,42 @@ export class FilteringFormComponent {
       optionPlaceHolder: 'Select statuses',
       type: 'multi-select',
       options: ['DONE', 'ERROR', 'CANCELED', 'RUNNING', 'SCHEDULED'], // at some point it should be fetched from backend
+      selectedOptions: signal([])
     },
     {
       backendName: 'name',
       label: 'Validation Name',
       optionPlaceHolder: 'Enter validation name',
       type: 'string',
-      selectedOptions: []
+      selectedOptions: signal([])
     },
     {
       backendName: 'start_time',
       label: 'Submission Date',
       optionPlaceHolder: 'Select date',
       type: 'date',
-      selectedOptions: []
+      selectedOptions: signal([])
     },
     {
       backendName: 'spatial_reference',
       label: 'Spatial Reference Dataset',
       optionPlaceHolder: 'Select datasets',
       type: 'string',
-      selectedOptions: []
+      selectedOptions: signal([])
     },
     {
       backendName: 'temporal_reference',
       label: 'Temporal Reference Dataset',
       optionPlaceHolder: 'Select datasets',
       type: 'string',
-      selectedOptions: []
+      selectedOptions: signal([])
     },
     {
       backendName: 'scaling_reference',
       label: 'Scaling Reference Dataset',
       optionPlaceHolder: 'Select datasets',
       type: 'string',
-      selectedOptions: []
+      selectedOptions: signal([])
     }
   ];
 
@@ -67,43 +68,43 @@ export class FilteringFormComponent {
 
 
   updateFilters(): void {
-    this.validationFilters.update(filters => {
-      // Create a new array for filters
-      const updatedFilters = [...filters];
-      const filterForUpdate = updatedFilters.find(filter => filter.backendName === this.selectedFilter.backendName);
-
-      if (filterForUpdate) {
-        // Remove filter if multi-select has no selected options
-        if (filterForUpdate.type === 'multi-select' && filterForUpdate.selectedOptions.length === 0) {
-          return updatedFilters.filter(filter => filter.backendName !== filterForUpdate.backendName);
-        } else {
-          // Create a new object for the updated filter to ensure immutability
-          const newFilter = {...filterForUpdate, selectedOptions: [...this.selectedFilter.selectedOptions]};
-          return updatedFilters.map(filter => filter.backendName === newFilter.backendName ? newFilter : filter);
-        }
+    const filters = this.validationFilters()
+    const filterForUpdate = filters.find(filter => filter.backendName === this.selectedFilter.backendName);
+    if (filterForUpdate) {
+    //   he re I may want to either update and emmit the updated version or to remove the existing filter
+    //   I want to remove the filter from the list when there is no options selected (for the input field filter, the filter can be removed with the removed button):
+      if (filterForUpdate.selectedOptions().length == 0 && filterForUpdate.type === 'multi-select') {
+        this.removeFilter(filterForUpdate)
       } else {
-        // Add a new filter by creating a new object
-        const newFilter = {...this.selectedFilter, selectedOptions: [...this.selectedFilter.selectedOptions]};
-        updatedFilters.push(newFilter);
+        // when not removing, refresh the filters
+        this.validationFilters.set([...filters])
       }
+    } else {
+      this.addFilter();
+    }
+  }
 
+  addFilter(): void{
+    this.validationFilters.update(filters => {
+      const updatedFilters = [...filters];
+      updatedFilters.push(this.selectedFilter);
       return updatedFilters;
     });
   }
+
+  onSelectedOptionsChange(newSelectedOptions: string[]): void {
+    console.log(newSelectedOptions)
+    this.selectedFilter.selectedOptions.set([...newSelectedOptions]); // Update the signal with the new value
+    this.updateFilters();
+  }
+
 
   addOption(): void {
     // For multiselect this step is done automatically, because the ngModel updates selected options
     if (this.selectedFilter && this.selectedFilter.value) {
       // Create a new selectedOptions array to ensure immutability
-      this.selectedFilter.selectedOptions = [this.selectedFilter.value];
+      this.selectedFilter.selectedOptions.set([this.selectedFilter.value]);
       this.updateFilters();
-    }
-  }
-
-  removeOption(filter: FilterConfig, option: any): void {
-    filter.selectedOptions = filter.selectedOptions.filter(opt => opt !== option);
-    if (filter.selectedOptions.length === 0) {
-      this.removeFilter(filter);
     }
   }
 
@@ -112,16 +113,17 @@ export class FilteringFormComponent {
       return filters.filter(filter => filter.backendName !== filterToRemove.backendName);
     });
     this.resetFilter(filterToRemove);
+
+  }
+
+  private resetFilter(filter: FilterConfig): void {
+    filter.value = null;
+    filter.selectedOptions.set([]);
     if (this.validationFilters().length === 0) {
       this.selectedFilter = null;
     } else {
       this.selectedFilter = this.validationFilters()[0];
     }
-  }
-
-  private resetFilter(filter: FilterConfig): void {
-    filter.value = null;
-    filter.selectedOptions = [];
   }
 
   cleanFilters(): void {

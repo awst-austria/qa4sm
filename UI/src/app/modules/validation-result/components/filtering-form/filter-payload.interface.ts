@@ -1,3 +1,5 @@
+import {WritableSignal} from "@angular/core";
+
 type FilterType = 'string' | 'dropdown' | 'multi-select' | 'single-select' | 'date' ;
 
 export interface FilterConfig {
@@ -7,5 +9,5 @@ export interface FilterConfig {
   type: FilterType;
   options?: string[];
   value?: string;
-  selectedOptions?: string[];
+  selectedOptions?: WritableSignal<string[]>;
 }

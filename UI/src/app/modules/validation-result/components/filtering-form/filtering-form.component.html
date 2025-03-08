@@ -25,10 +25,10 @@
                 class="lg:w-4 w-12" id="filterParamSelector">
     <p-multiSelect *ngSwitchCase="'multi-select'"
                    [options]="selectedFilter.options"
-                   [(ngModel)]="selectedFilter.selectedOptions"
+                   [ngModel]="selectedFilter.selectedOptions()"
+                   (ngModelChange)="onSelectedOptionsChange($event)"
                    [placeholder]="selectedFilter.optionPlaceHolder"
                    [filter]="true"
-                   (onChange)="updateFilters()"
                    showHeader="false"
                    [style]="{'width': '100%'}"/>
 
@@ -49,7 +49,7 @@
       <p-button
         [style]="{'width': '100%'}"
         styleClass="p-button-outlined p-button-primary"
-        label="Add option"
+        [label]="!selectedFilter.selectedOptions().length ? 'Add filter' : 'Update filter'"
         pTooltip="Click to add value to the selected filter"
         [disabled]="!selectedFilter.value"
         (onClick)="addOption()">
@@ -68,12 +68,10 @@
         <div class="mr-2">
           {{ filter.label }}
         </div>
-        <div *ngIf="filter.selectedOptions.length"
+        <div *ngIf="filter.selectedOptions().length"
              class="flex md:flex-column flex-row align-content-start justify-content-center p-0">
-          <p-chip *ngFor="let option of filter.selectedOptions"
-                  [label]="option"
-                  [removable]="filter.type === 'multi-select'"
-                  (onRemove)="removeOption(filter, option)"/>
+          <p-chip *ngFor="let option of filter.selectedOptions()"
+                  [label]="option"/>
         </div>
       </p-chip>
     </div>
