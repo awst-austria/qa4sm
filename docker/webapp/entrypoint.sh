@@ -28,7 +28,7 @@ fi
 
 if [[ "$QA4SM_INSTANCE" == "PROD" ]]; then
     git fetch origin
-    git switch master
+    git switch main
 fi
 
 cd $APP_DIR
