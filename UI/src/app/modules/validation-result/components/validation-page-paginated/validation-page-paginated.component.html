@@ -5,7 +5,7 @@
       [validations]="validations"
       [(multipleValidationAction)]="multipleValidationAction"
       *ngIf="!dataFetchError()"/>
-    <qa-filtering-form *ngIf="(validations.length) && !dataFetchError()"
+    <qa-filtering-form *ngIf="!dataFetchError()"
                        [availableDatasetsSignal]="datasets$"
                        [validationFilters]="valFilters()"
                        (validationFiltersChange)="valFilters.set($event)"
