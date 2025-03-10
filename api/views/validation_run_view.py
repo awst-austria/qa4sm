@@ -120,9 +120,10 @@ def my_results(request):
         offset = int(offset)
         serializer = ValidationRunSerializer(user_validations[offset:(offset + limit)], many=True)
     else:
-        serializer = ValidationRunSerializer(user_validations, many=True)
-    print('response on its way')
-    response = {'validations': serializer.data, 'length': len(user_validations)}
+        serializer = ValidationRunSerializer(val_runs, many=True)
+
+    response = {'validations': serializer.data, 'length': len(val_runs)}
+
     return JsonResponse(response, status=status.HTTP_200_OK, safe=False)
 
 
@@ -130,7 +131,8 @@ def my_results(request):
 @permission_classes([AllowAny])
 def validation_run_by_id(request, **kwargs):
     val_run = get_object_or_404(ValidationRun, pk=kwargs['id'])
-    if val_run is None and not val_run.is_removed:
+
+    if val_run is None or val_run.is_removed:
         return JsonResponse(None, status=status.HTTP_404_NOT_FOUND, safe=False)
 
     serializer = ValidationRunSerializer(val_run)
