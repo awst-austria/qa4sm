@@ -95,7 +95,7 @@ export class ValidationPagePaginatedComponent implements OnInit {
       .set('order', String(this.order()));
 
     this.valFilters().forEach(filter => {
-      parameters = parameters.set('filter:' + filter.backendName, filter.selectedOptions.toString());
+      parameters = parameters.set('filter:' + filter.backendName, filter.selectedOptions().toString());
     });
 
 
