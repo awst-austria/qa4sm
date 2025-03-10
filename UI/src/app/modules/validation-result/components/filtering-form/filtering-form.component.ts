@@ -17,6 +17,7 @@ export class FilteringFormComponent {
   panelCollapsed = signal<boolean>(true);  // Signal to manage the panel's collapsed state
   loading = signal<boolean>(false);  // Signal to manage loading state
   error = signal<string | null>(null);  // Signal to manage error state
+  // z =
 
   public readonly FILTER_CONFIGS: FilterConfig[] = [
     {
@@ -93,7 +94,6 @@ export class FilteringFormComponent {
   }
 
   onSelectedOptionsChange(newSelectedOptions: string[]): void {
-    console.log(newSelectedOptions)
     this.selectedFilter.selectedOptions.set([...newSelectedOptions]); // Update the signal with the new value
     this.updateFilters();
   }
