@@ -1,4 +1,4 @@
-import {Component, computed, HostListener, input, OnInit, signal} from '@angular/core';
+import {Component, effect, HostListener, input, OnInit, signal} from '@angular/core';
 import {ValidationrunService} from '../../../core/services/validation-run/validationrun.service';
 import {ValidationrunDto} from '../../../core/services/validation-run/validationrun.dto';
 import {HttpParams} from '@angular/common/http';
@@ -53,9 +53,9 @@ export class ValidationPagePaginatedComponent implements OnInit {
               private datasetVersionService: DatasetVersionService,
               private datasetVariableService: DatasetVariableService) {
 
-    // effect(() => {
-    //   this.getValidationsAndItsNumber();
-    // });
+    effect(() => {
+      this.getValidationsAndItsNumber();
+    });
   }
 
   ngOnInit(): void {
@@ -70,7 +70,6 @@ export class ValidationPagePaginatedComponent implements OnInit {
         this.refreshPage();
       }
     });
-    this.getValidationsAndItsNumber()
   }
 
   @HostListener('window:scroll', ['$event'])
@@ -87,60 +86,31 @@ export class ValidationPagePaginatedComponent implements OnInit {
     }
   }
 
-  getValidationsAndItsNumber = computed(() => {
-      this.isLoading = true;
+  getValidationsAndItsNumber(): void {
+    this.isLoading = true;
 
-      let parameters = new HttpParams()
-        .set('offset', String(this.offset))
-        .set('limit', String(this.limit))
-        .set('order', String(this.order()));
+    let parameters = new HttpParams()
+      .set('offset', String(this.offset))
+      .set('limit', String(this.limit))
+      .set('order', String(this.order()));
 
-      // const validationFilters = computed(() => this.valFilters())
-      this.valFilters().forEach(filter => {
-        parameters = parameters.set('filter:' + filter.backendName, filter.selectedOptions().toString());
-      });
+    this.valFilters().forEach(filter => {
+      parameters = parameters.set('filter:' + filter.backendName, filter.selectedOptions.toString());
+    });
 
 
-      const validationSet$ = this.published()
-        ? this.validationrunService.getPublishedValidationruns(parameters)
-        : this.validationrunService.getMyValidationruns(parameters);
+    const validationSet$ = this.published()
+      ? this.validationrunService.getPublishedValidationruns(parameters)
+      : this.validationrunService.getMyValidationruns(parameters);
 
-      validationSet$.pipe(
-        catchError(() => this.onDataFetchError())
-      )
-        .subscribe(
-          response => {
-            this.handleFetchedValidations(response);
-          });
-    }
-  )
-
-  // getValidationsAndItsNumber(): void {
-  //   this.isLoading = true;
-  //
-  //   let parameters = new HttpParams()
-  //     .set('offset', String(this.offset))
-  //     .set('limit', String(this.limit))
-  //     .set('order', String(this.order()));
-  //
-  //   // const validationFilters = computed(() => this.valFilters())
-  //   this.valFilters().forEach(filter => {
-  //     parameters = parameters.set('filter:' + filter.backendName, filter.selectedOptions().toString());
-  //   });
-  //
-  //
-  //   const validationSet$ = this.published()
-  //     ? this.validationrunService.getPublishedValidationruns(parameters)
-  //     : this.validationrunService.getMyValidationruns(parameters);
-  //
-  //   validationSet$.pipe(
-  //     catchError(() => this.onDataFetchError())
-  //   )
-  //     .subscribe(
-  //       response => {
-  //         this.handleFetchedValidations(response);
-  //       });
-  // }
+    validationSet$.pipe(
+      catchError(() => this.onDataFetchError())
+    )
+      .subscribe(
+        response => {
+          this.handleFetchedValidations(response);
+        });
+  }
 
   handleFetchedValidations(serverResponse: { validations: ValidationrunDto[]; length: number; }): void {
     this.maxNumberOfPages = Math.ceil(serverResponse.length / this.limit);
