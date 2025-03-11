@@ -82,11 +82,11 @@ export class ValidationPagePaginatedComponent implements OnInit {
     if ((windowBottom / docHeight) >= scrollThreshold && !this.isLoading && !this.endOfPage) {
       this.currentPage++;
       this.offset = (this.currentPage - 1) * this.limit;
-      this.getValidationsAndItsNumber();
+      this.getValidationsAndItsNumber(true);
     }
   }
 
-  getValidationsAndItsNumber(): void {
+  getValidationsAndItsNumber(onScroll = false): void {
     this.isLoading = true;
 
     let parameters = new HttpParams()
@@ -108,13 +108,16 @@ export class ValidationPagePaginatedComponent implements OnInit {
     )
       .subscribe(
         response => {
-          this.handleFetchedValidations(response);
+          this.handleFetchedValidations(response, onScroll);
         });
   }
 
-  handleFetchedValidations(serverResponse: { validations: ValidationrunDto[]; length: number; }): void {
+  handleFetchedValidations(serverResponse: {
+    validations: ValidationrunDto[];
+    length: number;
+  }, onScroll: boolean): void {
     this.maxNumberOfPages = Math.ceil(serverResponse.length / this.limit);
-    if (this.orderChange) {
+    if (!onScroll || this.orderChange) {
       this.validations = serverResponse.validations;
     } else {
       if (serverResponse.validations.length) {
