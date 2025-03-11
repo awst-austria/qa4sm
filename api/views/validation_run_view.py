@@ -10,6 +10,10 @@ from rest_framework.authentication import TokenAuthentication
 
 from api.views.auxiliary_functions import get_fields_as_list
 from validator.models import ValidationRun, CopiedValidations
+from dateutil.parser import parse
+
+def parse_date_filter(date_str: str):
+    return parse(date_str)
 
 ORDER_DICT = {
     'name:asc': 'name_tag',
@@ -21,6 +25,7 @@ ORDER_DICT = {
     'spatial_reference_dataset:asc': 'spatial_reference_configuration_id__dataset__pretty_name',
     'spatial_reference_dataset:desc': '-spatial_reference_configuration_id__dataset__pretty_name'
 }
+
 
 FILTER_CONFIG = {
     'status': {
@@ -34,6 +39,7 @@ FILTER_CONFIG = {
     'start_time': {
         'field': 'start_time',
         'type': 'range',
+        'parser': parse_date_filter
     },
     'spatial_reference': {
         'field': 'spatial_reference_configuration_id__dataset__pretty_name__icontains',
@@ -99,8 +105,8 @@ def my_results(request):
             if filter_config:
                 values = request.query_params.get(parameter, None).split(',')
                 if filter_config['type'] == 'range' and len(values) == 2:
-                    filters[f'{filter_config["field"]}__gte'] = values[0]
-                    filters[f'{filter_config["field"]}__lte'] = values[1]
+                    filters[f'{filter_config["field"]}__gte'] = filter_config['parser'](values[0])
+                    filters[f'{filter_config["field"]}__lte'] = filter_config['parser'](values[1])
                 elif filter_config['type'] == 'in':
                     filters[filter_config['field']] = values
                 elif filter_config['type'] == 'contains':
@@ -120,9 +126,9 @@ def my_results(request):
         offset = int(offset)
         serializer = ValidationRunSerializer(user_validations[offset:(offset + limit)], many=True)
     else:
-        serializer = ValidationRunSerializer(val_runs, many=True)
+        serializer = ValidationRunSerializer(user_validations, many=True)
 
-    response = {'validations': serializer.data, 'length': len(val_runs)}
+    response = {'validations': serializer.data, 'length': len(user_validations)}
 
     return JsonResponse(response, status=status.HTTP_200_OK, safe=False)
 
