@@ -40,7 +40,8 @@ export class FilteringFormComponent {
       label: 'Submission Date',
       optionPlaceHolder: 'Select date',
       type: 'date',
-      selectedOptions: signal([])
+      selectedOptions: signal([]),
+      optionParser: this.dateParser
     },
     {
       backendName: 'spatial_reference',
@@ -67,13 +68,18 @@ export class FilteringFormComponent {
 
   selectedFilter: FilterConfig;
 
+  dateParser(datesStr: string[]): string {
+    let parsedDates = datesStr.map(dateStr => new Date(dateStr).toDateString());
+    return parsedDates.join(',')
+  }
+
 
   updateFilters(): void {
     const filters = this.validationFilters()
     const filterForUpdate = filters.find(filter => filter.backendName === this.selectedFilter.backendName);
     if (filterForUpdate) {
-    //   he re I may want to either update and emmit the updated version or to remove the existing filter
-    //   I want to remove the filter from the list when there is no options selected (for the input field filter, the filter can be removed with the removed button):
+      //   he re I may want to either update and emmit the updated version or to remove the existing filter
+      //   I want to remove the filter from the list when there is no options selected (for the input field filter, the filter can be removed with the removed button):
       if (filterForUpdate.selectedOptions().length == 0 && filterForUpdate.type === 'multi-select') {
         this.removeFilter(filterForUpdate)
       } else {
@@ -85,7 +91,7 @@ export class FilteringFormComponent {
     }
   }
 
-  addFilter(): void{
+  addFilter(): void {
     this.validationFilters.update(filters => {
       const updatedFilters = [...filters];
       updatedFilters.push(this.selectedFilter);
@@ -102,8 +108,12 @@ export class FilteringFormComponent {
   addOption(): void {
     // For multiselect this step is done automatically, because the ngModel updates selected options
     if (this.selectedFilter && this.selectedFilter.value) {
+      let value = this.selectedFilter.value;
+      if (this.selectedFilter.optionParser) {
+        value = (this.selectedFilter.optionParser(this.selectedFilter.value));
+      }
       // Create a new selectedOptions array to ensure immutability
-      this.selectedFilter.selectedOptions.set([this.selectedFilter.value]);
+      this.selectedFilter.selectedOptions.set([(value)]);
       this.updateFilters();
     }
   }
@@ -126,11 +136,13 @@ export class FilteringFormComponent {
     }
   }
 
-  cleanFilters(): void {
-    this.selectedFilter = null;
-    this.validationFilters.set([]);
-    // Clean the selectedOptions of all filters
-    this.FILTER_CONFIGS.forEach(this.resetFilter.bind(this));
+  cancelFiltering(): void {
+    if (this.validationFilters().length) {
+      this.selectedFilter = null;
+      this.validationFilters.set([]);
+      // Clean the selectedOptions of all filters
+      this.FILTER_CONFIGS.forEach(this.resetFilter.bind(this));
+    }
   }
 
 }

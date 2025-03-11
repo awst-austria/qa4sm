@@ -10,4 +10,5 @@ export interface FilterConfig {
   options?: string[];
   value?: string;
   selectedOptions?: WritableSignal<string[]>;
+  optionParser?: (arg: string[] | string) => string;
 }
