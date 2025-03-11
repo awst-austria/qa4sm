@@ -96,6 +96,7 @@ def my_results(request):
     order = ORDER_DICT.get(order_name, None)
 
     user_validations = ValidationRun.objects.filter(user=current_user)
+    number_of_all_validations = len(user_validations)
 
     filters = {}
     for parameter in request.query_params:
@@ -128,7 +129,7 @@ def my_results(request):
     else:
         serializer = ValidationRunSerializer(user_validations, many=True)
 
-    response = {'validations': serializer.data, 'length': len(user_validations)}
+    response = {'validations': serializer.data, 'length': number_of_all_validations}
 
     return JsonResponse(response, status=status.HTTP_200_OK, safe=False)
 

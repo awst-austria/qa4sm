@@ -24,6 +24,9 @@ import {
 export class ValidationPagePaginatedComponent implements OnInit {
   published = input<boolean>();
   validations: ValidationrunDto[] = [];
+  // the variable below stores information about the number of all validations run by the user. validations.length
+  // provides information about how many validations are actually displayed
+  numberOfUserValidations: number;
 
   // valFilters: FilterConfig[] = [];  // Updated to signal
   valFilters = signal<FilterConfig[]>([]);  // Updated to signal
@@ -116,7 +119,9 @@ export class ValidationPagePaginatedComponent implements OnInit {
     validations: ValidationrunDto[];
     length: number;
   }, onScroll: boolean): void {
+    this.numberOfUserValidations = serverResponse.length;
     this.maxNumberOfPages = Math.ceil(serverResponse.length / this.limit);
+
     if (!onScroll || this.orderChange) {
       this.validations = serverResponse.validations;
     } else {

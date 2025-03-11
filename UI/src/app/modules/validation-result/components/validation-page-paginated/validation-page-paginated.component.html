@@ -17,7 +17,7 @@
     <!-- custom -->
     <div *ngIf="!published() && !dataFetchError()" class="text-center w-12">
       <h1>My validations</h1>
-      <p *ngIf="!validations.length" class="lead text-muted">
+      <p *ngIf="!numberOfUserValidations" class="lead text-muted">
         You have not started any validations yet. Visit the <a routerLink="/validate">validation page</a>
         to start your own validation run.
       </p>
@@ -38,12 +38,12 @@
       <qa-error></qa-error>
     </div>
 
-    <div *ngIf="(validations.length) && !dataFetchError()" class="w-12 my-2">
+    <div *ngIf="(numberOfUserValidations) && !dataFetchError()" class="w-12 my-2">
       <qa-sorting-form (orderQueryName)="getOrder($event)"/>
     </div>
 
     <!-- Rows -->
-    <div *ngIf="validations.length" class="w-12 py-2">
+    <div *ngIf="numberOfUserValidations" class="w-12 py-2">
       <div *ngIf="!(isLoading && orderChange)">
         <div *ngFor="let valrun of validations"
              class="validation-row-area">
@@ -78,20 +78,23 @@
         Loading... </em>
       </div>
 
-      <div *ngIf="endOfPage && !published()" class="val-number-information">
-        <em> You have run {{ validations.length }} {{ validations.length === 1 ? 'validation ' : 'validations' }}.</em>
-      </div>
-      <div *ngIf="endOfPage && !published()" class="val-number-information">
-        <em> Showing {{ validations.length }} {{ validations.length === 1 ? 'validation ' : 'validations' }}
-          that {{ validations.length === 1 ? 'meets ' : 'meet' }} the filter criteria.</em>
+      <div *ngIf="!published()" class="val-number-information">
+        <div>
+          <em> You have
+            run {{ numberOfUserValidations }} {{ numberOfUserValidations === 1 ? 'validation ' : 'validations' }}.</em>
+        </div>
+        <div *ngIf="(validations.length)">
+          <em> Showing {{ validations.length }} {{ validations.length === 1 ? 'validation ' : 'validations' }}
+            that {{ validations.length === 1 ? 'meets ' : 'meet' }} the filter criteria.</em>
+        </div>
+        <div *ngIf="(!validations.length)">
+          <em>
+            No validation results found that meet the filter criteria.
+          </em>
+        </div>
       </div>
     </div>
 
-    <div *ngIf="(!validations.length)" class="text-center w-12 my-2">
-      <p class="lead text-muted">
-        No validation results found that meet the filter criteria.
-      </p>
-    </div>
 
   </div>
 </main>
