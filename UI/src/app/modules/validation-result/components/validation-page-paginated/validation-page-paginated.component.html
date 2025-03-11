@@ -42,10 +42,6 @@
       <qa-sorting-form (orderQueryName)="getOrder($event)"/>
     </div>
 
-    <!--    <div *ngIf="(validations.length && !dataFetchError()" class="w-12">-->
-    <!--      <qa-filtering-form [availableDatasetsSignal]="datasets$" [(validationFilters)]="valFilters"/>-->
-    <!--    </div>-->
-
     <!-- Rows -->
     <div *ngIf="validations.length" class="w-12 py-2">
       <div *ngIf="!(isLoading && orderChange)">
