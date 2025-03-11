@@ -7,7 +7,6 @@
       </span>
         </div>
     </ng-template>
-
     <span class="p-float-label mb-1">
           <p-dropdown
                   id="filterVarSelector"
@@ -42,7 +41,7 @@
                     [(ngModel)]="selectedFilter.value"
                     dateFormat="dd/mm/yy"
                     selectionMode="range"
-                    [inputStyle]="{'width': '100%'}"
+                    [style]="{'width': '100%'}"
                     [placeholder]="selectedFilter.optionPlaceHolder">
         </p-calendar>
         <div class="flex flex-column w-12" *ngIf="!(selectedFilter.type==='multi-select')">
@@ -57,7 +56,7 @@
         </div>
     </ng-container>
 
-    <p-fieldset *ngIf="validationFilters().length" legend="Selected Filters">
+    <p-fieldset *ngIf="validationFilters().length" legend="Selected Filters: ">
         <div class="flex md:flex-column flex-row align-content-start justify-content-center p-0">
             <p-chip
                     class="flex w-12"
@@ -67,9 +66,8 @@
                     (onRemove)="removeFilter(filter)">
                 <div class="mr-2">
                     {{ filter.label }}
-                    <span *ngIf="filter.selectedOptions().length">(<span *ngFor="let option of filter.selectedOptions()">{{option }}</span> )</span>
+                  <em [style]="{'color': 'gray'}">({{filter.selectedOptions().join(', ')}})</em>
                 </div>
-
             </p-chip>
         </div>
     </p-fieldset>
@@ -81,7 +79,8 @@
                     [style]="{'width': '100%'}"
                     label="Cancel"
                     icon="pi pi-ban"
-                    pTooltip="Remove all"
+                    pTooltip="Remove all filters"
+                    [disabled]="!validationFilters().length"
                     (onClick)="cancelFiltering()">
             </p-button>
         </div>
