@@ -38,12 +38,13 @@
       <qa-error></qa-error>
     </div>
 
-    <div *ngIf="(numberOfUserValidations) && !dataFetchError()" class="w-12 my-2">
-      <qa-sorting-form (orderQueryName)="getOrder($event)"/>
-    </div>
-
     <!-- Rows -->
-    <div *ngIf="numberOfUserValidations" class="w-12 py-2">
+    <div *ngIf="numberOfUserValidations && !dataFetchError()" class="w-12 py-2">
+
+      <div class="w-12 my-2">
+        <qa-sorting-form (orderQueryName)="getOrder($event)"/>
+      </div>
+
       <div *ngIf="!(isLoading && orderChange)">
         <div *ngFor="let valrun of validations"
              class="validation-row-area">
