@@ -14,10 +14,7 @@ export class FilteringFormComponent {
   validationFilters = model<FilterConfig[]>()
   availableDatasetsSignal = input<Observable<DatasetDto[]>>();
 
-  panelCollapsed = signal<boolean>(true);  // Signal to manage the panel's collapsed state
   loading = signal<boolean>(false);  // Signal to manage loading state
-  error = signal<string | null>(null);  // Signal to manage error state
-  // z =
 
   public readonly FILTER_CONFIGS: FilterConfig[] = [
     {
@@ -72,7 +69,6 @@ export class FilteringFormComponent {
     let parsedDates = datesStr.map(dateStr => new Date(dateStr).toDateString());
     return parsedDates.join(',')
   }
-
 
   updateFilters(): void {
     const filters = this.validationFilters()
