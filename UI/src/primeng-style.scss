@@ -4025,6 +4025,7 @@ div.carousel-caption {
   background: #ffffff;
   color: #212529;
   border-radius: 4px;
+  padding: 0;
 }
 
 .p-fieldset .p-fieldset-legend {
@@ -6319,15 +6320,18 @@ div.carousel-caption {
 .p-chip {
   background-color: transparent;
   color: $base-font-color;
-  padding: 0.75rem;
-  border: 1px solid #dee2e6;
+  //padding: 0.75rem;
+  border: 0.5px solid #dee2e6;
   border-radius: 4px;
+  margin-bottom: 1px;
+  position: relative; /* Ensures absolute positioning works inside */
+  padding-right: 2rem; /* Add padding to avoid overlap */
 }
 
 .p-chip .p-chip-text {
   line-height: 1.5;
-  margin-top: 0.25rem;
-  margin-bottom: 0.25rem;
+  margin-top: 0.5rem;
+  margin-bottom: 0.5rem;
   font-size: 1rem;
 }
 
@@ -6337,6 +6341,10 @@ div.carousel-caption {
 
 .p-chip .pi-chip-remove-icon {
   margin-left: 0.5rem;
+  position: absolute;
+  right: 0.5rem; /* Adjust as needed */
+  top: 50%;
+  transform: translateY(-50%);
 }
 
 .p-chip img {
@@ -6349,6 +6357,7 @@ div.carousel-caption {
 .p-chip .pi-chip-remove-icon {
   border-radius: 4px;
   transition: box-shadow 0.15s;
+  color: #dc3545;
 }
 
 .p-chip .pi-chip-remove-icon:focus {

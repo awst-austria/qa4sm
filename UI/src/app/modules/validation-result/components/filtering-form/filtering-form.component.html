@@ -47,7 +47,7 @@
         <div class="flex flex-column w-12" *ngIf="!(selectedFilter.type==='multi-select')">
             <p-button
                     [style]="{'width': '100%'}"
-                    styleClass="p-button-outlined p-button-primary"
+                    styleClass="p-button-outlined p-button-info"
                     [label]="!selectedFilter.selectedOptions().length ? 'Add filter' : 'Update filter'"
                     pTooltip="Click to add value to the selected filter"
                     [disabled]="!selectedFilter.value"
@@ -63,6 +63,7 @@
                     *ngFor="let filter of validationFilters()"
                     [pTooltip]=""
                     [removable]="true"
+                    [style]="{'width': '100%'}"
                     (onRemove)="removeFilter(filter)">
                 <div class="mr-2">
                     {{ filter.label }}
