@@ -1,4 +1,4 @@
-import {Component, effect, HostListener, input, OnInit, signal} from '@angular/core';
+import {Component, computed, effect, HostListener, input, OnInit, signal} from '@angular/core';
 import {ValidationrunService} from '../../../core/services/validation-run/validationrun.service';
 import {ValidationrunDto} from '../../../core/services/validation-run/validationrun.dto';
 import {HttpParams} from '@angular/common/http';
@@ -89,9 +89,7 @@ export class ValidationPagePaginatedComponent implements OnInit {
     }
   }
 
-  getValidationsAndItsNumber(onScroll = false): void {
-    this.isLoading = true;
-
+  getHttpParams(): HttpParams {
     let parameters = new HttpParams()
       .set('offset', String(this.offset))
       .set('limit', String(this.limit))
@@ -100,11 +98,16 @@ export class ValidationPagePaginatedComponent implements OnInit {
     this.valFilters().forEach(filter => {
       parameters = parameters.set('filter:' + filter.backendName, filter.selectedOptions().toString());
     });
+    return parameters;
+  }
 
 
+  getValidationsAndItsNumber(onScroll = false): void {
+    this.isLoading = true;
+    const parameters = computed(() => this.getHttpParams());
     const validationSet$ = this.published()
-      ? this.validationrunService.getPublishedValidationruns(parameters)
-      : this.validationrunService.getMyValidationruns(parameters);
+      ? this.validationrunService.getPublishedValidationruns(parameters())
+      : this.validationrunService.getMyValidationruns(parameters());
 
     validationSet$.pipe(
       catchError(() => this.onDataFetchError())
@@ -177,10 +180,7 @@ export class ValidationPagePaginatedComponent implements OnInit {
   }
 
   refreshPage(): void {
-    const parameters = new HttpParams()
-      .set('offset', String(this.offset))
-      .set('limit', String(this.limit))
-      .set('order', String(this.order()));
+    const parameters = this.getHttpParams();
 
     this.validationrunService.getMyValidationruns(parameters)
       .pipe(
