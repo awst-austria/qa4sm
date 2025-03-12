@@ -63,21 +63,20 @@ class TestValidationRunView(TestCase):
         # validation number
 
         # introducing order - name_tag
-        response = self.client.get(published_results_url + f'?order=name_tag')
+        response = self.client.get(published_results_url + f'?order=name:asc')
         assert response.status_code == 200
         assert response.json()['validations'][0]['name_tag'] == 'A validation'
         assert response.json()['validations'][1]['name_tag'] == 'B validation'
 
         # changing the order
-        response = self.client.get(published_results_url + f'?order=-name_tag')
+        response = self.client.get(published_results_url + f'?order=name:desc')
         assert response.status_code == 200
         assert response.json()['validations'][0]['name_tag'] == 'B validation'
         assert response.json()['validations'][1]['name_tag'] == 'A validation'
 
-        # introducing non existing tag for order
+        # introducing non-existing tag for order - ordering skipped
         response = self.client.get(published_results_url + f'?order=-name')
-        assert response.status_code == 400
-        assert response.json()['message'] == 'Not appropriate order given'
+        assert response.status_code == 200
 
         # logging out and checking access
         self.client.logout()
@@ -114,14 +113,13 @@ class TestValidationRunView(TestCase):
         assert len(response.json()['validations']) == 0  # no validations are taken, because offset is bigger than the
 
         # introducing order - name_tag
-        response = self.client.get(my_results_url + f'?order=name_tag')
+        response = self.client.get(my_results_url + f'?order=name:asc')
         assert response.status_code == 200
         assert response.json()['validations'][0]['name_tag'] == 'B validation'
 
-        # introducing non existing tag for order
-        response = self.client.get(my_results_url + f'?order=-name')
-        assert response.status_code == 400
-        assert response.json()['message'] == 'Not appropriate order given'
+        # introducing non-existing tag for order - order will be skipped
+        response = self.client.get(my_results_url + f'?order=name_of_val')
+        assert response.status_code == 200
 
         # logging out and checking access
         self.client.logout()

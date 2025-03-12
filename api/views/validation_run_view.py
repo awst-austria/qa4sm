@@ -68,8 +68,6 @@ def published_results(request):
 
     if order:
         val_runs = val_runs.order_by(order)
-    else:
-        return JsonResponse({'message': 'Not appropriate order given'}, status=status.HTTP_400_BAD_REQUEST, safe=False)
 
     # both limit and offset are send as string, so the simple if limit and offset condition can be used,
     # if they were sent as numbers there would be a problem because they both can be 0
@@ -119,8 +117,7 @@ def my_results(request):
 
     if order:
         user_validations = user_validations.order_by(order)
-    else:
-        return JsonResponse({'message': 'Not appropriate order given'}, status=status.HTTP_400_BAD_REQUEST, safe=False)
+
 
     if limit and offset:
         limit = int(limit)
