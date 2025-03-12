@@ -81,7 +81,7 @@
                     label="Cancel"
                     icon="pi pi-ban"
                     pTooltip="Remove all filters"
-                    [disabled]="!validationFilters().length"
+                    [disabled]="!validationFilters().length && !selectedFilter"
                     (onClick)="cancelFiltering()">
             </p-button>
         </div>

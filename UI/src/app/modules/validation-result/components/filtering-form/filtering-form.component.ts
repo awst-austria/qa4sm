@@ -133,12 +133,10 @@ export class FilteringFormComponent {
   }
 
   cancelFiltering(): void {
-    if (this.validationFilters().length) {
-      this.selectedFilter = null;
-      this.validationFilters.set([]);
-      // Clean the selectedOptions of all filters
-      this.FILTER_CONFIGS.forEach(this.resetFilter.bind(this));
-    }
+    this.selectedFilter = null;
+    this.validationFilters.set([]);
+    // Clean the selectedOptions of all filters
+    this.FILTER_CONFIGS.forEach(this.resetFilter.bind(this));
   }
 
 }
