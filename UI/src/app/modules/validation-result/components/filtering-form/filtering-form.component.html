@@ -1,13 +1,13 @@
 <p-panel [toggleable]="true" class="side-panel" collapsed="true">
   <ng-template pTemplate="header">
-    <div class="side-menu-header my-3 ml-2">
+    <div class="side-menu-header my-2 ml-2">
       Filter validations
       <span class="pi pi-question-circle"
             pTooltip="Select filter from the list.">
       </span>
         </div>
     </ng-template>
-    <span class="p-float-label mb-1">
+    <span class="p-float-label mt-2 mb-1">
           <p-dropdown
                   id="filterVarSelector"
                   [options]="FILTER_CONFIGS"
@@ -44,7 +44,7 @@
                     [style]="{'width': '100%'}"
                     [placeholder]="selectedFilter.optionPlaceHolder">
         </p-calendar>
-        <div class="flex flex-column w-12" *ngIf="!(selectedFilter.type==='multi-select')">
+        <div class="flex flex-column w-12 mt-1" *ngIf="!(selectedFilter.type==='multi-select')">
             <p-button
                     [style]="{'width': '100%'}"
                     styleClass="p-button-outlined p-button-info"
