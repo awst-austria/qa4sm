@@ -111,9 +111,7 @@ def my_results(request):
                 elif filter_config['type'] == 'contains':
                     filters[filter_config['field']] = values[0]
     if filters:
-        print(filters)
         user_validations = user_validations.filter(**filters)
-        print(user_validations.filter(**filters))
 
     if order:
         user_validations = user_validations.order_by(order)
@@ -127,7 +125,6 @@ def my_results(request):
         serializer = ValidationRunSerializer(user_validations, many=True)
 
     response = {'validations': serializer.data, 'length': number_of_all_validations}
-
     return JsonResponse(response, status=status.HTTP_200_OK, safe=False)
 
 
