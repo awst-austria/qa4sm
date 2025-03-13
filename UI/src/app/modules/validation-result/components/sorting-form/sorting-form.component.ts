@@ -1,25 +1,6 @@
-import {Component, EventEmitter, OnInit, Output} from '@angular/core';
+import {Component, EventEmitter, Output} from '@angular/core';
 import {SortChoicesModel} from './sort-choices-model';
 import {SortOrderModel} from './sort-order-model';
-
-
-export const SORT_BY_TIME_DISPLAY_NAME = 'Date';
-export const SORT_BY_TIME_QUERY_NAME = 'start_time';
-
-export const SORT_BY_NAME_DISPLAY_NAME = 'Name';
-export const SORT_BY_NAME_QUERY_NAME = 'name_tag';
-
-export const SORT_BY_STATUS_DISPLAY_NAME = 'Status';
-export const SORT_BY_STATUS_QUERY_NAME = 'progress';
-
-export const SORT_BY_REFERENCE_DISPLAY_NAME = 'Spatial reference dataset';
-export const SORT_BY_REFERENCE_QUERY_NAME = 'spatial_reference_configuration_id__dataset__pretty_name';
-
-export const ORDER_DIRECTION_DESC = 'descending';
-export const ORDER_DIRECTION_DESC_PREP = '-';
-
-export const ORDER_DIRECTION_ASC = 'ascending';
-export const ORDER_DIRECTION_ASC_PREP = '';
 
 
 @Component({
@@ -27,37 +8,49 @@ export const ORDER_DIRECTION_ASC_PREP = '';
   templateUrl: './sorting-form.component.html',
   styleUrls: ['./sorting-form.component.scss']
 })
-export class SortingFormComponent implements OnInit {
-  sortingChoicesModels: SortChoicesModel[] = [];
-  selectedChoicesModel: SortChoicesModel;
-  orderChoicesModels: SortOrderModel[] = [];
-  selectedOrderModel: SortOrderModel;
-  @Output() orderQueryName =  new EventEmitter<string>();
+export class SortingFormComponent {
+  @Output() orderQueryName = new EventEmitter<string>();
 
-  constructor() { }
+  public sortingChoices: SortChoicesModel[] = [
+    {
+      displayName: 'Date',
+      queryName: 'start_time'
+    },
+    {
+      displayName: 'Name',
+      queryName: 'name'
+    },
+    {
+      displayName: "Status",
+      queryName: 'progress'
+    },
+    {
+      displayName: 'Spatial reference dataset',
+      queryName: 'spatial_reference_dataset'
+    }
+  ];
 
-  ngOnInit(): void {
-    this.prepareSortingChoices();
-    this.prepareSortingOrder();
+  public orderChoices: SortOrderModel[] = [
+    {
+      direction: 'descending',
+      querySuffix: 'desc'
+    },
+    {
+      direction: 'ascending',
+      querySuffix: 'asc'
+    }
+
+  ];
+
+  selectedChoicesModel: SortChoicesModel = this.sortingChoices[0];
+  selectedOrderModel: SortOrderModel = this.orderChoices[0];
+
+  constructor() {
   }
 
-  onSortingChange(): void{
-    const order = this.selectedOrderModel.queryPrependix + this.selectedChoicesModel.queryName;
+  onSortingChange(): void {
+    const order = `${this.selectedChoicesModel.queryName}:${this.selectedOrderModel.querySuffix}`;
     this.orderQueryName.emit(order);
-  }
-
-  private prepareSortingChoices(): void{
-    this.sortingChoicesModels.push(new SortChoicesModel(SORT_BY_TIME_DISPLAY_NAME, SORT_BY_TIME_QUERY_NAME));
-    this.sortingChoicesModels.push(new SortChoicesModel(SORT_BY_NAME_DISPLAY_NAME, SORT_BY_NAME_QUERY_NAME));
-    this.sortingChoicesModels.push(new SortChoicesModel(SORT_BY_STATUS_DISPLAY_NAME, SORT_BY_STATUS_QUERY_NAME));
-    this.sortingChoicesModels.push(new SortChoicesModel(SORT_BY_REFERENCE_DISPLAY_NAME, SORT_BY_REFERENCE_QUERY_NAME));
-    this.selectedChoicesModel = this.sortingChoicesModels[0];
-  }
-
-  private prepareSortingOrder(): void{
-    this.orderChoicesModels.push(new SortOrderModel(ORDER_DIRECTION_DESC, ORDER_DIRECTION_DESC_PREP));
-    this.orderChoicesModels.push(new SortOrderModel(ORDER_DIRECTION_ASC, ORDER_DIRECTION_ASC_PREP));
-    this.selectedOrderModel = this.orderChoicesModels[0];
   }
 
 }

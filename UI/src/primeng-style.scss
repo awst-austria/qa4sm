@@ -1111,6 +1111,38 @@ p-inputswitch.ng-dirty.ng-invalid > .p-inputswitch {
   }
 }
 
+#filterForm {
+  display: flex;
+  width: 100%;
+  max-width: 100%;
+
+}
+
+#filterParamSelector .p-dropdown {
+  border-left: none;
+  border-bottom-left-radius: 0;
+  border-top-left-radius: 0;
+}
+
+#filteringForm .small-label {
+  max-width: 100%;
+  padding: 1.3rem;
+}
+
+
+@media screen and (max-width: 991px) {
+  #filteringForm .small-label {
+    border-bottom-left-radius: 0;
+    border-top-left-radius: 0;
+  }
+  #filterParamSelector #filterVarSelector .p-dropdown .p-multiSelect .p-calendar {
+    max-width: 100%;
+    border-radius: 0;
+    border: 1px solid #ced4da;
+    border-top: none;
+  }
+}
+
 #anomaliesMethodSelector .p-dropdown, #intraAnnualMetricTypeSelector .p-dropdown, #intraAnnualMetricsSelector .p-dropdown {
   height: 2.5rem;
   border-left-style: none;
@@ -3989,18 +4021,19 @@ div.carousel-caption {
 }
 
 .p-fieldset {
-  border: 1px solid #dee2e6;
+  border: none;
   background: #ffffff;
   color: #212529;
   border-radius: 4px;
+  padding: 0;
 }
 
 .p-fieldset .p-fieldset-legend {
   padding: 1rem 1.25rem;
-  border: 1px solid #dee2e6;
+  border: none;
   color: #212529;
-  background: #efefef;
-  font-weight: 600;
+  background: transparent;
+  font-weight: 400;
   border-radius: 4px;
 }
 
@@ -4033,7 +4066,7 @@ div.carousel-caption {
 }
 
 .p-fieldset .p-fieldset-content {
-  padding: 1.25rem;
+  padding: 0;
 }
 
 .p-panel .p-panel-header {
@@ -4046,6 +4079,13 @@ div.carousel-caption {
   min-height: 3.2rem;
   font-size: 1.4rem;
   box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.side-panel .p-panel .p-panel-header {
+  border: 1px solid #dee2e6;
+  background: transparent;
+  font-size: 1rem;
+  box-shadow: none;
 }
 
 .p-panel .p-panel-header .p-panel-title {
@@ -4062,6 +4102,10 @@ div.carousel-caption {
   background: transparent;
   border-radius: 50%;
   transition: box-shadow 0.15s;
+}
+
+.side-panel .p-panel .p-panel-header .p-panel-header-icon {
+  color: #495057;
 }
 
 .p-panel .p-panel-header .p-panel-header-icon:enabled:hover {
@@ -6274,16 +6318,21 @@ div.carousel-caption {
 }
 
 .p-chip {
-  background-color: #dee2e6;
-  color: #212529;
-  border-radius: 16px;
-  padding: 0 0.75rem;
+  background-color: transparent;
+  color: $base-font-color;
+  //padding: 0.75rem;
+  border: 0.5px solid #dee2e6;
+  border-radius: 4px;
+  margin-bottom: 1px;
+  position: relative; /* Ensures absolute positioning works inside */
+  padding-right: 2rem; /* Add padding to avoid overlap */
 }
 
 .p-chip .p-chip-text {
   line-height: 1.5;
-  margin-top: 0.25rem;
-  margin-bottom: 0.25rem;
+  margin-top: 0.5rem;
+  margin-bottom: 0.5rem;
+  font-size: 1rem;
 }
 
 .p-chip .p-chip-icon {
@@ -6292,6 +6341,10 @@ div.carousel-caption {
 
 .p-chip .pi-chip-remove-icon {
   margin-left: 0.5rem;
+  position: absolute;
+  right: 0.5rem; /* Adjust as needed */
+  top: 50%;
+  transform: translateY(-50%);
 }
 
 .p-chip img {
@@ -6304,6 +6357,7 @@ div.carousel-caption {
 .p-chip .pi-chip-remove-icon {
   border-radius: 4px;
   transition: box-shadow 0.15s;
+  color: #dc3545;
 }
 
 .p-chip .pi-chip-remove-icon:focus {

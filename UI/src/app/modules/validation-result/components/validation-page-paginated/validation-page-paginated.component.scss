@@ -111,7 +111,8 @@ div {
   .side-panel-area {
     position: fixed;
     left: 2vw;
-    top: 40vh;
+    top: 30vh;
+    max-width: 300px;
   }
 }
 
@@ -134,13 +135,19 @@ div {
 }
 
 .val-number-information {
-  display: flex;
   color: darkgray;
   font-weight: bold;
+  padding: 0.5rem;
 }
 
 
+.controls-panel {
+  width: 100%;
+}
 
+.gap-3 {
+  gap: 1rem;
+}
 
 
 

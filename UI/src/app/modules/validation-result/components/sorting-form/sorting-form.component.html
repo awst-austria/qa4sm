@@ -9,7 +9,7 @@
     <p-dropdown id="sortingChoiceSelector"
                 inputId="sortingChoiceInput"
                 (onChange)="onSortingChange()"
-                [options]="sortingChoicesModels"
+                [options]="sortingChoices"
                 [(ngModel)]="selectedChoicesModel"
                 optionLabel="displayName"
                 [style]="{'width': '100%'}">
@@ -21,7 +21,7 @@
       <p-dropdown id="orderSelector"
                   inputId="orderSelectorInput"
                   (onChange)="onSortingChange()"
-                  [options]="orderChoicesModels"
+                  [options]="orderChoices"
                   [(ngModel)]="selectedOrderModel"
                   optionLabel="direction"
                   [style]="{'width': '100%'}">
