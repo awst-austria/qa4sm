@@ -33,27 +33,19 @@
 
         <input pInputText
                *ngSwitchCase="'string'"
-               [(ngModel)]="selectedFilter.value"
+               [ngModel]="selectedFilter.value"
+               (ngModelChange)="onTextInputChange($event)"
                [placeholder]="selectedFilter.optionPlaceHolder"
                [style]="{'width': '100%'}"/>
 
         <p-calendar *ngSwitchCase="'date'"
-                    [(ngModel)]="selectedFilter.value"
+                    [ngModel]="selectedFilter.value"
+                    (ngModelChange)="onTextInputChange($event)"
                     dateFormat="dd/mm/yy"
                     selectionMode="range"
                     [style]="{'width': '100%'}"
                     [placeholder]="selectedFilter.optionPlaceHolder">
         </p-calendar>
-        <div class="flex flex-column w-12 mt-1" *ngIf="!(selectedFilter.type==='multi-select')">
-            <p-button
-                    [style]="{'width': '100%'}"
-                    styleClass="p-button-outlined p-button-info"
-                    [label]="!selectedFilter.selectedOptions().length ? 'Add filter' : 'Update filter'"
-                    pTooltip="Click to add value to the selected filter"
-                    [disabled]="!selectedFilter.value"
-                    (onClick)="addOption()">
-            </p-button>
-        </div>
     </ng-container>
 
     <p-fieldset *ngIf="validationFilters().length" legend="Selected Filters: ">
