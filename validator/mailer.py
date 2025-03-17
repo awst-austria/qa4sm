@@ -113,7 +113,7 @@ def send_val_expiry_notification(val_runs):
 def send_new_user_signed_up(user):
     __logger.info('Sending mail about new user {} to admins...'.format(user.username))
 
-    url = settings.SITE_URL + reverse('admin:user_change_status', kwargs={'user_id': user.id})
+    url = settings.SITE_URL + reverse('admin:user_change_status', kwargs={'user_id': user.username})
 
     subject = '[QA4SM] New user signed up'
     body = 'Dear admins,\n\nnew user {} {} ({}) has signed up and a verification email has been sent to their provided address\n Kind regards,\nYour webapp'.format(
