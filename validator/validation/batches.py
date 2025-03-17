@@ -129,7 +129,7 @@ def create_jobs(
     total_points = 0
 
     # if we've got data on a grid, process one cell at a time
-    if isinstance(reader, GriddedBase) or isinstance(reader, ReaderWithTsExtension) or isinstance(reader, SMAPL3_AM_PM):
+    if isinstance(reader, GriddedBase) or isinstance(reader, ReaderWithTsExtension):
         cells = reader.grid.get_cells()
 
         jobs = []
@@ -278,8 +278,8 @@ def create_upscaling_lut(
                     gpis, lons, lats = other_points[0], other_points[1], other_points[2]
                     for gpi, lon, lat in zip(gpis, lons, lats):
                         # list all non-ref points under the same ref gpi
-                        ref_gpi = ref_grid.find_nearest_gpi(lon, lat)[
-                            0]  # todo: implement methods here to combine irregular grids
+                        ref_gpi = ref_grid.find_nearest_gpi(lon, lat)[0]
+                        # todo: implement methods here to combine irregular grids
                         if ref_gpi in other_lut.keys():
                             other_lut[ref_gpi].append((gpi, lon, lat))
                         else:

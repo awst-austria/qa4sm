@@ -27,37 +27,7 @@ import pandas as pd
 __logger = logging.getLogger(__name__)
 
 
-class SMAPL3_AM_PM:
-    """
-    Concatenate 2 time series upon reading
-    """
 
-    def __init__(self, cls, path, *args, **kwargs):
-        """
-        Parameters
-        ----------
-        cls: Callable
-            Reader class to wrap
-        path: str
-            Path to the main time series (not the extension dataset)
-        path_ext: str
-            Extension time series path
-        args, kwargs:
-            Additional arguments to set up the readers
-        """
-        self.base_reader = cls(path, *args, **kwargs)
-
-    @property
-    def grid(self):
-        return self.base_reader.grid
-
-    def read(self, *args, **kwargs) -> pd.DataFrame:
-        """
-        Read time series at location for both the base dataset and the
-        extension. If extension is read, concatenate both in time.
-        """
-        ts = self.base_reader.read(*args, **kwargs)
-        return ts
 
 
 class ReaderWithTsExtension:
@@ -244,11 +214,9 @@ def create_reader(dataset, version) -> GriddedNcTs:
         # and version.short_name == globals.SMAP_V9_AM_PM
     if dataset.short_name == globals.SMAP_L3 and version.short_name == 'SMAP_V9_AM_PM':
         smap_data_folder = path.join(folder_name, 'netcdf')
-        # ext_path = path.join(dataset.storage_path, version.short_name + '/netcdf-ext', 'timeseries')
-        reader = SMAPL3_AM_PM(
-            SMAPL3_V9Reader, smap_data_folder, ioclass_kws={'read_bulk': True},
-            grid=load_grid(path.join(smap_data_folder, "grid.nc"))
-        )
+        reader = SMAPL3_V9Reader(smap_data_folder,
+                              grid=load_grid(path.join(smap_data_folder, "grid.nc")),
+                              ioclass_kws={'read_bulk': True})
     if dataset.short_name == globals.SMOS_SBPCA:
         if version.short_name == globals.SMOS_SBPCA_v724:
             reader = SBPCAReader(folder_name, ioclass_kws={'read_bulk': True})
