@@ -150,7 +150,7 @@ class TestUserView(TestCase):
         assert verification_email.subject
         assert verification_email.body
         assert verification_email.from_email == settings.EMAIL_FROM
-        assert self.test_user.email in verification_email.to
+        assert new_user.email in verification_email.to
         assert any(name in verification_email.body for name in [new_user.first_name, new_user.username]) # can be either name or username
 
 
