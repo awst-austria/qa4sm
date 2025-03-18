@@ -4,7 +4,7 @@
     <qa-handle-multiple-validations
       [validations]="validations"
       [(multipleValidationAction)]="multipleValidationAction"
-      *ngIf="!dataFetchError()"/>
+      *ngIf="!dataFetchError() && !published()"/>
     <qa-filtering-form *ngIf="!dataFetchError()"
                        [availableDatasetsSignal]="datasets$"
                        [validationFilters]="valFilters()"
