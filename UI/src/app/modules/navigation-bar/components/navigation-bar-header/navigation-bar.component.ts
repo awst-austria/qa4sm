@@ -1,11 +1,10 @@
 import {Component, HostListener, OnInit, signal, ViewChild} from '@angular/core';
 import {MenuItem} from 'primeng/api';
 import {AuthService} from '../../../core/services/auth/auth.service';
-import {Event, NavigationEnd, Router, ActivatedRoute} from '@angular/router';
+import {Event, NavigationEnd, Router} from '@angular/router';
 import {ToastService} from '../../../core/services/toast/toast.service';
 import {SettingsService} from '../../../core/services/global/settings.service';
 import {LoginComponent} from 'src/app/modules/user/login/login.component';
-import {AuthGuard} from 'src/app/auth.guard';
 
 @Component({
   selector: 'qa-navigation-bar-header',
@@ -123,7 +122,6 @@ export class NavigationBarComponent implements OnInit {
 
   constructor(private authService: AuthService,
               private router: Router,
-              private route: ActivatedRoute,
               private toastService: ToastService,
               private settingsService: SettingsService) {
 
@@ -154,7 +152,7 @@ export class NavigationBarComponent implements OnInit {
 
   onLoginSuccess() {
     // Hide the login modal window on successful login
-    this.authService.switchLoginModal(false);   
+    this.authService.switchLoginModal(false);
   }
 
   private updateLogo(windowWidth: number): void {
@@ -188,7 +186,7 @@ export class NavigationBarComponent implements OnInit {
   }
 
   logout(): void {
-    this.authService.logout().subscribe({       
+    this.authService.logout().subscribe({
       next: () => {
         this.setPreviousUrl('');
         this.toastService.showSuccessWithHeader('Logout', 'Successful logout');
