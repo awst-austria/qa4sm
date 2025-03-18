@@ -62,7 +62,7 @@ def verify_email(request, user_id, token):
 
         frontend_url = settings.SITE_URL + get_angular_url('home')
 
-        return HttpResponseRedirect(f"{frontend_url}?showLogin=true&message=Login to complete registration")
+        return HttpResponseRedirect(f"{frontend_url}?showLogin=true&message=Verification successful, please login.")
     else:
         frontend_url = settings.SITE_URL + get_angular_url('home')
         return HttpResponseRedirect(f"{frontend_url}?error=Invalid or expired verification link")

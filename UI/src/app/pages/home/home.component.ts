@@ -1,8 +1,9 @@
-import {Component, HostListener, Renderer2} from '@angular/core';
+import {Component, HostListener, OnInit, Renderer2} from '@angular/core';
 import {AuthService} from '../../modules/core/services/auth/auth.service';
 import {SettingsService} from '../../modules/core/services/global/settings.service';
-import {Router} from '@angular/router';
+import {ActivatedRoute, Router} from '@angular/router';
 import {DomSanitizer} from '@angular/platform-browser';
+import {ToastService} from 'src/app/modules/core/services/toast/toast.service';
 
 const logoUrlPrefix = '/static/images/logo/';
 
@@ -12,7 +13,7 @@ const logoUrlPrefix = '/static/images/logo/';
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.scss'],
 })
-export class HomeComponent {
+export class HomeComponent implements OnInit {
 
   logoFiles = [{
     plot: logoUrlPrefix + 'logo_awst.webp',
@@ -122,7 +123,23 @@ export class HomeComponent {
               private settingsService: SettingsService,
               private router: Router,
               private sanitizer: DomSanitizer,
-              private renderer: Renderer2) {
+              private renderer: Renderer2,
+              private route: ActivatedRoute,
+              private toastService: ToastService) {
+  }
+
+  ngOnInit() {
+    // handle opening the login modal window when directed from user email verification
+    this.route.queryParams.subscribe(params => {
+      if (Object.keys(params).length > 0) {
+        if (params['showLogin'] && !params['error']) {
+          this.authService.switchLoginModal(true, params['message']);
+        }
+        else if (params['error']) {
+          this.toastService.showErrorWithHeader('Verification error', 'Something went wrong with the verification. Please try again or contact our support team.');
+        }
+      }
+    });
   }
 
   goToNews(): void {
