@@ -122,12 +122,15 @@ export class ValidationPagePaginatedComponent implements OnInit {
     validations: ValidationrunDto[];
     length: number;
   }, onScroll: boolean): void {
-    this.endOfPage = false;
+
     this.numberOfUserValidations = serverResponse.length;
     this.maxNumberOfPages = Math.ceil(serverResponse.length / this.limit);
 
     if (!onScroll || this.orderChange) {
-      this.validations = [];
+      if (!this.orderChange){
+        this.currentPage = 1; // Reset to the first page
+        this.endOfPage = false;
+      }
       this.validations = serverResponse.validations;
     } else {
       if (serverResponse.validations.length) {
@@ -139,7 +142,7 @@ export class ValidationPagePaginatedComponent implements OnInit {
           this.currentPage = Math.floor(this.validations.length / this.limit);
         }
 
-        if (this.currentPage > this.maxNumberOfPages) {
+        if (this.currentPage >= this.maxNumberOfPages) {
           this.setEndOfPage();
         }
       } else {
@@ -182,6 +185,8 @@ export class ValidationPagePaginatedComponent implements OnInit {
 
   refreshPage(): void {
     const parameters = this.getHttpParams();
+    this.currentPage = 1; // Reset to the first page
+
 
     this.validationrunService.getMyValidationruns(parameters)
       .pipe(
