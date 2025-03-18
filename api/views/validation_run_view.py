@@ -55,6 +55,24 @@ FILTER_CONFIG = {
     }
 }
 
+def filter_validations(query_params, validations):
+    filters = {}
+    for parameter in query_params:
+        if parameter.startswith('filter'):
+            filter_name = parameter.split(':')[1]
+            filter_config = FILTER_CONFIG.get(filter_name, None)
+            if filter_config:
+                values = query_params.get(parameter, None).split(',')
+                if filter_config['type'] == 'range' and len(values) == 2:
+                    filters[f'{filter_config["field"]}__gte'] = filter_config['parser'](values[0])
+                    filters[f'{filter_config["field"]}__lte'] = filter_config['parser'](values[1])
+                elif filter_config['type'] == 'in':
+                    filters[filter_config['field']] = values
+                elif filter_config['type'] == 'contains':
+                    filters[filter_config['field']] = values[0]
+    if filters:
+        return validations.filter(**filters)
+
 
 @api_view(['GET'])
 @permission_classes([AllowAny])
@@ -65,6 +83,9 @@ def published_results(request):
     order = ORDER_DICT.get(order_name, None)
 
     val_runs = ValidationRun.objects.exclude(doi='')
+
+    if any(parameter.startswith('filter') for parameter in request.query_params.keys()):
+        val_runs = filter_validations(request.query_params, val_runs)
 
     if order:
         val_runs = val_runs.order_by(order)
@@ -96,22 +117,8 @@ def my_results(request):
     user_validations = ValidationRun.objects.filter(user=current_user)
     number_of_all_validations = len(user_validations)
 
-    filters = {}
-    for parameter in request.query_params:
-        if parameter.startswith('filter'):
-            filter_name = parameter.split(':')[1]
-            filter_config = FILTER_CONFIG.get(filter_name, None)
-            if filter_config:
-                values = request.query_params.get(parameter, None).split(',')
-                if filter_config['type'] == 'range' and len(values) == 2:
-                    filters[f'{filter_config["field"]}__gte'] = filter_config['parser'](values[0])
-                    filters[f'{filter_config["field"]}__lte'] = filter_config['parser'](values[1])
-                elif filter_config['type'] == 'in':
-                    filters[filter_config['field']] = values
-                elif filter_config['type'] == 'contains':
-                    filters[filter_config['field']] = values[0]
-    if filters:
-        user_validations = user_validations.filter(**filters)
+    if any(parameter.startswith('filter') for parameter in request.query_params.keys()):
+        user_validations = filter_validations(request.query_params, user_validations)
 
     if order:
         user_validations = user_validations.order_by(order)
