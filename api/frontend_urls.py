@@ -1,4 +1,5 @@
 from django.shortcuts import redirect
+from django.conf import settings
 
 from valentina.settings_conf import SITE_URL
 
@@ -47,6 +48,9 @@ def get_angular_url(url_name, parameter=None):
         searched_path = 'validate?validation_id=' + str(parameter)
     else:
         searched_path = searched_element['path']
+
+    if settings.DEBUG:
+        return '/' + searched_path
 
     return '/ui/' + searched_path
 
