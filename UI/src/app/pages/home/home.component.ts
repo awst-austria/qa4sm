@@ -129,17 +129,18 @@ export class HomeComponent implements OnInit {
   }
 
   ngOnInit() {
+    
     // handle opening the login modal window when directed from user email verification
-    this.route.queryParams.subscribe(params => {
-      if (Object.keys(params).length > 0) {
-        if (params['showLogin'] && !params['error']) {
+    if (Object.keys(this.route.snapshot.queryParams).length > 0) {
+      this.route.queryParams.subscribe(params => {
+        if (params['showLogin']) {
           this.authService.switchLoginModal(true, params['message']);
         }
         else if (params['error']) {
           this.toastService.showErrorWithHeader('Verification error', 'Something went wrong with the verification. Please try again or contact our support team.');
         }
-      }
-    });
+      });
+    }
   }
 
   goToNews(): void {
