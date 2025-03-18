@@ -7,7 +7,7 @@ from django.conf import settings
 from rest_framework import status
 
 from validator.mailer import send_val_expiry_notification
-from validator.models import ValidationRun, CeleryTask, User
+from validator.models import ValidationRun, CeleryTask, User, DatasetConfiguration
 
 from rest_framework.decorators import api_view, permission_classes, authentication_classes
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
@@ -57,6 +57,9 @@ def auto_cleanup():
         for task in celery_tasks:
             task.delete()
             # we still need to clean it, because there might be a situation when the user got removed
+        leftover_configs = DatasetConfiguration.objects.filter(validation_id=no_user_val.id)
+        for config in leftover_configs:
+            config.delete()
         no_user_val.delete(permanently=False)
 
 
