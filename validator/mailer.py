@@ -116,7 +116,7 @@ def send_new_user_signed_up(user):
     url = settings.SITE_URL + reverse('admin:user_change_status', kwargs={'user_id': user.username})
 
     subject = '[QA4SM] New user signed up'
-    body = 'Dear admins,\n\nnew user {} {} ({}) has signed up and a verification email has been sent to their provided address\n Kind regards,\nYour webapp'.format(
+    body = 'Dear admins,\n\nnew user {} {} ({}) has signed up and a verification email has been sent to their provided address\nKind regards,\nYour webapp'.format(
         user.first_name,
         user.last_name,
         user.username,
@@ -129,17 +129,19 @@ def send_new_user_signed_up(user):
 def send_new_user_verification(user, token):
     __logger.info('Sending email verification to user {}...'.format(user.id))
 
-    help_url = settings.SITE_URL + get_angular_url('help')
+    contact_us_url = settings.SITE_URL + get_angular_url('contact-us')
 
     verification_url = f"{settings.SITE_URL}/api/verify-email/{user.id}/{token}/"
     
     subject = '[QA4SM] Verify your email address'
-    body = f'''Dear {user.first_name or user.username},
+    body = f'''
+    Dear {user.first_name or user.username},
+    
     Thank you for signing up to QA4SM. To complete your registration, please verify your email address by clicking the following link: 
     
     {verification_url}
 
-    This link will expire in 24 hours. If you have any problems please contact the admins at {help_url}.
+    This link will expire in 24 hours. If you have any problems please contact the admins at {contact_us_url}.
 
     Kind regards,
     QA4SM team
