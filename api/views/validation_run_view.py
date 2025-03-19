@@ -41,17 +41,9 @@ FILTER_CONFIG = {
         'type': 'range',
         'parser': parse_date_filter
     },
-    'spatial_reference': {
-        'field': 'spatial_reference_configuration_id__dataset__pretty_name__icontains',
-        'type': 'contains',
-    },
-    'temporal_reference': {
-        'field': 'temporal_reference_configuration_id__dataset__pretty_name__icontains',
-        'type': 'contains',
-    },
-    'scaling_reference': {
-        'field': 'scaling_ref_id__dataset__pretty_name__icontains',
-        'type': 'contains',
+    'dataset': {
+        'field': 'dataset_configurations__dataset__pretty_name__icontains',
+        'type': 'contains'
     }
 }
 
