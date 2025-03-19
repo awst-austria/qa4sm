@@ -39,33 +39,20 @@ export class FilteringFormComponent {
             optionParser: this.dateParser
         },
         {
-            backendName: 'spatial_reference',
-            label: 'Spatial Reference Dataset',
-            optionPlaceHolder: 'Select datasets',
-            type: 'string',
-            selectedOptions: signal([])
-        },
-        {
-            backendName: 'temporal_reference',
-            label: 'Temporal Reference Dataset',
-            optionPlaceHolder: 'Select datasets',
-            type: 'string',
-            selectedOptions: signal([])
-        },
-        {
-            backendName: 'scaling_reference',
-            label: 'Scaling Reference Dataset',
-            optionPlaceHolder: 'Select datasets',
+            backendName: 'dataset',
+            label: 'Used Dataset',
+            optionPlaceHolder: 'Type dataset name',
             type: 'string',
             selectedOptions: signal([])
         }
     ];
+
     selectedFilter: FilterConfig;
     private textInputChange$ = new Subject<string>();
 
     constructor() {
         this.textInputChange$.pipe(
-            debounceTime(600)
+            debounceTime(700)
         ).subscribe(value => this.addOption(value));
     }
 
