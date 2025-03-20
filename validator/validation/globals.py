@@ -7,7 +7,6 @@ import qa4sm_reader.globals as qr_globals
 
 OUTPUT_FOLDER = settings.MEDIA_ROOT
 
-
 METRICS = qr_globals.METRICS
 
 NON_METRICS = qr_globals.NON_METRICS
@@ -22,7 +21,8 @@ TEMPORAL_SUB_WINDOW_SEPARATOR = qr_globals.TEMPORAL_SUB_WINDOW_SEPARATOR
 
 INTRA_ANNUAL_METRIC_TEMPLATE = qr_globals.INTRA_ANNUAL_METRIC_TEMPLATE
 
-INTRA_ANNUAL_TCOL_METRIC_TEMPLATE = qr_globals.INTRA_ANNUAL_TCOL_METRIC_TEMPLATE
+INTRA_ANNUAL_TCOL_METRIC_TEMPLATE = (
+    qr_globals.INTRA_ANNUAL_TCOL_METRIC_TEMPLATE)
 
 TC_METRICS = qr_globals.TC_METRICS
 
@@ -32,9 +32,10 @@ TC_METRIC_TEMPLATE = [
 ]
 
 STABILITY_METRICS = qr_globals.STABILITY_METRICS
-#-----------------------------------------------------------------------------------------------------------------------
-#TODO: If a new dataset is added here, make sure to add it to `qa4sm_reader.globals.DATASETS` as well
-#-----------------------------------------------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------------------------------------------------
+# TODO: If a new dataset is added here, make sure to add it to
+#  `qa4sm_reader.globals.DATASETS` as well
+# -----------------------------------------------------------------------------------------------------------------------
 C3SC = 'C3S_combined'
 ISMN = 'ISMN'
 GLDAS = 'GLDAS'
@@ -52,7 +53,7 @@ SMOS_L3 = 'SMOS_L3'
 SMOS_L2 = 'SMOS_L2'
 SMAP_L2 = 'SMAP_L2'
 SMOS_SBPCA = 'SMOS_SBPCA'
-#-----------------------------------------------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------------------------------------------------
 
 DATASETS = qr_globals.DATASETS
 
@@ -73,6 +74,7 @@ SMAP_V5_PM = 'SMAP_V5_PM'
 SMAP_V6_PM = 'SMAP_V6_PM'
 SMAP_V5_AM = 'SMAP_V5_AM'
 SMAP_V6_AM = 'SMAP_V6_AM'
+SMAP_V9_AM_PM = 'SMAP_V9_AM_PM'
 SMOS_105_ASC = 'SMOS_105_ASC'
 GLDAS_NOAH025_3H_2_1 = 'GLDAS_NOAH025_3H_2_1'
 ASCAT_H113 = 'ASCAT_H113'
@@ -126,11 +128,13 @@ SMOSL2_sm = 'SMOSL2_sm'
 SMAPL2_soil_moisture = 'SMAPL2_soil_moisture'
 SMOS_SBPCA_sm = 'SMOS_SBPCA_sm'
 
-# left empty, because if in the future we want to exclude some datasets from the reference group it will be enough to
+# left empty, because if in the future we want to exclude some datasets from
+# the reference group it will be enough to
 # insert it's shortname to the list
 NOT_AS_REFERENCE = []
 
-# ValidationRun and Datasets fields for comparison when looking for a validation with the same settings
+# ValidationRun and Datasets fields for comparison when looking for a
+# validation with the same settings
 VR_FIELDS = [
     'interval_from', 'interval_to', 'max_lat', 'min_lat', 'max_lon', 'min_lon',
     'tcol', 'bootstrap_tcol_cis', 'anomalies', 'anomalies_from',
@@ -180,8 +184,8 @@ ALLOWED_COMPRESSION_LEVELS = qr_globals.ALLOWED_COMPRESSION_LEVELS
 
 # intra-annual metrics related
 DEFAULT_TSW = qr_globals.DEFAULT_TSW
-TEMPORAL_SUB_WINDOW_NC_COORD_NAME = qr_globals.TEMPORAL_SUB_WINDOW_NC_COORD_NAME
-
+TEMPORAL_SUB_WINDOW_NC_COORD_NAME = (
+    qr_globals.TEMPORAL_SUB_WINDOW_NC_COORD_NAME)
 
 # default temporal sub windows
 TEMPORAL_SUB_WINDOWS = qr_globals.TEMPORAL_SUB_WINDOWS
@@ -195,5 +199,3 @@ MAX_NUM_DS_PER_VAL_RUN = qr_globals.MAX_NUM_DS_PER_VAL_RUN
 
 ISMN_LIST_FILE_NAME = 'ismn_station_list.csv'
 GEOJSON_FILE_NAME = 'ismn_sensors.json'
-
-
