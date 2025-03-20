@@ -135,14 +135,9 @@ export class ValidationPagePaginatedComponent implements OnInit {
     } else {
       if (serverResponse.validations.length) {
         this.validations = this.validations.concat(serverResponse.validations);
-
         this.checkIfValidationShouldBeSelected();
 
-        if (this.validations.length < serverResponse.length) {
-          this.currentPage = Math.floor(this.validations.length / this.limit);
-        }
-
-        if (this.currentPage >= this.maxNumberOfPages) {
+        if (this.currentPage >= this.maxNumberOfPages || serverResponse.validations.length < this.limit) {
           this.setEndOfPage();
         }
       } else {
