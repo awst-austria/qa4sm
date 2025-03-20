@@ -12,8 +12,10 @@ from api.views.auxiliary_functions import get_fields_as_list
 from validator.models import ValidationRun, CopiedValidations
 from dateutil.parser import parse
 
+
 def parse_date_filter(date_str: str):
     return parse(date_str)
+
 
 ORDER_DICT = {
     'name:asc': 'name_tag',
@@ -25,7 +27,6 @@ ORDER_DICT = {
     'spatial_reference_dataset:asc': 'spatial_reference_configuration_id__dataset__pretty_name',
     'spatial_reference_dataset:desc': '-spatial_reference_configuration_id__dataset__pretty_name'
 }
-
 
 FILTER_CONFIG = {
     'status': {
@@ -47,14 +48,21 @@ FILTER_CONFIG = {
     }
 }
 
-def filter_validations(query_params, validations):
+
+def check_for_filters(query_params):
+    return any(parameter.startswith('filter') for parameter in query_params.keys())
+
+
+def get_filters(query_params):
     filters = {}
     for parameter in query_params:
         if parameter.startswith('filter'):
             filter_name = parameter.split(':')[1]
             filter_config = FILTER_CONFIG.get(filter_name, None)
+            values = query_params.get(parameter, None).split(',')
+            if any(value == '' for value in values):
+                break
             if filter_config:
-                values = query_params.get(parameter, None).split(',')
                 if filter_config['type'] == 'range' and len(values) == 2:
                     filters[f'{filter_config["field"]}__gte'] = filter_config['parser'](values[0])
                     filters[f'{filter_config["field"]}__lte'] = filter_config['parser'](values[1])
@@ -62,8 +70,15 @@ def filter_validations(query_params, validations):
                     filters[filter_config['field']] = values
                 elif filter_config['type'] == 'contains':
                     filters[filter_config['field']] = values[0]
+    return filters
+
+
+def filter_validations(query_params, validations):
+    filters = get_filters(query_params)
     if filters:
+        print('given filters', filters)
         return validations.filter(**filters)
+    return validations
 
 
 @api_view(['GET'])
@@ -76,7 +91,7 @@ def published_results(request):
 
     val_runs = ValidationRun.objects.exclude(doi='')
 
-    if any(parameter.startswith('filter') for parameter in request.query_params.keys()):
+    if check_for_filters(request.query_params):
         val_runs = filter_validations(request.query_params, val_runs)
 
     if order:
@@ -109,12 +124,11 @@ def my_results(request):
     user_validations = ValidationRun.objects.filter(user=current_user)
     number_of_all_validations = len(user_validations)
 
-    if any(parameter.startswith('filter') for parameter in request.query_params.keys()):
+    if check_for_filters(request.query_params):
         user_validations = filter_validations(request.query_params, user_validations)
 
     if order:
         user_validations = user_validations.order_by(order)
-
 
     if limit and offset:
         limit = int(limit)
@@ -124,6 +138,7 @@ def my_results(request):
         serializer = ValidationRunSerializer(user_validations, many=True)
 
     response = {'validations': serializer.data, 'length': number_of_all_validations}
+    print('there is a response', len(serializer.data))
     return JsonResponse(response, status=status.HTTP_200_OK, safe=False)
 
 
