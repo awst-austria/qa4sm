@@ -1,7 +1,9 @@
-from validator.models import Dataset, DatasetVersion, DatasetConfiguration, ValidationRun, DataVariable
+from validator.models import Dataset, DatasetVersion, DatasetConfiguration, \
+    ValidationRun, DataVariable
 from dateutil.tz import tzlocal
 from datetime import datetime
-from validator.validation.globals import ISMN_V20191211, ISMN, ISMN_soil_moisture, C3SC, C3S_sm, C3S_V202212, DEFAULT_TSW
+from validator.validation.globals import ISMN_V20191211, ISMN, \
+    ISMN_soil_moisture, C3SC, C3S_sm, C3S_V202212, DEFAULT_TSW
 
 default_reference_dataset = ISMN
 default_reference_version = ISMN_V20191211
@@ -11,7 +13,8 @@ default_non_reference_dataset = C3SC
 default_non_reference_version = C3S_V202212
 default_non_reference_variable = C3S_sm
 
-def generate_default_validation_hires():        # defined, but never used
+
+def generate_default_validation_hires():  # defined, but never used
     run = ValidationRun()
     run.plots_save_metadata = 'always'
     run.start_time = datetime.now(tzlocal())
@@ -20,7 +23,8 @@ def generate_default_validation_hires():        # defined, but never used
     data_c = DatasetConfiguration()
     data_c.validation = run
     data_c.dataset = Dataset.objects.get(short_name='CGLS_CSAR_SSM1km')
-    data_c.version = DatasetVersion.objects.get(short_name='CGLS_CSAR_SSM1km_V1_1')
+    data_c.version = DatasetVersion.objects.get(
+        short_name='CGLS_CSAR_SSM1km_V1_1')
     data_c.variable = DataVariable.objects.get(pretty_name='CGLS_SSM')
     data_c.is_spatial_reference = False
     data_c.is_temporal_reference = False
@@ -29,8 +33,10 @@ def generate_default_validation_hires():        # defined, but never used
     ref_c = DatasetConfiguration()
     ref_c.validation = run
     ref_c.dataset = Dataset.objects.get(short_name=default_reference_dataset)
-    ref_c.version = DatasetVersion.objects.get(short_name=default_reference_version)
-    ref_c.variable = DataVariable.objects.get(pretty_name=default_reference_variable)
+    ref_c.version = DatasetVersion.objects.get(
+        short_name=default_reference_version)
+    ref_c.variable = DataVariable.objects.get(
+        pretty_name=default_reference_variable)
     ref_c.is_spatial_reference = True
     ref_c.is_temporal_reference = True
     ref_c.save()
@@ -52,9 +58,12 @@ def generate_default_validation():
 
     data_c = DatasetConfiguration()
     data_c.validation = run
-    data_c.dataset = Dataset.objects.get(short_name=default_non_reference_dataset)
-    data_c.version = DatasetVersion.objects.get(short_name=default_non_reference_version)
-    data_c.variable = DataVariable.objects.get(pretty_name=default_non_reference_variable)
+    data_c.dataset = Dataset.objects.get(
+        short_name=default_non_reference_dataset)
+    data_c.version = DatasetVersion.objects.get(
+        short_name=default_non_reference_version)
+    data_c.variable = DataVariable.objects.get(
+        pretty_name=default_non_reference_variable)
     data_c.is_spatial_reference = False
     data_c.is_temporal_reference = False
     data_c.save()
@@ -62,8 +71,51 @@ def generate_default_validation():
     ref_c = DatasetConfiguration()
     ref_c.validation = run
     ref_c.dataset = Dataset.objects.get(short_name=default_reference_dataset)
-    ref_c.version = DatasetVersion.objects.get(short_name=default_reference_version)
-    ref_c.variable = DataVariable.objects.get(pretty_name=default_reference_variable)
+    ref_c.version = DatasetVersion.objects.get(
+        short_name=default_reference_version)
+    ref_c.variable = DataVariable.objects.get(
+        pretty_name=default_reference_variable)
+    ref_c.is_spatial_reference = True
+    ref_c.is_temporal_reference = True
+    ref_c.save()
+
+    run.spatial_reference_configuration = ref_c
+    run.temporal_reference_configuration = ref_c
+
+    run.intra_annual_metrics = False
+    run.intra_annual_type = None
+    run.intra_annual_overlap = 0
+
+    run.save()
+
+    return run
+
+
+def generate_validation_smap_l3_v9():
+    '''
+    Generate a default validation run, as it was always used for tests
+    '''
+    run = ValidationRun()
+    run.start_time = datetime.now(tzlocal())
+    run.save()
+
+    data_c = DatasetConfiguration()
+    data_c.validation = run
+    data_c.dataset = Dataset.objects.get(short_name='SMAP_L3')
+    data_c.version = DatasetVersion.objects.get(short_name='SMAP_V9_AM_PM')
+    data_c.variable = DataVariable.objects.get(
+        pretty_name='SMAP_soil_moisture')
+    data_c.is_spatial_reference = False
+    data_c.is_temporal_reference = False
+    data_c.save()
+
+    ref_c = DatasetConfiguration()
+    ref_c.validation = run
+    ref_c.dataset = Dataset.objects.get(short_name=default_reference_dataset)
+    ref_c.version = DatasetVersion.objects.get(
+        short_name=default_reference_version)
+    ref_c.variable = DataVariable.objects.get(
+        pretty_name=default_reference_variable)
     ref_c.is_spatial_reference = True
     ref_c.is_temporal_reference = True
     ref_c.save()
@@ -97,8 +149,10 @@ def generate_default_validation_smos():
     ref_c = DatasetConfiguration()
     ref_c.validation = run
     ref_c.dataset = Dataset.objects.get(short_name=default_reference_dataset)
-    ref_c.version = DatasetVersion.objects.get(short_name=default_reference_version)
-    ref_c.variable = DataVariable.objects.get(pretty_name=default_reference_variable)
+    ref_c.version = DatasetVersion.objects.get(
+        short_name=default_reference_version)
+    ref_c.variable = DataVariable.objects.get(
+        pretty_name=default_reference_variable)
     ref_c.is_spatial_reference = True
     ref_c.is_temporal_reference = True
     ref_c.save()
@@ -119,7 +173,8 @@ def generate_default_validation_smos_l2(sbpca=False):
     data_c.validation = run
     if sbpca:
         data_c.dataset = Dataset.objects.get(short_name='SMOS_SBPCA')
-        data_c.version = DatasetVersion.objects.get(short_name='SMOS_SBPCA_v724')
+        data_c.version = DatasetVersion.objects.get(
+            short_name='SMOS_SBPCA_v724')
     else:
         data_c.dataset = Dataset.objects.get(short_name='SMOS_L2')
         data_c.version = DatasetVersion.objects.get(short_name='SMOSL2_v700')
@@ -131,8 +186,10 @@ def generate_default_validation_smos_l2(sbpca=False):
     ref_c = DatasetConfiguration()
     ref_c.validation = run
     ref_c.dataset = Dataset.objects.get(short_name=default_reference_dataset)
-    ref_c.version = DatasetVersion.objects.get(short_name=default_reference_version)
-    ref_c.variable = DataVariable.objects.get(pretty_name=default_reference_variable)
+    ref_c.version = DatasetVersion.objects.get(
+        short_name=default_reference_version)
+    ref_c.variable = DataVariable.objects.get(
+        pretty_name=default_reference_variable)
     ref_c.is_spatial_reference = True
     ref_c.is_temporal_reference = True
     ref_c.save()
@@ -151,9 +208,12 @@ def generate_default_validation_triple_coll():
 
     data_c = DatasetConfiguration()
     data_c.validation = run
-    data_c.dataset = Dataset.objects.get(short_name=default_non_reference_dataset)
-    data_c.version = DatasetVersion.objects.get(short_name=default_non_reference_version)
-    data_c.variable = DataVariable.objects.get(pretty_name=default_non_reference_variable)
+    data_c.dataset = Dataset.objects.get(
+        short_name=default_non_reference_dataset)
+    data_c.version = DatasetVersion.objects.get(
+        short_name=default_non_reference_version)
+    data_c.variable = DataVariable.objects.get(
+        pretty_name=default_non_reference_variable)
     data_c.is_spatial_reference = False
     data_c.is_temporal_reference = False
     data_c.save()
@@ -161,7 +221,8 @@ def generate_default_validation_triple_coll():
     other_data_c = DatasetConfiguration()
     other_data_c.validation = run
     other_data_c.dataset = Dataset.objects.get(short_name='SMOS_IC')
-    other_data_c.version = DatasetVersion.objects.get(short_name='SMOS_105_ASC')
+    other_data_c.version = DatasetVersion.objects.get(
+        short_name='SMOS_105_ASC')
     other_data_c.variable = DataVariable.objects.get(pretty_name='SMOS_sm')
     other_data_c.is_spatial_reference = False
     other_data_c.is_temporal_reference = False
@@ -170,8 +231,10 @@ def generate_default_validation_triple_coll():
     ref_c = DatasetConfiguration()
     ref_c.validation = run
     ref_c.dataset = Dataset.objects.get(short_name=default_reference_dataset)
-    ref_c.version = DatasetVersion.objects.get(short_name=default_reference_version)
-    ref_c.variable = DataVariable.objects.get(pretty_name=default_reference_variable)
+    ref_c.version = DatasetVersion.objects.get(
+        short_name=default_reference_version)
+    ref_c.variable = DataVariable.objects.get(
+        pretty_name=default_reference_variable)
     ref_c.is_spatial_reference = True
     ref_c.is_temporal_reference = True
     ref_c.save()
@@ -199,9 +262,12 @@ def generate_ismn_upscaling_validation():
     # here ref and non ref switch places
     ref_c = DatasetConfiguration()
     ref_c.validation = run
-    ref_c.dataset = Dataset.objects.get(short_name=default_non_reference_dataset)
-    ref_c.version = DatasetVersion.objects.get(short_name=default_non_reference_version)
-    ref_c.variable = DataVariable.objects.get(pretty_name=default_non_reference_variable)
+    ref_c.dataset = Dataset.objects.get(
+        short_name=default_non_reference_dataset)
+    ref_c.version = DatasetVersion.objects.get(
+        short_name=default_non_reference_version)
+    ref_c.variable = DataVariable.objects.get(
+        pretty_name=default_non_reference_variable)
     ref_c.is_spatial_reference = True
     ref_c.is_temporal_reference = True
     ref_c.save()
@@ -209,8 +275,10 @@ def generate_ismn_upscaling_validation():
     data_c = DatasetConfiguration()
     data_c.validation = run
     data_c.dataset = Dataset.objects.get(short_name=default_reference_dataset)
-    data_c.version = DatasetVersion.objects.get(short_name=default_reference_version)
-    data_c.variable = DataVariable.objects.get(pretty_name=default_reference_variable)
+    data_c.version = DatasetVersion.objects.get(
+        short_name=default_reference_version)
+    data_c.variable = DataVariable.objects.get(
+        pretty_name=default_reference_variable)
     data_c.is_spatial_reference = False
     data_c.is_temporal_reference = False
     data_c.save()
@@ -227,7 +295,8 @@ def generate_ismn_upscaling_validation():
     return run
 
 
-# #----------------------------------vals for the intra-annual metrics-------------------------------
+# #----------------------------------vals for the intra-annual
+# metrics-------------------------------
 
 def generate_default_seasonal_validation():
     run = generate_default_validation()
@@ -240,6 +309,7 @@ def generate_default_seasonal_validation():
 
     return run
 
+
 def generate_default_monthly_validation():
     run = generate_default_validation()
 
@@ -250,6 +320,7 @@ def generate_default_monthly_validation():
     run.save()
 
     return run
+
 
 def generate_default_seasonal_overlap_validation():
     run = generate_default_validation()
@@ -274,6 +345,7 @@ def generate_default_seasonal_validation_triple_coll():
 
     return run
 
+
 def generate_default_monthly_validation_triple_coll():
     run = generate_default_validation_triple_coll()
 
@@ -284,6 +356,7 @@ def generate_default_monthly_validation_triple_coll():
     run.save()
 
     return run
+
 
 def generate_default_seasonal_overlap_validation_triple_coll():
     run = generate_default_validation_triple_coll()
@@ -296,6 +369,7 @@ def generate_default_seasonal_overlap_validation_triple_coll():
 
     return run
 
+
 def generate_default_seasonal_validation_smos():
     run = generate_default_validation_smos()
 
@@ -307,6 +381,7 @@ def generate_default_seasonal_validation_smos():
 
     return run
 
+
 def generate_default_monthly_validation_smos():
     run = generate_default_validation_smos()
 
@@ -317,6 +392,7 @@ def generate_default_monthly_validation_smos():
     run.save()
 
     return run
+
 
 def generate_default_seasonal_overlap_validation_smos():
     run = generate_default_validation_smos()
@@ -341,6 +417,7 @@ def generate_default_seasonal_validation_smos_l2(sbpca=False):
 
     return run
 
+
 def generate_default_monthly_validation_smos_l2(sbpca=False):
     run = generate_default_validation_smos_l2(sbpca=sbpca)
 
@@ -351,6 +428,7 @@ def generate_default_monthly_validation_smos_l2(sbpca=False):
     run.save()
 
     return run
+
 
 def generate_default_seasonal_overlap_validation_smos_l2(sbpca=False):
     run = generate_default_validation_smos_l2(sbpca=sbpca)
@@ -363,6 +441,7 @@ def generate_default_seasonal_overlap_validation_smos_l2(sbpca=False):
 
     return run
 
+
 def generate_seasonal_ismn_upscaling_validation():
     run = generate_ismn_upscaling_validation()
 
@@ -374,6 +453,7 @@ def generate_seasonal_ismn_upscaling_validation():
 
     return run
 
+
 def generate_monthly_ismn_upscaling_validation():
     run = generate_ismn_upscaling_validation()
 
@@ -384,6 +464,7 @@ def generate_monthly_ismn_upscaling_validation():
     run.save()
 
     return run
+
 
 def generate_seasonal_overlap_ismn_upscaling_validation():
     run = generate_ismn_upscaling_validation()
