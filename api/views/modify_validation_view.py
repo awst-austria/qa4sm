@@ -229,7 +229,7 @@ def delete_result(request, result_uuid):
     if not val_run.is_unpublished or val_run.is_archived:
         return HttpResponse(status=status.HTTP_405_METHOD_NOT_ALLOWED)  # 405
 
-    val_run.delete(permanently=False)
+    val_run.delete()
     return HttpResponse(status=status.HTTP_200_OK)
 
 
@@ -243,7 +243,7 @@ def delete_multiple_result(request):
                              .filter(user=request.user))
 
     for validation in validations_to_remove:
-        validation.delete(permanently=False)
+        validation.delete()
 
     return HttpResponse(status=status.HTTP_200_OK)
 
