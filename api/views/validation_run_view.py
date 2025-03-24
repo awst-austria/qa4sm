@@ -138,7 +138,6 @@ def my_results(request):
         serializer = ValidationRunSerializer(user_validations, many=True)
 
     response = {'validations': serializer.data, 'length': number_of_all_validations}
-    print('there is a response', len(serializer.data))
     return JsonResponse(response, status=status.HTTP_200_OK, safe=False)
 
 
@@ -147,7 +146,7 @@ def my_results(request):
 def validation_run_by_id(request, **kwargs):
     val_run = get_object_or_404(ValidationRun, pk=kwargs['id'])
 
-    if val_run is None or val_run.is_removed:
+    if val_run is None:
         return JsonResponse(None, status=status.HTTP_404_NOT_FOUND, safe=False)
 
     serializer = ValidationRunSerializer(val_run)

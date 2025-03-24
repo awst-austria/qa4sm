@@ -140,8 +140,6 @@ class ValidationRun(models.Model):
     stability_metrics = models.BooleanField(default=False)
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='SCHEDULED')
 
-    is_removed = models.BooleanField(default=False)
-
     # many-to-one relationships coming from other models:
     # dataset_configurations from DatasetConfiguration
     # celery_tasks from CeleryTask
@@ -295,24 +293,10 @@ class ValidationRun(models.Model):
         super().save(*args, **kwargs)
 
 
-    def __remove_validation(self):
-        self.user = None
-        self.output_file = None
-        self.name_tag = ''
-        self.is_removed = True
-        self.save()
-        configs = DatasetConfiguration.objects.filter(validation_id=self.id)
-        for config in configs:
-            config.delete()
-        auto_delete_file_on_delete(sender=self.__class__, instance=self)  # Manually trigger cleanup
-
-    def delete(self, permanently=True, using=None, keep_parents=False):
+    def delete(self, using=None, keep_parents=False):
         global DATASETS_WITHOUT_FILES
         DATASETS_WITHOUT_FILES = list(self.get_dataset_configs_without_file().values_list('dataset', flat=True))
-        if permanently:
-            super().delete(using=using, keep_parents=keep_parents)
-        else:
-            self.__remove_validation()
+        super().delete(using=using, keep_parents=keep_parents)
 
     # delete model output directory on disk when model is deleted
 
