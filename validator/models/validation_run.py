@@ -15,6 +15,8 @@ from django.utils import timezone
 from validator.models import DatasetConfiguration, User, CopiedValidations, Dataset
 from django.db.models import Q, ExpressionWrapper, F, BooleanField
 
+from validator.models.validation_run_deleted import DeletedValidationRun
+
 # def get_spatial_reference_id(instance) -> int:
 #     return instance.spatial_reference_configuration.primary_key
 
@@ -296,6 +298,7 @@ class ValidationRun(models.Model):
     def delete(self, using=None, keep_parents=False):
         global DATASETS_WITHOUT_FILES
         DATASETS_WITHOUT_FILES = list(self.get_dataset_configs_without_file().values_list('dataset', flat=True))
+        create_deleted_validation_run(self)
         super().delete(using=using, keep_parents=keep_parents)
 
     # delete model output directory on disk when model is deleted
@@ -327,3 +330,46 @@ def auto_delete_file_on_delete(sender, instance, **kwargs):
         outdir = os.path.join(OUTPUT_FOLDER, str(instance.id))
         if os.path.isdir(outdir):
             rmtree(outdir)
+
+
+def create_deleted_validation_run(instance):
+    val_datasets = [f'{config.dataset.pretty_name}/{config.version.pretty_name}/{config.variable.pretty_name}' for config in instance.dataset_configurations.all()]
+    spatial_ref_config = instance.spatial_reference_configuration
+    temporal_ref_config = instance.temporal_reference_configuration
+    scaling_ref_config = instance.scaling_ref
+    scaling_ref = None if not scaling_ref_config else f'{scaling_ref_config.dataset.pretty_name}/{scaling_ref_config.version.pretty_name}/{scaling_ref_config.variable.pretty_name}'
+
+    DeletedValidationRun.objects.create(
+        id=instance.id,
+        user=instance.user,
+        start_time=instance.start_time,
+        end_time=instance.end_time,
+        total_points=instance.total_points,
+        error_points=instance.error_points,
+        ok_points=instance.ok_points,
+        datasets=val_datasets,
+        spatial_reference=f'{spatial_ref_config.dataset.pretty_name}/{spatial_ref_config.version.pretty_name}/{spatial_ref_config.variable.pretty_name}',
+        temporal_reference=f'{temporal_ref_config.dataset.pretty_name}/{temporal_ref_config.version.pretty_name}/{temporal_ref_config.variable.pretty_name}',
+        scaling_reference=scaling_ref,
+        scaling_method=instance.scaling_method,
+        interval_from=instance.interval_from,
+        interval_to=instance.interval_to,
+        anomalies=instance.anomalies,
+        min_lat=instance.min_lat,
+        min_lon=instance.min_lon,
+        max_lat=instance.max_lat,
+        max_lon=instance.max_lon,
+        anomalies_from=instance.anomalies_from,
+        anomalies_to=instance.anomalies_to,
+        upscaling_method=instance.upscaling_method,
+        temporal_stability=instance.temporal_stability,
+        tcol=instance.tcol,
+        bootstrap_tcol_cis=instance.bootstrap_tcol_cis,
+        temporal_matching=instance.temporal_matching,
+        plots_save_metadata=instance.plots_save_metadata,
+        intra_annual_metrics=instance.intra_annual_metrics,
+        intra_annual_type=instance.intra_annual_type,
+        intra_annual_overlap=instance.intra_annual_overlap,
+        stability_metrics=instance.stability_metrics,
+        status=instance.status
+    )
