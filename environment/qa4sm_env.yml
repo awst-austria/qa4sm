@@ -280,7 +280,7 @@ dependencies:
     - shapely==2.0.7
     - six==1.17.0
     - smos
-    - smap-io==0.5
+#    - smap-io==0.5
     - sortedcontainers==2.4.0
     - sqlparse==0.5.3
     - tblib==3.0.0
@@ -300,3 +300,4 @@ dependencies:
     - zict==3.0.0
     - zipp==3.21.0
     - zstandard==0.23.0
+    - git+https://github.com/ThoUnt96/smap_io.git@create_SMAP_L3_V9_timeseries
