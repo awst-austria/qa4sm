@@ -337,7 +337,12 @@ def create_deleted_validation_run(instance):
     spatial_ref_config = instance.spatial_reference_configuration
     temporal_ref_config = instance.temporal_reference_configuration
     scaling_ref_config = instance.scaling_ref
-    scaling_ref = None if not scaling_ref_config else f'{scaling_ref_config.dataset.pretty_name}/{scaling_ref_config.version.pretty_name}/{scaling_ref_config.variable.pretty_name}'
+    scaling_ref = None if not scaling_ref_config else \
+        f'{scaling_ref_config.dataset.pretty_name}/{scaling_ref_config.version.pretty_name}/{scaling_ref_config.variable.pretty_name}'
+    spatial_ref = None if not spatial_ref_config else \
+        f'{spatial_ref_config.dataset.pretty_name}/{spatial_ref_config.version.pretty_name}/{spatial_ref_config.variable.pretty_name}'
+    temporal_ref = None if not temporal_ref_config else \
+        f'{temporal_ref_config.dataset.pretty_name}/{temporal_ref_config.version.pretty_name}/{temporal_ref_config.variable.pretty_name}'
 
     DeletedValidationRun.objects.create(
         id=instance.id,
@@ -348,8 +353,8 @@ def create_deleted_validation_run(instance):
         error_points=instance.error_points,
         ok_points=instance.ok_points,
         datasets=val_datasets,
-        spatial_reference=f'{spatial_ref_config.dataset.pretty_name}/{spatial_ref_config.version.pretty_name}/{spatial_ref_config.variable.pretty_name}',
-        temporal_reference=f'{temporal_ref_config.dataset.pretty_name}/{temporal_ref_config.version.pretty_name}/{temporal_ref_config.variable.pretty_name}',
+        spatial_reference=spatial_ref,
+        temporal_reference=temporal_ref,
         scaling_reference=scaling_ref,
         scaling_method=instance.scaling_method,
         interval_from=instance.interval_from,
