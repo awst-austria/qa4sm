@@ -1,4 +1,5 @@
 from django.shortcuts import redirect
+from django.conf import settings
 
 from valentina.settings_conf import SITE_URL
 
@@ -12,6 +13,7 @@ angular_paths = [
     {'path': 'published-validations', 'name': 'published_validations'},
     {'path': 'about', 'name': 'about'},
     {'path': 'help', 'name': 'help'},
+    {'path': 'contact-us', 'name': 'contact-us'},
     {'path': 'terms', 'name': 'terms'},
     {'path': 'datasets', 'name': 'datasets'},
     {'path': 'signup', 'name': 'signup'},
@@ -21,7 +23,8 @@ angular_paths = [
     {'path': 'password-reset-done', 'name': 'password-reset-done'},
     {'path': 'password-reset/:token', 'name': 'validate-token'},
     {'path': 'set-password', 'name': 'set-password'},
-    {'path': 'my-datasets', 'name': 'my-datasets'}
+    {'path': 'my-datasets', 'name': 'my-datasets'},
+    {'path': 'contact-us', 'name': 'contact-us'}
 ]
 
 
@@ -47,6 +50,9 @@ def get_angular_url(url_name, parameter=None):
         searched_path = 'validate?validation_id=' + str(parameter)
     else:
         searched_path = searched_element['path']
+
+    if settings.DEBUG:
+        return '/' + searched_path
 
     return '/ui/' + searched_path
 
