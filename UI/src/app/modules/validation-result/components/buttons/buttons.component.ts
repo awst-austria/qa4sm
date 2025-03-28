@@ -10,7 +10,6 @@ import {GlobalParamsService} from '../../../core/services/global/global-params.s
 import {ToastService} from '../../../core/services/toast/toast.service';
 import {CustomHttpError} from '../../../core/services/global/http-error.service';
 
-
 @Component({
   selector: 'qa-buttons',
   templateUrl: './buttons.component.html',
@@ -40,7 +39,6 @@ export class ButtonsComponent implements OnInit {
   status: string;
   publishingInProgress$: Observable<boolean>;
   isArchived = signal(undefined)
-
 
   constructor(private router: Router,
               private validationService: ValidationrunService,

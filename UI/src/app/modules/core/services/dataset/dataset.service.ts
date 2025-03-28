@@ -31,7 +31,6 @@ export class DatasetService {
   }
 
   getAllDatasets(userData = false, excludeNoFiles = true): Observable<DatasetDto[]> {
-
     if (this.arrayRequestCache.isCached(CACHE_KEY_ALL_DATASETS) && this.userDataInfoCache
       .get(CACHE_USER_DATA_INFO) === userData && this.userDataInfoCache.get(CACHE_FILE_INFO) === excludeNoFiles) {
       return this.arrayRequestCache.get(CACHE_KEY_ALL_DATASETS).pipe(

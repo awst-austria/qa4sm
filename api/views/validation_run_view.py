@@ -10,7 +10,75 @@ from rest_framework.authentication import TokenAuthentication
 
 from api.views.auxiliary_functions import get_fields_as_list
 from validator.models import ValidationRun, CopiedValidations
+from dateutil.parser import parse
 
+
+def parse_date_filter(date_str: str):
+    return parse(date_str)
+
+
+ORDER_DICT = {
+    'name:asc': 'name_tag',
+    'name:desc': '-name_tag',
+    'start_time:asc': 'start_time',
+    'start_time:desc': '-start_time',
+    'progress:asc': 'progress',
+    'progress:desc': '-progress',
+    'spatial_reference_dataset:asc': 'spatial_reference_configuration_id__dataset__pretty_name',
+    'spatial_reference_dataset:desc': '-spatial_reference_configuration_id__dataset__pretty_name'
+}
+
+FILTER_CONFIG = {
+    'status': {
+        'field': 'status__in',
+        'type': 'in',
+    },
+    'name': {
+        'field': 'name_tag__icontains',
+        'type': 'contains',
+    },
+    'start_time': {
+        'field': 'start_time',
+        'type': 'range',
+        'parser': parse_date_filter
+    },
+    'dataset': {
+        'field': 'dataset_configurations__dataset__pretty_name__icontains',
+        'type': 'contains'
+    }
+}
+
+
+def check_for_filters(query_params):
+    return any(parameter.startswith('filter') for parameter in query_params.keys())
+
+
+def get_filters(query_params):
+    filters = {}
+    for parameter in query_params:
+        if parameter.startswith('filter'):
+            filter_name = parameter.split(':')[1]
+            filter_config = FILTER_CONFIG.get(filter_name, None)
+            values = query_params.get(parameter, None).split(',')
+            if any(value == '' for value in values):
+                break
+            if filter_config:
+                if filter_config['type'] == 'range' and len(values) == 2:
+                    filters[f'{filter_config["field"]}__gte'] = filter_config['parser'](values[0])
+                    filters[f'{filter_config["field"]}__lte'] = filter_config['parser'](values[1])
+                elif filter_config['type'] == 'in':
+                    filters[filter_config['field']] = values
+                elif filter_config['type'] == 'contains':
+                    filters[filter_config['field']] = values[0]
+    return filters
+
+
+def filter_validations(query_params, validations):
+    filters = get_filters(query_params)
+    if filters:
+        print('given filters', filters)
+        return validations.filter(**filters)
+    return validations
 
 
 @api_view(['GET'])
@@ -18,23 +86,16 @@ from validator.models import ValidationRun, CopiedValidations
 def published_results(request):
     limit = request.query_params.get('limit', None)
     offset = request.query_params.get('offset', None)
-    order = request.query_params.get('order', None)
-    order_list = ['name_tag',
-                  '-name_tag',
-                  'start_time',
-                  '-start_time',
-                  'progress',
-                  '-progress',
-                  'spatial_reference_configuration_id__dataset__pretty_name',
-                  '-spatial_reference_configuration_id__dataset__pretty_name'
-                  ]
+    order_name = request.query_params.get('order', None)
+    order = ORDER_DICT.get(order_name, None)
 
-    if order and order in order_list:
-        val_runs = ValidationRun.objects.exclude(doi='').order_by(order)
-    elif not order:
-        val_runs = ValidationRun.objects.exclude(doi='')
-    else:
-        return JsonResponse({'message': 'Not appropriate order given'}, status=status.HTTP_400_BAD_REQUEST, safe=False)
+    val_runs = ValidationRun.objects.exclude(doi='')
+
+    if check_for_filters(request.query_params):
+        val_runs = filter_validations(request.query_params, val_runs)
+
+    if order:
+        val_runs = val_runs.order_by(order)
 
     # both limit and offset are send as string, so the simple if limit and offset condition can be used,
     # if they were sent as numbers there would be a problem because they both can be 0
@@ -57,33 +118,26 @@ def my_results(request):
     current_user = request.user
     limit = request.query_params.get('limit', None)
     offset = request.query_params.get('offset', None)
-    order = request.query_params.get('order', None)
-    order_list = ['name_tag',
-                  '-name_tag',
-                  'start_time',
-                  '-start_time',
-                  'progress',
-                  '-progress',
-                  'spatial_reference_configuration_id__dataset__pretty_name',
-                  '-spatial_reference_configuration_id__dataset__pretty_name'
-                  ]
+    order_name = request.query_params.get('order', None)
+    order = ORDER_DICT.get(order_name, None)
 
-    if order and order in order_list:
-        val_runs = ValidationRun.objects.filter(user=current_user).order_by(order)
-    elif not order:
-        val_runs = ValidationRun.objects.filter(user=current_user)
-    else:
-        return JsonResponse({'message': 'Not appropriate order given'}, status=status.HTTP_400_BAD_REQUEST, safe=False)
+    user_validations = ValidationRun.objects.filter(user=current_user)
+    number_of_all_validations = len(user_validations)
+
+    if check_for_filters(request.query_params):
+        user_validations = filter_validations(request.query_params, user_validations)
+
+    if order:
+        user_validations = user_validations.order_by(order)
 
     if limit and offset:
         limit = int(limit)
         offset = int(offset)
-        serializer = ValidationRunSerializer(val_runs[offset:(offset + limit)], many=True)
+        serializer = ValidationRunSerializer(user_validations[offset:(offset + limit)], many=True)
     else:
-        serializer = ValidationRunSerializer(val_runs, many=True)
+        serializer = ValidationRunSerializer(user_validations, many=True)
 
-    response = {'validations': serializer.data, 'length': len(val_runs)}
-
+    response = {'validations': serializer.data, 'length': number_of_all_validations}
     return JsonResponse(response, status=status.HTTP_200_OK, safe=False)
 
 
@@ -92,7 +146,7 @@ def my_results(request):
 def validation_run_by_id(request, **kwargs):
     val_run = get_object_or_404(ValidationRun, pk=kwargs['id'])
 
-    if val_run is None or val_run.is_removed:
+    if val_run is None:
         return JsonResponse(None, status=status.HTTP_404_NOT_FOUND, safe=False)
 
     serializer = ValidationRunSerializer(val_run)
@@ -160,13 +214,13 @@ def get_copied_validations(request, **kwargs):
 @api_view(['GET'])
 @authentication_classes([TokenAuthentication])
 def is_validation_finished(request, **kwargs):
-
     val_run = get_object_or_404(ValidationRun, pk=kwargs['id'])
     if not val_run:
         return JsonResponse(status=status.HTTP_404_NOT_FOUND)
 
     ifFinished = (val_run.progress == 100 and val_run.end_time is not None)
     return JsonResponse({'validation_complete': ifFinished}, status=status.HTTP_200_OK)
+
 
 class ValidationRunSerializer(ModelSerializer):
     class Meta:

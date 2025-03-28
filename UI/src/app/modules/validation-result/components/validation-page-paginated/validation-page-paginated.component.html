@@ -3,23 +3,28 @@
   <div class="side-panel-area mb-3">
     <qa-handle-multiple-validations
       [validations]="validations"
-      [selectedValidationsId$]="selectedValidations$"
-      (selectionActive)="handleMultipleSelection($event)"
-      *ngIf="!published && !dataFetchError()"/>
+      [(multipleValidationAction)]="multipleValidationAction"
+      *ngIf="!dataFetchError() && !published()"/>
+    <qa-filtering-form *ngIf="!dataFetchError()"
+                       [availableDatasetsSignal]="datasets$"
+                       [validationFilters]="valFilters()"
+                       (validationFiltersChange)="valFilters.set($event)"
+    />
   </div>
+
 
   <div class="flex flex-column w-12 align-content-center justify-content-center">
     <!-- custom -->
-    <div *ngIf="!published && !dataFetchError()" class="text-center w-12">
+    <div *ngIf="!published() && !dataFetchError()" class="text-center w-12">
       <h1>My validations</h1>
-      <p *ngIf="!validations.length" class="lead text-muted">
+      <p *ngIf="!numberOfUserValidations" class="lead text-muted">
         You have not started any validations yet. Visit the <a routerLink="/validate">validation page</a>
         to start your own validation run.
       </p>
     </div>
 
     <!-- published -->
-    <div *ngIf="published && !dataFetchError()" class="text-center w-12 my-2">
+    <div *ngIf="published() && !dataFetchError()" class="text-center w-12 my-2">
       <h1>Published validations</h1>
       <p class="lead text-muted">
         The QA4SM validations below have been published by their owners to
@@ -33,27 +38,38 @@
       <qa-error></qa-error>
     </div>
 
-    <div *ngIf="validations.length && !dataFetchError()" class="w-12 my-2">
-      <qa-sorting-form (orderQueryName)="getOrder($event)"/>
-    </div>
-
     <!-- Rows -->
-    <div *ngIf="validations.length" class="w-12 py-2">
+    <div *ngIf="numberOfUserValidations && !dataFetchError()" class="w-12 py-2">
+
+      <div class="w-12 my-2">
+        <qa-sorting-form (orderQueryName)="getOrder($event)"/>
+      </div>
+
       <div *ngIf="!(isLoading && orderChange)">
         <div *ngFor="let valrun of validations"
              class="validation-row-area">
-          <p-checkbox
-            class="modify-checkbox"
-            *ngIf="(selectionActive$|async)"
-            [disabled]="!checkIfEnabled(valrun)"
-            [value]="valrun.id"
-            [ngModel]="selectedValidations$ | async"
-            (ngModelChange)="updateSelectedValidations($event, valrun.id)"
-            [pTooltip]="!checkIfEnabled(valrun) ? 'This validation cannot be selected for current action' : null"
-            inputId="{{valrun.id}}}">
-          </p-checkbox>
-          <qa-validationrun-row [published]=published [validationRun]="valrun" (emitError)="dataFetchError.set($event)"/>
-          <br/>
+          <!--- <div *ngIf="rowVisibility.get(valrun.id) !== undefined ? rowVisibility.get(valrun.id) : true" class="validation-row-area"> --->
+          <div class="validation-row-area">
+
+            <p-checkbox
+              class="modify-checkbox"
+              *ngIf="(multipleValidationAction.active)"
+              [disabled]="!checkIfActionApplies(valrun)"
+              [value]="valrun.id"
+              [ngModel]="multipleValidationAction.selectedValidationIds"
+              (ngModelChange)="updateSelectedValidations($event, valrun.id)"
+              [pTooltip]="!checkIfActionApplies(valrun) ? 'This validation cannot be selected for current action' : null"
+              inputId="{{valrun.id}}}">
+            </p-checkbox>
+            <qa-validationrun-row
+              [datasets]="datasets$"
+              [versions]="versions$"
+              [variables]="variables$"
+              [published]=published()
+              [validationRun]="valrun"
+              (emitError)="dataFetchError.set($event)"/>
+            <br/>
+          </div>
         </div>
       </div>
 
@@ -63,10 +79,23 @@
         Loading... </em>
       </div>
 
-      <div *ngIf="endOfPage && !published" class="val-number-information">
-        <em> You have run {{ validations.length }} {{ validations.length === 1 ? 'validation ' : 'validations' }}.</em>
+      <div *ngIf="!published()" class="val-number-information">
+        <div>
+          <em> You have
+            run {{ numberOfUserValidations }} {{ numberOfUserValidations === 1 ? 'validation ' : 'validations' }}.</em>
+        </div>
+        <div *ngIf="(validations.length)">
+          <em> Showing {{ validations.length }} {{ validations.length === 1 ? 'validation ' : 'validations' }}
+            that {{ validations.length === 1 ? 'meets ' : 'meet' }} the filter criteria.</em>
+        </div>
+        <div *ngIf="(!validations.length)">
+          <em>
+            No validation results found that meet the filter criteria.
+          </em>
+        </div>
       </div>
     </div>
+
 
   </div>
 </main>
