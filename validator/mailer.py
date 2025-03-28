@@ -116,7 +116,7 @@ def send_new_user_signed_up(user):
     url = settings.SITE_URL
 
     subject = '[QA4SM] New user signed up'
-    body = 'Dear admins,\n\nnew user {} {} ({}) has signed up from {}. A verification email has been sent to their provided address\n Kind regards,\nYour webapp'.format(
+    body = 'Dear admins,\n\nnew user {} {} ({}) has signed up from {}. A verification email has been sent to their provided address\nKind regards,\nYour webapp'.format(
         user.first_name,
         user.last_name,
         user.username,
@@ -135,7 +135,8 @@ def send_new_user_verification(user, token):
     
     subject = '[QA4SM] Verify your email address'
     
-    body = f'''Dear {user.first_name or user.username},
+    body = f'''
+    Dear {user.first_name or user.username},
     
     Thank you for signing up to QA4SM. To complete your registration, please verify your email address by clicking the following link: 
     
