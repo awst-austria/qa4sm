@@ -1,3 +1,11 @@
+QA4SM v3.0.4 - Release notes 2025-03-24
+=======================================================
+# Updates
+1. Default permanent validation removal retrieved
+
+# New features
+1. Validation filtering added
+
 QA4SM v3.0.3 - Release notes 2025-03-18
 =======================================================
 # Updates

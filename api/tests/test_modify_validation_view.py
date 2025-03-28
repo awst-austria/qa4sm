@@ -517,9 +517,7 @@ class TestModifyValidationView(TestCase):
         response = self.client.delete(delete_validation_url)
 
         assert response.status_code == 200
-        val_record = ValidationRun.objects.filter(pk=self.run_id)
-        assert len(val_record) == 1  # record still there
-        assert val_record.first().is_removed
+        assert len(ValidationRun.objects.filter(pk=self.run_id)) == 0  # not there anymore
 
     def test_delete_multiple_results(self):
         create_default_validation_without_running(self.test_user)
@@ -540,14 +538,7 @@ class TestModifyValidationView(TestCase):
         response = self.client.delete(delete_validation_url)
 
         assert response.status_code == 200
-        vals = ValidationRun.objects.all()
-        assert len(vals) == 4  # 4 left, but  one belonging to other user, second one published., so only 2 of them are in fact removed
-        removed_vals = ValidationRun.objects.filter(is_removed=True)
-        assert len(removed_vals) == 2
-        for val in removed_vals:
-            assert not val.user
-            assert not val.output_file
-            assert not val.name_tag
+        assert len(ValidationRun.objects.all()) == 2  # 2 left, one belonging to othe user, second one published.
 
     def test_get_publishing_form(self):
         get_publishing_form_url = reverse('Get publishing form')
@@ -716,11 +707,7 @@ class TestModifyValidationView(TestCase):
         assert run3.expiry_notified
         assert run4.expiry_notified
         assert run5.expiry_notified
-        assert len(non_user_val) == 1  # there should be 1 validation, but marked as removed
-        assert non_user_val.first().is_removed
-        assert not non_user_val.first().user
-        assert not non_user_val.first().name_tag
-        assert not non_user_val.first().output_file
+        assert len(non_user_val) == 0  # there should be no validation anymore, because it was already removed
         assert not no_user_run_published.expiry_notified  # no notification sent
 
         ## the validations may have been extended in the previous step, undo that to get them really deleted in the next call
@@ -740,6 +727,6 @@ class TestModifyValidationView(TestCase):
         response = self.client.post(run_autocleanup_url)
         assert response.status_code == 200
 
-        ## all the validations should still be there
+        ## the two expired validations should be have been deleted now
         ended_vals3 = ValidationRun.objects.filter(end_time__isnull=False).count()
-        assert ended_vals + 7 == ended_vals3
+        assert ended_vals + 4 == ended_vals3

@@ -1,10 +1,7 @@
-import {Component, EventEmitter, Input, OnDestroy, OnInit, Output, signal} from '@angular/core';
+import {Component, EventEmitter, input, Input, OnDestroy, OnInit, Output, signal} from '@angular/core';
 import {ValidationrunDto} from '../../../core/services/validation-run/validationrun.dto';
 import {DatasetConfigurationService} from '../../services/dataset-configuration.service';
 import {GlobalParamsService} from '../../../core/services/global/global-params.service';
-import {DatasetService} from 'src/app/modules/core/services/dataset/dataset.service';
-import {DatasetVersionService} from 'src/app/modules/core/services/dataset/dataset-version.service';
-import {DatasetVariableService} from 'src/app/modules/core/services/dataset/dataset-variable.service';
 import {fas} from '@fortawesome/free-solid-svg-icons';
 import {ValidationrunService} from '../../../core/services/validation-run/validationrun.service';
 import {combineLatest, EMPTY, Observable, Observer, of} from 'rxjs';
@@ -12,6 +9,9 @@ import {catchError, map} from 'rxjs/operators';
 import {ValidationRunConfigService} from '../../../../pages/validate/service/validation-run-config.service';
 import {CustomHttpError} from '../../../core/services/global/http-error.service';
 import {ToastService} from '../../../core/services/toast/toast.service';
+import {DatasetDto} from "../../../core/services/dataset/dataset.dto";
+import {DatasetVersionDto} from "../../../core/services/dataset/dataset-version.dto";
+import {DatasetVariableDto} from "../../../core/services/dataset/dataset-variable.dto";
 
 
 @Component({
@@ -24,6 +24,11 @@ export class ValidationrunRowComponent implements OnInit, OnDestroy {
   @Input() published = false;
   @Input() validationRun: ValidationrunDto;
   @Output() emitError = new EventEmitter();
+  datasets = input<Observable<DatasetDto[]>>()
+  versions = input<Observable<DatasetVersionDto[]>>()
+  variables = input<Observable<DatasetVariableDto[]>>()
+
+
   configurations$: Observable<any>;
   validationStatusInterval: any;
   validationStatus = signal<string | undefined>(undefined);
@@ -36,9 +41,6 @@ export class ValidationrunRowComponent implements OnInit, OnDestroy {
   valName = signal<string | undefined>(undefined);
 
   constructor(private datasetConfigService: DatasetConfigurationService,
-              private datasetService: DatasetService,
-              private datasetVersionService: DatasetVersionService,
-              private datasetVariableService: DatasetVariableService,
               public globalParamsService: GlobalParamsService,
               private validationService: ValidationrunService,
               public validationConfigService: ValidationRunConfigService,
@@ -49,21 +51,23 @@ export class ValidationrunRowComponent implements OnInit, OnDestroy {
     if (this.validationRun.is_a_copy) {
       this.getOriginalDate(this.validationRun);
     }
+
     this.updateConfig();
     this.valName.set(this.validationRun.name_tag);
     this.validationStatus.set(this.getStatusFromProgress(this.validationRun));
     this.refreshStatus();
   }
 
+
   private updateConfig(): void {
     this.configurations$ = combineLatest(
       [
         this.datasetConfigService.getConfigByValidationrun(this.validationRun.id),
-        this.datasetService.getAllDatasets(true, false),
-        this.datasetVersionService.getAllVersions().pipe(
+        this.datasets(),
+        this.versions().pipe(
           catchError(() => of([]))
         ),
-        this.datasetVariableService.getAllVariables().pipe(
+        this.variables().pipe(
           catchError(() => of([]))
         )
       ]
