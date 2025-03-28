@@ -301,6 +301,9 @@ class ValidationRun(models.Model):
         self.name_tag = ''
         self.is_removed = True
         self.save()
+        configs = DatasetConfiguration.objects.filter(validation_id=self.id)
+        for config in configs:
+            config.delete()
         auto_delete_file_on_delete(sender=self.__class__, instance=self)  # Manually trigger cleanup
 
     def delete(self, permanently=True, using=None, keep_parents=False):

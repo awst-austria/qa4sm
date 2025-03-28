@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.contrib.auth import get_user_model
-from validator.admin import CustomUserAdmin
+from validator.admin import CustomUserAdmin, DatasetConfigurationAdmin
 from validator.admin import SystemSettingsAdmin
 from validator.admin import ValidationRunAdmin
 from validator.admin import StatisticsAdmin
@@ -13,7 +13,7 @@ from validator.admin import DatasetVariableAdmin
 from validator.admin.data_management_groups import DataManagementGroupAdmin
 from validator.admin.user_manual_admin import UserManualAdmin
 from validator.admin.celery_tasks import CeleryTasksAdmin
-from validator.models import DataFilter
+from validator.models import DataFilter, DatasetConfiguration
 from validator.models import DataVariable
 from validator.models import Dataset
 from validator.models import DatasetVersion
@@ -42,3 +42,4 @@ admin.site.register(UserDatasetFile, UserDatasetFileAdmin)
 admin.site.register(DataManagementGroup, DataManagementGroupAdmin)
 admin.site.register(UserManual, UserManualAdmin)
 admin.site.register(CeleryTask, CeleryTasksAdmin)
+admin.site.register(DatasetConfiguration, DatasetConfigurationAdmin)

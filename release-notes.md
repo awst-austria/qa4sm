@@ -1,3 +1,13 @@
+QA4SM v3.0.3 - Release notes 2025-03-18
+=======================================================
+# Updates
+1. Non-permanent validation removal updated
+
+QA4SM v3.0.2 - Release notes 2025-03-12
+=======================================================
+# Updates
+1. Pytesmo version updated
+
 QA4SM v3.0.1.2 - Release notes 2025-03.09
 =======================================================
 # Updates
