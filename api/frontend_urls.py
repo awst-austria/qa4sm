@@ -13,6 +13,7 @@ angular_paths = [
     {'path': 'published-validations', 'name': 'published_validations'},
     {'path': 'about', 'name': 'about'},
     {'path': 'help', 'name': 'help'},
+    {'path': 'contact-us', 'name': 'contact-us'},
     {'path': 'terms', 'name': 'terms'},
     {'path': 'datasets', 'name': 'datasets'},
     {'path': 'signup', 'name': 'signup'},
