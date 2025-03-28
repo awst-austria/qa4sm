@@ -128,12 +128,13 @@ def send_new_user_signed_up(user):
 
 def send_new_user_verification(user, token):
     __logger.info('Sending email verification to user {}...'.format(user.id))
-
+    
     contact_url = settings.SITE_URL + get_angular_url('contact-us')
 
     verification_url = f"{settings.SITE_URL}/api/verify-email/{user.id}/{token}/"
     
     subject = '[QA4SM] Verify your email address'
+    
     body = f'''Dear {user.first_name or user.username},
     
     Thank you for signing up to QA4SM. To complete your registration, please verify your email address by clicking the following link: 
