@@ -64,6 +64,11 @@
                                        [datasetModel]="validationModel.datasetConfigurations[datasetIdx].datasetModel"
                                        [filterModel$]="validationModel.datasetConfigurations[datasetIdx].smosChi2Filter$"
                                        [minThreshold]="0." [increment]="0.05" maxThreshold="1." [units]="' [-]'" />
+                  <qa-threshold-filter *ngIf="validationModel.datasetConfigurations[datasetIdx].staticWaterFilter$|async"
+                                       [datasetModel]="validationModel.datasetConfigurations[datasetIdx].datasetModel"
+                                       [filterModel$]="validationModel.datasetConfigurations[datasetIdx].staticWaterFilter$"
+                                       [minThreshold]="0." [increment]="0.05" maxThreshold="1." [units]="' [-]'" />
+
                   <div *ngIf="validationModel.datasetConfigurations[datasetIdx].ismnNetworkFilter$|async">
                     <qa-ismn-network-filter
                       (networkSelectionChanged)="onIsmnNetworkSelectionChange($event)"
@@ -272,7 +277,7 @@
     <qa-existing-validation *ngIf="isExistingValidationWindowOpen"
                             [isThereValidation]="isThereValidation"
                             (startValidation)="startValidation(false)"/>
-                          
+
   </div>
 
 </main>
