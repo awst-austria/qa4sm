@@ -7,7 +7,7 @@ from django.conf import settings
 from rest_framework import status
 
 from validator.mailer import send_val_expiry_notification
-from validator.models import ValidationRun, CeleryTask, User
+from validator.models import ValidationRun, CeleryTask, User, DatasetConfiguration
 
 from rest_framework.decorators import api_view, permission_classes, authentication_classes
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
@@ -17,7 +17,6 @@ from validator.mailer import send_autocleanup_failed
 
 def auto_cleanup():
     users = User.objects.all()
-    cleaned_up = []
     notified = []
     for user in users:
         # no, you can't filter for is_expired because it isn't in the database. but you can exclude running validations
@@ -47,21 +46,21 @@ def auto_cleanup():
                 for task in celery_tasks:
                     task.delete()
                 validation.delete()
-                cleaned_up.append(vid)
 
         if len(validations_near_expiring) != 0:
             send_val_expiry_notification(validations_near_expiring)
 
-    # this part refer to validations that belong to a non-existing user -> there is no user to send a notification
-    # to, so we can just remove those validations (apart from published ones)
-    no_user_validations = ValidationRun.objects.filter(user=None)
+    # this part refer to validations that have already no user assigned but there might be some remaining celery tasks
+    no_user_validations = ValidationRun.objects.filter(user=None).filter(doi='')
     for no_user_val in no_user_validations:
         celery_tasks = CeleryTask.objects.filter(validation_id=no_user_val.id)
         for task in celery_tasks:
             task.delete()
-        if no_user_val.doi == '':
-            no_user_val.delete()
-            cleaned_up.append(str(no_user_val.id))
+            # we still need to clean it, because there might be a situation when the user got removed
+        leftover_configs = DatasetConfiguration.objects.filter(validation_id=no_user_val.id)
+        for config in leftover_configs:
+            config.delete()
+        no_user_val.delete()
 
 
 @api_view(['POST'])
