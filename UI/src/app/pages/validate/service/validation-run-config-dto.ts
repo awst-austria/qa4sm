@@ -47,6 +47,8 @@ export interface ConfigurationChanges {
   filters: {dataset: string, filter_desc: string[]}[];
   anomalies: boolean;
   scaling: boolean;
+  versions: {version: string, dataset: string}[];
+  variables: {variable: string, dataset: string}[];
 }
 
 export interface IntraAnnualMetricsDto{

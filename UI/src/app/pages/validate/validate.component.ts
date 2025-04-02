@@ -171,8 +171,9 @@ export class ValidateComponent implements OnInit, AfterViewInit {
       new BehaviorSubject<string>(''));
   }
 
-  private onGetValidationConfigNext(valrun): void {
+  private onGetValidationConfigNext(valrun: ValidationRunConfigDto): void {
     this.modelFromValidationConfig(valrun);
+    console.log(valrun.changes)
     if (valrun.changes) {
       this.toastService.showAlertWithHeader('Not all settings could be reloaded.',
         this.messageAboutConfigurationChanges(valrun.changes));
@@ -207,10 +208,15 @@ export class ValidateComponent implements OnInit, AfterViewInit {
     }
     if (changes.filters.length !== 0) {
       changes.filters.forEach(filter => {
-        message += `\nFilters:${filter.filter_desc.map(desc => ' ' + desc)} for dataset ${filter.dataset} not available.`;
+        message += `\nFilters: ${filter.filter_desc.map(desc => desc)} for dataset ${filter.dataset} not available.`;
       });
     }
 
+    if (changes.versions.length !== 0) {
+      changes.versions.forEach(version => {
+        message += `\nVersion: ${version.version} of ${version.dataset} is no longer available. The newest available versions set instead.\n`;
+      })
+    }
     return message.toString();
   }
 
@@ -727,7 +733,7 @@ export class ValidateComponent implements OnInit, AfterViewInit {
   }
 
   public startValidation(checkForExistingValidation: boolean): void {
-    
+
     if (!this.authService.authenticated.value) {
       this.toastService.showErrorWithHeader('Cannot start validation', 'You must be logged in to start a validation.');
       this.authService.switchLoginModal(true, 'Please log in to start validation');
@@ -792,7 +798,7 @@ export class ValidateComponent implements OnInit, AfterViewInit {
     if (this.authService.authenticated.getValue()) {
       const validationErrorMessage = this.messageAboutValidationErrors(error);
       this.toastService.showErrorWithHeader('Error', 'Your validation could not be started. \n\n' + validationErrorMessage);
-    } 
+    }
   }
 
   setDefaultGeographicalRange(): void {

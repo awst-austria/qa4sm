@@ -13,17 +13,21 @@ from validator.models import DatasetVersion
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def dataset_version_geojson_by_id(request, **kwargs):
-
+    print('version id', kwargs['version_id'])
     version = get_object_or_404(DatasetVersion, id=kwargs['version_id'])
+    dataset = version.versions.all().first()
 
-    if version.versions.all().first().pretty_name != ISMN:
+    if not dataset:
+        return JsonResponse({'message': 'Version not used anymore'}, status=status.HTTP_200_OK)
+
+    if dataset.pretty_name != ISMN:
         return JsonResponse({'message': 'Not ISMN'}, status=status.HTTP_200_OK)
 
     if version.versions.count() != 1:
         return JsonResponse({'message': 'Dataset could not be determined'},
                             status=status.HTTP_500_INTERNAL_SERVER_ERROR, safe=False)
 
-    file_path = version.versions.all()[0].storage_path + "/" + version.short_name + "/" + GEOJSON_FILE_NAME
+    file_path = dataset.storage_path + "/" + version.short_name + "/" + GEOJSON_FILE_NAME
 
     if not os.path.exists(file_path):
         raise Http404("Geo-info file could not found")
