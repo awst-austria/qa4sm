@@ -32,7 +32,7 @@ export class ToastService {
     this.messageService.add({key: 'global-toast', severity: 'warn', summary: header, detail: message, life});
   }
   showPopUpAlert(message: string): void {
-    
+
   }
 
 }
