@@ -9,6 +9,7 @@ export const ISMN_NETWORK_FILTER_ID = 18;
 export const ISMN_DEPTH_FILTER_ID = 24;
 export const SMOS_RFI_FILTER_ID = 34;
 export const SMOS_CHI2_FILTER_ID = 35;
+export const SMAP_L3_V9_VWC_FILTER_ID = 49;
 export const SMAP_L3_STATIC_WATER_FILTER_ID = 50;
 
 export class DatasetConfigModel {
@@ -22,6 +23,7 @@ export class DatasetConfigModel {
               public spatialReference$: BehaviorSubject<boolean>,
               public temporalReference$: BehaviorSubject<boolean>,
               public scalingReference$: BehaviorSubject<boolean>,
+              public vegetationWaterFilter$: BehaviorSubject<FilterModel>,
               public staticWaterFilter$: BehaviorSubject<FilterModel>,
               public highlighted$?: BehaviorSubject<boolean>,
 
@@ -54,6 +56,10 @@ export class DatasetConfigModel {
 
     if (this.smosChi2Filter$.value != null) {
       parameterisedFilters.push({id: SMOS_CHI2_FILTER_ID, parameters: this.smosChi2Filter$.value.parameters$.value});
+    }
+
+    if (this.vegetationWaterFilter$.value != null) {
+      parameterisedFilters.push({id: SMAP_L3_V9_VWC_FILTER_ID, parameters: this.vegetationWaterFilter$.value.parameters$.value});
     }
 
     if (this.staticWaterFilter$.value != null) {
