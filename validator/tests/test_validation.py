@@ -945,7 +945,70 @@ class TestValidation(TestCase):
         "ignore: Too few points are available to generate:UserWarning")
     @pytest.mark.long_running
 
-    def test_validation_smap_v9(self):
+    def test_validation_smap_v9_all_orbits(self):
+        run = generate_validation_smap_l3_v9()
+        run.plots_save_metadata = 'always'
+        run.user = self.testuser
+
+        for config in run.dataset_configurations.all():
+            if config == run.spatial_reference_configuration:
+                config.filters.add(DataFilter.objects.get(name='FIL_ISMN_GOOD'))
+            else:
+                config.filters.add(DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
+
+                param_filters_thresholds = {
+                    'FIL_SMAP_L3_V9_static_water_body': '0.5',
+                    'FIL_SMAP_L3_V9_VWC': '30'}
+
+                for param_name in param_filters_thresholds:
+                    pfilter = ParametrisedFilter(
+                        filter=DataFilter.objects.get(name=param_name),
+                        parameters=param_filters_thresholds[param_name],
+                        dataset_config=config
+                    )
+                    pfilter.save()
+
+            config.save()
+
+
+        run.interval_from = datetime(2017, 1, 1, tzinfo=UTC)
+        run.interval_to = datetime(2018, 1, 1, tzinfo=UTC)
+
+        run.min_lat = self.hawaii_coordinates[0]
+        run.min_lon = self.hawaii_coordinates[1]
+        run.max_lat = self.hawaii_coordinates[2]
+        run.max_lon = self.hawaii_coordinates[3]
+
+        run.scaling_method = ValidationRun.MEAN_STD
+        run.scaling_ref = run.spatial_reference_configuration
+        run.scaling_ref.is_scaling_reference = True
+        run.scaling_ref.save()
+
+        run.save()
+
+
+        run_id = run.id
+
+        val.run_validation(run_id)
+
+        new_run = ValidationRun.objects.get(pk=run_id)
+
+        assert new_run
+        assert new_run.total_points == 9, "Number of gpis is off"
+        assert new_run.error_points == 1, "Error points are off"
+        assert new_run.ok_points == 8, "OK points are off"
+
+        self.check_results(new_run,
+                           is_tcol_run=False,
+                           meta_plots=True)
+        self.delete_run(new_run)
+
+    @pytest.mark.filterwarnings(
+        "ignore:No results for gpi:UserWarning",
+        "ignore:No data for:UserWarning",
+        "ignore: Too few points are available to generate:UserWarning")
+    @pytest.mark.long_running
+    def test_validation_smap_v9_select_orbit(self):
         run = generate_validation_smap_l3_v9()
         run.plots_save_metadata = 'always'
         run.user = self.testuser
