@@ -134,7 +134,7 @@ export class ValidateComponent implements OnInit, AfterViewInit {
         this.validationConfigService.getValidationConfig(params.validation_id).pipe(
          tap(validationConfig => {
            if (validationConfig.changes) {
-             alert(`Not all settings could be reloaded. \n ${this.messageAboutConfigurationChanges(validationConfig.changes)}`)
+             alert(`Not all settings could be reloaded. \n ${this.messageAboutConfigurationChanges(validationConfig.settings_changes)}`)
            }
          })
         ).subscribe(
@@ -179,6 +179,11 @@ export class ValidateComponent implements OnInit, AfterViewInit {
 
   private onGetValidationConfigNext(valrun: ValidationRunConfigDto): void {
     this.modelFromValidationConfig(valrun);
+    console.log(valrun.newer_version_exists);
+    if (valrun.newer_version_exists){
+      this.toastService.showAlertWithHeader('Newer version exists!',
+        this.messageAboutNewerVersionsAvailable(valrun.settings_changes))
+    }
   }
 
   private onGetValidationConfigError(response): void {
@@ -217,6 +222,16 @@ export class ValidateComponent implements OnInit, AfterViewInit {
         message += `\nVersion: ${version.version} of ${version.dataset} is no longer available. The newest available versions set instead.\n`;
       })
     }
+    return message.toString();
+  }
+
+  private messageAboutNewerVersionsAvailable(changes: ConfigurationChanges): string {
+    let message = '';
+
+    changes.newer_version_instead.forEach(change => {
+      message += `\nYou are using version: ${change.version} of ${change.dataset}. There is a newer version available.`;
+    })
+
     return message.toString();
   }
 
