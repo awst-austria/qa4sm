@@ -225,7 +225,7 @@ def get_validation_configuration(request, **kwargs):
         if (changes_in_settings['anomalies'] or changes_in_settings['scaling']
                 or len(changes_in_settings['filters']) != 0
                 or len(changes_in_settings['variables']) != 0
-                or changes_in_settings['versions'] !=0):
+                or len(changes_in_settings['versions']) !=0):
             val_run_dict['changes'] = changes_in_settings
         return JsonResponse(val_run_dict,
                             status=status.HTTP_200_OK, safe=False)
