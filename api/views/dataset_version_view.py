@@ -110,7 +110,6 @@ def update_fixture_entry(version):
 
     # Find the entry matching the updated version
     for entry in fixture_data:
-        print(entry)
         if entry["model"] == "validator.datasetversion" and entry["pk"] == version.pk:
             # Update fields with the current DB data
             entry_fields = entry["fields"]
