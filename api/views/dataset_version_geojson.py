@@ -13,7 +13,6 @@ from validator.models import DatasetVersion
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def dataset_version_geojson_by_id(request, **kwargs):
-    print('version id', kwargs['version_id'])
     version = get_object_or_404(DatasetVersion, id=kwargs['version_id'])
     dataset = version.versions.all().first()
 
