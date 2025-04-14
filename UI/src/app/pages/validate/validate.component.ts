@@ -40,7 +40,7 @@ import {BehaviorSubject, EMPTY, forkJoin, Observable, of, ReplaySubject} from 'r
 import {MapComponent} from '../../modules/map/components/map/map.component';
 import {ModalWindowService} from '../../modules/core/services/global/modal-window.service';
 import {ExistingValidationDto} from '../../modules/core/services/validation-run/existing-validation.dto';
-import {catchError, delay, map} from 'rxjs/operators';
+import {catchError, delay, map, tap} from 'rxjs/operators';
 import {SettingsService} from '../../modules/core/services/global/settings.service';
 import {
   TemporalMatchingModel
@@ -131,7 +131,13 @@ export class ValidateComponent implements OnInit, AfterViewInit {
 
     this.route.queryParams.subscribe(params => {
       if (params.validation_id) {
-        this.validationConfigService.getValidationConfig(params.validation_id).subscribe(
+        this.validationConfigService.getValidationConfig(params.validation_id).pipe(
+         tap(validationConfig => {
+           if (validationConfig.changes) {
+             alert(`Not all settings could be reloaded. \n ${this.messageAboutConfigurationChanges(validationConfig.changes)}`)
+           }
+         })
+        ).subscribe(
           this.getValidationConfigObserver
         );
       } else {
@@ -173,11 +179,6 @@ export class ValidateComponent implements OnInit, AfterViewInit {
 
   private onGetValidationConfigNext(valrun: ValidationRunConfigDto): void {
     this.modelFromValidationConfig(valrun);
-    console.log(valrun.changes)
-    if (valrun.changes) {
-      this.toastService.showAlertWithHeader('Not all settings could be reloaded.',
-        this.messageAboutConfigurationChanges(valrun.changes));
-    }
   }
 
   private onGetValidationConfigError(response): void {
@@ -211,7 +212,6 @@ export class ValidateComponent implements OnInit, AfterViewInit {
         message += `\nFilters: ${filter.filter_desc.map(desc => desc)} for dataset ${filter.dataset} not available.`;
       });
     }
-
     if (changes.versions.length !== 0) {
       changes.versions.forEach(version => {
         message += `\nVersion: ${version.version} of ${version.dataset} is no longer available. The newest available versions set instead.\n`;
@@ -292,9 +292,8 @@ export class ValidateComponent implements OnInit, AfterViewInit {
           if (datasetConfig.is_scaling_reference) {
             this.scalingChild.setSelection(validationRunConfig.scaling_method, newDatasetConfigModel);
           }
+
         });
-
-
     });
 
     // Spatial subset
