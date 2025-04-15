@@ -40,7 +40,7 @@ import {BehaviorSubject, EMPTY, forkJoin, Observable, of, ReplaySubject} from 'r
 import {MapComponent} from '../../modules/map/components/map/map.component';
 import {ModalWindowService} from '../../modules/core/services/global/modal-window.service';
 import {ExistingValidationDto} from '../../modules/core/services/validation-run/existing-validation.dto';
-import {catchError, delay, map, tap} from 'rxjs/operators';
+import {catchError, delay, map} from 'rxjs/operators';
 import {SettingsService} from '../../modules/core/services/global/settings.service';
 import {
   TemporalMatchingModel
@@ -131,13 +131,7 @@ export class ValidateComponent implements OnInit, AfterViewInit {
 
     this.route.queryParams.subscribe(params => {
       if (params.validation_id) {
-        this.validationConfigService.getValidationConfig(params.validation_id).pipe(
-         tap(validationConfig => {
-           if (validationConfig.changes) {
-             alert(`Not all settings could be reloaded. \n ${this.messageAboutConfigurationChanges(validationConfig.settings_changes)}`)
-           }
-         })
-        ).subscribe(
+        this.validationConfigService.getValidationConfig(params.validation_id).subscribe(
           this.getValidationConfigObserver
         );
       } else {
@@ -179,6 +173,13 @@ export class ValidateComponent implements OnInit, AfterViewInit {
 
   private onGetValidationConfigNext(valrun: ValidationRunConfigDto): void {
     this.modelFromValidationConfig(valrun);
+
+    setTimeout(() => {
+      if (valrun.changes) {
+        alert(`Not all settings could be reloaded. \n ${this.messageAboutConfigurationChanges(valrun.settings_changes)}`)
+      }
+    }, 300);
+
     if (valrun.newer_version_exists){
       this.toastService.showAlertWithHeader('Newer version exists!',
         this.messageAboutNewerVersionsAvailable(valrun.settings_changes))
