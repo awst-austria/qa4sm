@@ -179,7 +179,6 @@ export class ValidateComponent implements OnInit, AfterViewInit {
 
   private onGetValidationConfigNext(valrun: ValidationRunConfigDto): void {
     this.modelFromValidationConfig(valrun);
-    console.log(valrun.newer_version_exists);
     if (valrun.newer_version_exists){
       this.toastService.showAlertWithHeader('Newer version exists!',
         this.messageAboutNewerVersionsAvailable(valrun.settings_changes))
