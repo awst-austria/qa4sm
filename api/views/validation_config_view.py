@@ -237,8 +237,6 @@ def get_validation_configuration(request, **kwargs):
                 val_run_dict['newer_version_exists'] = True
 
         val_run_dict['settings_changes'] = changes_in_settings
-        print(val_run_dict['settings_changes'])
-
         return JsonResponse(val_run_dict,
                             status=status.HTTP_200_OK, safe=False)
     except ObjectDoesNotExist:
