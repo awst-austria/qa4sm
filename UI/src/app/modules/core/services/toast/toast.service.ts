@@ -31,4 +31,5 @@ export class ToastService {
   showAlertWithHeader(header: string, message: string, life = 5000): void{
     this.messageService.add({key: 'global-toast', severity: 'warn', summary: header, detail: message, life});
   }
+
 }
