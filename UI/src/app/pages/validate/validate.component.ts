@@ -431,7 +431,7 @@ export class ValidateComponent implements OnInit, AfterViewInit {
         }
 
         const getVariablesByDatasetObserver = {
-          next: variables => model.datasetModel.selectedVariable = variables[variables.length - 1],
+          next: variables => model.datasetModel.selectedVariable = variables[0],
           error: (error: CustomHttpError) => this.onGetVariableError(error),
         }
 
@@ -456,7 +456,7 @@ export class ValidateComponent implements OnInit, AfterViewInit {
 
 
   private onGetVersionNext(versions, model, defaultVersionName): void {
-    model.datasetModel.selectedVersion = defaultVersionName ? versions.find((version => version.pretty_name === defaultVersionName)) : versions[versions.length - 1];
+    model.datasetModel.selectedVersion = defaultVersionName ? versions.find((version => version.pretty_name === defaultVersionName)) : versions[0];
     this.loadFiltersForModel(model)
   }
 
