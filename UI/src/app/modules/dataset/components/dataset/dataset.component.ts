@@ -77,7 +77,9 @@ export class DatasetComponent implements OnInit {
     });
 
 
-    this.selectableDatasetVersions$ = this.datasetVersionService.getVersionsByDataset(this.selectionModel.selectedDataset.id);
+    this.selectableDatasetVersions$ = this.datasetVersionService.getVersionsByDataset(this.selectionModel.selectedDataset.id).pipe(
+      tap(datasetVersions => {this.checkIfNewerVersionExists(datasetVersions);})
+    );
 
     this.selectableDatasetVariables$ = this.datasetVariableService.getVariablesByDataset(this.selectionModel.selectedDataset.id);
 
@@ -128,10 +130,12 @@ export class DatasetComponent implements OnInit {
   }
 
   onVersionChange(versions: DatasetVersionDto[]): void {
-    this.newerVersionExists = Math.max(...versions.map(version => version.id)) > this.selectionModel.selectedVersion.id
-    console.log(this.newerVersionExists);
-
+    this.checkIfNewerVersionExists(versions);
     this.changeDataset.emit(this.selectionModel);
+  }
+
+  checkIfNewerVersionExists(versions: DatasetVersionDto[]): void {
+    this.newerVersionExists = Math.max(...versions.map(version => version.id)) > this.selectionModel.selectedVersion.id
   }
 
   setSelectorsId(): void {
