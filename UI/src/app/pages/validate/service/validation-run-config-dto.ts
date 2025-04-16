@@ -19,7 +19,6 @@ export interface ValidationRunConfigDto {
   name_tag: string;
   temporal_matching: number;
   changes?: boolean;
-  newer_version_exists?: boolean;
   settings_changes?: ConfigurationChanges;
 }
 
