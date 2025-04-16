@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.contrib.auth import get_user_model
-from validator.admin import CustomUserAdmin, DatasetConfigurationAdmin
+from validator.admin import CustomUserAdmin, DatasetConfigurationAdmin, DeletedValidationRunAdmin
 from validator.admin import SystemSettingsAdmin
 from validator.admin import ValidationRunAdmin
 from validator.admin import StatisticsAdmin
@@ -26,6 +26,7 @@ from validator.models import UserDatasetFile
 from validator.models import DataManagementGroup
 from validator.models import UserManual
 from validator.models import CeleryTask
+from validator.models import DeletedValidationRun
 User = get_user_model()
 
 admin.site.register(Settings, SystemSettingsAdmin)
@@ -43,3 +44,4 @@ admin.site.register(DataManagementGroup, DataManagementGroupAdmin)
 admin.site.register(UserManual, UserManualAdmin)
 admin.site.register(CeleryTask, CeleryTasksAdmin)
 admin.site.register(DatasetConfiguration, DatasetConfigurationAdmin)
+admin.site.register(DeletedValidationRun, DeletedValidationRunAdmin)
