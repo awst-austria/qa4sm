@@ -29,7 +29,7 @@ def dataset_variable_by_id(request, **kwargs):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def dataset_variable_by_dataset(request, **kwargs):
-    variables = get_object_or_404(Dataset, id=kwargs['dataset_id']).variables.order_by('id')
+    variables = get_object_or_404(Dataset, id=kwargs['dataset_id']).variables.order_by('-id')
     serializer = DatasetVariableSerializer(variables, many=True)
 
     return JsonResponse(serializer.data, status=status.HTTP_200_OK, safe=False)

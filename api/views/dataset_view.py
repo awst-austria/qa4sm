@@ -28,7 +28,7 @@ def dataset(request):
                 storage_path='') if exclude_no_files else Dataset.objects.filter(user_groups__in=user.data_management_groups())
             datasets = datasets.union(shared_datasets)
 
-    serializer = DatasetSerializer(datasets, many=True)
+    serializer = DatasetSerializer(datasets.order_by('pretty_name'), many=True)
     return JsonResponse(serializer.data, status=status.HTTP_200_OK, safe=False)
 
 

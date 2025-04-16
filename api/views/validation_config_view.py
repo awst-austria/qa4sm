@@ -74,7 +74,6 @@ def get_validation_configuration(request, **kwargs):
         'scaling': False,
         'variables': [],
         'versions': [],
-        'newer_version_instead': []
     }
 
     validation_run_id = kwargs['id']
@@ -173,12 +172,6 @@ def get_validation_configuration(request, **kwargs):
             variable_assigned = DataVariable.objects.get(pk=variable_id) in dataset_variables
             version_assigned = DatasetVersion.objects.get(pk=version_id) in dataset_versions
 
-            if version_id != max(dataset_versions.values_list('id', flat=True)):
-                changes_in_settings['newer_version_instead'].append(
-                    {'version': DatasetVersion.objects.get(pk=version_id).pretty_name,
-                     'dataset': dataset.pretty_name}
-                )
-
             if not variable_assigned:
                 changes_in_settings['variables'].append(
                     {'variable': DataVariable.objects.get(pk=variable_id).pretty_name,
@@ -233,8 +226,6 @@ def get_validation_configuration(request, **kwargs):
                 or len(changes_in_settings['variables']) != 0
                 or len(changes_in_settings['versions']) != 0):
             val_run_dict['changes'] = True
-        elif len(changes_in_settings['newer_version_instead']):
-                val_run_dict['newer_version_exists'] = True
 
         val_run_dict['settings_changes'] = changes_in_settings
         return JsonResponse(val_run_dict,
