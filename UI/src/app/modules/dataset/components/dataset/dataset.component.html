@@ -26,14 +26,14 @@
 
 <div class="grid  align-content-center">
   <div class="col">
-    <span class="p-float-label mb-4">
+    <span class="p-float-label mb-4" *ngIf="(selectableDatasetVersions$|async) as selectedVersions">
       <p-dropdown [inputId]="versionSelectorId"
                   [style]="{'width': '100%'}"
-                  [options]="(selectableDatasetVersions$|async)"
+                  [options]="selectedVersions"
                   [(ngModel)]="selectionModel.selectedVersion"
                   optionLabel="pretty_name"
-                  (onChange)="onVersionChange()"></p-dropdown>
-      <label for="{{versionSelectorId}}">Version</label>
+                  (onChange)="onVersionChange(selectedVersions)"></p-dropdown>
+      <label for="{{versionSelectorId}}">Version <span *ngIf="newerVersionExists" class='warning-text'> (newer version available!) </span> </label>
     </span>
 
   </div>

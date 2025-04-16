@@ -8,7 +8,7 @@ import {DatasetVersionService} from '../../../core/services/dataset/dataset-vers
 import {DatasetComponentSelectionModel} from './dataset-component-selection-model';
 import {DatasetVariableDto} from '../../../core/services/dataset/dataset-variable.dto';
 import {DatasetVariableService} from '../../../core/services/dataset/dataset-variable.service';
-import {map} from 'rxjs/operators';
+import {map, tap} from 'rxjs/operators';
 import {ValidationRunConfigService} from '../../../../pages/validate/service/validation-run-config.service';
 import {AuthService} from '../../../core/services/auth/auth.service';
 
@@ -43,6 +43,7 @@ export class DatasetComponent implements OnInit {
   datasetSelectorId: string;
   versionSelectorId: string;
   variableSelectorId: string;
+  newerVersionExists = false;
 
   constructor(private datasetService: DatasetService,
               private datasetVersionService: DatasetVersionService,
@@ -53,34 +54,32 @@ export class DatasetComponent implements OnInit {
 
 
   ngOnInit(): void {
-    this.allDatasets$ = this.datasetService.getAllDatasets(true)
+    this.allDatasets$ = this.datasetService.getAllDatasets(true);
 
     this.validationConfigService.listOfSelectedConfigs.subscribe(configs => {
       if (configs.filter(config => config.datasetModel.selectedDataset?.short_name === 'ISMN').length !== 0
         && this.selectionModel.selectedDataset?.short_name !== 'ISMN') {
         this.datasets$ = this.allDatasets$
           .pipe(map<DatasetDto[], DatasetDto[]>(datasets => {
-            return this.sortById(datasets.filter(dataset => dataset.pretty_name !== 'ISMN'));
+            return datasets.filter(dataset => dataset.pretty_name !== 'ISMN');
           }));
       } else if (configs.filter(config => config.datasetModel.selectedDataset?.user).length == configs.length - 1 && !this.selectionModel.selectedDataset?.user) {
         this.datasets$ = this.allDatasets$
           .pipe(map<DatasetDto[], DatasetDto[]>(datasets => {
-            return this.sortById(datasets.filter(dataset => !dataset.user));
+            return datasets.filter(dataset => !dataset.user);
           }));
       } else {
         this.datasets$ = this.allDatasets$
           .pipe(map<DatasetDto[], DatasetDto[]>(datasets => {
-            return this.sortById(datasets);
+            return datasets;
           }));
       }
     });
 
 
-    this.selectableDatasetVersions$ = this.sortObservableById(
-      this.datasetVersionService.getVersionsByDataset(this.selectionModel.selectedDataset.id), false);
+    this.selectableDatasetVersions$ = this.datasetVersionService.getVersionsByDataset(this.selectionModel.selectedDataset.id);
 
-    this.selectableDatasetVariables$ = this.sortObservableById(
-      this.datasetVariableService.getVariablesByDataset(this.selectionModel.selectedDataset.id));
+    this.selectableDatasetVariables$ = this.datasetVariableService.getVariablesByDataset(this.selectionModel.selectedDataset.id);
 
     this.setSelectorsId();
   }
@@ -90,8 +89,14 @@ export class DatasetComponent implements OnInit {
       return;
     }
 
-    this.selectableDatasetVersions$ = this.sortObservableById(
-      this.datasetVersionService.getVersionsByDataset(this.selectionModel.selectedDataset.id), false);
+    this.selectableDatasetVersions$ = this.datasetVersionService.getVersionsByDataset(this.selectionModel.selectedDataset.id).pipe(
+      tap(versions => {
+        if (versions.filter(version => version.id > this.selectionModel.selectedVersion.id).length) {
+          this.newerVersionExists = true;
+          console.log(this.newerVersionExists)
+        }
+      })
+    );
 
 
     this.selectableDatasetVersions$.subscribe(this.selectableDatasetVersionsObserver);
@@ -103,8 +108,7 @@ export class DatasetComponent implements OnInit {
   }
 
   private onSelectableVersionsComplete(): void {
-    this.selectableDatasetVariables$ = this.sortObservableById(
-      this.datasetVariableService.getVariablesByDataset(this.selectionModel.selectedDataset.id));
+    this.selectableDatasetVariables$ = this.datasetVariableService.getVariablesByDataset(this.selectionModel.selectedDataset.id);
 
     this.selectableDatasetVariables$.subscribe(this.selectableDatasetVariablesObserver)
     this.setSelectorsId();
@@ -123,23 +127,11 @@ export class DatasetComponent implements OnInit {
     this.updateSelectableVersionsAndVariableAndEmmit();
   }
 
-  onVersionChange(): void {
+  onVersionChange(versions: DatasetVersionDto[]): void {
+    this.newerVersionExists = Math.max(...versions.map(version => version.id)) > this.selectionModel.selectedVersion.id
+    console.log(this.newerVersionExists);
+
     this.changeDataset.emit(this.selectionModel);
-  }
-
-  sortById(listOfElements): any {
-    return listOfElements.sort((a, b) => {
-      return a.id < b.id ? 1 : -1;
-    });
-  }
-
-  sortObservableById(observableOfListOfElements: Observable<any>, minToMax = true): Observable<any> {
-    return observableOfListOfElements.pipe(map((data) => {
-      data.sort((a, b) => {
-        return minToMax ? (a.id > b.id ? 1 : -1) : (a.id < b.id ? 1 : -1);
-      });
-      return data;
-    }));
   }
 
   setSelectorsId(): void {
