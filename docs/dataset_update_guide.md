@@ -208,3 +208,6 @@ Before your changes can be used on the production or test instance, the new data
 If the data is available on the server, and your code has been merged, everything is in place to be deployed. Deployments
 are handled by AWST. When your changes are deployed to the test instance, perform another round of testing to make sure 
 that everything will work later on the production instance.
+
+# Dataset decomissioning
+The general rule is that only the latest **two versions** of a product are kept in the service. This is also what was agreed upon with ESA. While this might lead to some results no being reproducible anymore, they will still be traceable (as the version numbers are indicated in the results), and it ensures that the data amount on the production instance remains manageable. For some datasets, we **need to keep all versions, because the annual validation reports compare all past versions**. This is the case for CCI and C3S for now, so don't delete these versions!
