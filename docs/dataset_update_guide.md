@@ -104,7 +104,7 @@ stats for a location.
 
 ### Version fixture
 
-The version fixture must always be updated. It contains version specific metadata (that is also showed on e.g. the "Info->Datasets" overview page on qa4sm)
+The version fixture must always be updated. It contains version specific metadata (that is also showed on e.g. the "Info->Datasets" overview page on qa4sm). If a dataset has multiple versions, the service assumes that the version with the highest ID is the latest version!!
 
 1) Add a new entry to the end of the ``versions.json`` fixture file (choose the next free "pk" version id).
 2) Fill out all fields. Pick a (short, unique) ``short_name`` (no spaces) and (descriptive) ``pretty_name``, e.g. "SMOSL2_v700", and "v700". 
