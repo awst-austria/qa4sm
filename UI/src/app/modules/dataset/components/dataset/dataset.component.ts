@@ -1,16 +1,16 @@
-import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
-import {DatasetService} from '../../../core/services/dataset/dataset.service';
-import {DatasetDto} from '../../../core/services/dataset/dataset.dto';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { DatasetService } from '../../../core/services/dataset/dataset.service';
+import { DatasetDto } from '../../../core/services/dataset/dataset.dto';
 
-import {Observable} from 'rxjs';
-import {DatasetVersionDto} from '../../../core/services/dataset/dataset-version.dto';
-import {DatasetVersionService} from '../../../core/services/dataset/dataset-version.service';
-import {DatasetComponentSelectionModel} from './dataset-component-selection-model';
-import {DatasetVariableDto} from '../../../core/services/dataset/dataset-variable.dto';
-import {DatasetVariableService} from '../../../core/services/dataset/dataset-variable.service';
-import {map, tap} from 'rxjs/operators';
-import {ValidationRunConfigService} from '../../../../pages/validate/service/validation-run-config.service';
-import {AuthService} from '../../../core/services/auth/auth.service';
+import { Observable } from 'rxjs';
+import { DatasetVersionDto } from '../../../core/services/dataset/dataset-version.dto';
+import { DatasetVersionService } from '../../../core/services/dataset/dataset-version.service';
+import { DatasetComponentSelectionModel } from './dataset-component-selection-model';
+import { DatasetVariableDto } from '../../../core/services/dataset/dataset-variable.dto';
+import { DatasetVariableService } from '../../../core/services/dataset/dataset-variable.service';
+import { map, tap } from 'rxjs/operators';
+import { ValidationRunConfigService } from '../../../../pages/validate/service/validation-run-config.service';
+import { AuthService } from '../../../core/services/auth/auth.service';
 
 
 @Component({
@@ -93,10 +93,7 @@ export class DatasetComponent implements OnInit {
 
     this.selectableDatasetVersions$ = this.datasetVersionService.getVersionsByDataset(this.selectionModel.selectedDataset.id).pipe(
       tap(versions => {
-        if (versions.filter(version => version.id > this.selectionModel.selectedVersion.id).length) {
-          this.newerVersionExists = true;
-          console.log(this.newerVersionExists)
-        }
+        this.newerVersionExists = versions.filter(version => version.id > this.selectionModel.selectedVersion.id).length > 0;
       })
     );
 
