@@ -1,7 +1,7 @@
-import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
-import {BehaviorSubject, Observable} from 'rxjs';
-import {DatasetConfigModel} from '../../../../pages/validate/dataset-config-model';
-import {ValidationModel} from '../../../../pages/validate/validation-model';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { BehaviorSubject, Observable } from 'rxjs';
+import { DatasetConfigModel } from '../../../../pages/validate/dataset-config-model';
+import { ValidationModel } from '../../../../pages/validate/validation-model';
 
 @Component({
   selector: 'qa-validation-reference',
@@ -39,20 +39,18 @@ export class ValidationReferenceComponent implements OnInit {
     this.hoverOverDataset.emit({hoveredDataset: item, highlight});
   }
 
+  ind = 0;
   verifyOptions(): BehaviorSubject<DatasetConfigModel[]>{
-    this.chosenDatasets$.next(this.validationModel.datasetConfigurations);
+    this.ind += 1;
+    console.log(this.ind);
+    const availableDatasets = this.validationModel.datasetConfigurations;
     if (this.referenceType === 'spatialReference$'){
-      const listOfISMNDatasets = this.validationModel.datasetConfigurations.filter(dataset =>
-        dataset.datasetModel.selectedDataset?.short_name === 'ISMN');
-      const listOfServiceDatasets = this.validationModel.datasetConfigurations.filter(dataset =>
-      !dataset.datasetModel.selectedDataset?.user);
-      if (listOfISMNDatasets.length !== 0){
-        this.chosenDatasets$.next(listOfISMNDatasets);
-      } else if (listOfServiceDatasets.length < this.validationModel.datasetConfigurations.length) {
-        this.chosenDatasets$.next(listOfServiceDatasets);
+      const listOfISMNDatasets = availableDatasets.filter(dataset => dataset.datasetModel.selectedDataset.short_name === 'ISMN')
+      if (listOfISMNDatasets.length) {
+        return new BehaviorSubject(listOfISMNDatasets)
       }
     }
-    return this.chosenDatasets$;
+    return new BehaviorSubject(availableDatasets);
   }
 
   verifyChosenValue(): BehaviorSubject<DatasetConfigModel>{
