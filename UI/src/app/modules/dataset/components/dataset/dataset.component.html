@@ -1,7 +1,7 @@
 <div class="grid align-content-center">
   <div class="col">
     <span class="p-float-label mb-4 mt-3">
-    <p-dropdown [inputId]="datasetSelectorId" (onChange)="onDatasetChange()" [options]="(datasets$|async)"
+    <p-dropdown [inputId]="datasetSelectorId" (onChange)="updateSelectableVersionsAndVariableAndEmmit()" [options]="(datasets$|async)"
                 [(ngModel)]="selectionModel.selectedDataset"
                 optionLabel="pretty_name" [style]="{'width': '100%'}">
       <ng-template let-item pTemplate="item">

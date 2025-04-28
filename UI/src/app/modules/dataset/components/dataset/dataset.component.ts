@@ -87,7 +87,7 @@ export class DatasetComponent implements OnInit {
     this.setSelectorsId();
   }
 
-  private updateSelectableVersionsAndVariableAndEmmit(): void {
+   updateSelectableVersionsAndVariableAndEmmit(): void {
     if (this.selectionModel.selectedDataset === undefined || this.selectionModel.selectedDataset.versions.length === 0) {
       return;
     }
@@ -119,10 +119,6 @@ export class DatasetComponent implements OnInit {
   private onSelectableVariablesComplete(): void {
     this.changeDataset.emit(this.selectionModel);
     this.setSelectorsId();
-  }
-
-  onDatasetChange(): void {
-    this.updateSelectableVersionsAndVariableAndEmmit();
   }
 
   onVersionChange(versions: DatasetVersionDto[]): void {
