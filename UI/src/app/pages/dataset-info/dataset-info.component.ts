@@ -1,9 +1,9 @@
-import {Component} from '@angular/core';
-import {DatasetService} from '../../modules/core/services/dataset/dataset.service';
-import {DatasetVersionService} from '../../modules/core/services/dataset/dataset-version.service';
-import {FilterService} from '../../modules/core/services/filter/filter.service';
-import {combineLatest, EMPTY, Observable} from 'rxjs';
-import {catchError, map} from 'rxjs/operators';
+import { Component } from '@angular/core';
+import { DatasetService } from '../../modules/core/services/dataset/dataset.service';
+import { DatasetVersionService } from '../../modules/core/services/dataset/dataset-version.service';
+import { FilterService } from '../../modules/core/services/filter/filter.service';
+import { combineLatest, EMPTY, Observable } from 'rxjs';
+import { catchError, map, tap } from 'rxjs/operators';
 
 @Component({
   selector: 'qa-dataset-info',
@@ -33,6 +33,7 @@ export class DatasetInfoComponent {
     this.versionService.getAllVersions(),
     this.filterService.getAllFilters()
   ]).pipe(
+    tap(dss => console.log(dss)),
     map(([datasets, versions, filters]) =>
       datasets.map(
         dataset => {
@@ -59,12 +60,6 @@ export class DatasetInfoComponent {
         }
       )
     ),
-    map((data) => {
-      data.sort((a, b) => {
-        return a.id < b.id ? -1 : 1;
-      });
-      return data;
-    }),
     catchError(err => {
       this.errorOccured = true;
       return EMPTY;
