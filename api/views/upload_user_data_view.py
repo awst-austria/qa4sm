@@ -49,7 +49,7 @@ def create_variable_entry(variable_name, variable_pretty_name, dataset_name, use
         raise Exception(variable_serializer.errors)
 
 
-def create_version_entry(version_name, version_pretty_name, dataset_pretty_name, user):
+def create_version_entry(version_name, version_pretty_name, dataset_pretty_name, user, variable):
     current_max_id = DatasetVersion.objects.all().last().id if DatasetVersion.objects.all().last() else 0
     new_version_data = {
         "short_name": version_name,
@@ -58,7 +58,8 @@ def create_version_entry(version_name, version_pretty_name, dataset_pretty_name,
         "time_range_start": None,
         "time_range_end": None,
         "geographical_range": None,
-        "filters": []
+        "filters": [],
+        'variables': [variable.pk]
     }
 
     version_serializer = DatasetVersionSerializer(data=new_version_data)
@@ -77,7 +78,7 @@ def create_version_entry(version_name, version_pretty_name, dataset_pretty_name,
         raise Exception(version_serializer.errors)
 
 
-def create_dataset_entry(dataset_name, dataset_pretty_name, version, variable, user):
+def create_dataset_entry(dataset_name, dataset_pretty_name, version, user):
     # TODO: update variables
     current_max_id = Dataset.objects.all().last().id if Dataset.objects.all() else 0
     dataset_data = {
@@ -91,8 +92,8 @@ def create_dataset_entry(dataset_name, dataset_pretty_name, version, variable, u
         'resolution': None,
         'user': user.pk,
         'versions': [version.pk],
-        'variables': [variable.pk],
     }
+
     dataset_serializer = DatasetSerializer(data=dataset_data)
     if dataset_serializer.is_valid():
         new_dataset = dataset_serializer.save()
@@ -221,11 +222,12 @@ def upload_user_data(request, filename):
         USER_DATA_VERSION_FIELD_PRETTY_NAME] else version_name
 
     # creating version entry
-    new_version = create_version_entry(version_name, version_pretty_name, dataset_pretty_name, request.user)
+
     new_variable = create_variable_entry('none', 'none', dataset_pretty_name,
                                          request.user, 'n.a.')
-
-    new_dataset = create_dataset_entry(dataset_name, dataset_pretty_name, new_version, new_variable, request.user)
+    new_version = create_version_entry(version_name, version_pretty_name, dataset_pretty_name, request.user,
+                                       new_variable)
+    new_dataset = create_dataset_entry(dataset_name, dataset_pretty_name, new_version, request.user)
 
     file_data = {
         'file': file,
@@ -294,7 +296,6 @@ class DatasetSerializer(ModelSerializer):
                   'source_reference',
                   'citation',
                   'versions',
-                  'variables',
                   'user'
                   ]
 

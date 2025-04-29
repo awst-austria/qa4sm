@@ -4,7 +4,7 @@ from django.urls import path, include
 from api.views.data_filter_view import data_filter, data_parameterised_filter, data_filter_by_datasetversion
 # data_parameterised_filter_by_config
 # from api.views.data_filter_view data_filter_by_id, data_parameterised_filter_by_id
-from api.views.dataset_variable_view import dataset_variable, dataset_variable_by_id, dataset_variable_by_dataset
+from api.views.dataset_variable_view import dataset_variable, dataset_variable_by_id, dataset_variable_by_version
 from api.views.dataset_version_geojson import dataset_version_geojson_by_id
 from api.views.dataset_version_view import *
 from api.views.dataset_view import dataset, dataset_by_id
@@ -66,7 +66,7 @@ urlpatterns = [
             name='Dataset version by dataset'),
     path('dataset-variable', dataset_variable, name='Dataset variable'),
     re_path(r'^dataset-variable/(?P<variable_id>.+)$', dataset_variable_by_id),
-    re_path(r'^dataset-variable-by-dataset/(?P<dataset_id>.+)$', dataset_variable_by_dataset,
+    re_path(r'^dataset-variable-by-dataset/(?P<dataset_id>.+)$', dataset_variable_by_version,
             name='Dataset_variable_by_dataset'),
     path('published-results', published_results, name='Published results'),
     re_path(r'^validation-runs/(?P<id>.+)$', validation_run_by_id, name='Validation run by id'),
