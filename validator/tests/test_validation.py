@@ -1707,7 +1707,6 @@ class TestValidation(TestCase):
         print("Test duration: {}".format(time.time() - start_time))
 
     # minimal test of filtering, quicker than the full test below
-
     def test_setup_filtering_min(self):
         dataset = Dataset.objects.get(short_name='ISMN')
         version = DatasetVersion.objects.get(short_name='ISMN_V20180712_MINI')

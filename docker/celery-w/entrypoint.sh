@@ -23,6 +23,11 @@ if [[ "$QA4SM_INSTANCE" == "TEST" ]]; then
     git switch test-branch || git checkout -b test-branch origin/test-branch
 fi
 
+if [[ "$QA4SM_INSTANCE" == "PROD" ]]; then
+    git fetch origin
+    git switch main
+fi
+
 cd $APP_DIR
 chown www-data:www-data -R "$APP_DIR/validator/fixtures"
 

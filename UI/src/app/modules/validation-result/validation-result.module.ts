@@ -10,6 +10,7 @@ import {
 import {RouterModule} from '@angular/router';
 import {SortingFormComponent} from './components/sorting-form/sorting-form.component';
 import {DropdownModule} from 'primeng/dropdown';
+import {MultiSelectModule} from 'primeng/multiselect';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {ValidationSummaryComponent} from './components/validation-summary/validation-summary.component';
 import {ButtonsComponent} from './components/buttons/buttons.component';
@@ -33,11 +34,18 @@ import {SelectButtonModule} from 'primeng/selectbutton';
 import {ToggleButtonModule} from 'primeng/togglebutton';
 import {MenuModule} from 'primeng/menu';
 import {CoreModule} from '../core/core.module';
+import {FilteringFormComponent} from './components/filtering-form/filtering-form.component';
+import {CalendarModule} from 'primeng/calendar';
+import {AccordionModule} from "primeng/accordion";
+import {ChipModule} from "primeng/chip";
+import {CardModule} from "primeng/card";
+import {Ripple} from "primeng/ripple";
 
 @NgModule({
   declarations: [ValidationrunRowComponent,
     ValidationPagePaginatedComponent,
     SortingFormComponent,
+    FilteringFormComponent,
     ValidationSummaryComponent,
     ButtonsComponent,
     TrackedValidationsComponent,
@@ -56,28 +64,34 @@ import {CoreModule} from '../core/core.module';
         PublishingComponent,
         ExistingValidationComponent,
     ],
-    imports: [
-        CommonModule,
-        PanelModule,
-        TooltipModule,
-        FontAwesomeModule,
-        RouterModule,
-        DropdownModule,
-        FormsModule,
-        InputTextModule,
-        NgDompurifyModule,
-        ButtonModule,
-        ReactiveFormsModule,
-        GalleriaModule,
-        DialogModule,
-        PanelMenuModule,
-        FieldsetModule,
-        CheckboxModule,
-        SelectButtonModule,
-        ToggleButtonModule,
-        MenuModule,
-        CoreModule
-    ]
+  imports: [
+    CommonModule,
+    PanelModule,
+    TooltipModule,
+    FontAwesomeModule,
+    RouterModule,
+    DropdownModule,
+    MultiSelectModule,
+    CalendarModule,
+    FormsModule,
+    InputTextModule,
+    NgDompurifyModule,
+    ButtonModule,
+    ReactiveFormsModule,
+    GalleriaModule,
+    DialogModule,
+    PanelMenuModule,
+    FieldsetModule,
+    CheckboxModule,
+    SelectButtonModule,
+    ToggleButtonModule,
+    MenuModule,
+    CoreModule,
+    AccordionModule,
+    ChipModule,
+    CardModule,
+    Ripple
+  ]
 })
 export class ValidationResultModule {
 }
