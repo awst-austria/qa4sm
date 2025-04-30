@@ -11,10 +11,6 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RemoveField(
-            model_name='dataset',
-            name='variables',
-        ),
         migrations.AddField(
             model_name='datasetversion',
             name='variables',
