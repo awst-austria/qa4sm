@@ -4,6 +4,7 @@ import logging
 
 from django.conf import settings
 from django.contrib.auth import get_user_model
+
 User = get_user_model()
 
 from django.core.exceptions import ValidationError
@@ -28,7 +29,6 @@ from validator.models import ValidationRun
 
 
 class TestModels(TestCase):
-
     fixtures = ['variables', 'versions', 'datasets', 'filters', 'users']
 
     __logger = logging.getLogger(__name__)
@@ -41,7 +41,6 @@ class TestModels(TestCase):
         for testorcid in [
             "0000-0002-1825-0097",
             "0000-0002-9079-593X", ]:
-
             user.orcid = testorcid
             user.clean()
             assert user
@@ -51,7 +50,6 @@ class TestModels(TestCase):
             "lah.",
             "0000-0002-1825-0097-5555",
             "0000-0002-9abc-593X", ]:
-
             with self.assertRaises(ValidationError):
                 user.orcid = testorcid
                 user.clean()
@@ -77,7 +75,7 @@ class TestModels(TestCase):
         assert len(run.dataset_configurations.all()) == 1
         assert run.spatial_reference_configuration
         assert run.scaling_ref
-        
+
     def test_testdata_integrity(self):
         """
         checks whether a submodule update is needed for the testdata repository
@@ -85,8 +83,11 @@ class TestModels(TestCase):
         set_dataset_paths()
         for dataset in Dataset.objects.all():
             for version in dataset.versions.all():
-                
-                assert os.path.isdir(os.path.join(dataset.storage_path, version.short_name)), "Folder not present for dataset version {}. Did you remember to update the submodule?".format(version)
+                assert os.path.isdir(os.path.join(dataset.storage_path,
+                                                  version.short_name)), (
+                    "Folder not present for dataset version {}. Did you "
+                    "remember to update the submodule?".format(
+                    version))
 
     def test_dataset_configuration(self):
         dc = DatasetConfiguration()
@@ -113,7 +114,8 @@ class TestModels(TestCase):
         run.scaling_ref = dc
         run.save()
 
-        # check that we can get the order of dataset configs from the validation run
+        # check that we can get the order of dataset configs from the
+        # validation run
         orderorder = run.get_datasetconfiguration_order()
         self.__logger.debug('Orig order {}'.format(orderorder))
         assert orderorder
@@ -121,7 +123,7 @@ class TestModels(TestCase):
         # check that they have the same order when using all()
         for i, dsc in enumerate(run.dataset_configurations.all(), 1):
             assert dsc.dataset.id == i
-            assert dsc.id == orderorder[i-1]
+            assert dsc.id == orderorder[i - 1]
 
         # randomly change the order
         newworldorder = np.random.permutation(orderorder)
@@ -131,7 +133,7 @@ class TestModels(TestCase):
         # make sure the new order is used
         for i, dsc in enumerate(run.dataset_configurations.all(), 1):
             self.__logger.debug('current id {}'.format(dsc.id))
-            assert dsc.id == newworldorder[i-1]
+            assert dsc.id == newworldorder[i - 1]
 
     def test_validation_run_str(self):
         run = ValidationRun()
@@ -224,7 +226,8 @@ class TestModels(TestCase):
     def test_validation_run_expiry(self):
         assert settings.VALIDATION_EXPIRY_DAYS >= 1
         assert settings.VALIDATION_EXPIRY_WARNING_DAYS >= 1
-        assert settings.VALIDATION_EXPIRY_WARNING_DAYS < settings.VALIDATION_EXPIRY_DAYS
+        assert (settings.VALIDATION_EXPIRY_WARNING_DAYS <
+                settings.VALIDATION_EXPIRY_DAYS)
 
         ## while the validation is running, we don't have an expiry date
         run = ValidationRun()
@@ -234,32 +237,41 @@ class TestModels(TestCase):
 
         ## once the validation has finished, it can expire
         run.end_time = timezone.now()
-        assert run.expiry_date == (run.end_time + timedelta(days=settings.VALIDATION_EXPIRY_DAYS))
+        assert run.expiry_date == (run.end_time + timedelta(
+            days=settings.VALIDATION_EXPIRY_DAYS))
         assert not run.is_expired
         assert not run.is_near_expiry
 
         ## move us to the warning period
-        run.end_time = timezone.now() - timedelta(days=settings.VALIDATION_EXPIRY_DAYS-settings.VALIDATION_EXPIRY_WARNING_DAYS+1)
+        run.end_time = timezone.now() - timedelta(
+            days=settings.VALIDATION_EXPIRY_DAYS -
+                 settings.VALIDATION_EXPIRY_WARNING_DAYS + 1)
         assert not run.is_expired
         assert run.is_near_expiry
 
         ## make the validation expire
-        run.end_time = timezone.now() - timedelta(days=settings.VALIDATION_EXPIRY_DAYS+1)
+        run.end_time = timezone.now() - timedelta(
+            days=settings.VALIDATION_EXPIRY_DAYS + 1)
         assert run.is_expired
         assert run.is_near_expiry
 
-        ## once the validation has been extended, it expires based on the extension date
+        ## once the validation has been extended, it expires based on the
+        # extension date
         run.end_time = timezone.now() - timedelta(days=7)
         run.last_extended = timezone.now()
-        assert run.expiry_date == (run.last_extended + timedelta(days=settings.VALIDATION_EXPIRY_DAYS))
+        assert run.expiry_date == (run.last_extended + timedelta(
+            days=settings.VALIDATION_EXPIRY_DAYS))
 
         ## move us to the warning period
-        run.last_extended = timezone.now() - timedelta(days=settings.VALIDATION_EXPIRY_DAYS - settings.VALIDATION_EXPIRY_WARNING_DAYS+1)
+        run.last_extended = timezone.now() - timedelta(
+            days=settings.VALIDATION_EXPIRY_DAYS -
+                 settings.VALIDATION_EXPIRY_WARNING_DAYS + 1)
         assert not run.is_expired
         assert run.is_near_expiry
 
         ## make the validation expire
-        run.last_extended = timezone.now() - timedelta(days=settings.VALIDATION_EXPIRY_DAYS+1)
+        run.last_extended = timezone.now() - timedelta(
+            days=settings.VALIDATION_EXPIRY_DAYS + 1)
         assert run.is_expired
         assert run.is_near_expiry
 
@@ -318,9 +330,11 @@ class TestModels(TestCase):
         mydataset.id = 1337
         mydataset.short_name = 'SUPERSAT'
         mydataset.pretty_name = 'Super satellite dataset'
-        mydataset.help_text = 'Dataset from the super satellite - solves all problems!'
+        mydataset.help_text = ('Dataset from the super satellite - solves all '
+                               'problems!')
         mydataset.is_reference = True
-        mydataset.source_reference = "<a href=\"http://tuwien.ac.at\">Click here!</a>"
+        mydataset.source_reference = ("<a href=\"http://tuwien.ac.at\">Click "
+                                      "here!</a>")
         mydataset.citation = "<a href=\"http://tuwien.ac.at\">Click here!</a>"
 
         dataset_str = str(mydataset)
@@ -344,7 +358,8 @@ class TestModels(TestCase):
         mydatasetversion.id = 1337
         mydatasetversion.short_name = 'V2.0'
         mydatasetversion.pretty_name = 'Version 2.0'
-        mydatasetversion.help_text = 'Version 2.0 has the latest foobar flag set to 0'
+        mydatasetversion.help_text = ('Version 2.0 has the latest foobar flag'
+                                      ' set to 0')
 
         version_str = str(mydatasetversion)
         print(version_str)

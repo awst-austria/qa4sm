@@ -64,7 +64,19 @@
                   <qa-threshold-filter *ngIf="validationModel.datasetConfigurations[datasetIdx].smosChi2Filter$|async"
                                        [datasetModel]="validationModel.datasetConfigurations[datasetIdx].datasetModel"
                                        [filterModel$]="validationModel.datasetConfigurations[datasetIdx].smosChi2Filter$"
-                                       [minThreshold]="0." [increment]="0.05" maxThreshold="1." [units]="' [-]'"/>
+                                       [minThreshold]="0." [increment]="0.05" maxThreshold="1." [units]="' [-]'" />
+
+
+                  <qa-threshold-filter *ngIf="validationModel.datasetConfigurations[datasetIdx].vegetationWaterFilter$|async"
+                                       [datasetModel]="validationModel.datasetConfigurations[datasetIdx].datasetModel"
+                                       [filterModel$]="validationModel.datasetConfigurations[datasetIdx].vegetationWaterFilter$"
+                                       [minThreshold]="0" [increment]="1" maxThreshold="60" [units]="' [kg/m3]'" />
+
+                  <qa-threshold-filter *ngIf="validationModel.datasetConfigurations[datasetIdx].staticWaterFilter$|async"
+                                       [datasetModel]="validationModel.datasetConfigurations[datasetIdx].datasetModel"
+                                       [filterModel$]="validationModel.datasetConfigurations[datasetIdx].staticWaterFilter$"
+                                       [minThreshold]="0." [increment]="0.05" maxThreshold="1." [units]="' [-]'" />
+
                   <div *ngIf="validationModel.datasetConfigurations[datasetIdx].ismnNetworkFilter$|async">
                     <qa-ismn-network-filter
                       (networkSelectionChanged)="onIsmnNetworkSelectionChange($event)"

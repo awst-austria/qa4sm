@@ -9,6 +9,8 @@ import {
   DatasetConfigModel,
   ISMN_DEPTH_FILTER_ID,
   ISMN_NETWORK_FILTER_ID,
+  SMAP_L3_STATIC_WATER_FILTER_ID,
+  SMAP_L3_V9_VWC_FILTER_ID,
   SMOS_CHI2_FILTER_ID,
   SMOS_RFI_FILTER_ID
 } from './dataset-config-model';
@@ -233,6 +235,8 @@ export class ValidateComponent implements OnInit, AfterViewInit {
         new BehaviorSubject(false),
         new BehaviorSubject(false),
         new BehaviorSubject(false),
+        new BehaviorSubject(null),
+        new BehaviorSubject(null),
         new BehaviorSubject(false)
       );
       this.validationModel.datasetConfigurations.push(newDatasetConfigModel);
@@ -397,6 +401,8 @@ export class ValidateComponent implements OnInit, AfterViewInit {
       new BehaviorSubject(spatialReference),
       new BehaviorSubject(temporalReference),
       new BehaviorSubject(false),
+      new BehaviorSubject(null),
+      new BehaviorSubject(null),
       new BehaviorSubject(false)
     );
     targetArray.push(model);
@@ -474,7 +480,10 @@ export class ValidateComponent implements OnInit, AfterViewInit {
     model.ismnNetworkFilter$.next(null);
     model.ismnDepthFilter$.next(null);
     model.smosChi2Filter$.next(null);
+    model.vegetationWaterFilter$.next(null);
+    model.staticWaterFilter$.next(null);
     filters.forEach(filter => {
+      console.log(filter);
       if (filter.parameterised) {
         if (filter.id === ISMN_NETWORK_FILTER_ID) {
           model.ismnNetworkFilter$.next(new FilterModel(
@@ -491,6 +500,36 @@ export class ValidateComponent implements OnInit, AfterViewInit {
               new BehaviorSubject<string>(filter.default_parameter)));
           } else {
             model.smosRfiFilter$ = new BehaviorSubject<FilterModel>(new FilterModel(
+              filter,
+              false,
+              false,
+              new BehaviorSubject<string>(filter.default_parameter))
+            );
+          }
+        } else if (filter.id === SMAP_L3_STATIC_WATER_FILTER_ID) {
+          if (model.staticWaterFilter$) {
+            model.staticWaterFilter$.next(new FilterModel(
+              filter,
+              false,
+              false,
+              new BehaviorSubject<string>(filter.default_parameter)));
+          } else {
+            model.staticWaterFilter$ = new BehaviorSubject<FilterModel>(new FilterModel(
+              filter,
+              false,
+              false,
+              new BehaviorSubject<string>(filter.default_parameter))
+            );
+          }
+        } else if (filter.id === SMAP_L3_V9_VWC_FILTER_ID) {
+          if (model.vegetationWaterFilter$) {
+            model.vegetationWaterFilter$.next(new FilterModel(
+              filter,
+              false,
+              false,
+              new BehaviorSubject<string>(filter.default_parameter)));
+          } else {
+            model.vegetationWaterFilter$ = new BehaviorSubject<FilterModel>(new FilterModel(
               filter,
               false,
               false,
