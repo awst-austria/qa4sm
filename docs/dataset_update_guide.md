@@ -104,7 +104,7 @@ stats for a location.
 
 ### Version fixture
 
-The version fixture must always be updated. It contains version specific metadata (that is also showed on e.g. the "Info->Datasets" overview page on qa4sm)
+The version fixture must always be updated. It contains version specific metadata (that is also showed on e.g. the "Info->Datasets" overview page on qa4sm). If a dataset has multiple versions, the service assumes that the version with the highest ID is the latest version!!
 
 1) Add a new entry to the end of the ``versions.json`` fixture file (choose the next free "pk" version id).
 2) Fill out all fields. Pick a (short, unique) ``short_name`` (no spaces) and (descriptive) ``pretty_name``, e.g. "SMOSL2_v700", and "v700". 
@@ -208,3 +208,6 @@ Before your changes can be used on the production or test instance, the new data
 If the data is available on the server, and your code has been merged, everything is in place to be deployed. Deployments
 are handled by AWST. When your changes are deployed to the test instance, perform another round of testing to make sure 
 that everything will work later on the production instance.
+
+# Dataset decomissioning
+The general rule is that only the latest **two versions** of a product are kept in the service. This is also what was agreed upon with ESA. While this might lead to some results no being reproducible anymore, they will still be traceable (as the version numbers are indicated in the results), and it ensures that the data amount on the production instance remains manageable. For some datasets, we **need to keep all versions, because the annual validation reports compare all past versions**. This is the case for CCI and C3S for now, so don't delete these versions!

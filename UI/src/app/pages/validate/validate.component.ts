@@ -173,12 +173,14 @@ export class ValidateComponent implements OnInit, AfterViewInit {
       new BehaviorSubject<string>(''));
   }
 
-  private onGetValidationConfigNext(valrun): void {
+  private onGetValidationConfigNext(valrun: ValidationRunConfigDto): void {
     this.modelFromValidationConfig(valrun);
-    if (valrun.changes) {
-      this.toastService.showAlertWithHeader('Not all settings could be reloaded.',
-        this.messageAboutConfigurationChanges(valrun.changes));
-    }
+
+    setTimeout(() => {
+      if (valrun.changes) {
+        alert(`Not all settings could be reloaded. \n ${this.messageAboutConfigurationChanges(valrun.settings_changes)}`)
+      }
+    }, 300);
   }
 
   private onGetValidationConfigError(response): void {
@@ -209,10 +211,14 @@ export class ValidateComponent implements OnInit, AfterViewInit {
     }
     if (changes.filters.length !== 0) {
       changes.filters.forEach(filter => {
-        message += `\nFilters:${filter.filter_desc.map(desc => ' ' + desc)} for dataset ${filter.dataset} not available.`;
+        message += `\nFilters: ${filter.filter_desc.map(desc => desc)} for dataset ${filter.dataset} not available.`;
       });
     }
-
+    if (changes.versions.length !== 0) {
+      changes.versions.forEach(version => {
+        message += `\nVersion: ${version.version} of ${version.dataset} is no longer available. The newest available versions set instead.\n`;
+      })
+    }
     return message.toString();
   }
 
@@ -290,9 +296,8 @@ export class ValidateComponent implements OnInit, AfterViewInit {
           if (datasetConfig.is_scaling_reference) {
             this.scalingChild.setSelection(validationRunConfig.scaling_method, newDatasetConfigModel);
           }
+
         });
-
-
     });
 
     // Spatial subset
@@ -417,7 +422,7 @@ export class ValidateComponent implements OnInit, AfterViewInit {
         }
 
         const getVariablesByDatasetObserver = {
-          next: variables => model.datasetModel.selectedVariable = variables[variables.length - 1],
+          next: variables => model.datasetModel.selectedVariable = variables[0],
           error: (error: CustomHttpError) => this.onGetVariableError(error),
         }
 
@@ -442,7 +447,7 @@ export class ValidateComponent implements OnInit, AfterViewInit {
 
 
   private onGetVersionNext(versions, model, defaultVersionName): void {
-    model.datasetModel.selectedVersion = defaultVersionName ? versions.find((version => version.pretty_name === defaultVersionName)) : versions[versions.length - 1];
+    model.datasetModel.selectedVersion = defaultVersionName ? versions.find((version => version.pretty_name === defaultVersionName)) : versions[0];
     this.loadFiltersForModel(model)
   }
 

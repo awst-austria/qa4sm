@@ -167,6 +167,7 @@ METADATA_PLOT_NAMES = {
     "Climate classification": "metadata_climate_KG",
     "Soil type classification": "metadata_instrument_depth_and_soil_type",
     "FRM classification": "metadata_frm_class",
+    "Networks": "metadata_network"
 }
 
 TEMP_MATCH_WINDOW = ValidationRun.TEMP_MATCH_WINDOW

@@ -72,7 +72,8 @@ def get_validation_configuration(request, **kwargs):
         'filters': [],
         'anomalies': False,
         'scaling': False,
-        'variables': []
+        'variables': [],
+        'versions': [],
     }
 
     validation_run_id = kwargs['id']
@@ -159,15 +160,34 @@ def get_validation_configuration(request, **kwargs):
         for ds in validation_configs:
 
             dataset_id = ds.dataset.id
-            if DataVariable.objects.get(pk=ds.variable_id) not in Dataset.objects.get(pk=dataset_id).variables.all():
-                return JsonResponse({'message': 'Could not restore validation run, because some of '
-                                                'the chosen datasets, their versions or variables '
-                                                'are not available anymore'},
-                                    status=status.HTTP_404_NOT_FOUND, safe=False)
+            version_id = ds.version_id
+            variable_id = ds.variable_id
+
+            dataset = Dataset.objects.get(pk=dataset_id)
+
+            dataset_versions = dataset.versions.all()
+            dataset_variables = dataset.variables.all()
+
+            # we are checking if the version and variable is still assigned to the dataset:
+            variable_assigned = DataVariable.objects.get(pk=variable_id) in dataset_variables
+            version_assigned = DatasetVersion.objects.get(pk=version_id) in dataset_versions
+
+            if not variable_assigned:
+                changes_in_settings['variables'].append(
+                    {'variable': DataVariable.objects.get(pk=variable_id).pretty_name,
+                     'dataset': dataset.pretty_name}
+                )
+                variable_id = max(dataset_variables.values_list('id', flat=True))
+            if not version_assigned:
+                changes_in_settings['versions'].append({
+                    'version': DatasetVersion.objects.get(pk=version_id).pretty_name,
+                    'dataset': dataset.pretty_name
+                })
+                version_id = max(dataset_versions.values_list('id', flat=True))
 
             ds_dict = {'dataset_id': dataset_id,
-                       'version_id': ds.version_id,
-                       'variable_id': ds.variable_id,
+                       'version_id': version_id,
+                       'variable_id': variable_id,
                        'is_spatial_reference': ds.is_spatial_reference,
                        'is_temporal_reference': ds.is_temporal_reference,
                        'is_scaling_reference': ds.is_scaling_reference}
@@ -177,7 +197,7 @@ def get_validation_configuration(request, **kwargs):
 
             for basic_filter in ds.filters.all():
                 # check if the reloaded filter still belongs to the dataset
-                datasetversion_filters = DatasetVersion.objects.get(id=ds.version_id).filters.all()
+                datasetversion_filters = DatasetVersion.objects.get(id=version_id).filters.all()
                 if basic_filter in datasetversion_filters:
                     filters_list.append(basic_filter.id)
                 else:
@@ -187,7 +207,7 @@ def get_validation_configuration(request, **kwargs):
             ds_dict['parametrised_filters'] = parametrised_filters
             for param_filter in ParametrisedFilter.objects.filter(dataset_config=ds):
                 # check if the reloaded filter still belongs to the dataset
-                datasetversion_filter_ids = DatasetVersion.objects.get(id=ds.version_id).filters.all().values_list('id',
+                datasetversion_filter_ids = DatasetVersion.objects.get(id=version_id).filters.all().values_list('id',
                                                                                                                    flat=True)
                 if param_filter.filter_id in datasetversion_filter_ids:
                     parametrised_filters.append({'id': param_filter.filter.id, 'parameters': param_filter.parameters})
@@ -196,16 +216,18 @@ def get_validation_configuration(request, **kwargs):
                     non_existing_filters_list.append(filter_desc)
 
             if len(non_existing_filters_list) != 0:
-                print('non existing filter', non_existing_filters_list)
                 changes_in_settings['filters'].append(
                     {'dataset': ds.dataset.pretty_name, 'filter_desc': non_existing_filters_list})
 
             datasets.append(ds_dict)
 
-        if changes_in_settings['anomalies'] or changes_in_settings['scaling'] or \
-                len(changes_in_settings['filters']) != 0:
-            val_run_dict['changes'] = changes_in_settings
+        if (changes_in_settings['anomalies'] or changes_in_settings['scaling']
+                or len(changes_in_settings['filters']) != 0
+                or len(changes_in_settings['variables']) != 0
+                or len(changes_in_settings['versions']) != 0):
+            val_run_dict['changes'] = True
 
+        val_run_dict['settings_changes'] = changes_in_settings
         return JsonResponse(val_run_dict,
                             status=status.HTTP_200_OK, safe=False)
     except ObjectDoesNotExist:

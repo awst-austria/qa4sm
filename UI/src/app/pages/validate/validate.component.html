@@ -6,7 +6,8 @@
       <h5 class="pt-2">
         You are not logged in.
         You can check validation options, but cannot start a validation.
-        <a (click)="authService.switchLoginModal(true)" class="mt-5 cursor-pointer">Click here</a> or on the Validate button
+        <a (click)="authService.switchLoginModal(true)" class="mt-5 cursor-pointer">Click here</a> or on the Validate
+        button
         to log in or use
         <a [routerLink]="'/signup'" class="mt-5">this form</a>
         to register.
@@ -58,7 +59,7 @@
                   <qa-threshold-filter *ngIf="validationModel.datasetConfigurations[datasetIdx].smosRfiFilter$|async"
                                        [datasetModel]="validationModel.datasetConfigurations[datasetIdx].datasetModel"
                                        [filterModel$]="validationModel.datasetConfigurations[datasetIdx].smosRfiFilter$"
-                                       [minThreshold]="0." [increment]="0.05" maxThreshold="1." [units]="' [-]'" />
+                                       [minThreshold]="0." [increment]="0.05" maxThreshold="1." [units]="' [-]'"/>
 
                   <qa-threshold-filter *ngIf="validationModel.datasetConfigurations[datasetIdx].smosChi2Filter$|async"
                                        [datasetModel]="validationModel.datasetConfigurations[datasetIdx].datasetModel"
@@ -86,7 +87,7 @@
                     <qa-ismn-depth-filter
                       (depthSelectionChanged)="onIsmnDepthSelectionChange($event)"
                       [datasetModel]="validationModel.datasetConfigurations[datasetIdx].datasetModel"
-                      [filterModel$]="validationModel.datasetConfigurations[datasetIdx].ismnDepthFilter$" />
+                      [filterModel$]="validationModel.datasetConfigurations[datasetIdx].ismnDepthFilter$"/>
                   </div>
 
                   <div style="width: 100%;text-align: right">
@@ -149,32 +150,32 @@
               <hr class="w-11 mt-2" style="opacity: 1.0;">
 
               <!--             temporal reference-->
-                <label for="temporal-reference"
-                       class="mb-4"
-                       pTooltip="Choose the temporal reference dataset. Please note, that we do not recommend selecting ISMN."
-                       tooltipPosition="bottom">
-                  <span class="pi pi-question-circle"></span>
-                  Temporal reference
-                </label>
-                <qa-validation-reference
-                  id="temporal-reference"
-                  #temporalReference
-                  [validationModel]="validationModel"
-                  [referenceType]="'temporalReference$'"
-                  (hoverOverDataset)="onHoverOverReferenceDataset($event)"/>
+              <label for="temporal-reference"
+                     class="mb-4"
+                     pTooltip="Choose the temporal reference dataset. Please note, that we do not recommend selecting ISMN."
+                     tooltipPosition="bottom">
+                <span class="pi pi-question-circle"></span>
+                Temporal reference
+              </label>
+              <qa-validation-reference
+                id="temporal-reference"
+                #temporalReference
+                [validationModel]="validationModel"
+                [referenceType]="'temporalReference$'"
+                (hoverOverDataset)="onHoverOverReferenceDataset($event)"/>
 
 
-                <!--      Temporal matching-->
-                <label  for="temporal-matching"
-                        pTooltip="Select the size of the temporal matching window used to collocate the 'reference' and 'data' measurements in time.
+              <!--      Temporal matching-->
+              <label for="temporal-matching"
+                     pTooltip="Select the size of the temporal matching window used to collocate the 'reference' and 'data' measurements in time.
                                   The specified temporal window is centered on the reference measurements (i.e., with edges at +- half size distance from each considered measurement point).
                                   NOTE: the size of the window influences the number of observations used in the validation and could lead to no results in case no matches are found."
-                        tooltipPosition="bottom">
+                     tooltipPosition="bottom">
                 <span class="pi pi-question-circle"></span>
                 Temporal matching window
-                </label>
-                <qa-temporal-matching id="temporal-matching"
-                [temporalMatchingModel]="validationModel.temporalMatchingModel"/>
+              </label>
+              <qa-temporal-matching id="temporal-matching"
+                                    [temporalMatchingModel]="validationModel.temporalMatchingModel"/>
             </p-panel>
 
 

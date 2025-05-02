@@ -36,7 +36,7 @@ def dataset_version_by_id(request, **kwargs):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def dataset_version_by_dataset(request, **kwargs):
-    versions = get_object_or_404(Dataset, id=kwargs['dataset_id']).versions.order_by('id')
+    versions = get_object_or_404(Dataset, id=kwargs['dataset_id']).versions.order_by('-id')
     serializer = DatasetVersionSerializer(versions, many=True)
 
     return JsonResponse(serializer.data, status=status.HTTP_200_OK, safe=False)
@@ -110,7 +110,6 @@ def update_fixture_entry(version):
 
     # Find the entry matching the updated version
     for entry in fixture_data:
-        print(entry)
         if entry["model"] == "validator.datasetversion" and entry["pk"] == version.pk:
             # Update fields with the current DB data
             entry_fields = entry["fields"]
