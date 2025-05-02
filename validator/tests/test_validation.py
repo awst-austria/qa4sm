@@ -1523,10 +1523,10 @@ class TestValidation(TestCase):
         """
         all_datasets = [(globals.CCIC, globals.ESA_CCI_SM_P_V05_2,
                          globals.ESA_CCI_SM_P_sm),
-                        (globals.SMAP_L3, globals.SMAP_V5_PM,
+                        (globals.SMAP_L3, globals.SMAP_V8_AM,
                          globals.SMAP_soil_moisture),
                         (globals.ASCAT, globals.ASCAT_H113, globals.ASCAT_sm),
-                        (globals.ERA5, globals.ERA5_20190613, globals.ERA5_sm),
+                        (globals.ERA5, globals.ERA5_LAND_latest, globals.ERA5_sm),
                         (globals.GLDAS, globals.GLDAS_NOAH025_3H_2_1,
                          globals.GLDAS_SoilMoi0_10cm_inst), (globals.SMAP_L3, globals.SMAP_V9_AM_PM,
                          globals.SMAP_soil_moisture)]
