@@ -2,15 +2,15 @@ from validator.models import Dataset, DatasetVersion, DatasetConfiguration, \
     ValidationRun, DataVariable
 from dateutil.tz import tzlocal
 from datetime import datetime
-from validator.validation.globals import ISMN_V20230110, ISMN, \
-    ISMN_soil_moisture, C3SC, C3S_sm, C3S_V202212, DEFAULT_TSW
+from validator.validation.globals import ISMN_V20240314, ISMN, \
+    ISMN_soil_moisture, C3SC, C3S_sm, C3S_V202312, DEFAULT_TSW
 
 default_reference_dataset = ISMN
-default_reference_version = ISMN_V20230110
+default_reference_version = ISMN_V20240314
 default_reference_variable = ISMN_soil_moisture
 
 default_non_reference_dataset = C3SC
-default_non_reference_version = C3S_V202212
+default_non_reference_version = C3S_V202312
 default_non_reference_variable = C3S_sm
 
 
