@@ -55,7 +55,7 @@ class TestValidationConfigView(TransactionTestCase):
                                                'variable_id': DataVariable.objects.get(
                                                    pretty_name=globals.SMAP_soil_moisture).id,
                                                'version_id': DatasetVersion.objects.get(
-                                                   short_name=globals.SMAP_V6_PM).id,
+                                                   short_name=globals.SMAP_V8_AM).id,
                                                'basic_filters': [basic_filter_id],
                                                'parametrised_filters': [],
                                                'is_spatial_reference': False,
