@@ -1,18 +1,18 @@
-import {Component, OnInit} from '@angular/core';
-import {DatasetConfigModel} from '../../../../pages/validate/dataset-config-model';
-import {DatasetService} from '../../../core/services/dataset/dataset.service';
-import {DatasetVersionService} from '../../../core/services/dataset/dataset-version.service';
-import {DatasetComponentSelectionModel} from '../../../dataset/components/dataset/dataset-component-selection-model';
-import {Validations2CompareModel} from './validation-selection.model';
-import {ValidationrunService} from '../../../core/services/validation-run/validationrun.service';
-import {HttpParams} from '@angular/common/http';
-import {ValidationrunDto} from '../../../core/services/validation-run/validationrun.dto';
-import {ExtentModel} from '../spatial-extent/extent-model';
-import {ComparisonService} from '../../services/comparison.service';
-import {ToastService} from '../../../core/services/toast/toast.service';
-import {BehaviorSubject, EMPTY} from 'rxjs';
-import {DatasetVariableService} from '../../../core/services/dataset/dataset-variable.service';
-import {catchError} from 'rxjs/operators';
+import { Component, OnInit } from '@angular/core';
+import { DatasetConfigModel } from '../../../../pages/validate/dataset-config-model';
+import { DatasetService } from '../../../core/services/dataset/dataset.service';
+import { DatasetVersionService } from '../../../core/services/dataset/dataset-version.service';
+import { DatasetComponentSelectionModel } from '../../../dataset/components/dataset/dataset-component-selection-model';
+import { Validations2CompareModel } from './validation-selection.model';
+import { ValidationrunService } from '../../../core/services/validation-run/validationrun.service';
+import { HttpParams } from '@angular/common/http';
+import { ValidationrunDto } from '../../../core/services/validation-run/validationrun.dto';
+import { ExtentModel } from '../spatial-extent/extent-model';
+import { ComparisonService } from '../../services/comparison.service';
+import { ToastService } from '../../../core/services/toast/toast.service';
+import { BehaviorSubject, EMPTY } from 'rxjs';
+import { DatasetVariableService } from '../../../core/services/dataset/dataset-variable.service';
+import { catchError } from 'rxjs/operators';
 
 const N_MAX_VALIDATIONS = 2; // A maximum of two validation results can be compared, at the moment - this shouldn't be hardcoded
 
@@ -99,7 +99,7 @@ export class ValidationSelectorComponent implements OnInit {
         this.getValidations4comparison(String(model.datasetModel.selectedDataset.short_name),
           String(model.datasetModel.selectedVersion.short_name));
         // get all variables
-        this.datasetVariableService.getVariablesByDataset(model.datasetModel.selectedDataset.id)
+        this.datasetVariableService.getVariablesByVersion(model.datasetModel.selectedVersion.id)
           .pipe(
             //todo: when updating the component think of a better way of handling this error here
             //todo: fix the issue of empty variable for the comparison summary

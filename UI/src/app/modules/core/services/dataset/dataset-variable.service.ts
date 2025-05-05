@@ -40,7 +40,7 @@ export class DatasetVariableService {
 
   }
 
-  getVariablesByDataset(versionId: number): Observable<DatasetVariableDto[]> {
+  getVariablesByVersion(versionId: number): Observable<DatasetVariableDto[]> {
     if (this.arrayRequestCache.isCached(versionId)) {
       return this.arrayRequestCache.get(versionId);
     } else {

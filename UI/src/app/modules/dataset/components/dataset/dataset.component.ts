@@ -1,16 +1,16 @@
-import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
-import {DatasetService} from '../../../core/services/dataset/dataset.service';
-import {DatasetDto} from '../../../core/services/dataset/dataset.dto';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { DatasetService } from '../../../core/services/dataset/dataset.service';
+import { DatasetDto } from '../../../core/services/dataset/dataset.dto';
 
-import {Observable} from 'rxjs';
-import {DatasetVersionDto} from '../../../core/services/dataset/dataset-version.dto';
-import {DatasetVersionService} from '../../../core/services/dataset/dataset-version.service';
-import {DatasetComponentSelectionModel} from './dataset-component-selection-model';
-import {DatasetVariableDto} from '../../../core/services/dataset/dataset-variable.dto';
-import {DatasetVariableService} from '../../../core/services/dataset/dataset-variable.service';
-import {map, tap} from 'rxjs/operators';
-import {ValidationRunConfigService} from '../../../../pages/validate/service/validation-run-config.service';
-import {AuthService} from '../../../core/services/auth/auth.service';
+import { Observable } from 'rxjs';
+import { DatasetVersionDto } from '../../../core/services/dataset/dataset-version.dto';
+import { DatasetVersionService } from '../../../core/services/dataset/dataset-version.service';
+import { DatasetComponentSelectionModel } from './dataset-component-selection-model';
+import { DatasetVariableDto } from '../../../core/services/dataset/dataset-variable.dto';
+import { DatasetVariableService } from '../../../core/services/dataset/dataset-variable.service';
+import { map, tap } from 'rxjs/operators';
+import { ValidationRunConfigService } from '../../../../pages/validate/service/validation-run-config.service';
+import { AuthService } from '../../../core/services/auth/auth.service';
 
 
 @Component({
@@ -81,7 +81,7 @@ export class DatasetComponent implements OnInit {
       tap(datasetVersions => {this.checkIfNewerVersionExists(datasetVersions);})
     );
 
-    this.selectableDatasetVariables$ = this.datasetVariableService.getVariablesByDataset(this.selectionModel.selectedDataset.id);
+    this.selectableDatasetVariables$ = this.datasetVariableService.getVariablesByVersion(this.selectionModel.selectedVersion.id);
 
     this.setSelectorsId();
   }
@@ -110,7 +110,7 @@ export class DatasetComponent implements OnInit {
   }
 
   private onSelectableVersionsComplete(): void {
-    this.selectableDatasetVariables$ = this.datasetVariableService.getVariablesByDataset(this.selectionModel.selectedDataset.id);
+    this.selectableDatasetVariables$ = this.datasetVariableService.getVariablesByVersion(this.selectionModel.selectedVersion.id);
 
     this.selectableDatasetVariables$.subscribe(this.selectableDatasetVariablesObserver)
     this.setSelectorsId();
