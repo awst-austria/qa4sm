@@ -1850,7 +1850,7 @@ class TestValidation(TestCase):
         for i, dataset in enumerate(Dataset.objects.all()):
             self.__logger.info(dataset.pretty_name)
             vs = dataset.versions.all()
-            va = dataset.variables.all()
+            va = vs.first().variables.all()
 
             for version in vs:
                 reader = val.create_reader(dataset, version)
