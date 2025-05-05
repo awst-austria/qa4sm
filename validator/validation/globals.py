@@ -7,7 +7,6 @@ import qa4sm_reader.globals as qr_globals
 
 OUTPUT_FOLDER = settings.MEDIA_ROOT
 
-
 METRICS = qr_globals.METRICS
 
 NON_METRICS = qr_globals.NON_METRICS
@@ -22,7 +21,8 @@ TEMPORAL_SUB_WINDOW_SEPARATOR = qr_globals.TEMPORAL_SUB_WINDOW_SEPARATOR
 
 INTRA_ANNUAL_METRIC_TEMPLATE = qr_globals.INTRA_ANNUAL_METRIC_TEMPLATE
 
-INTRA_ANNUAL_TCOL_METRIC_TEMPLATE = qr_globals.INTRA_ANNUAL_TCOL_METRIC_TEMPLATE
+INTRA_ANNUAL_TCOL_METRIC_TEMPLATE = (
+    qr_globals.INTRA_ANNUAL_TCOL_METRIC_TEMPLATE)
 
 TC_METRICS = qr_globals.TC_METRICS
 
@@ -32,9 +32,10 @@ TC_METRIC_TEMPLATE = [
 ]
 
 STABILITY_METRICS = qr_globals.STABILITY_METRICS
-#-----------------------------------------------------------------------------------------------------------------------
-#TODO: If a new dataset is added here, make sure to add it to `qa4sm_reader.globals.DATASETS` as well
-#-----------------------------------------------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------------------------------------------------
+# TODO: If a new dataset is added here, make sure to add it to
+#  `qa4sm_reader.globals.DATASETS` as well
+# -----------------------------------------------------------------------------------------------------------------------
 C3SC = 'C3S_combined'
 ISMN = 'ISMN'
 GLDAS = 'GLDAS'
@@ -52,35 +53,33 @@ SMOS_L3 = 'SMOS_L3'
 SMOS_L2 = 'SMOS_L2'
 SMAP_L2 = 'SMAP_L2'
 SMOS_SBPCA = 'SMOS_SBPCA'
-#-----------------------------------------------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------------------------------------------------
 
 DATASETS = qr_globals.DATASETS
 
 MAX_NUM_DS_PER_VAL_RUN = qr_globals.MAX_NUM_DS_PER_VAL_RUN
 
-# dataset versions
+# dataset versions - keep it up to date with the current status of used versions
 C3S_V201706 = 'C3S_V201706'
 C3S_V201812 = 'C3S_V201812'
 C3S_V201912 = 'C3S_V201912'
 C3S_V202012 = 'C3S_V202012'
 C3S_V202212 = 'C3S_V202212'
-ISMN_V20180712_MINI = 'ISMN_V20180712_MINI'
-ISMN_V20191211 = 'ISMN_V20191211'
-ISMN_V20210131 = 'ISMN_V20210131'
-ISMN_VRelease2_Verification = 'ISMN_VRelease2_Verification'
+C3S_V202312 = 'C3S_V202312'
 ISMN_V20230110 = 'ISMN_V20230110'
-SMAP_V5_PM = 'SMAP_V5_PM'
-SMAP_V6_PM = 'SMAP_V6_PM'
-SMAP_V5_AM = 'SMAP_V5_AM'
-SMAP_V6_AM = 'SMAP_V6_AM'
+ISMN_V20240314 = 'ISMN_V20240314'
+SMAP_V8_AM = 'SMAP_V8_AM'
+SMAP_V9_AM_PM = 'SMAP_V9_AM_PM'
 SMOS_105_ASC = 'SMOS_105_ASC'
 GLDAS_NOAH025_3H_2_1 = 'GLDAS_NOAH025_3H_2_1'
 ASCAT_H113 = 'ASCAT_H113'
+ASCAT_H119 = 'ASCAT_H119'
+
 ERA5_20190613 = 'ERA5_20190613'
+ERA5_latest = 'ERA5_latest'
 ERA5_Land_V20190904 = 'ERA5_LAND_V20190904'
-ESA_CCI_SM_A_V04_4 = 'ESA_CCI_SM_A_V04_4'
-ESA_CCI_SM_P_V04_4 = 'ESA_CCI_SM_P_V04_4'
-ESA_CCI_SM_C_V04_4 = 'ESA_CCI_SM_C_V04_4'
+ERA5_LAND_latest = 'ERA5_LAND_latest'
+
 ESA_CCI_SM_A_V04_5 = 'ESA_CCI_SM_A_V04_5'
 ESA_CCI_SM_P_V04_5 = 'ESA_CCI_SM_P_V04_5'
 ESA_CCI_SM_C_V04_5 = 'ESA_CCI_SM_C_V04_5'
@@ -126,11 +125,13 @@ SMOSL2_sm = 'SMOSL2_sm'
 SMAPL2_soil_moisture = 'SMAPL2_soil_moisture'
 SMOS_SBPCA_sm = 'SMOS_SBPCA_sm'
 
-# left empty, because if in the future we want to exclude some datasets from the reference group it will be enough to
+# left empty, because if in the future we want to exclude some datasets from
+# the reference group it will be enough to
 # insert it's shortname to the list
 NOT_AS_REFERENCE = []
 
-# ValidationRun and Datasets fields for comparison when looking for a validation with the same settings
+# ValidationRun and Datasets fields for comparison when looking for a
+# validation with the same settings
 VR_FIELDS = [
     'interval_from', 'interval_to', 'max_lat', 'min_lat', 'max_lon', 'min_lon',
     'tcol', 'bootstrap_tcol_cis', 'anomalies', 'anomalies_from',
@@ -181,8 +182,8 @@ ALLOWED_COMPRESSION_LEVELS = qr_globals.ALLOWED_COMPRESSION_LEVELS
 
 # intra-annual metrics related
 DEFAULT_TSW = qr_globals.DEFAULT_TSW
-TEMPORAL_SUB_WINDOW_NC_COORD_NAME = qr_globals.TEMPORAL_SUB_WINDOW_NC_COORD_NAME
-
+TEMPORAL_SUB_WINDOW_NC_COORD_NAME = (
+    qr_globals.TEMPORAL_SUB_WINDOW_NC_COORD_NAME)
 
 # default temporal sub windows
 TEMPORAL_SUB_WINDOWS = qr_globals.TEMPORAL_SUB_WINDOWS
@@ -196,5 +197,3 @@ MAX_NUM_DS_PER_VAL_RUN = qr_globals.MAX_NUM_DS_PER_VAL_RUN
 
 ISMN_LIST_FILE_NAME = 'ismn_station_list.csv'
 GEOJSON_FILE_NAME = 'ismn_sensors.json'
-
-

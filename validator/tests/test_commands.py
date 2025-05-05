@@ -161,7 +161,7 @@ class TestCommands(TestCase):
         df = pd.read_csv(out_path)
         assert not df.empty
         os.remove(out_path)
-        call_command('generateismnlist', *args, '-s', 'ISMN_V20191211')
+        call_command('generateismnlist', *args, '-s', 'ISMN_V20240314')
         df = pd.read_csv(out_path)
         assert not df.empty
 

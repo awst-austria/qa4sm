@@ -24,10 +24,10 @@ from django.contrib.auth import get_user_model
 from api.tests import test_validation_config_view
 
 from api.views import auxiliary_functions
-from validator.validation.validation import compare_validation_runs, copy_validationrun
-from validator.tests.auxiliary_functions import generate_ismn_upscaling_validation
-# from validator.tests.auxiliary_functions_new import generate_ismn_upscaling_validation
-# import validator.tests.auxiliary_functions_new as aux
+from validator.validation.validation import (compare_validation_runs,
+                                             copy_validationrun)
+from validator.tests.auxiliary_functions import (
+    generate_ismn_upscaling_validation)
 from django.test import TestCase
 from django.test.utils import override_settings
 from pytz import UTC
@@ -44,14 +44,22 @@ from validator.models import CopiedValidations
 from validator.tests.testutils import set_dataset_paths
 from validator.validation import globals, adapt_timestamp
 import validator.validation as val
-from validator.validation.batches import _geographic_subsetting, create_upscaling_lut
-from validator.validation.globals import DEFAULT_TSW, METRICS, TC_METRICS, METADATA_PLOT_NAMES, NON_METRICS, OVERLAP_MIN, OVERLAP_MAX, OUTPUT_FOLDER
+from validator.validation.batches import (_geographic_subsetting,
+                                          create_upscaling_lut)
+from validator.validation.globals import (DEFAULT_TSW, METRICS, TC_METRICS,
+                                          METADATA_PLOT_NAMES, NON_METRICS,
+                                          OVERLAP_MIN, OVERLAP_MAX,
+                                          OUTPUT_FOLDER)
 from validator.validation.util import get_function_name
-from validator.tests.valruns_for_tests import TestValidationRunType, validations_runs_lut, tcol_validations_runs_lut, ismn_upscaling_validations_runs_lut
+from validator.tests.valruns_for_tests import (TestValidationRunType,
+                                               validations_runs_lut,
+                                               tcol_validations_runs_lut,
+                                        ismn_upscaling_validations_runs_lut)
 from django.shortcuts import get_object_or_404
 from math import comb
 
-from qa4sm_reader.globals import out_metadata_plots, _metadata_exclude, CLUSTERED_BOX_PLOT_SAVENAME
+from qa4sm_reader.globals import (out_metadata_plots, _metadata_exclude,
+                                  CLUSTERED_BOX_PLOT_SAVENAME)
 from qa4sm_reader.utils import transcribe
 
 User = get_user_model()
@@ -141,14 +149,15 @@ class TestValidation(TestCase):
                 if scaling_ref.is_scaling_reference or len(
                         val_configs.filter(is_scaling_reference=True)) != 0:
                     raise ValueError(
-                        'Scaling method is none, but scaling reference is set and a configuration is '
-                        'marked as reference.')
+                        'Scaling method is none, but scaling reference is '
+                        'set and a configuration is marked as reference.')
                 raise ValueError(
                     'Scaling method is none, but scaling reference is set.')
             else:
                 if len(val_configs.filter(is_scaling_reference=True)) != 0:
                     raise ValueError(
-                        'Scaling method is not set but at least one configuration is marked as reference.'
+                        'Scaling method is not set but at least one '
+                        'configuration is marked as reference.'
                     )
         else:
             if scaling_ref:
@@ -157,7 +166,8 @@ class TestValidation(TestCase):
                         'No configuration is marked as scaling reference.')
                 elif len(val_configs.filter(is_scaling_reference=True)) > 1:
                     raise ValueError(
-                        'More than one configuration is marked as scaling reference.'
+                        'More than one configuration is marked as '
+                        'scaling reference.'
                     )
                 if not scaling_ref.is_scaling_reference:
                     raise ValueError(
@@ -193,19 +203,25 @@ class TestValidation(TestCase):
         if validation.intra_annual_metrics != expected_results[
                 'intra_annual_metrics']:
             raise ValueError(
-                f'Intra-annual metrics are not configured properly. Expected "{expected_results["intra_annual_metrics"]}", but got "{validation.intra_annual_metrics=}".'
+                f'Intra-annual metrics are not configured properly. Expected '
+                f'"{expected_results["intra_annual_metrics"]}", '
+                f'but got "{validation.intra_annual_metrics=}".'
             )
 
         if validation.intra_annual_type != expected_results[
                 'intra_annual_type']:
             raise ValueError(
-                f'Intra-annual type is not configured properly. Expected "{expected_results["intra_annual_type"]}", but got "{validation.intra_annual_type=}".'
+                f'Intra-annual type is not configured properly. Expected '
+                f'"{expected_results["intra_annual_type"]}", '
+                f'but got "{validation.intra_annual_type=}".'
             )
 
         if validation.intra_annual_overlap != expected_results[
                 'intra_annual_overlap']:
             raise ValueError(
-                f'Intra-annual overlap is not configured properly. Expected "{expected_results["intra_annual_overlap"]}", but got "{validation.intra_annual_overlap=}".'
+                f'Intra-annual overlap is not configured properly. Expected '
+                f'"{expected_results["intra_annual_overlap"]}", '
+                f'but got "{validation.intra_annual_overlap=}".'
             )
 
         # above the expected results are verified against the actual results
@@ -217,34 +233,44 @@ class TestValidation(TestCase):
         if expected_results['intra_annual_metrics'] == False:
             if validation.intra_annual_overlap != 0:
                 raise ValueError(
-                    f'The default intra-annual overlap should be 0, but is found to be {validation.intra_annual_overlap=}.'
+                    f'The default intra-annual overlap should be 0, but '
+                    f'is found to be {validation.intra_annual_overlap=}.'
                 )
 
             if validation.intra_annual_type != None:
                 raise ValueError(
-                    f'The default intra-annual type should be "None", but is found to be {validation.intra_annual_type=}.'
+                    f'The default intra-annual type should be "None", but '
+                    f'is found to be {validation.intra_annual_type=}.'
                 )
 
         elif expected_results['intra_annual_metrics'] == True:
             if validation.intra_annual_overlap < OVERLAP_MIN:
                 raise ValueError(
-                    f'The intra-annual overlap should not be below 0, as this does not make sense. Yet, it is found to be {validation.intra_annual_overlap=}.'
+                    f'The intra-annual overlap should not be below 0, as this '
+                    f'does not make sense. Yet, it is '
+                    f'found to be {validation.intra_annual_overlap=}.'
                 )
 
             elif validation.intra_annual_overlap > OVERLAP_MAX:
                 raise ValueError(
-                    f'The intra-annual overlap should not be above {OVERLAP_MAX}, bit is found to be {validation.intra_annual_overlap=}.'
+                    f'The intra-annual overlap should not be above {OVERLAP_MAX}, '
+                    f'bit is found to be {validation.intra_annual_overlap=}.'
                 )
 
             elif validation.intra_annual_overlap != expected_results[
                     'intra_annual_overlap']:
                 raise ValueError(
-                    f'The intra-annual overlap should be {expected_results["intra_annual_overlap"]}, but is found to be {validation.intra_annual_overlap=}.'
+                    f'The intra-annual overlap should be '
+                    f'{expected_results["intra_annual_overlap"]}, '
+                    f'but is found to be {validation.intra_annual_overlap=}.'
                 )
 
             if validation.intra_annual_type not in ['Seasonal', 'Monthly']:
                 raise ValueError(
-                    f'If intra annual metrics are to be calculated, this is to be done either on a monthly or seasonal basis. Thus, allowed values are ["Seasonal", "Monthly"], not {validation.intra_annual_type=}.'
+                    f'If intra annual metrics are to be calculated, '
+                    f'this is to be done either on a monthly or seasonal basis. '
+                    f'Thus, allowed values are ["Seasonal", "Monthly"], '
+                    f'not {validation.intra_annual_type=}.'
                 )
 
     def check_results(
@@ -255,14 +281,14 @@ class TestValidation(TestCase):
         expected_results: Dict[str, Any] = {
             'intra_annual_metrics': False,
             'intra_annual_type': None,
-            'intra_annual_overlap': 0
-        }):
+            'intra_annual_overlap': 0}):
 
         try:
             self._check_validation_configuration_consistency(
                 run, expected_results)
         except Exception as exc:
-            assert False, f"'_check_validation_configuration raised and exception {exc}'"
+            assert False, (f"'_check_validation_configuration raised "
+                           f"and exception {exc}'")
 
         assert run is not None
         assert run.end_time is not None
@@ -321,7 +347,8 @@ class TestValidation(TestCase):
                         ) is not None)
 
                 self.__logger.debug(
-                    f'Metric variables for metric {metric} are {[m.name for m in metric_vars]}'
+                    f'Metric variables for metric {metric} are '
+                    f'{[m.name for m in metric_vars]}'
                 )
 
                 # check that all metrics have the same number of variables (depends on number of input datasets)
@@ -362,7 +389,8 @@ class TestValidation(TestCase):
                     else:
                         assert len(
                             values
-                        ) == length, 'Variable q{} doesn\'t match other variables in length'.format(
+                        ) == length, ('Variable q{} doesn\'t '
+                                      'match other variables in length').format(
                             m_var.name)
                     self.__logger.debug(f'Length {m_var.name} are {length}')
 
@@ -370,18 +398,21 @@ class TestValidation(TestCase):
                     nan_ratio = np.sum(np.isnan(values.data)) / float(
                         len(values))
                     error_ratio = run.error_points / run.total_points
-                    assert nan_ratio <= error_ratio, 'Variable {} has too many NaNs. Ratio: {}'.format(
+                    assert nan_ratio <= error_ratio, ('Variable {} has too '
+                                                      'many NaNs. Ratio: {}').format(
                         metric, nan_ratio)
 
             if run.interval_from is None:
-                assert ds.val_interval_from == "N/A", 'Wrong validation config attribute. [interval_from]'
+                assert ds.val_interval_from == "N/A", ('Wrong validation '
+                                                       'config attribute. [interval_from]')
             else:
                 assert ds.val_interval_from == run.interval_from.strftime(
                     '%Y-%m-%d %H:%M'
                 ), 'Wrong validation config attribute. [interval_from]'
 
             if run.interval_to is None:
-                assert ds.val_interval_to == "N/A", 'Wrong validation config attribute. [interval_to]'
+                assert ds.val_interval_to == "N/A", ('Wrong validation '
+                                                     'config attribute. [interval_to]')
             else:
                 assert ds.val_interval_to == run.interval_to.strftime(
                     '%Y-%m-%d %H:%M'
@@ -590,7 +621,7 @@ class TestValidation(TestCase):
             # bulk graphics in .svg format
             bulk_svg_graphics = [
                 x.replace('.png', '.svg') for x in bulk_png_graphics
-            ]  #TODO
+            ]  # TODO
 
             # graphics for temporal sub-windows
             if run.intra_annual_metrics:
@@ -1054,6 +1085,7 @@ class TestValidation(TestCase):
         "ignore:No data for:UserWarning",
         "ignore: Too few points are available to generate:UserWarning")
     @pytest.mark.long_running
+    # TODO filter smap
     def test_validation_smap_ref(self):
         for testvalrun_type, testvalrun_data in self.get_test_validation_run(
                 'default').items():
@@ -1117,6 +1149,7 @@ class TestValidation(TestCase):
                 meta_plots=False,
                 expected_results=testvalrun_data.results_tbe_dict())
             self.delete_run(new_run)
+
 
     @pytest.mark.filterwarnings(
         "ignore:No results for gpi:UserWarning",
@@ -1640,6 +1673,7 @@ class TestValidation(TestCase):
         "ignore:No data for:UserWarning",
         "ignore: Too few points are available to generate:UserWarning")
     @pytest.mark.long_running
+    # TODO
     def test_all_datasets_validation_upscaling(self):
         """
         Test a validation for each sat. dataset with ISMN as non-reference, and upscaling option active. Test description
@@ -1943,7 +1977,7 @@ class TestValidation(TestCase):
             assert exact_tstamp.index.shape == \
                    midnight_tstamp[~np.isnan(midnight_tstamp[field])].index.shape
             # Check the index type
-            assert exact_tstamp.index.dtype == np.dtype('<M8[ns]')
+            assert exact_tstamp.index.dtype == np.dtype('<M8[s]')
             # Check that the offset field is not in the output
             assert field not in exact_tstamp.columns
 
