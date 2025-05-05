@@ -47,11 +47,11 @@ class TestDatasetVariableView(TestCase):
     def test_dataset_variable_by_version(self):
         dataset_variable_by_dataset_url_name ='Dataset_variable_by_version'
         # check if they are properly taken based on a dataset id provided
-        response = self.client.get(reverse(dataset_variable_by_dataset_url_name, kwargs={'version_id': 5}))  # GLDAS
+        response = self.client.get(reverse(dataset_variable_by_dataset_url_name, kwargs={'version_id': 7}))  # GLDAS GLDAS_NOAH025_3H_2_1
         assert response.status_code == 200
         assert len(response.json()) == 4  # usually there is only 1, but GLDAS has 4
 
-        response = self.client.get(reverse(dataset_variable_by_dataset_url_name, kwargs={'version_id': 1}))  # C3S
+        response = self.client.get(reverse(dataset_variable_by_dataset_url_name, kwargs={'version_id': 1}))  # C3S_V201706
         assert response.status_code == 200
         assert len(response.json()) == 1
 
@@ -61,7 +61,7 @@ class TestDatasetVariableView(TestCase):
         # check availability after logging out
         self.client.logout()
 
-        response = self.client.get(reverse(dataset_variable_by_dataset_url_name, kwargs={'dataset_id': 5}))  # GLDAS
+        response = self.client.get(reverse(dataset_variable_by_dataset_url_name, kwargs={'dataset_id': 7}))  # GLDAS
         assert response.status_code == 200
 
 
