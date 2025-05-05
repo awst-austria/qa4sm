@@ -892,7 +892,7 @@ class TestValidation(TestCase):
         run.spatial_reference_configuration.dataset = Dataset.objects.get(
             short_name=globals.SMAP_L3)
         run.spatial_reference_configuration.version = DatasetVersion.objects.get(
-            short_name=globals.SMAP_V5_PM)
+            short_name=globals.SMAP_V8_AM)
         run.spatial_reference_configuration.variable = DataVariable.objects.get(
             pretty_name=globals.SMAP_soil_moisture)
         run.spatial_reference_configuration.filters.add(
