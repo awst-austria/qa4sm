@@ -7,7 +7,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('validator', '0080_run_data_migration'),
+        ('validator', '0081_run_data_migration'),
     ]
 
     operations = [
