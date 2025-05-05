@@ -163,13 +163,15 @@ def get_validation_configuration(request, **kwargs):
             version_id = ds.version_id
             variable_id = ds.variable_id
 
+            # We can use get, because if the dataset or the version doesn't exist in our db, the code above handles it.
             dataset = Dataset.objects.get(pk=dataset_id)
+            version = DatasetVersion.objects.get(pk=version_id)
 
             dataset_versions = dataset.versions.all()
-            dataset_variables = dataset.variables.all()
+            version_variables = version.variables.all()
 
             # we are checking if the version and variable is still assigned to the dataset:
-            variable_assigned = DataVariable.objects.get(pk=variable_id) in dataset_variables
+            variable_assigned = DataVariable.objects.get(pk=variable_id) in version_variables
             version_assigned = DatasetVersion.objects.get(pk=version_id) in dataset_versions
 
             if not variable_assigned:
@@ -177,7 +179,7 @@ def get_validation_configuration(request, **kwargs):
                     {'variable': DataVariable.objects.get(pk=variable_id).pretty_name,
                      'dataset': dataset.pretty_name}
                 )
-                variable_id = max(dataset_variables.values_list('id', flat=True))
+                variable_id = max(version_variables.values_list('id', flat=True))
             if not version_assigned:
                 changes_in_settings['versions'].append({
                     'version': DatasetVersion.objects.get(pk=version_id).pretty_name,
