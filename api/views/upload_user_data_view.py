@@ -79,7 +79,6 @@ def create_version_entry(version_name, version_pretty_name, dataset_pretty_name,
 
 
 def create_dataset_entry(dataset_name, dataset_pretty_name, version, user):
-    # TODO: update variables
     current_max_id = Dataset.objects.all().last().id if Dataset.objects.all() else 0
     dataset_data = {
         'short_name': dataset_name,
@@ -152,7 +151,6 @@ def preprocess_file(file_serializer, file_raw_path):
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
 def update_metadata(request, file_uuid):
-    # TODO: update this one with the new approach to the variable issue
     file_entry = get_object_or_404(UserDatasetFile, id=file_uuid)
     field_name = request.data[USER_DATA_FIELD_NAME]
     field_value = request.data[USER_DATA_FIELD_VALUE]
@@ -179,7 +177,6 @@ def update_metadata(request, file_uuid):
         current_version.pretty_name = field_value
         current_version.save()
 
-    # todo Update the response
     return JsonResponse({'variable_id': current_variable.id}, status=200)
 
 
