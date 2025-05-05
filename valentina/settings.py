@@ -122,7 +122,7 @@ if DBSM == "postgresql":
             'ENGINE': 'django.db.backends.postgresql_psycopg2',
             'NAME': 'valentina',
             'USER': 'django',
-            'PASSWORD': 's3cr3t',
+            'PASSWORD': DB_PASSWORD,
             'HOST': DB_HOST,
             'PORT': 5435,
         }
