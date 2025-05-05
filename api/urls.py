@@ -66,8 +66,9 @@ urlpatterns = [
             name='Dataset version by dataset'),
     path('dataset-variable', dataset_variable, name='Dataset variable'),
     re_path(r'^dataset-variable/(?P<variable_id>.+)$', dataset_variable_by_id),
+    # todo: update the url here and in the frontend
     re_path(r'^dataset-variable-by-dataset/(?P<dataset_id>.+)$', dataset_variable_by_version,
-            name='Dataset_variable_by_dataset'),
+            name='Dataset_variable_by_version'),
     path('published-results', published_results, name='Published results'),
     re_path(r'^validation-runs/(?P<id>.+)$', validation_run_by_id, name='Validation run by id'),
     re_path(r'^is-validation-finished/(?P<id>.+)$', is_validation_finished, name='Is validation finished'),
