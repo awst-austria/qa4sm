@@ -1,19 +1,7 @@
-import os
-from datetime import timedelta
-from os import path
-from re import sub as regex_sub
-from shutil import rmtree
 import uuid
 from django.conf import settings
-from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
-from django.db.models.signals import post_delete
-from django.dispatch.dispatcher import receiver
-from django.utils import timezone
-
-from validator.models import DatasetConfiguration, User, CopiedValidations, Dataset
-from django.db.models import Q, ExpressionWrapper, F, BooleanField
 
 
 class DeletedValidationRun(models.Model):
