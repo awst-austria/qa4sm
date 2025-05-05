@@ -1762,7 +1762,7 @@ class TestValidation(TestCase):
         ref_c.validation = run
         ref_c.dataset = dataset
         ref_c.version = version
-        ref_c.variable = dataset.variables.first()
+        ref_c.variable = version.variables.first()
         ref_c.save()
         run.spatial_reference_configuration = ref_c
         run.save()
@@ -1933,7 +1933,7 @@ class TestValidation(TestCase):
                 ref_c.validation = run
                 ref_c.dataset = dataset
                 ref_c.version = version
-                ref_c.variable = dataset.variables.first()
+                ref_c.variable = ref_c.version.variables.first()
                 ref_c.save()
 
                 run.spatial_reference_configuration = ref_c
