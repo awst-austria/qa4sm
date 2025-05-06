@@ -54,7 +54,7 @@ def generate_all_graphs(validation_run, temporal_sub_windows: List[str], outfold
     zipfilename = path.join(outfolder, 'graphs.zip')
     __logger.debug('Trying to create zipfile {}'.format(zipfilename))
 
-    fnb, fnm, fcsv, fncb = plot_all(
+    fnb, fnm, fcsv, fncb, _ = plot_all(
         validation_run.output_file.path,
         temporal_sub_windows=temporal_sub_windows,
         out_dir=outfolder,
