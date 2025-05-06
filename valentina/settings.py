@@ -124,7 +124,7 @@ if DBSM == "postgresql":
             'USER': 'django',
             'PASSWORD': DB_PASSWORD,
             'HOST': DB_HOST,
-            'PORT': '',
+            'PORT': 5435,
         }
     }
 else:

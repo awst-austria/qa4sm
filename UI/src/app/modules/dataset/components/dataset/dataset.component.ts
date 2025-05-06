@@ -82,7 +82,7 @@ export class DatasetComponent implements OnInit {
       tap(datasetVersions => this.checkIfNewerVersionExists(datasetVersions))
     );
 
-    this.selectableDatasetVariables$ = this.datasetVariableService.getVariablesByDataset(this.selectionModel.selectedDataset.id);
+    this.selectableDatasetVariables$ = this.datasetVariableService.getVariablesByVersion(this.selectionModel.selectedVersion.id);
 
     this.setSelectorsId();
   }
@@ -106,7 +106,7 @@ export class DatasetComponent implements OnInit {
   }
 
   private onSelectableVersionsComplete(): void {
-    this.selectableDatasetVariables$ = this.datasetVariableService.getVariablesByDataset(this.selectionModel.selectedDataset.id);
+    this.selectableDatasetVariables$ = this.datasetVariableService.getVariablesByVersion(this.selectionModel.selectedVersion.id);
 
     this.selectableDatasetVariables$.subscribe(this.selectableDatasetVariablesObserver);
     this.setSelectorsId();

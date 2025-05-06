@@ -68,7 +68,7 @@ class TestMailer(TestCase):
             data_c.validation = run
             data_c.dataset = ds
             data_c.version = ds.versions.first()
-            data_c.variable = ds.variables.first()
+            data_c.variable = data_c.version.variables.first()
             data_c.save()
 
         ref_c = DatasetConfiguration()
