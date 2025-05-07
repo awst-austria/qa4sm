@@ -23,8 +23,7 @@ git submodule update --init --remote  validator/fixtures
 cd "validator/fixtures"
 if [[ "$QA4SM_INSTANCE" == "TEST" ]]; then
     git fetch origin
-    git switch variables_in_versions || git checkout -b variables_in_versions origin/variables_in_versions
-#    git switch test-branch || git checkout -b test-branch origin/test-branch
+    git switch test-branch || git checkout -b test-branch origin/test-branch
 fi
 
 if [[ "$QA4SM_INSTANCE" == "PROD" ]]; then
