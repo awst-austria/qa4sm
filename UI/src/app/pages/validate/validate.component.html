@@ -41,7 +41,7 @@
                                 [class]="{'highlighted': (item.highlighted$|async),
                             'is-reference': ((item.spatialReference$|async) || (item.temporalReference$|async) || (item.scalingReference$|async))}">
 
-                  <qa-dataset *ngIf="validationModel.datasetConfigurations[datasetIdx].datasetModel.selectedDataset"
+                  <qa-dataset *ngIf="validationModel.datasetConfigurations[datasetIdx].datasetModel.selectedDataset && validationModel.datasetConfigurations[datasetIdx].datasetModel.selectedVersion"
                               [selectionModel]="validationModel.datasetConfigurations[datasetIdx].datasetModel"
                               [removable]="true" (changeDataset)="onDatasetChange($event)"/>
 
@@ -59,12 +59,12 @@
                   <qa-threshold-filter *ngIf="validationModel.datasetConfigurations[datasetIdx].smosRfiFilter$|async"
                                        [datasetModel]="validationModel.datasetConfigurations[datasetIdx].datasetModel"
                                        [filterModel$]="validationModel.datasetConfigurations[datasetIdx].smosRfiFilter$"
-                                       [minThreshold]="0." [increment]="0.05" maxThreshold="1." [units]="' [-]'" />
+                                       [minThreshold]="0." [increment]="0.05" [maxThreshold]="1.0" [units]="' [-]'"/>
 
                   <qa-threshold-filter *ngIf="validationModel.datasetConfigurations[datasetIdx].smosChi2Filter$|async"
                                        [datasetModel]="validationModel.datasetConfigurations[datasetIdx].datasetModel"
                                        [filterModel$]="validationModel.datasetConfigurations[datasetIdx].smosChi2Filter$"
-                                       [minThreshold]="0." [increment]="0.05" maxThreshold="1." [units]="' [-]'" />
+                                       [minThreshold]="0." [increment]="0.05" [maxThreshold]="1.0" [units]="' [-]'"/>
                   <div *ngIf="validationModel.datasetConfigurations[datasetIdx].ismnNetworkFilter$|async">
                     <qa-ismn-network-filter
                       (networkSelectionChanged)="onIsmnNetworkSelectionChange($event)"

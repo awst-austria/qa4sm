@@ -1,11 +1,11 @@
-import {Injectable} from '@angular/core';
-import {HttpClient} from '@angular/common/http';
-import {catchError, shareReplay} from 'rxjs/operators';
-import {Observable} from 'rxjs';
-import {environment} from '../../../../../environments/environment';
-import {DatasetVariableDto} from './dataset-variable.dto';
-import {DataCache} from '../../tools/DataCache';
-import {HttpErrorService} from '../global/http-error.service';
+import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { catchError, shareReplay } from 'rxjs/operators';
+import { Observable } from 'rxjs';
+import { environment } from '../../../../../environments/environment';
+import { DatasetVariableDto } from './dataset-variable.dto';
+import { DataCache } from '../../tools/DataCache';
+import { HttpErrorService } from '../global/http-error.service';
 
 const DATASET_VARIABLE_URL: string = environment.API_URL + 'api/dataset-variable';
 const CACHE_KEY_ALL_VERSIONS = -1;
@@ -40,13 +40,13 @@ export class DatasetVariableService {
 
   }
 
-  getVariablesByDataset(datasetId: number): Observable<DatasetVariableDto[]> {
-    if (this.arrayRequestCache.isCached(datasetId)) {
-      return this.arrayRequestCache.get(datasetId);
+  getVariablesByVersion(versionId: number): Observable<DatasetVariableDto[]> {
+    if (this.arrayRequestCache.isCached(versionId)) {
+      return this.arrayRequestCache.get(versionId);
     } else {
-      const getUrl = DATASET_VARIABLE_URL + '-by-dataset/' + datasetId;
+      const getUrl = DATASET_VARIABLE_URL + '-by-version/' + versionId;
       let datasetVariables$ = this.httpClient.get<DatasetVariableDto[]>(getUrl).pipe(shareReplay());
-      this.arrayRequestCache.push(datasetId, datasetVariables$);
+      this.arrayRequestCache.push(versionId, datasetVariables$);
       return datasetVariables$
         .pipe(
           catchError(err => this.httpError.handleError(err, 'We could not fetch variables for selected dataset.')),

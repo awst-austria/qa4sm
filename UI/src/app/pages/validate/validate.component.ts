@@ -1,10 +1,10 @@
-import {AfterViewInit, Component, OnInit, signal, ViewChild} from '@angular/core';
-import {DatasetService} from '../../modules/core/services/dataset/dataset.service';
+import { AfterViewInit, Component, OnInit, signal, ViewChild } from '@angular/core';
+import { DatasetService } from '../../modules/core/services/dataset/dataset.service';
 import {
   DatasetComponentSelectionModel
 } from '../../modules/dataset/components/dataset/dataset-component-selection-model';
-import {DatasetVersionService} from '../../modules/core/services/dataset/dataset-version.service';
-import {DatasetVariableService} from '../../modules/core/services/dataset/dataset-variable.service';
+import { DatasetVersionService } from '../../modules/core/services/dataset/dataset-version.service';
+import { DatasetVariableService } from '../../modules/core/services/dataset/dataset-variable.service';
 import {
   DatasetConfigModel,
   ISMN_DEPTH_FILTER_ID,
@@ -14,46 +14,46 @@ import {
   SMOS_CHI2_FILTER_ID,
   SMOS_RFI_FILTER_ID
 } from './dataset-config-model';
-import {FilterService} from '../../modules/core/services/filter/filter.service';
-import {FilterModel} from '../../modules/filter/components/basic-filter/filter-model';
-import {ValidationModel} from './validation-model';
-import {SpatialSubsetModel} from '../../modules/spatial-subset/components/spatial-subset/spatial-subset-model';
+import { FilterService } from '../../modules/core/services/filter/filter.service';
+import { FilterModel } from '../../modules/filter/components/basic-filter/filter-model';
+import { ValidationModel } from './validation-model';
+import { SpatialSubsetModel } from '../../modules/spatial-subset/components/spatial-subset/spatial-subset-model';
 import {
   ValidationPeriodModel
 } from '../../modules/validation-period/components/validation-period/validation-period-model';
-import {AnomaliesModel} from '../../modules/anomalies/components/anomalies/anomalies-model';
+import { AnomaliesModel } from '../../modules/anomalies/components/anomalies/anomalies-model';
 import {
   ANOMALIES_NONE,
   ANOMALIES_NONE_DESC,
   AnomaliesComponent
 } from '../../modules/anomalies/components/anomalies/anomalies.component';
-import {ScalingComponent} from '../../modules/scaling/components/scaling/scaling.component';
+import { ScalingComponent } from '../../modules/scaling/components/scaling/scaling.component';
 import {
   ConfigurationChanges,
   ValidationRunConfigDto,
   ValidationRunDatasetConfigDto,
-  ValidationRunMetricConfigDto,
+  ValidationRunMetricConfigDto
 } from './service/validation-run-config-dto';
-import {ValidationRunConfigService} from './service/validation-run-config.service';
+import { ValidationRunConfigService } from './service/validation-run-config.service';
 
-import {ToastService} from '../../modules/core/services/toast/toast.service';
-import {ActivatedRoute, Router} from '@angular/router';
-import {BehaviorSubject, EMPTY, forkJoin, Observable, of, ReplaySubject} from 'rxjs';
-import {MapComponent} from '../../modules/map/components/map/map.component';
-import {ModalWindowService} from '../../modules/core/services/global/modal-window.service';
-import {ExistingValidationDto} from '../../modules/core/services/validation-run/existing-validation.dto';
-import {catchError, delay, map} from 'rxjs/operators';
-import {SettingsService} from '../../modules/core/services/global/settings.service';
+import { ToastService } from '../../modules/core/services/toast/toast.service';
+import { ActivatedRoute, Router } from '@angular/router';
+import { BehaviorSubject, EMPTY, forkJoin, Observable, of, ReplaySubject } from 'rxjs';
+import { MapComponent } from '../../modules/map/components/map/map.component';
+import { ModalWindowService } from '../../modules/core/services/global/modal-window.service';
+import { ExistingValidationDto } from '../../modules/core/services/validation-run/existing-validation.dto';
+import { catchError, delay, map } from 'rxjs/operators';
+import { SettingsService } from '../../modules/core/services/global/settings.service';
 import {
   TemporalMatchingModel
 } from '../../modules/temporal-matching/components/temporal-matching/temporal-matching-model';
-import {ReferenceModel} from '../../modules/validation-reference/components/validation-reference/reference-model';
-import {ScalingModel} from '../../modules/scaling/components/scaling/scaling-model';
+import { ReferenceModel } from '../../modules/validation-reference/components/validation-reference/reference-model';
+import { ScalingModel } from '../../modules/scaling/components/scaling/scaling-model';
 import {
   ValidationReferenceComponent
 } from '../../modules/validation-reference/components/validation-reference/validation-reference.component';
-import {AuthService} from '../../modules/core/services/auth/auth.service';
-import {CustomHttpError} from '../../modules/core/services/global/http-error.service';
+import { AuthService } from '../../modules/core/services/auth/auth.service';
+import { CustomHttpError } from '../../modules/core/services/global/http-error.service';
 
 
 const MAX_DATASETS_FOR_VALIDATION = 6;  // TODO: this should come from either config file or the database
@@ -421,10 +421,6 @@ export class ValidateComponent implements OnInit, AfterViewInit {
           complete: () => this.onGetVersionComplete(),
         }
 
-        const getVariablesByDatasetObserver = {
-          next: variables => model.datasetModel.selectedVariable = variables[0],
-          error: (error: CustomHttpError) => this.onGetVariableError(error),
-        }
 
         // then get all versions for the first dataset in the result list
         this.versionService.getVersionsByDataset(model.datasetModel.selectedDataset.id).subscribe(
@@ -432,8 +428,8 @@ export class ValidateComponent implements OnInit, AfterViewInit {
         );
 
         // at the same time get the variables too
-        this.variableService.getVariablesByDataset(model.datasetModel.selectedDataset.id)
-          .subscribe(getVariablesByDatasetObserver);
+        // this.variableService.getVariablesByVersion(model.datasetModel.selectedVersion.id)
+        //   .subscribe(getVariablesByDatasetObserver);
 
         // and the filters
         // this.loadFiltersForModel(model);
@@ -447,8 +443,16 @@ export class ValidateComponent implements OnInit, AfterViewInit {
 
 
   private onGetVersionNext(versions, model, defaultVersionName): void {
+    const getVariablesByDatasetObserver = {
+      next: variables => model.datasetModel.selectedVariable = variables[0],
+      error: (error: CustomHttpError) => this.onGetVariableError(error),
+    }
+
+
     model.datasetModel.selectedVersion = defaultVersionName ? versions.find((version => version.pretty_name === defaultVersionName)) : versions[0];
     this.loadFiltersForModel(model)
+    this.variableService.getVariablesByVersion(model.datasetModel.selectedVersion.id)
+      .subscribe(getVariablesByDatasetObserver);
   }
 
   private onGetVersionError(error: CustomHttpError): void {
