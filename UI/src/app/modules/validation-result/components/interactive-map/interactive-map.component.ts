@@ -4,9 +4,9 @@ import { Map, View } from 'ol';
 import TileLayer from 'ol/layer/Tile';
 import OSM from 'ol/source/OSM';
 import { Cluster } from 'ol/source';
-import VectorLayer from 'ol/layer/Vector';
 import VectorSource from 'ol/source/Vector';
 import { FullScreen } from 'ol/control';
+import { WebsiteGraphicsService } from '../../../core/services/global/website-graphics.service';
 
 
 @Component({
@@ -19,14 +19,16 @@ import { FullScreen } from 'ol/control';
   styleUrl: './interactive-map.component.scss'
 })
 export class InteractiveMapComponent implements OnInit {
-  validationId = input('')
+  validationId = input('');
 
   Map: Map;
   clusteredSource: VectorSource = new VectorSource();
 
+  constructor(public plotService: WebsiteGraphicsService) {
+  }
+
 
   ngOnInit() {
-    console.log('InteractiveMapComponent init');
     this.initMap();
   }
 
@@ -37,16 +39,11 @@ export class InteractiveMapComponent implements OnInit {
       distance: 20 // Pixel distance between features to be clustered
     });
 
-    let clusteredSourceLayer = new VectorLayer({
-      source: clusterSource,
-    });
-
-
     this.Map = new Map({
       target: 'map',
       layers: [new TileLayer({
         source: new OSM({})
-      }), clusteredSourceLayer],
+      })],
       view: new View({
         projection: 'EPSG:3857',
         center: [0, 0],
@@ -56,8 +53,17 @@ export class InteractiveMapComponent implements OnInit {
       }),
       controls: [
         new FullScreen()
-      ],
-    })
+      ]
+    });
+    this.loadAvailableLayers();
+  }
+
+  private loadAvailableLayers(){
+  //   here goes the logic for fetching and managing layers
+    this.plotService.getAvailableTiffLayers(this.validationId()).subscribe(
+      //   here add what should happen with the given layers; it might be a good idea to define an interface for the layer
+      data => {console.log(data)}
+    )
   }
 
 }
