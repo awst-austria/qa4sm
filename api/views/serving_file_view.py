@@ -278,3 +278,24 @@ def get_ismn_list_file(request):
             return response
     else:
         return HttpResponse("File not found", status=404)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_tiff_layers(request, result_uuid):
+    # here put the all logic fetching and returning layers
+    #  I guess this is the code that does that:
+    # def available_layers():
+    #     """Return information about all available layers"""
+    #     layers = get_dataset_info()
+    #     return jsonify({
+    #         "layers": layers,
+    #         "currentIndex": current_geotiff_index
+    #     })
+
+    validation = get_object_or_404(ValidationRun, pk=result_uuid)
+    # tiff path can be get based on the result file path, just add proper directories and proper extension of the file
+    # check for missining files => for old validations and when sth goes wrong there will be no tiffs
+    # return layers in proper format
+
+    return JsonResponse({'message': 'ok'}, status=200)

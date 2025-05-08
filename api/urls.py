@@ -137,5 +137,6 @@ urlpatterns = [
     path('run-auto-cleanup', run_auto_cleanup_script, name='Run Auto Cleanup'),
     path('password-update', password_update, name='Password Update'),
     path('update-fixture-in-git', update_fixture_in_github, name='Update-Fixture'),
-    path('verify-email/<int:user_id>/<str:token>/', verify_email, name='verify_email')
+    path('verify-email/<int:user_id>/<str:token>/', verify_email, name='verify_email'),
+    path('get-tiff-layers/<uuid:result_uuid>/', get_tiff_layers, name='tiff-file')
 ]
