@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, input, OnInit } from '@angular/core';
 import { MapModule } from '../../../map/map.module';
 import { Map, View } from 'ol';
 import TileLayer from 'ol/layer/Tile';
@@ -6,6 +6,7 @@ import OSM from 'ol/source/OSM';
 import { Cluster } from 'ol/source';
 import VectorLayer from 'ol/layer/Vector';
 import VectorSource from 'ol/source/Vector';
+import { FullScreen } from 'ol/control';
 
 
 @Component({
@@ -18,6 +19,8 @@ import VectorSource from 'ol/source/Vector';
   styleUrl: './interactive-map.component.scss'
 })
 export class InteractiveMapComponent implements OnInit {
+  validationId = input('')
+
   Map: Map;
   clusteredSource: VectorSource = new VectorSource();
 
@@ -51,7 +54,9 @@ export class InteractiveMapComponent implements OnInit {
         minZoom: 0,
         maxZoom: 18
       }),
-      controls: []
+      controls: [
+        new FullScreen()
+      ],
     })
   }
 
