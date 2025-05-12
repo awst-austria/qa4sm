@@ -75,7 +75,7 @@
                   <qa-threshold-filter *ngIf="validationModel.datasetConfigurations[datasetIdx].staticWaterFilter$|async"
                                        [datasetModel]="validationModel.datasetConfigurations[datasetIdx].datasetModel"
                                        [filterModel$]="validationModel.datasetConfigurations[datasetIdx].staticWaterFilter$"
-                                       [minThreshold]="0." [increment]="0.05" [maxThreshold]="1." [units]="' [-]'" />
+                                       [minThreshold]="0" [increment]="0.05" [maxThreshold]="1.0" [units]="' [-]'" />
 
                   <div *ngIf="validationModel.datasetConfigurations[datasetIdx].ismnNetworkFilter$|async">
                     <qa-ismn-network-filter

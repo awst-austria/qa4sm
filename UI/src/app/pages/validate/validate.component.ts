@@ -497,7 +497,6 @@ export class ValidateComponent implements OnInit, AfterViewInit {
     model.vegetationWaterFilter$.next(null);
     model.staticWaterFilter$.next(null);
     filters.forEach(filter => {
-      console.log(filter);
       if (filter.parameterised) {
         if (filter.id === ISMN_NETWORK_FILTER_ID) {
           model.ismnNetworkFilter$.next(new FilterModel(
@@ -830,7 +829,6 @@ export class ValidateComponent implements OnInit, AfterViewInit {
       name_tag: this.validationModel.nameTag$.getValue(),
       temporal_matching: this.validationModel.temporalMatchingModel.size$.getValue()
     };
-
     this.validationConfigService.startValidation(newValidation, checkForExistingValidation)
       .subscribe(this.startValidationObserver);
   }
