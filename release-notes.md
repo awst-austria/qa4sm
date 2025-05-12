@@ -6,7 +6,8 @@ QA4SM v3.1.0 - Release notes 2025-05-12
 3. Outdated dataset versions removed
 4. SMAP3 data v9 added 
 5. Variable now stored in version model, not dataset model
-6. 'Deleted validation' model added, stores metadata on removed validations 
+6. 'Deleted validation' model added, stores metadata on removed validations
+7. User data can be used as spatial reference
 
 QA4SM v3.0.4 - Release notes 2025-03-24
 =======================================================
