@@ -2,7 +2,7 @@
 
 Releasing a new version of QA4SM has several aspects:
 
-- Managing the versions of dependencies
+- Managing the versions of dependencies - please consider it as a good practice, but if you did a release a few days ago and now just fixing a bug, you can skip this part. If the env update happened recently and there are no build issues, might be, that this step can be skipped. Please assess it every time.
 - Developing a new release
 - Pushing out the new release
 
@@ -27,26 +27,14 @@ Note: You can remove unwanted conda environments with:
 
 If you have access to the AWST buildserver, you can do steps 1-4 by running build job "Conda environment". Well, obviously not the fixing of issues, that you have to do yourself ;-)
 
-## Development
-
-0. Set up your conda environment using the *current* `qa4sm_env.yml` file. If you or another contributor updates the environment, ideally switch to the new environment soon.
-
-        conda env create -f qa4sm_env.yml -n my_environment_name
-
-1. Make and commit your development changes to a feature branch.
-2. Perform testing (includes unit tests).
-3. Create pull request to the master branch.
-4. Peer review of the changes. Peer also needs to use the current `qa4sm_env.yml` environment.
-5. Merge the feature branch into the master branch.
-
 ## Release
 
-1. Perform integration testing (including the long unit tests and manual tests). Usually, manual testing should only happen after all automatic tests succeed in order to save the testers' time.
+1. Perform integration testing (including the long unit tests and manual tests). Usually, manual testing should only happen after all automatic tests succeed in order to save the testers' time - it's a good practice to have both - local instance and github actions passing.
 2. Update the test system to be used for testing to the current `qa4sm_env.yml` environment.
 
         conda env create -f qa4sm_env.yml -n my_environment_name
 
-3. Deploy the release candidate to the test system.
+3. Deploy the release candidate to the test system - here you can find potential problems with the deployment, so it is ALWAYS a good practice to have the current master pushed to one of the tests instances to check if everything works.
 
 4. Decide which version number to use. The format should be v(MAJOR).(MINOR).(PATCH).
     * major: Indicates a significant change in the application which may essentially mean one of the following:
@@ -65,9 +53,15 @@ If you have access to the AWST buildserver, you can do steps 1-4 by running buil
 
 7. Update the `docker/compose/prod/docker-compose.yml` file with the new version number. You need to change the image version for the web, proxy and worker-1 containers at line number 22, 46 and 50. For example: `awst/qa4sm-proxy:1.2.3`. All 3 mentioned containers should have the same version. The db, redis and rabbitmq containers should be left untouched.
 8. Commit your changes and create a git tag with the chosen version number. e.g.: `v1.2.3`.
+9. Make sure that the main branch of the fixture repo is up to dat with recent changes. If it is not, merge all the needed changes.
 9. Update Jenkins jobs with the current version number.
-10. Run QA4SM_Build_Prod_base_image and then  QA4SM_Deploy_to_prod job. Restart the instance.
+10. Run QA4SM_Build_Prod_base_image (it will build an image with the current environment) and then  QA4SM_Deploy_to_prod job (it will deploy all the containers).
 
+### Notes on deployment:
+1. After deployment, check docker containers if none of them gets restarted - if that's the case, check logs to identify potential problems;
+2. Please remember about updating version and release date in the admin panel along with switching off the maintenance mode;
+3. If after deployment you realize that the settings_conf.py file still needs to be updated, update it and rebuild QA4SM_Deploy_to_prod job;
+4. If there are bugs you don't understand or they require more time to be fixed - deploy the previous working version.
 
 ## Release notes template
 
