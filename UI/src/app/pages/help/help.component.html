@@ -16,8 +16,7 @@
     <h1 class="h3 mb-3 font-weight-normal">User Manual</h1>
     <p *ngIf="settingsService.getAllSettings()|async as settings">
       This page contains a quick user tutorial. More comprehensive information can be found in our
-      <a target="_blank"
-         [href]="settings[0].sum_link">User Manual</a>.
+      <a target="_blank" [href]="settings && settings.length > 0 ? settings[0].sum_link : '#'">User Manual</a>
     </p>
 
     <h1 id="validation" class="h3 mb-3 font-weight-normal">Validate Page</h1>
