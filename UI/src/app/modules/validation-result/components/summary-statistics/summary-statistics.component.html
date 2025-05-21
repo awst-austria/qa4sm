@@ -23,7 +23,7 @@
           and dataset. The spatial reference dataset used is {{ (refDataset$ | async)?.pretty_name || '...'}}
           ({{ (refDatasetVersion$ | async)?.short_name  || '...'}}, {{ (refDatasetVariable$ | async)?.pretty_name || '...'}}).
           You can find formulas of each metric in
-          <a [href]="settings[0].sum_link + '#page=22'" target="_blank">chapter 4</a> of our user manual.
+          <a [href]="(settings && settings.length > 0 ? settings[0].sum_link : '#') + '#page=22'" target="_blank">chapter 4</a> of our user manual.
         </div>
         <span [innerHtml]="table | dompurify" class="lg:text-base text-sm"></span>
         <div class="d-flex justify-content-between align-items-center">
