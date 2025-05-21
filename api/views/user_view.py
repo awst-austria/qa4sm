@@ -10,9 +10,11 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from validator.forms import SignUpForm, UserProfileForm
 from validator.mailer import send_new_user_signed_up, send_user_account_removal_request, \
-    send_user_status_changed, send_new_user_verification
+    send_user_status_changed, send_new_user_verification, user_api_token_request
 from django.contrib.auth import update_session_auth_hash
 from django.conf import settings
+
+from rest_framework.response import Response
 
 User = get_user_model()
 
@@ -112,6 +114,22 @@ def password_update(request):
         for error in serializer.errors['non_field_errors']:
             full_error += f'{error}\n\n'
         return JsonResponse({'error': full_error}, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def request_api_token(request):
+    try:
+        user_api_token_request(request.user)
+        return JsonResponse({
+            'message': 'API token request has been sent to administrators'
+        }, status=status.HTTP_200_OK)
+
+    except Exception as e:
+        return JsonResponse({
+            'message': 'Failed to send token request',
+            'error': str(e)
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 @api_view(['DELETE'])

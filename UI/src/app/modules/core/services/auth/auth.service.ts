@@ -24,6 +24,8 @@ export class AuthService {
   private setPasswordUrl = this.API_URL + 'api/password-reset/confirm';
   private validateTokenUrl = this.API_URL + 'api/password-reset/validate_token/';
   private contactUrl = this.API_URL + 'api/support-request';
+  
+  private apiTokenURL = this.API_URL + 'user/request-api-token/';
 
   emptyUser = {
     username: '',
@@ -197,6 +199,9 @@ export class AuthService {
       );
   }
 
+  requestApiToken(): Observable<any> {
+    return this.httpClient.post(this.apiTokenURL, {});
+  }
 
   validateResetPasswordToken(tkn: string): Observable<any> {
     return this.httpClient.post(this.validateTokenUrl, {token: tkn})

@@ -108,6 +108,17 @@ export class UserFormComponent implements OnInit {
     this.toastService.showErrorWithHeader(error.errorMessage.header, error.errorMessage.message);
   }
 
+  requestApiToken() {
+    this.userService.requestApiToken().subscribe(
+        response => {
+            this.alertService.success('API token request has been sent to administrators');
+        },
+        error => {
+            this.alertService.error('Failed to request API token: ' + error.message);
+        }
+    );
+}
+
   setDefaultValues(): void {
     this.userForm.patchValue(this.userData)
     this.userForm.controls.username.disable();

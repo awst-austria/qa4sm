@@ -152,6 +152,13 @@
       <button *ngIf="!userData"
               pButton
               type="submit"
+              label="Request API token"
+              [disabled]="!userForm.valid">
+      </button>
+
+      <button *ngIf="!userData"
+              pButton
+              type="submit"
               label="Submit"
               [disabled]="!userForm.valid">
       </button>
