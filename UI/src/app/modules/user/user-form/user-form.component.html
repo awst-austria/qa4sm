@@ -1,3 +1,6 @@
+<p-toast></p-toast>
+<p-confirmDialog key="apiTokenConfirm" [style]="{width: '30vw'}" [baseZIndex]="10000"></p-confirmDialog>
+
 <div class="center">
   <qa-maintenance-mode *ngIf="maintenanceMode" [action]="userData ? 'update your data' : 'sign up'"/>
   <div *ngIf="!maintenanceMode">
@@ -149,12 +152,16 @@
         <label for="active">some label</label>
       </div>
 
-      <button *ngIf="!userData"
+
+      <p>
+      <button *ngIf="userData"
               pButton
-              type="submit"
+              type="button"
               label="Request API token"
-              [disabled]="!userForm.valid">
+              (click)="confirmRequestToken()"
+              class="p-button-request">
       </button>
+      </p>
 
       <button *ngIf="!userData"
               pButton

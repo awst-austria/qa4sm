@@ -12,6 +12,9 @@ import { SliderModule } from 'primeng/slider';
 import { TooltipModule } from 'primeng/tooltip';
 import { LoginComponent } from './login/login.component';
 import { UserFormComponent } from './user-form/user-form.component';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { ConfirmationService } from 'primeng/api';
+import { ToastModule } from 'primeng/toast';
 
 @NgModule({
   declarations: [
@@ -26,6 +29,7 @@ import { UserFormComponent } from './user-form/user-form.component';
     ButtonModule,
     CheckboxModule,
     CommonModule,
+    ConfirmDialogModule,
     DialogModule,
     DropdownModule,
     FormsModule,
@@ -34,7 +38,11 @@ import { UserFormComponent } from './user-form/user-form.component';
     ReactiveFormsModule,
     RouterModule,
     SliderModule,
-    TooltipModule
+    TooltipModule,
+    ToastModule
+  ],
+  providers: [
+    ConfirmationService
   ]
 })
 export class UserModule { }

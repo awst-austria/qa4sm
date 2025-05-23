@@ -10,12 +10,14 @@ import {ToastService} from '../../core/services/toast/toast.service';
 import {UserData} from '../../core/services/form-interfaces/UserDataForm';
 import {CustomHttpError} from '../../core/services/global/http-error.service';
 import {SettingsService} from "../../core/services/global/settings.service";
+import { ConfirmationService } from 'primeng/api';
 
 @Component({
   selector: 'qa-user-form',
   templateUrl: './user-form.component.html',
-  styleUrls: ['./user-form.component.scss']
-})
+  styleUrls: ['./user-form.component.scss'],
+  providers: [ConfirmationService]
+}) 
 export class UserFormComponent implements OnInit {
   userForm = this.formBuilder.group<UserData>({
     username: ['', [Validators.required, Validators.maxLength(150)]],
@@ -31,7 +33,7 @@ export class UserFormComponent implements OnInit {
     active: false,
     honeypot: [0, [Validators.required, Validators.min(100)]]
   });
-
+ 
   countries$: Observable<CountryDto[]>;
   selectedCountry: CountryDto;
   formErrors: any;
@@ -62,7 +64,8 @@ export class UserFormComponent implements OnInit {
               private userService: AuthService,
               private router: Router,
               private toastService: ToastService,
-              private settingsService: SettingsService) {
+              private settingsService: SettingsService,
+              private confirmationService: ConfirmationService) {
   }
 
   ngOnInit(): void {
@@ -108,13 +111,28 @@ export class UserFormComponent implements OnInit {
     this.toastService.showErrorWithHeader(error.errorMessage.header, error.errorMessage.message);
   }
 
+
+  confirmRequestToken() {
+    this.confirmationService.confirm({
+      key: 'apiTokenConfirm',
+      message: 'This API token can be used to submit validation jobs via API request. Your our token request will be reviewed by admins. Once granted the token will be displayed on your user profile. \n Information on how to use the token is provided in the user manual. Please only confirm if you do intend to use the QA4SM service via API.',
+      header: 'Confirm Request',
+      icon: 'pi pi-exclamation-triangle',
+      acceptLabel: 'Confirm',
+      rejectLabel: 'Cancel',
+      accept: () => {
+        this.requestApiToken();
+      }
+    });
+  }
+
   requestApiToken() {
     this.userService.requestApiToken().subscribe(
         response => {
-            this.alertService.success('API token request has been sent to administrators');
+            this.toastService.showSuccess('API token request has been sent to administrators');
         },
         error => {
-            this.alertService.error('Failed to request API token: ' + error.message);
+            this.toastService.showErrorWithHeader('Failed to request API token', error.message);
         }
     );
 }

@@ -25,7 +25,7 @@ export class AuthService {
   private validateTokenUrl = this.API_URL + 'api/password-reset/validate_token/';
   private contactUrl = this.API_URL + 'api/support-request';
   
-  private apiTokenURL = this.API_URL + 'user/request-api-token/';
+  private apiTokenURL = this.API_URL + 'api/request-api-token';
 
   emptyUser = {
     username: '',
