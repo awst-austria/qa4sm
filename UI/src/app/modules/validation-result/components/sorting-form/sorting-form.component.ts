@@ -1,11 +1,17 @@
-import {Component, EventEmitter, Output} from '@angular/core';
-import {SortChoicesModel} from './sort-choices-model';
-import {SortOrderModel} from './sort-order-model';
+import { Component, EventEmitter, Output } from '@angular/core';
+import { SortChoicesModel } from './sort-choices-model';
+import { SortOrderModel } from './sort-order-model';
+import { DropdownModule } from 'primeng/dropdown';
+import { FormsModule } from '@angular/forms';
 
 
 @Component({
   selector: 'qa-sorting-form',
   templateUrl: './sorting-form.component.html',
+  imports: [
+    DropdownModule,
+    FormsModule
+  ],
   styleUrls: ['./sorting-form.component.scss']
 })
 export class SortingFormComponent {
