@@ -15,8 +15,6 @@ import { UserFormComponent } from './user-form/user-form.component';
 
 @NgModule({
   declarations: [
-    LoginComponent,
-    UserFormComponent
   ],
   exports: [
     LoginComponent,
@@ -34,7 +32,9 @@ import { UserFormComponent } from './user-form/user-form.component';
     ReactiveFormsModule,
     RouterModule,
     SliderModule,
-    TooltipModule
+    TooltipModule,
+    UserFormComponent,
+    LoginComponent
   ]
 })
 export class UserModule { }
