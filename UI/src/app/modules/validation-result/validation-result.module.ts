@@ -54,16 +54,6 @@ import {Ripple} from "primeng/ripple";
     PublishingComponent,
     ExistingValidationComponent,
     HandleMultipleValidationsComponent],
-    exports: [
-        ValidationrunRowComponent,
-        ValidationPagePaginatedComponent,
-        ValidationSummaryComponent,
-        TrackedValidationsComponent,
-        SummaryStatisticsComponent,
-        ResultFilesComponent,
-        PublishingComponent,
-        ExistingValidationComponent,
-    ],
   imports: [
     CommonModule,
     PanelModule,
@@ -90,8 +80,26 @@ import {Ripple} from "primeng/ripple";
     AccordionModule,
     ChipModule,
     CardModule,
-    Ripple
-  ]
+    Ripple,
+    ValidationrunRowComponent,
+    ValidationPagePaginatedComponent,
+    ValidationSummaryComponent,
+    TrackedValidationsComponent,
+    SummaryStatisticsComponent,
+    ResultFilesComponent,
+    PublishingComponent,
+    ExistingValidationComponent
+  ],
+    exports: [
+        ValidationrunRowComponent,
+        ValidationPagePaginatedComponent,
+        ValidationSummaryComponent,
+        TrackedValidationsComponent,
+        SummaryStatisticsComponent,
+        ResultFilesComponent,
+        PublishingComponent,
+        ExistingValidationComponent,
+    ]
 })
 export class ValidationResultModule {
 }
