@@ -16,7 +16,8 @@ import { AuthService } from '../../../core/services/auth/auth.service';
 @Component({
   selector: 'qa-dataset',
   templateUrl: './dataset.component.html',
-  styleUrls: ['./dataset.component.scss']
+  styleUrls: ['./dataset.component.scss'],
+  standalone: false,
 })
 export class DatasetComponent implements OnInit {
 

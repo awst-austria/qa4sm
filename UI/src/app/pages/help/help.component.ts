@@ -1,14 +1,15 @@
-import {Component} from '@angular/core';
-import {GlobalParamsService} from '../../modules/core/services/global/global-params.service';
-import {fas} from '@fortawesome/free-solid-svg-icons';
-import {SettingsService} from '../../modules/core/services/global/settings.service';
+import { Component } from '@angular/core';
+import { GlobalParamsService } from '../../modules/core/services/global/global-params.service';
+import { fas } from '@fortawesome/free-solid-svg-icons';
+import { SettingsService } from '../../modules/core/services/global/settings.service';
 
 const plotsUrlPrefix = '/static/images/help/';
 
 @Component({
   selector: 'qa-help',
   templateUrl: './help.component.html',
-  styleUrls: ['./help.component.scss']
+  styleUrls: ['./help.component.scss'],
+  standalone: false
 })
 export class HelpComponent {
   // Icons for bullet points

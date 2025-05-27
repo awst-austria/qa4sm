@@ -1,17 +1,18 @@
-import {Component} from '@angular/core';
-import {FormControl, FormGroup, Validators} from '@angular/forms';
-import {AuthService} from '../../modules/core/services/auth/auth.service';
-import {Router} from '@angular/router';
-import {PasswordResetForm} from '../../modules/core/services/form-interfaces/password-forms';
-import {ToastService} from '../../modules/core/services/toast/toast.service';
-import {catchError} from 'rxjs/operators';
-import {EMPTY, Observable} from 'rxjs';
-import {CustomHttpError} from '../../modules/core/services/global/http-error.service';
+import { Component } from '@angular/core';
+import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { AuthService } from '../../modules/core/services/auth/auth.service';
+import { Router } from '@angular/router';
+import { PasswordResetForm } from '../../modules/core/services/form-interfaces/password-forms';
+import { ToastService } from '../../modules/core/services/toast/toast.service';
+import { catchError } from 'rxjs/operators';
+import { EMPTY, Observable } from 'rxjs';
+import { CustomHttpError } from '../../modules/core/services/global/http-error.service';
 
 @Component({
   selector: 'qa-password-reset',
   templateUrl: './password-reset.component.html',
-  styleUrls: ['./password-reset.component.scss']
+  styleUrls: ['./password-reset.component.scss'],
+  standalone: false
 })
 export class PasswordResetComponent {
 

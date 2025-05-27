@@ -53,12 +53,12 @@
 </div>
 
 <div class="p-float-label my-4" *ngIf="addToGroupView || removeFromGroupView" [style]="{height: '5vw'}">
-  <p-dropdown [options]="addToGroupView ? dataManagementGroups : (datasetGroups$|async)"
+  <p-select [options]="addToGroupView ? dataManagementGroups : (datasetGroups$|async)"
               optionLabel="name"
               [style]="{width: '40%', 'max-height': '100%', 'overflow-y': 'unset'}"
               [(ngModel)]="groupToUpdate"
               id="user-group-selector">
-  </p-dropdown>
+  </p-select>
   <label for="user-group-selector">Choose a group</label>
 
   <button *ngIf="addToGroupView && !removeFromGroupView"

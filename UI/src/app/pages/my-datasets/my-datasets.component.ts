@@ -1,15 +1,16 @@
-import {Component, OnInit} from '@angular/core';
-import {UserDatasetsService} from '../../modules/user-datasets/services/user-datasets.service';
-import {EMPTY, Observable} from 'rxjs';
-import {AuthService} from '../../modules/core/services/auth/auth.service';
-import {DataManagementGroupsDto} from '../../modules/user-datasets/services/data-management-groups.dto';
-import {SettingsService} from '../../modules/core/services/global/settings.service';
-import {catchError} from 'rxjs/operators';
+import { Component, OnInit } from '@angular/core';
+import { UserDatasetsService } from '../../modules/user-datasets/services/user-datasets.service';
+import { EMPTY, Observable } from 'rxjs';
+import { AuthService } from '../../modules/core/services/auth/auth.service';
+import { DataManagementGroupsDto } from '../../modules/user-datasets/services/data-management-groups.dto';
+import { SettingsService } from '../../modules/core/services/global/settings.service';
+import { catchError } from 'rxjs/operators';
 
 @Component({
   selector: 'qa-my-datasets',
   templateUrl: './my-datasets.component.html',
-  styleUrls: ['./my-datasets.component.scss']
+  styleUrls: ['./my-datasets.component.scss'],
+  standalone: false
 })
 export class MyDatasetsComponent implements OnInit {
   // userDatasets = [];

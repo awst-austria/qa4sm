@@ -1,12 +1,13 @@
-import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
-import {BehaviorSubject} from 'rxjs';
-import {FilterModel} from '../basic-filter/filter-model';
-import {DatasetComponentSelectionModel} from '../../../dataset/components/dataset/dataset-component-selection-model';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { BehaviorSubject } from 'rxjs';
+import { FilterModel } from '../basic-filter/filter-model';
+import { DatasetComponentSelectionModel } from '../../../dataset/components/dataset/dataset-component-selection-model';
 
 @Component({
   selector: 'qa-ismn-depth-filter',
   templateUrl: './ismn-depth-filter.component.html',
-  styleUrls: ['./ismn-depth-filter.component.scss']
+  styleUrls: ['./ismn-depth-filter.component.scss'],
+  standalone: false,
 })
 export class IsmnDepthFilterComponent implements OnInit {
 

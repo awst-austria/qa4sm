@@ -1,13 +1,14 @@
-import {Component, EventEmitter, OnInit, Output} from '@angular/core';
-import {ComparisonService} from '../../services/comparison.service';
-import {HttpParams} from '@angular/common/http';
-import {Validations2CompareModel} from '../validation-selector/validation-selection.model';
-import {debounceTime} from 'rxjs/operators';
+import { Component, EventEmitter, OnInit, Output } from '@angular/core';
+import { ComparisonService } from '../../services/comparison.service';
+import { HttpParams } from '@angular/common/http';
+import { Validations2CompareModel } from '../validation-selector/validation-selection.model';
+import { debounceTime } from 'rxjs/operators';
 
 @Component({
   selector: 'qa-table-comparison',
   templateUrl: './table-comparison.component.html',
-  styleUrls: ['./table-comparison.component.scss']
+  styleUrls: ['./table-comparison.component.scss'],
+  standalone: false,
 })
 export class TableComparisonComponent implements OnInit {
   @Output() isError = new EventEmitter<boolean>();

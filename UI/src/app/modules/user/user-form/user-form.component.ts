@@ -14,7 +14,8 @@ import {SettingsService} from "../../core/services/global/settings.service";
 @Component({
   selector: 'qa-user-form',
   templateUrl: './user-form.component.html',
-  styleUrls: ['./user-form.component.scss']
+  styleUrls: ['./user-form.component.scss'],
+  standalone: false,
 })
 export class UserFormComponent implements OnInit {
   userForm = this.formBuilder.group<UserData>({

@@ -1,23 +1,24 @@
-import {Component, EventEmitter, input, Input, OnDestroy, OnInit, Output, signal} from '@angular/core';
-import {ValidationrunDto} from '../../../core/services/validation-run/validationrun.dto';
-import {DatasetConfigurationService} from '../../services/dataset-configuration.service';
-import {GlobalParamsService} from '../../../core/services/global/global-params.service';
-import {fas} from '@fortawesome/free-solid-svg-icons';
-import {ValidationrunService} from '../../../core/services/validation-run/validationrun.service';
-import {combineLatest, EMPTY, Observable, Observer, of} from 'rxjs';
-import {catchError, map} from 'rxjs/operators';
-import {ValidationRunConfigService} from '../../../../pages/validate/service/validation-run-config.service';
-import {CustomHttpError} from '../../../core/services/global/http-error.service';
-import {ToastService} from '../../../core/services/toast/toast.service';
-import {DatasetDto} from "../../../core/services/dataset/dataset.dto";
-import {DatasetVersionDto} from "../../../core/services/dataset/dataset-version.dto";
-import {DatasetVariableDto} from "../../../core/services/dataset/dataset-variable.dto";
+import { Component, EventEmitter, input, Input, OnDestroy, OnInit, Output, signal } from '@angular/core';
+import { ValidationrunDto } from '../../../core/services/validation-run/validationrun.dto';
+import { DatasetConfigurationService } from '../../services/dataset-configuration.service';
+import { GlobalParamsService } from '../../../core/services/global/global-params.service';
+import { fas } from '@fortawesome/free-solid-svg-icons';
+import { ValidationrunService } from '../../../core/services/validation-run/validationrun.service';
+import { combineLatest, EMPTY, Observable, Observer, of } from 'rxjs';
+import { catchError, map } from 'rxjs/operators';
+import { ValidationRunConfigService } from '../../../../pages/validate/service/validation-run-config.service';
+import { CustomHttpError } from '../../../core/services/global/http-error.service';
+import { ToastService } from '../../../core/services/toast/toast.service';
+import { DatasetDto } from '../../../core/services/dataset/dataset.dto';
+import { DatasetVersionDto } from '../../../core/services/dataset/dataset-version.dto';
+import { DatasetVariableDto } from '../../../core/services/dataset/dataset-variable.dto';
 
 
 @Component({
   selector: 'qa-validationrun-row',
   templateUrl: './validationrun-row.component.html',
-  styleUrls: ['./validationrun-row.component.scss']
+  styleUrls: ['./validationrun-row.component.scss'],
+  standalone: false
 })
 export class ValidationrunRowComponent implements OnInit, OnDestroy {
 

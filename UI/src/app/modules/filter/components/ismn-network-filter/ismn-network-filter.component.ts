@@ -1,18 +1,18 @@
-import {Component, EventEmitter, Input, OnInit, Output, signal} from '@angular/core';
-import {FilterModel} from '../basic-filter/filter-model';
-import {TreeNode} from 'primeng/api';
-import {IsmnNetworkService} from '../../../core/services/filter/ismn-network-service';
-import {BehaviorSubject} from 'rxjs';
-import {DatasetComponentSelectionModel} from '../../../dataset/components/dataset/dataset-component-selection-model';
-import {IsmnNetworkDto} from '../../../core/services/filter/ismn-network.dto';
-import {ToastService} from '../../../core/services/toast/toast.service';
-import * as net from "node:net";
+import { Component, EventEmitter, Input, OnInit, Output, signal } from '@angular/core';
+import { FilterModel } from '../basic-filter/filter-model';
+import { TreeNode } from 'primeng/api';
+import { IsmnNetworkService } from '../../../core/services/filter/ismn-network-service';
+import { BehaviorSubject } from 'rxjs';
+import { DatasetComponentSelectionModel } from '../../../dataset/components/dataset/dataset-component-selection-model';
+import { IsmnNetworkDto } from '../../../core/services/filter/ismn-network.dto';
+import { ToastService } from '../../../core/services/toast/toast.service';
 
 
 @Component({
   selector: 'qa-ismn-network-filter',
   templateUrl: './ismn-network-filter.component.html',
-  styleUrls: ['./ismn-network-filter.component.scss']
+  styleUrls: ['./ismn-network-filter.component.scss'],
+  standalone: false,
 })
 export class IsmnNetworkFilterComponent implements OnInit {
 

@@ -6,26 +6,26 @@
     </div>
   <div class="lg:w-5 w-12 px-0 mx-0 p-float-label">
     <!--      <div class="box">-->
-    <p-dropdown id="sortingChoiceSelector"
+    <p-select id="sortingChoiceSelector"
                 inputId="sortingChoiceInput"
                 (onChange)="onSortingChange()"
                 [options]="sortingChoices"
                 [(ngModel)]="selectedChoicesModel"
                 optionLabel="displayName"
                 [style]="{'width': '100%'}">
-    </p-dropdown>
+    </p-select>
     <label for="sortingChoiceInput"> Feature </label>
     <!--      </div>-->
   </div>
   <div class="lg:w-5 w-12 px-0 mx-0 p-float-label">
-      <p-dropdown id="orderSelector"
+      <p-select id="orderSelector"
                   inputId="orderSelectorInput"
                   (onChange)="onSortingChange()"
                   [options]="orderChoices"
                   [(ngModel)]="selectedOrderModel"
                   optionLabel="direction"
                   [style]="{'width': '100%'}">
-      </p-dropdown>
+      </p-select>
       <label for="orderSelectorInput">Sorting order</label>
   </div>
 </div>

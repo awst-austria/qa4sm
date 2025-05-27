@@ -1,22 +1,23 @@
-import {Component, Input, OnDestroy, OnInit, signal} from '@angular/core';
-import {UserDataFileDto} from '../../services/user-data-file.dto';
-import {EMPTY, Observable} from 'rxjs';
-import {UserDatasetsService} from '../../services/user-datasets.service';
-import {DatasetService} from '../../../core/services/dataset/dataset.service';
-import {DatasetVersionService} from '../../../core/services/dataset/dataset-version.service';
-import {DatasetVariableService} from '../../../core/services/dataset/dataset-variable.service';
-import {ToastService} from '../../../core/services/toast/toast.service';
-import {DatasetDto} from '../../../core/services/dataset/dataset.dto';
-import {DatasetVersionDto} from '../../../core/services/dataset/dataset-version.dto';
-import {AuthService} from '../../../core/services/auth/auth.service';
-import {DataManagementGroupsDto} from '../../services/data-management-groups.dto';
-import {CustomHttpError} from '../../../core/services/global/http-error.service';
-import {catchError} from 'rxjs/operators';
+import { Component, Input, OnDestroy, OnInit, signal } from '@angular/core';
+import { UserDataFileDto } from '../../services/user-data-file.dto';
+import { EMPTY, Observable } from 'rxjs';
+import { UserDatasetsService } from '../../services/user-datasets.service';
+import { DatasetService } from '../../../core/services/dataset/dataset.service';
+import { DatasetVersionService } from '../../../core/services/dataset/dataset-version.service';
+import { DatasetVariableService } from '../../../core/services/dataset/dataset-variable.service';
+import { ToastService } from '../../../core/services/toast/toast.service';
+import { DatasetDto } from '../../../core/services/dataset/dataset.dto';
+import { DatasetVersionDto } from '../../../core/services/dataset/dataset-version.dto';
+import { AuthService } from '../../../core/services/auth/auth.service';
+import { DataManagementGroupsDto } from '../../services/data-management-groups.dto';
+import { CustomHttpError } from '../../../core/services/global/http-error.service';
+import { catchError } from 'rxjs/operators';
 
 @Component({
   selector: 'qa-user-data-row',
   templateUrl: './user-data-row.component.html',
-  styleUrls: ['./user-data-row.component.scss']
+  styleUrls: ['./user-data-row.component.scss'],
+  standalone: false
 })
 export class UserDataRowComponent implements OnInit, OnDestroy {
 

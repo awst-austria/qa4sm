@@ -1,22 +1,22 @@
-import {Component, Input, model, signal} from '@angular/core';
-import {DropdownModule} from "primeng/dropdown";
-import {InputNumberModule} from "primeng/inputnumber";
-import {NgIf} from "@angular/common";
-import {TooltipModule} from "primeng/tooltip";
-import {FormsModule} from "@angular/forms";
-import {IntraAnnualMetricsDto} from "../../../../pages/validate/service/validation-run-config-dto";
-import {CheckboxModule} from "primeng/checkbox";
+import { Component, Input, model, signal } from '@angular/core';
+import { InputNumberModule } from 'primeng/inputnumber';
+import { NgIf } from '@angular/common';
+import { TooltipModule } from 'primeng/tooltip';
+import { FormsModule } from '@angular/forms';
+import { IntraAnnualMetricsDto } from '../../../../pages/validate/service/validation-run-config-dto';
+import { CheckboxModule } from 'primeng/checkbox';
+import { Select } from 'primeng/select';
 
 @Component({
   selector: 'qa-intra-annual-metrics',
   standalone: true,
   imports: [
-    DropdownModule,
     InputNumberModule,
     NgIf,
     TooltipModule,
     FormsModule,
-    CheckboxModule
+    CheckboxModule,
+    Select
   ],
   templateUrl: './intra-annual-metrics.component.html',
   styleUrl: './intra-annual-metrics.component.scss'

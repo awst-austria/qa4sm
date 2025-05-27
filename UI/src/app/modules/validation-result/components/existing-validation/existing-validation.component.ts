@@ -1,16 +1,17 @@
-import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
-import {ModalWindowService} from '../../../core/services/global/modal-window.service';
-import {EMPTY, Observable} from 'rxjs';
-import {ExistingValidationDto} from '../../../core/services/validation-run/existing-validation.dto';
-import {ValidationrunDto} from '../../../core/services/validation-run/validationrun.dto';
-import {ValidationrunService} from '../../../core/services/validation-run/validationrun.service';
-import {Router} from '@angular/router';
-import {catchError} from 'rxjs/operators';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { ModalWindowService } from '../../../core/services/global/modal-window.service';
+import { EMPTY, Observable } from 'rxjs';
+import { ExistingValidationDto } from '../../../core/services/validation-run/existing-validation.dto';
+import { ValidationrunDto } from '../../../core/services/validation-run/validationrun.dto';
+import { ValidationrunService } from '../../../core/services/validation-run/validationrun.service';
+import { Router } from '@angular/router';
+import { catchError } from 'rxjs/operators';
 
 @Component({
   selector: 'qa-existing-validation',
   templateUrl: './existing-validation.component.html',
-  styleUrls: ['./existing-validation.component.scss']
+  styleUrls: ['./existing-validation.component.scss'],
+  standalone: false,
 })
 export class ExistingValidationComponent implements OnInit {
   dateFormat = 'medium';
