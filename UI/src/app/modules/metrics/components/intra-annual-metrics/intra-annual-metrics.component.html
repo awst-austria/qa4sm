@@ -26,11 +26,11 @@
         </div>
       </div>
       <div class="p-float-label">
-        <p-dropdown id="intraAnnualMetricTypeSelector"
+        <p-select id="intraAnnualMetricTypeSelector"
                     [options]="intraAnnualMetricTypes"
                     [ngModel]="selectedMetric().intra_annual_type"
                     (ngModelChange)="updateType($event)">
-        </p-dropdown>
+        </p-select>
         <label for="intraAnnualMetricTypeSelector">Select</label>
       </div>
       <div class="w-1 flex lg:justify-content-center justify-content-start">
