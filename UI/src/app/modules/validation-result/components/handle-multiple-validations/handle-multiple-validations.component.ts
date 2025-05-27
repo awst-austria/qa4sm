@@ -1,14 +1,34 @@
-import {Component, input, model} from '@angular/core';
-import {ValidationrunDto} from '../../../core/services/validation-run/validationrun.dto';
-import {ValidationrunService} from '../../../core/services/validation-run/validationrun.service';
-import {MenuItem} from 'primeng/api';
-import {CustomHttpError} from '../../../core/services/global/http-error.service';
-import {ToastService} from '../../../core/services/toast/toast.service';
-import {ActionMenuItem, getDefaultValidationActionState, MultipleValidationAction} from "./multiple-validation-action";
+import { Component, input, model } from '@angular/core';
+import { ValidationrunDto } from '../../../core/services/validation-run/validationrun.dto';
+import { ValidationrunService } from '../../../core/services/validation-run/validationrun.service';
+import { MenuItem } from 'primeng/api';
+import { CustomHttpError } from '../../../core/services/global/http-error.service';
+import { ToastService } from '../../../core/services/toast/toast.service';
+import {
+  ActionMenuItem,
+  getDefaultValidationActionState,
+  MultipleValidationAction
+} from './multiple-validation-action';
+import { Panel } from 'primeng/panel';
+import { DropdownModule } from 'primeng/dropdown';
+import { FormsModule } from '@angular/forms';
+import { Menu } from 'primeng/menu';
+import { NgIf } from '@angular/common';
+import { Tooltip } from 'primeng/tooltip';
+import { Button } from 'primeng/button';
 
 @Component({
   selector: 'qa-handle-multiple-validations',
   templateUrl: './handle-multiple-validations.component.html',
+  imports: [
+    Panel,
+    DropdownModule,
+    FormsModule,
+    Menu,
+    NgIf,
+    Tooltip,
+    Button
+  ],
   styleUrls: ['./handle-multiple-validations.component.scss']
 })
 export class HandleMultipleValidationsComponent {
