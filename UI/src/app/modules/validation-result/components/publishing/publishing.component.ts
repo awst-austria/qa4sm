@@ -1,14 +1,27 @@
-import {Component, EventEmitter, Input, OnInit, Output, signal} from '@angular/core';
-import {ValidationrunService} from '../../../core/services/validation-run/validationrun.service';
-import {HttpParams} from '@angular/common/http';
-import {FormBuilder, Validators} from '@angular/forms';
-import {PublishingForm} from '../../../core/services/form-interfaces/publishing-form';
-import {CustomHttpError} from '../../../core/services/global/http-error.service';
-import {ToastService} from '../../../core/services/toast/toast.service';
+import { Component, EventEmitter, Input, OnInit, Output, signal } from '@angular/core';
+import { ValidationrunService } from '../../../core/services/validation-run/validationrun.service';
+import { HttpParams } from '@angular/common/http';
+import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { PublishingForm } from '../../../core/services/form-interfaces/publishing-form';
+import { CustomHttpError } from '../../../core/services/global/http-error.service';
+import { ToastService } from '../../../core/services/toast/toast.service';
+import { InputText } from 'primeng/inputtext';
+import { Tooltip } from 'primeng/tooltip';
+import { NgForOf, NgIf } from '@angular/common';
+import { ButtonDirective, ButtonLabel } from 'primeng/button';
 
 @Component({
   selector: 'qa-publishing',
   templateUrl: './publishing.component.html',
+  imports: [
+    ReactiveFormsModule,
+    InputText,
+    Tooltip,
+    NgIf,
+    NgForOf,
+    ButtonDirective,
+    ButtonLabel
+  ],
   styleUrls: ['./publishing.component.scss']
 })
 export class PublishingComponent implements OnInit {
