@@ -49,13 +49,6 @@
             }
           },
           "configurations": {
-            "development": {
-              "sourceMap": {
-                "scripts": true,
-                "styles": true,
-                "hidden": false
-              }
-            },
             "production": {
               "fileReplacements": [
                 {
@@ -96,9 +89,6 @@
           "configurations": {
             "production": {
               "buildTarget": "UI:build:production"
-            },
-            "development": {
-              "buildTarget": "UI:build:development"
             }
           }
         },
