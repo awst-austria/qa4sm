@@ -9,7 +9,6 @@ import {
 } from './components/validation-page-paginated/validation-page-paginated.component';
 import { RouterModule } from '@angular/router';
 import { SortingFormComponent } from './components/sorting-form/sorting-form.component';
-import { DropdownModule } from 'primeng/dropdown';
 import { MultiSelectModule } from 'primeng/multiselect';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ValidationSummaryComponent } from './components/validation-summary/validation-summary.component';
@@ -39,6 +38,7 @@ import { AccordionModule } from 'primeng/accordion';
 import { ChipModule } from 'primeng/chip';
 import { CardModule } from 'primeng/card';
 import { Ripple } from 'primeng/ripple';
+import { Select } from 'primeng/select';
 
 @NgModule({
   declarations: [ValidationrunRowComponent,
@@ -63,33 +63,33 @@ import { Ripple } from 'primeng/ripple';
     PublishingComponent,
     ExistingValidationComponent,
   ],
-  imports: [
-    CommonModule,
-    PanelModule,
-    TooltipModule,
-    FontAwesomeModule,
-    RouterModule,
-    DropdownModule,
-    MultiSelectModule,
-    CalendarModule,
-    FormsModule,
-    InputTextModule,
-    ButtonModule,
-    ReactiveFormsModule,
-    GalleriaModule,
-    DialogModule,
-    PanelMenuModule,
-    FieldsetModule,
-    CheckboxModule,
-    SelectButtonModule,
-    ToggleButtonModule,
-    MenuModule,
-    CoreModule,
-    AccordionModule,
-    ChipModule,
-    CardModule,
-    Ripple
-  ]
+    imports: [
+        CommonModule,
+        PanelModule,
+        TooltipModule,
+        FontAwesomeModule,
+        RouterModule,
+        MultiSelectModule,
+        CalendarModule,
+        FormsModule,
+        InputTextModule,
+        ButtonModule,
+        ReactiveFormsModule,
+        GalleriaModule,
+        DialogModule,
+        PanelMenuModule,
+        FieldsetModule,
+        CheckboxModule,
+        SelectButtonModule,
+        ToggleButtonModule,
+        MenuModule,
+        CoreModule,
+        AccordionModule,
+        ChipModule,
+        CardModule,
+        Ripple,
+        Select
+    ]
 })
 export class ValidationResultModule {
 }

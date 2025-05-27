@@ -4,7 +4,6 @@ import { PanelModule } from 'primeng/panel';
 import { TooltipModule } from 'primeng/tooltip';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { RouterModule } from '@angular/router';
-import { DropdownModule } from 'primeng/dropdown';
 import { FormsModule } from '@angular/forms';
 import { InputTextModule } from 'primeng/inputtext';
 import { ValidationSelectorComponent } from './components/validation-selector/validation-selector.component';
@@ -21,6 +20,7 @@ import { ExtentVisualizationComponent } from './components/extent-visualization/
 import { CoreModule } from '../core/core.module';
 import { ImageModule } from 'primeng/image';
 import { GalleriaModule } from 'primeng/galleria';
+import { Select } from 'primeng/select';
 
 @NgModule({
   declarations: [ValidationSelectorComponent, PlotsComponent, SpatialExtentComponent, TableComparisonComponent,
@@ -29,23 +29,23 @@ import { GalleriaModule } from 'primeng/galleria';
     ValidationSelectorComponent, PlotsComponent, SpatialExtentComponent, TableComparisonComponent,
     ComparisonSummaryComponent, ExtentVisualizationComponent
   ],
-  imports: [
-    CommonModule,
-    PanelModule,
-    TooltipModule,
-    FontAwesomeModule,
-    RouterModule,
-    DropdownModule,
-    FormsModule,
-    InputTextModule,
-    AccordionModule,
-    DatasetModule,
-    ButtonModule,
-    CheckboxModule,
-    ValidationResultModule,
-    CoreModule,
-    ImageModule,
-    GalleriaModule,
-  ]
+    imports: [
+        CommonModule,
+        PanelModule,
+        TooltipModule,
+        FontAwesomeModule,
+        RouterModule,
+        FormsModule,
+        InputTextModule,
+        AccordionModule,
+        DatasetModule,
+        ButtonModule,
+        CheckboxModule,
+        ValidationResultModule,
+        CoreModule,
+        ImageModule,
+        GalleriaModule,
+        Select,
+    ]
 })
 export class ComparisonModule { }
