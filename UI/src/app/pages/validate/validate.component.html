@@ -12,7 +12,6 @@
         <a [routerLink]="'/signup'" class="mt-5">this form</a>
         to register.
       </h5>
-
     </div>
     <div class="flex flex-column flex-wrap xl:w-8 lg:w-9 w-10 justify-content-center align-content-center">
 
@@ -31,77 +30,87 @@
                   <span class="pi pi-question-circle"></span>
                 </label>
               </ng-template>
-              <p-accordion multiple="true">
-
-                <p-accordionTab *ngFor="let item of validationModel.datasetConfigurations; index as datasetIdx"
-                                [header]="(item.datasetModel.selectedDataset?.pretty_name)+' / ' +
-                             ''+(item.datasetModel.selectedVersion?.pretty_name)+' / '+(item.datasetModel.selectedVariable?.short_name)
-                             + (validationConfigService.getInformationOnTheReference((item.spatialReference$|async), (item.temporalReference$|async), (item.scalingReference$|async)))"
-                                [selected]="datasetIdx === validationModel.datasetConfigurations.length - 1"
-                                [class]="{'highlighted': (item.highlighted$|async),
+              <p-accordion multiple="true" [value]="[0]">
+                @for (item of validationModel.datasetConfigurations; track item.datasetModel; let datasetIdx = $index) {
+                  <p-accordion-panel [value]="datasetIdx">
+                    <p-accordion-header>
+                      {{
+                        (item.datasetModel.selectedDataset?.pretty_name) + ' / ' +
+                        '' + (item.datasetModel.selectedVersion?.pretty_name) + ' / ' + (item.datasetModel.selectedVariable?.short_name)
+                        + (validationConfigService.getInformationOnTheReference((item.spatialReference$|async), (item.temporalReference$|async), (item.scalingReference$|async)))
+                      }}
+                    </p-accordion-header>
+                    <p-accordion-content
+                      [class]="{'highlighted': (item.highlighted$|async),
                             'is-reference': ((item.spatialReference$|async) || (item.temporalReference$|async) || (item.scalingReference$|async))}">
 
-                  <qa-dataset *ngIf="validationModel.datasetConfigurations[datasetIdx].datasetModel.selectedDataset && validationModel.datasetConfigurations[datasetIdx].datasetModel.selectedVersion"
-                              [selectionModel]="validationModel.datasetConfigurations[datasetIdx].datasetModel"
-                              [removable]="true" (changeDataset)="onDatasetChange($event)"/>
+                      <qa-dataset
+                        *ngIf="validationModel.datasetConfigurations[datasetIdx].datasetModel.selectedDataset && validationModel.datasetConfigurations[datasetIdx].datasetModel.selectedVersion"
+                        [selectionModel]="validationModel.datasetConfigurations[datasetIdx].datasetModel"
+                        [removable]="true" (changeDataset)="onDatasetChange($event)"/>
 
-                  <ng-container *ngFor="let filter of item.basicFilters; let filterIdx = index">
-                    <qa-basic-filter
-                      [ngClass]="{'ml-1-icon': isIncluded(filter.filterDto.id, item.basicFilters)}"
-                      [isIncluded]="isIncluded(filter.filterDto.id, item.basicFilters)"
-                      [filterModel]="filter"
-                      (excludeMutual)="this.includeFilter($event, item.basicFilters, false)"
-                      (includeMutual)="this.includeFilter($event, item.basicFilters, filter.enabled)"
-                      (updateMap)="onBasicFilterMapUpdate($event)"
-                    />
-                  </ng-container>
+                      <ng-container *ngFor="let filter of item.basicFilters; let filterIdx = index">
+                        <qa-basic-filter
+                          [ngClass]="{'ml-1-icon': isIncluded(filter.filterDto.id, item.basicFilters)}"
+                          [isIncluded]="isIncluded(filter.filterDto.id, item.basicFilters)"
+                          [filterModel]="filter"
+                          (excludeMutual)="this.includeFilter($event, item.basicFilters, false)"
+                          (includeMutual)="this.includeFilter($event, item.basicFilters, filter.enabled)"
+                          (updateMap)="onBasicFilterMapUpdate($event)"
+                        />
+                      </ng-container>
 
-                  <qa-threshold-filter *ngIf="validationModel.datasetConfigurations[datasetIdx].smosRfiFilter$|async"
-                                       [datasetModel]="validationModel.datasetConfigurations[datasetIdx].datasetModel"
-                                       [filterModel$]="validationModel.datasetConfigurations[datasetIdx].smosRfiFilter$"
-                                       [minThreshold]="0." [increment]="0.05" [maxThreshold]="1.0" [units]="' [-]'"/>
+                      <qa-threshold-filter
+                        *ngIf="validationModel.datasetConfigurations[datasetIdx].smosRfiFilter$|async"
+                        [datasetModel]="validationModel.datasetConfigurations[datasetIdx].datasetModel"
+                        [filterModel$]="validationModel.datasetConfigurations[datasetIdx].smosRfiFilter$"
+                        [minThreshold]="0." [increment]="0.05" [maxThreshold]="1.0" [units]="' [-]'"/>
 
-                  <qa-threshold-filter *ngIf="validationModel.datasetConfigurations[datasetIdx].smosChi2Filter$|async"
-                                       [datasetModel]="validationModel.datasetConfigurations[datasetIdx].datasetModel"
-                                       [filterModel$]="validationModel.datasetConfigurations[datasetIdx].smosChi2Filter$"
-                                       [minThreshold]="0." [increment]="0.05" [maxThreshold]="1.0" [units]="' [-]'"/>
+                      <qa-threshold-filter
+                        *ngIf="validationModel.datasetConfigurations[datasetIdx].smosChi2Filter$|async"
+                        [datasetModel]="validationModel.datasetConfigurations[datasetIdx].datasetModel"
+                        [filterModel$]="validationModel.datasetConfigurations[datasetIdx].smosChi2Filter$"
+                        [minThreshold]="0." [increment]="0.05" [maxThreshold]="1.0" [units]="' [-]'"/>
 
 
-                  <qa-threshold-filter *ngIf="validationModel.datasetConfigurations[datasetIdx].vegetationWaterFilter$|async"
-                                       [datasetModel]="validationModel.datasetConfigurations[datasetIdx].datasetModel"
-                                       [filterModel$]="validationModel.datasetConfigurations[datasetIdx].vegetationWaterFilter$"
-                                       [minThreshold]="0" [increment]="1" [maxThreshold]="60" [units]="' [kg/m3]'" />
+                      <qa-threshold-filter
+                        *ngIf="validationModel.datasetConfigurations[datasetIdx].vegetationWaterFilter$|async"
+                        [datasetModel]="validationModel.datasetConfigurations[datasetIdx].datasetModel"
+                        [filterModel$]="validationModel.datasetConfigurations[datasetIdx].vegetationWaterFilter$"
+                        [minThreshold]="0" [increment]="1" [maxThreshold]="60" [units]="' [kg/m3]'"/>
 
-                  <qa-threshold-filter *ngIf="validationModel.datasetConfigurations[datasetIdx].staticWaterFilter$|async"
-                                       [datasetModel]="validationModel.datasetConfigurations[datasetIdx].datasetModel"
-                                       [filterModel$]="validationModel.datasetConfigurations[datasetIdx].staticWaterFilter$"
-                                       [minThreshold]="0" [increment]="0.05" [maxThreshold]="1.0" [units]="' [-]'" />
+                      <qa-threshold-filter
+                        *ngIf="validationModel.datasetConfigurations[datasetIdx].staticWaterFilter$|async"
+                        [datasetModel]="validationModel.datasetConfigurations[datasetIdx].datasetModel"
+                        [filterModel$]="validationModel.datasetConfigurations[datasetIdx].staticWaterFilter$"
+                        [minThreshold]="0" [increment]="0.05" [maxThreshold]="1.0" [units]="' [-]'"/>
 
-                  <div *ngIf="validationModel.datasetConfigurations[datasetIdx].ismnNetworkFilter$|async">
-                    <qa-ismn-network-filter
-                      (networkSelectionChanged)="onIsmnNetworkSelectionChange($event)"
-                      [datasetModel]="validationModel.datasetConfigurations[datasetIdx].datasetModel"
-                      [filterModel$]="validationModel.datasetConfigurations[datasetIdx].ismnNetworkFilter$"/>
-                  </div>
-                  <div *ngIf="validationModel.datasetConfigurations[datasetIdx].ismnDepthFilter$|async">
-                    <qa-ismn-depth-filter
-                      (depthSelectionChanged)="onIsmnDepthSelectionChange($event)"
-                      [datasetModel]="validationModel.datasetConfigurations[datasetIdx].datasetModel"
-                      [filterModel$]="validationModel.datasetConfigurations[datasetIdx].ismnDepthFilter$"/>
-                  </div>
+                      <div *ngIf="validationModel.datasetConfigurations[datasetIdx].ismnNetworkFilter$|async">
+                        <qa-ismn-network-filter
+                          (networkSelectionChanged)="onIsmnNetworkSelectionChange($event)"
+                          [datasetModel]="validationModel.datasetConfigurations[datasetIdx].datasetModel"
+                          [filterModel$]="validationModel.datasetConfigurations[datasetIdx].ismnNetworkFilter$"/>
+                      </div>
+                      <div *ngIf="validationModel.datasetConfigurations[datasetIdx].ismnDepthFilter$|async">
+                        <qa-ismn-depth-filter
+                          (depthSelectionChanged)="onIsmnDepthSelectionChange($event)"
+                          [datasetModel]="validationModel.datasetConfigurations[datasetIdx].datasetModel"
+                          [filterModel$]="validationModel.datasetConfigurations[datasetIdx].ismnDepthFilter$"/>
+                      </div>
 
-                  <div style="width: 100%;text-align: right">
-                    <button pButton type="button"
-                            [disabled]="validationModel.datasetConfigurations.length < 3"
-                            (click)="removeDataset(validationModel.datasetConfigurations[datasetIdx])"
-                            label="Remove dataset"
-                            icon="pi pi-trash"
-                            class="removeDataset p-button-danger my-2"
-                            style="padding: 0.2rem;">
-                    </button>
-                  </div>
-                </p-accordionTab>
-
+                      <div style="width: 100%;text-align: right">
+                        <button pButton type="button"
+                                [disabled]="validationModel.datasetConfigurations.length < 3"
+                                (click)="removeDataset(validationModel.datasetConfigurations[datasetIdx])"
+                                label="Remove dataset"
+                                icon="pi pi-trash"
+                                class="removeDataset p-button-danger my-2"
+                                style="padding: 0.2rem;">
+                        </button>
+                      </div>
+                    </p-accordion-content>
+                  </p-accordion-panel>
+                }
               </p-accordion>
               <button pButton
                       type="button"

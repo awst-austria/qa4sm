@@ -17,7 +17,7 @@
     </div>
 
     <div class="flex flex-column lg:w-10 w-11 justify-content-center align-content-center">
-      <p-accordion [value]="['0']" [multiple]="true">
+      <p-accordion [value]="[0]" [multiple]="true">
         <div *ngFor="let dataset of datasets; index as ind">
           <p-accordion-panel [value]="ind">
             <p-accordion-header>{{ dataset.pretty_name }}</p-accordion-header>
