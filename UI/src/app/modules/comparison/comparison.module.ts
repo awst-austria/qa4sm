@@ -14,7 +14,6 @@ import { DatasetModule } from '../dataset/dataset.module';
 import { ButtonModule } from 'primeng/button';
 import { CheckboxModule } from 'primeng/checkbox';
 import { SpatialExtentComponent } from './components/spatial-extent/spatial-extent.component';
-import { NgDompurifyModule } from '@tinkoff/ng-dompurify';
 import { TableComparisonComponent } from './components/table-comparison/table-comparison.component';
 import { ComparisonSummaryComponent } from './components/comparison-summary/comparison-summary.component';
 import { ValidationResultModule } from '../validation-result/validation-result.module';
@@ -43,7 +42,6 @@ import { GalleriaModule } from 'primeng/galleria';
     DatasetModule,
     ButtonModule,
     CheckboxModule,
-    NgDompurifyModule,
     ValidationResultModule,
     CoreModule,
     ImageModule,

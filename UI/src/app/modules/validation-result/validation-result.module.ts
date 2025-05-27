@@ -18,7 +18,6 @@ import { InputTextModule } from 'primeng/inputtext';
 import { TrackedValidationsComponent } from './components/tracked-validations/tracked-validations.component';
 import { SummaryStatisticsComponent } from './components/summary-statistics/summary-statistics.component';
 import { ResultFilesComponent } from './components/result-files/result-files.component';
-import { NgDompurifyModule } from '@tinkoff/ng-dompurify';
 import { ButtonModule } from 'primeng/button';
 import { PublishingComponent } from './components/publishing/publishing.component';
 import { ExistingValidationComponent } from './components/existing-validation/existing-validation.component';
@@ -75,7 +74,6 @@ import { Ripple } from 'primeng/ripple';
     CalendarModule,
     FormsModule,
     InputTextModule,
-    NgDompurifyModule,
     ButtonModule,
     ReactiveFormsModule,
     GalleriaModule,
