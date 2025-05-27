@@ -1,9 +1,11 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { TemporalMatchingComponent } from './components/temporal-matching/temporal-matching.component';
 
 
 @NgModule({
-  declarations: [TemporalMatchingModule],
+  declarations: [TemporalMatchingComponent],
+  exports: [TemporalMatchingComponent],
   imports: [
     CommonModule
   ]
