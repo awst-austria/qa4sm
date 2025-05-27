@@ -1,8 +1,8 @@
-import { Component } from '@angular/core';
+import { Component, signal } from '@angular/core';
 import { DatasetService } from '../../modules/core/services/dataset/dataset.service';
 import { DatasetVersionService } from '../../modules/core/services/dataset/dataset-version.service';
 import { FilterService } from '../../modules/core/services/filter/filter.service';
-import { combineLatest, EMPTY, Observable } from 'rxjs';
+import { combineLatest, EMPTY, Observable, tap } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 
 @Component({
@@ -14,18 +14,28 @@ import { catchError, map } from 'rxjs/operators';
 export class DatasetInfoComponent {
 
   toggleOption = [
-    {label: 'Expand all',
-      value: true},
-    {label: 'Close all',
-      value: false}
-  ]
-  allSelected: boolean;
+    {
+      label: 'Expand all',
+      value: true
+    },
+    {
+      label: 'Close all',
+      value: false
+    }
+  ];
   errorOccured = false;
+  activeTabInd = signal([0]);
+  numberOfDatasets: number;
 
   constructor(private datasetService: DatasetService,
               private versionService: DatasetVersionService,
               private filterService: FilterService) {
   }
+
+  toggleVisibility(allSelected: boolean) {
+    allSelected ? this.activeTabInd.set(Array.from({ length: this.numberOfDatasets }, (_, i) => i)) : this.activeTabInd.set([]);
+  }
+
 
   // here it actually doesn't make sense to handle errors separately for datasets, versions and filters; if part of
   // the information is missing, it doesn't make sense to show it at all.
@@ -55,11 +65,12 @@ export class DatasetInfoComponent {
             ))),
             filtersHelpText: this.getDistinctFilters(datasetVersions.flatMap(version => version.filters.map(filterId =>
               filters.find(filter => filter.id === filterId).help_text
-            ))),
-          }
+            )))
+          };
         }
       )
     ),
+    tap(datasets => this.numberOfDatasets = datasets.length),
     catchError(err => {
       this.errorOccured = true;
       return EMPTY;
