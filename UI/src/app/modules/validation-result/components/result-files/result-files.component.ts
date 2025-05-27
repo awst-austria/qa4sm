@@ -1,21 +1,44 @@
-import {Component, Input, OnInit, signal, WritableSignal} from '@angular/core';
-import {EMPTY, Observable, of, tap} from 'rxjs';
-import {MetricsPlotsDto} from '../../../core/services/validation-run/metrics-plots.dto';
-import {ValidationrunService} from '../../../core/services/validation-run/validationrun.service';
-import {HttpParams} from '@angular/common/http';
-import {ValidationrunDto} from '../../../core/services/validation-run/validationrun.dto';
-import {WebsiteGraphicsService} from '../../../core/services/global/website-graphics.service';
-import {fas} from '@fortawesome/free-solid-svg-icons';
-import {catchError, map} from 'rxjs/operators';
-import {PlotDto} from '../../../core/services/global/plot.dto';
-import {SafeUrl} from '@angular/platform-browser';
-import {GlobalParamsService} from '../../../core/services/global/global-params.service';
-import {CustomHttpError} from '../../../core/services/global/http-error.service';
-import {ToastService} from '../../../core/services/toast/toast.service';
+import { Component, Input, OnInit, signal, WritableSignal } from '@angular/core';
+import { EMPTY, Observable, of, tap } from 'rxjs';
+import { MetricsPlotsDto } from '../../../core/services/validation-run/metrics-plots.dto';
+import { ValidationrunService } from '../../../core/services/validation-run/validationrun.service';
+import { HttpParams } from '@angular/common/http';
+import { ValidationrunDto } from '../../../core/services/validation-run/validationrun.dto';
+import { WebsiteGraphicsService } from '../../../core/services/global/website-graphics.service';
+import { fas } from '@fortawesome/free-solid-svg-icons';
+import { catchError, map } from 'rxjs/operators';
+import { PlotDto } from '../../../core/services/global/plot.dto';
+import { SafeUrl } from '@angular/platform-browser';
+import { GlobalParamsService } from '../../../core/services/global/global-params.service';
+import { CustomHttpError } from '../../../core/services/global/http-error.service';
+import { ToastService } from '../../../core/services/toast/toast.service';
+import { AsyncPipe, NgIf } from '@angular/common';
+import { PrimeTemplate } from 'primeng/api';
+import { Panel } from 'primeng/panel';
+import { DropdownModule } from 'primeng/dropdown';
+import { FormsModule } from '@angular/forms';
+import { ButtonDirective, ButtonIcon, ButtonLabel } from 'primeng/button';
+import { Tooltip } from 'primeng/tooltip';
+import { FaIconComponent } from '@fortawesome/angular-fontawesome';
+import { GalleriaModule } from 'primeng/galleria';
 
 @Component({
   selector: 'qa-result-files',
   templateUrl: './result-files.component.html',
+  imports: [
+    NgIf,
+    PrimeTemplate,
+    Panel,
+    AsyncPipe,
+    DropdownModule,
+    FormsModule,
+    ButtonDirective,
+    Tooltip,
+    FaIconComponent,
+    ButtonLabel,
+    ButtonIcon,
+    GalleriaModule
+  ],
   styleUrls: ['./result-files.component.scss']
 })
 export class ResultFilesComponent implements OnInit {

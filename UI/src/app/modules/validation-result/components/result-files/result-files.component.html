@@ -45,9 +45,9 @@
             <div class="flex flex-column lg:w-5 w-10 justify-content-center">
               <button pButton
                       type="button"
-                      icon="pi pi-download"
+                      pButtonIcon="pi pi-download"
                       class="btn-action-large download-results"
-                      label="Download graphs"
+                      pButtonLabel="Download graphs"
                       pTooltip="Download graphs .zip"
                       [life]="globals.tooltipLifetime"
                       (click)="downloadResultFile(validation.id, 'graphics',validation.id + '_graphs.zip')">
@@ -57,7 +57,7 @@
             <div class="flex flex-column lg:w-5 w-10 justify-content-center">
               <button pButton
                       type="button"
-                      label="Download NetCDF"
+                      pButtonLabel="Download NetCDF"
                       pTooltip="Download all results in NetCDF format"
                       [life]="globals.tooltipLifetime"
                       (click)="downloadResultFile(validation.id, 'netCDF', validation.output_file_name)">
