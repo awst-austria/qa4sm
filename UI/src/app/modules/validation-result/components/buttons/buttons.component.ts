@@ -1,19 +1,20 @@
-import {Component, EventEmitter, Input, OnInit, Output, signal} from '@angular/core';
-import {ValidationrunDto} from '../../../core/services/validation-run/validationrun.dto';
-import {fas} from '@fortawesome/free-solid-svg-icons';
-import {HttpParams} from '@angular/common/http';
-import {Router} from '@angular/router';
-import {ValidationrunService} from '../../../core/services/validation-run/validationrun.service';
-import {AuthService} from '../../../core/services/auth/auth.service';
-import {Observable, Observer} from 'rxjs';
-import {GlobalParamsService} from '../../../core/services/global/global-params.service';
-import {ToastService} from '../../../core/services/toast/toast.service';
-import {CustomHttpError} from '../../../core/services/global/http-error.service';
+import { Component, EventEmitter, Input, OnInit, Output, signal } from '@angular/core';
+import { ValidationrunDto } from '../../../core/services/validation-run/validationrun.dto';
+import { fas } from '@fortawesome/free-solid-svg-icons';
+import { HttpParams } from '@angular/common/http';
+import { Router } from '@angular/router';
+import { ValidationrunService } from '../../../core/services/validation-run/validationrun.service';
+import { AuthService } from '../../../core/services/auth/auth.service';
+import { Observable, Observer } from 'rxjs';
+import { GlobalParamsService } from '../../../core/services/global/global-params.service';
+import { ToastService } from '../../../core/services/toast/toast.service';
+import { CustomHttpError } from '../../../core/services/global/http-error.service';
 
 @Component({
   selector: 'qa-buttons',
   templateUrl: './buttons.component.html',
-  styleUrls: ['./buttons.component.scss']
+  styleUrls: ['./buttons.component.scss'],
+  standalone: false,
 })
 
 export class ButtonsComponent implements OnInit {

@@ -9,27 +9,12 @@ import {
   getDefaultValidationActionState,
   MultipleValidationAction
 } from './multiple-validation-action';
-import { Panel } from 'primeng/panel';
-import { DropdownModule } from 'primeng/dropdown';
-import { FormsModule } from '@angular/forms';
-import { Menu } from 'primeng/menu';
-import { NgIf } from '@angular/common';
-import { Tooltip } from 'primeng/tooltip';
-import { Button } from 'primeng/button';
 
 @Component({
   selector: 'qa-handle-multiple-validations',
   templateUrl: './handle-multiple-validations.component.html',
-  imports: [
-    Panel,
-    DropdownModule,
-    FormsModule,
-    Menu,
-    NgIf,
-    Tooltip,
-    Button
-  ],
-  styleUrls: ['./handle-multiple-validations.component.scss']
+  styleUrls: ['./handle-multiple-validations.component.scss'],
+  standalone: false,
 })
 export class HandleMultipleValidationsComponent {
   validations = input([] as ValidationrunDto[]);

@@ -1,18 +1,13 @@
 import { Component, EventEmitter, Output } from '@angular/core';
 import { SortChoicesModel } from './sort-choices-model';
 import { SortOrderModel } from './sort-order-model';
-import { DropdownModule } from 'primeng/dropdown';
-import { FormsModule } from '@angular/forms';
 
 
 @Component({
   selector: 'qa-sorting-form',
   templateUrl: './sorting-form.component.html',
-  imports: [
-    DropdownModule,
-    FormsModule
-  ],
-  styleUrls: ['./sorting-form.component.scss']
+  styleUrls: ['./sorting-form.component.scss'],
+  standalone: false
 })
 export class SortingFormComponent {
   @Output() orderQueryName = new EventEmitter<string>();
@@ -27,7 +22,7 @@ export class SortingFormComponent {
       queryName: 'name'
     },
     {
-      displayName: "Status",
+      displayName: 'Status',
       queryName: 'progress'
     },
     {

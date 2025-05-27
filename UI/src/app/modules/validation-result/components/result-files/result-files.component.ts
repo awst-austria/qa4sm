@@ -12,34 +12,12 @@ import { SafeUrl } from '@angular/platform-browser';
 import { GlobalParamsService } from '../../../core/services/global/global-params.service';
 import { CustomHttpError } from '../../../core/services/global/http-error.service';
 import { ToastService } from '../../../core/services/toast/toast.service';
-import { AsyncPipe, NgIf } from '@angular/common';
-import { PrimeTemplate } from 'primeng/api';
-import { Panel } from 'primeng/panel';
-import { DropdownModule } from 'primeng/dropdown';
-import { FormsModule } from '@angular/forms';
-import { ButtonDirective, ButtonIcon, ButtonLabel } from 'primeng/button';
-import { Tooltip } from 'primeng/tooltip';
-import { FaIconComponent } from '@fortawesome/angular-fontawesome';
-import { GalleriaModule } from 'primeng/galleria';
 
 @Component({
   selector: 'qa-result-files',
   templateUrl: './result-files.component.html',
-  imports: [
-    NgIf,
-    PrimeTemplate,
-    Panel,
-    AsyncPipe,
-    DropdownModule,
-    FormsModule,
-    ButtonDirective,
-    Tooltip,
-    FaIconComponent,
-    ButtonLabel,
-    ButtonIcon,
-    GalleriaModule
-  ],
-  styleUrls: ['./result-files.component.scss']
+  styleUrls: ['./result-files.component.scss'],
+  standalone: false,
 })
 export class ResultFilesComponent implements OnInit {
   @Input() validation: ValidationrunDto;

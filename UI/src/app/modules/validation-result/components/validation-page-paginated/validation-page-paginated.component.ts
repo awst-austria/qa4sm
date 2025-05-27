@@ -1,25 +1,26 @@
-import {Component, computed, effect, HostListener, input, OnInit, signal} from '@angular/core';
-import {ValidationrunService} from '../../../core/services/validation-run/validationrun.service';
-import {ValidationrunDto} from '../../../core/services/validation-run/validationrun.dto';
-import {HttpParams} from '@angular/common/http';
-import {EMPTY, Observable} from 'rxjs';
-import {catchError} from 'rxjs/operators';
-import {FilterConfig,} from 'src/app/modules/validation-result/components/filtering-form/filter-payload.interface';
-import {DatasetService} from "../../../core/services/dataset/dataset.service";
-import {DatasetDto} from "../../../core/services/dataset/dataset.dto";
-import {DatasetVersionService} from "../../../core/services/dataset/dataset-version.service";
-import {DatasetVariableService} from "../../../core/services/dataset/dataset-variable.service";
-import {DatasetVersionDto} from "../../../core/services/dataset/dataset-version.dto";
-import {DatasetVariableDto} from "../../../core/services/dataset/dataset-variable.dto";
+import { Component, computed, effect, HostListener, input, OnInit, signal } from '@angular/core';
+import { ValidationrunService } from '../../../core/services/validation-run/validationrun.service';
+import { ValidationrunDto } from '../../../core/services/validation-run/validationrun.dto';
+import { HttpParams } from '@angular/common/http';
+import { EMPTY, Observable } from 'rxjs';
+import { catchError } from 'rxjs/operators';
+import { FilterConfig } from 'src/app/modules/validation-result/components/filtering-form/filter-payload.interface';
+import { DatasetService } from '../../../core/services/dataset/dataset.service';
+import { DatasetDto } from '../../../core/services/dataset/dataset.dto';
+import { DatasetVersionService } from '../../../core/services/dataset/dataset-version.service';
+import { DatasetVariableService } from '../../../core/services/dataset/dataset-variable.service';
+import { DatasetVersionDto } from '../../../core/services/dataset/dataset-version.dto';
+import { DatasetVariableDto } from '../../../core/services/dataset/dataset-variable.dto';
 import {
   getDefaultValidationActionState,
   MultipleValidationAction
-} from "../handle-multiple-validations/multiple-validation-action";
+} from '../handle-multiple-validations/multiple-validation-action';
 
 @Component({
   selector: 'qa-validation-page-paginated',
   templateUrl: './validation-page-paginated.component.html',
-  styleUrls: ['./validation-page-paginated.component.scss']
+  styleUrls: ['./validation-page-paginated.component.scss'],
+  standalone: false
 })
 export class ValidationPagePaginatedComponent implements OnInit {
   published = input<boolean>();

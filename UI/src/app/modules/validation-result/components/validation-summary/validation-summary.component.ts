@@ -15,21 +15,13 @@ import { ValidationrunDto } from '../../../core/services/validation-run/validati
 import { ValidationRunConfigService } from '../../../../pages/validate/service/validation-run-config.service';
 import { CustomHttpError } from '../../../core/services/global/http-error.service';
 import { ToastService } from '../../../core/services/toast/toast.service';
-import { PublishingComponent } from '../publishing/publishing.component';
-import { Dialog } from 'primeng/dialog';
-import { ButtonsComponent } from '../buttons/buttons.component';
-import { FaIconComponent } from '@fortawesome/angular-fontawesome';
-import { AsyncPipe, DatePipe, DecimalPipe, NgClass } from '@angular/common';
-import { Panel } from 'primeng/panel';
-import { Tooltip } from 'primeng/tooltip';
-import { ButtonDirective } from 'primeng/button';
 
 
 @Component({
   selector: 'qa-validation-summary',
   templateUrl: './validation-summary.component.html',
   styleUrls: ['./validation-summary.component.scss'],
-  imports: [PublishingComponent, Dialog, ButtonsComponent, FaIconComponent, DatePipe, NgClass, DecimalPipe, AsyncPipe, Panel, Tooltip, ButtonDirective]
+  standalone: false,
 })
 export class ValidationSummaryComponent implements OnInit, OnDestroy {
 

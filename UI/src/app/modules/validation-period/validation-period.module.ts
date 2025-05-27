@@ -8,7 +8,7 @@ import { FormsModule } from '@angular/forms';
 
 
 @NgModule({
-  declarations: [],
+  declarations: [ValidationPeriodComponent],
   exports: [
     ValidationPeriodComponent
   ],

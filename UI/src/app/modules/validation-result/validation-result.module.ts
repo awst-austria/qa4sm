@@ -42,6 +42,28 @@ import { CardModule } from 'primeng/card';
 import { Ripple } from 'primeng/ripple';
 
 @NgModule({
+  declarations: [ValidationrunRowComponent,
+    ValidationPagePaginatedComponent,
+    SortingFormComponent,
+    FilteringFormComponent,
+    ValidationSummaryComponent,
+    ButtonsComponent,
+    TrackedValidationsComponent,
+    SummaryStatisticsComponent,
+    ResultFilesComponent,
+    PublishingComponent,
+    ExistingValidationComponent,
+    HandleMultipleValidationsComponent],
+  exports: [
+    ValidationrunRowComponent,
+    ValidationPagePaginatedComponent,
+    ValidationSummaryComponent,
+    TrackedValidationsComponent,
+    SummaryStatisticsComponent,
+    ResultFilesComponent,
+    PublishingComponent,
+    ExistingValidationComponent,
+  ],
   imports: [
     CommonModule,
     PanelModule,
@@ -68,38 +90,8 @@ import { Ripple } from 'primeng/ripple';
     AccordionModule,
     ChipModule,
     CardModule,
-    Ripple,
-    ValidationrunRowComponent,
-    ValidationPagePaginatedComponent,
-    ValidationSummaryComponent,
-    TrackedValidationsComponent,
-    SummaryStatisticsComponent,
-    ResultFilesComponent,
-    PublishingComponent,
-    ExistingValidationComponent,
-    ValidationrunRowComponent,
-    ValidationPagePaginatedComponent,
-    SortingFormComponent,
-    FilteringFormComponent,
-    ValidationSummaryComponent,
-    ButtonsComponent,
-    TrackedValidationsComponent,
-    SummaryStatisticsComponent,
-    ResultFilesComponent,
-    PublishingComponent,
-    ExistingValidationComponent,
-    HandleMultipleValidationsComponent
-  ],
-    exports: [
-        ValidationrunRowComponent,
-        ValidationPagePaginatedComponent,
-        ValidationSummaryComponent,
-        TrackedValidationsComponent,
-        SummaryStatisticsComponent,
-        ResultFilesComponent,
-        PublishingComponent,
-        ExistingValidationComponent,
-    ]
+    Ripple
+  ]
 })
 export class ValidationResultModule {
 }

@@ -12,29 +12,13 @@ import { DatasetVersionDto } from '../../../core/services/dataset/dataset-versio
 import { DatasetVariableDto } from '../../../core/services/dataset/dataset-variable.dto';
 import { GlobalParamsService } from '../../../core/services/global/global-params.service';
 import { SettingsService } from '../../../core/services/global/settings.service';
-import { Panel } from 'primeng/panel';
-import { AsyncPipe, NgIf } from '@angular/common';
-import { NgDompurifyModule } from '@tinkoff/ng-dompurify';
-import { ButtonDirective } from 'primeng/button';
-import { Tooltip } from 'primeng/tooltip';
-import { PrimeTemplate } from 'primeng/api';
-import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'qa-summary-statistics',
   templateUrl: './summary-statistics.component.html',
   styleUrls: ['./summary-statistics.component.scss'],
-  imports: [
-    Panel,
-    NgIf,
-    AsyncPipe,
-    NgDompurifyModule,
-    ButtonDirective,
-    Tooltip,
-    PrimeTemplate,
-    RouterLink
-  ],
-  encapsulation: ViewEncapsulation.None
+  encapsulation: ViewEncapsulation.None,
+  standalone: false,
 })
 export class SummaryStatisticsComponent implements OnInit {
   @Input() validationRun: ValidationrunDto;
