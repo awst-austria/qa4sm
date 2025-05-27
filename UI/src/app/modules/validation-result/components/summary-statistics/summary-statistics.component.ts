@@ -1,22 +1,39 @@
-import {Component, Input, OnInit, ViewEncapsulation} from '@angular/core';
-import {ValidationrunService} from '../../../core/services/validation-run/validationrun.service';
-import {HttpParams} from '@angular/common/http';
-import {Observable} from 'rxjs';
-import {ValidationrunDto} from '../../../core/services/validation-run/validationrun.dto';
-import {DatasetConfigurationDto} from '../../services/dataset-configuration.dto';
-import {DatasetService} from '../../../core/services/dataset/dataset.service';
-import {DatasetVersionService} from '../../../core/services/dataset/dataset-version.service';
-import {DatasetVariableService} from '../../../core/services/dataset/dataset-variable.service';
-import {DatasetDto} from '../../../core/services/dataset/dataset.dto';
-import {DatasetVersionDto} from '../../../core/services/dataset/dataset-version.dto';
-import {DatasetVariableDto} from '../../../core/services/dataset/dataset-variable.dto';
-import {GlobalParamsService} from '../../../core/services/global/global-params.service';
-import {SettingsService} from '../../../core/services/global/settings.service';
+import { Component, Input, OnInit, ViewEncapsulation } from '@angular/core';
+import { ValidationrunService } from '../../../core/services/validation-run/validationrun.service';
+import { HttpParams } from '@angular/common/http';
+import { Observable } from 'rxjs';
+import { ValidationrunDto } from '../../../core/services/validation-run/validationrun.dto';
+import { DatasetConfigurationDto } from '../../services/dataset-configuration.dto';
+import { DatasetService } from '../../../core/services/dataset/dataset.service';
+import { DatasetVersionService } from '../../../core/services/dataset/dataset-version.service';
+import { DatasetVariableService } from '../../../core/services/dataset/dataset-variable.service';
+import { DatasetDto } from '../../../core/services/dataset/dataset.dto';
+import { DatasetVersionDto } from '../../../core/services/dataset/dataset-version.dto';
+import { DatasetVariableDto } from '../../../core/services/dataset/dataset-variable.dto';
+import { GlobalParamsService } from '../../../core/services/global/global-params.service';
+import { SettingsService } from '../../../core/services/global/settings.service';
+import { Panel } from 'primeng/panel';
+import { AsyncPipe, NgIf } from '@angular/common';
+import { NgDompurifyModule } from '@tinkoff/ng-dompurify';
+import { ButtonDirective } from 'primeng/button';
+import { Tooltip } from 'primeng/tooltip';
+import { PrimeTemplate } from 'primeng/api';
+import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'qa-summary-statistics',
   templateUrl: './summary-statistics.component.html',
   styleUrls: ['./summary-statistics.component.scss'],
+  imports: [
+    Panel,
+    NgIf,
+    AsyncPipe,
+    NgDompurifyModule,
+    ButtonDirective,
+    Tooltip,
+    PrimeTemplate,
+    RouterLink
+  ],
   encapsulation: ViewEncapsulation.None
 })
 export class SummaryStatisticsComponent implements OnInit {
