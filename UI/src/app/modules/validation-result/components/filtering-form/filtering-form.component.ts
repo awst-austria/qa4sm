@@ -1,14 +1,40 @@
-import {Component, input, model, signal} from '@angular/core';
-import {FilterConfig} from './filter-payload.interface';
+import { Component, input, model, signal } from '@angular/core';
+import { FilterConfig } from './filter-payload.interface';
 
-import {DatasetDto} from 'src/app/modules/core/services/dataset/dataset.dto';
-import {Observable, Subject} from "rxjs";
-import {debounceTime} from "rxjs/operators";
+import { DatasetDto } from 'src/app/modules/core/services/dataset/dataset.dto';
+import { Observable, Subject } from 'rxjs';
+import { debounceTime } from 'rxjs/operators';
+import { Panel } from 'primeng/panel';
+import { DropdownModule } from 'primeng/dropdown';
+import { FormsModule } from '@angular/forms';
+import { MultiSelect } from 'primeng/multiselect';
+import { NgForOf, NgSwitch, NgSwitchCase } from '@angular/common';
+import { InputText } from 'primeng/inputtext';
+import { Calendar } from 'primeng/calendar';
+import { Fieldset } from 'primeng/fieldset';
+import { Chip } from 'primeng/chip';
+import { Tooltip } from 'primeng/tooltip';
+import { Button } from 'primeng/button';
 
 @Component({
-    selector: 'qa-filtering-form',
-    templateUrl: './filtering-form.component.html',
-    styleUrl: './filtering-form.component.scss'
+  selector: 'qa-filtering-form',
+  templateUrl: './filtering-form.component.html',
+  imports: [
+    Panel,
+    DropdownModule,
+    FormsModule,
+    MultiSelect,
+    NgSwitch,
+    NgSwitchCase,
+    InputText,
+    Calendar,
+    Fieldset,
+    Chip,
+    Tooltip,
+    NgForOf,
+    Button
+  ],
+  styleUrl: './filtering-form.component.scss'
 })
 export class FilteringFormComponent {
     validationFilters = model<FilterConfig[]>()
