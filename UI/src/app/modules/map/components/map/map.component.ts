@@ -1,28 +1,29 @@
-import {AfterViewInit, Component, ElementRef, EventEmitter, Input, NgZone, OnInit, Output} from '@angular/core';
-import {Map, Overlay, View} from 'ol';
-import {Coordinate} from 'ol/coordinate';
-import {Attribution} from 'ol/control';
+import { AfterViewInit, Component, ElementRef, EventEmitter, Input, NgZone, OnInit, Output } from '@angular/core';
+import { Map, Overlay, View } from 'ol';
+import { Coordinate } from 'ol/coordinate';
+import { Attribution } from 'ol/control';
 import Projection from 'ol/proj/Projection';
-import {get as GetProjection, transform} from 'ol/proj';
-import {Extent} from 'ol/extent';
+import { get as GetProjection, transform } from 'ol/proj';
+import { Extent } from 'ol/extent';
 import TileLayer from 'ol/layer/Tile';
 import OSM from 'ol/source/OSM';
 
-import {BoundingBoxControl} from './bounding-box-control';
-import {SpatialSubsetModel} from '../../../spatial-subset/components/spatial-subset/spatial-subset-model';
-import {ToastService} from '../../../core/services/toast/toast.service';
-import VectorSource from "ol/source/Vector";
-import {GeoJSON} from "ol/format";
-import VectorLayer from "ol/layer/Vector";
-import {Circle, Fill, Stroke, Style} from "ol/style";
-import {addCommon as addCommonProjections} from 'ol/proj.js';
-import {Cluster} from "ol/source";
-import {LegendItem} from '../legend-item';
+import { BoundingBoxControl } from './bounding-box-control';
+import { SpatialSubsetModel } from '../../../spatial-subset/components/spatial-subset/spatial-subset-model';
+import { ToastService } from '../../../core/services/toast/toast.service';
+import VectorSource from 'ol/source/Vector';
+import { GeoJSON } from 'ol/format';
+import VectorLayer from 'ol/layer/Vector';
+import { Circle, Fill, Stroke, Style } from 'ol/style';
+import { addCommon as addCommonProjections } from 'ol/proj.js';
+import { Cluster } from 'ol/source';
+import { LegendItem } from '../legend-item';
 
 @Component({
   selector: 'qa-map',
   templateUrl: './map.component.html',
-  styleUrls: ['./map.component.scss']
+  styleUrls: ['./map.component.scss'],
+  standalone: false,
 })
 export class MapComponent implements AfterViewInit, OnInit {
 

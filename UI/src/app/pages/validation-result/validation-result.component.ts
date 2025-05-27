@@ -10,7 +10,8 @@ import {EMPTY} from 'rxjs';
   selector: 'qa-validation',
   templateUrl: './validation-result.component.html',
   styleUrls: ['./validation-result.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  standalone: false
 })
 export class ValidationResultComponent implements OnInit {
   public validationId: string;

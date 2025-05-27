@@ -18,7 +18,6 @@ import { FormsModule } from '@angular/forms';
     TooltipModule,
     CalendarModule,
     FormsModule,
-    ValidationPeriodComponent
   ]
 })
 export class ValidationPeriodModule { }

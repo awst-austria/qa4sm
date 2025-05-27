@@ -7,13 +7,13 @@ import { TooltipModule } from 'primeng/tooltip';
 
 
 @NgModule({
+  declarations: [ValidationReferenceComponent],
   exports: [ValidationReferenceComponent],
   imports: [
     CommonModule,
     DropdownModule,
     FormsModule,
     TooltipModule,
-    ValidationReferenceComponent
   ]
 })
 export class ValidationReferenceModule { }

@@ -1,6 +1,6 @@
-import {Component, model, OnInit} from '@angular/core';
-import {MetricModel} from '../metric/metric-model';
-import {ValidationModel} from '../../../../pages/validate/validation-model';
+import { Component, model, OnInit } from '@angular/core';
+import { MetricModel } from '../metric/metric-model';
+import { ValidationModel } from '../../../../pages/validate/validation-model';
 
 /**
 If a new metric that requires only a checkbox should be added, follow the comments below.
@@ -15,7 +15,8 @@ information.
 @Component({
   selector: 'qa-metrics',
   templateUrl: './metrics.component.html',
-  styleUrls: ['./metrics.component.scss']
+  styleUrls: ['./metrics.component.scss'],
+  standalone: false,
 })
 export class MetricsComponent implements OnInit {
 

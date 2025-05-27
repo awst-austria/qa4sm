@@ -1,18 +1,19 @@
-import {Component, OnInit} from '@angular/core';
-import {FormControl, FormGroup, Validators} from '@angular/forms';
-import {AuthService} from '../../modules/core/services/auth/auth.service';
-import {Router} from '@angular/router';
-import {ToastService} from '../../modules/core/services/toast/toast.service';
-import {PasswordValidator} from '../../modules/user/password.validator';
-import {PasswordForm} from '../../modules/core/services/form-interfaces/password-forms';
-import {EMPTY, Observable} from 'rxjs';
-import {catchError} from 'rxjs/operators';
-import {CustomHttpError} from '../../modules/core/services/global/http-error.service';
+import { Component, OnInit } from '@angular/core';
+import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { AuthService } from '../../modules/core/services/auth/auth.service';
+import { Router } from '@angular/router';
+import { ToastService } from '../../modules/core/services/toast/toast.service';
+import { PasswordValidator } from '../../modules/user/password.validator';
+import { PasswordForm } from '../../modules/core/services/form-interfaces/password-forms';
+import { EMPTY, Observable } from 'rxjs';
+import { catchError } from 'rxjs/operators';
+import { CustomHttpError } from '../../modules/core/services/global/http-error.service';
 
 @Component({
   selector: 'qa-set-password',
   templateUrl: './set-password.component.html',
-  styleUrls: ['./set-password.component.scss']
+  styleUrls: ['./set-password.component.scss'],
+  standalone: false
 })
 export class SetPasswordComponent implements OnInit {
   token: string;

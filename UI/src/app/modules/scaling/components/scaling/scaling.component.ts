@@ -1,15 +1,16 @@
-import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
-import {ValidationModel} from '../../../../pages/validate/validation-model';
-import {BehaviorSubject} from 'rxjs';
-import {ValidationRunConfigService} from '../../../../pages/validate/service/validation-run-config.service';
-import {ScalingMethodDto} from './scaling-methods.dto';
-import {DatasetConfigModel} from '../../../../pages/validate/dataset-config-model';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { ValidationModel } from '../../../../pages/validate/validation-model';
+import { BehaviorSubject } from 'rxjs';
+import { ValidationRunConfigService } from '../../../../pages/validate/service/validation-run-config.service';
+import { ScalingMethodDto } from './scaling-methods.dto';
+import { DatasetConfigModel } from '../../../../pages/validate/dataset-config-model';
 
 
 @Component({
   selector: 'qa-scaling',
   templateUrl: './scaling.component.html',
-  styleUrls: ['./scaling.component.scss']
+  styleUrls: ['./scaling.component.scss'],
+  standalone: false,
 })
 export class ScalingComponent implements OnInit {
 

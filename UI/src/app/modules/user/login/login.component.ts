@@ -1,19 +1,19 @@
-import {Component, EventEmitter, Input, OnInit, Output, signal, ViewChild} from '@angular/core';
-import {AuthService} from '../../core/services/auth/auth.service';
-import {LoginDto} from '../../core/services/auth/login.dto';
-import {FormControl, FormGroup, Validators} from '@angular/forms';
-import {ToastService} from '../../core/services/toast/toast.service';
-import {LoginForm} from '../../core/services/form-interfaces/login-form';
-import {HttpErrorResponse} from '@angular/common/http';
-import {Subject, takeUntil} from 'rxjs';
-import {Router, NavigationEnd} from '@angular/router';
+import { Component, EventEmitter, OnInit, Output, signal } from '@angular/core';
+import { AuthService } from '../../core/services/auth/auth.service';
+import { LoginDto } from '../../core/services/auth/login.dto';
+import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { ToastService } from '../../core/services/toast/toast.service';
+import { LoginForm } from '../../core/services/form-interfaces/login-form';
+import { HttpErrorResponse } from '@angular/common/http';
+import { NavigationEnd, Router } from '@angular/router';
 
 
 @Component({
   selector: 'qa-login',
   templateUrl: './login.component.html',
-  styleUrls: ['./login.component.scss'], 
-  providers: []
+  styleUrls: ['./login.component.scss'],
+  providers: [],
+  standalone: false,
 })
 export class LoginComponent implements OnInit {
 
@@ -36,7 +36,7 @@ export class LoginComponent implements OnInit {
               private router: Router) {}
 
   ngOnInit() {
-    
+
     //set isHomePage boolean value based on the current route
     this.router.events.subscribe(event => {
       if (event instanceof NavigationEnd) {
@@ -61,12 +61,12 @@ export class LoginComponent implements OnInit {
 
 
   get isHomePageValue(): boolean {
-    // is homepage boolean getter 
+    // is homepage boolean getter
     return this.isHomePage();
   }
 
   get dialogClasses(): string {
-    // get p dialog classes for login modal colour scheme 
+    // get p dialog classes for login modal colour scheme
     const baseClass = 'login-dialog';
     return this.isHomePageValue ? `${baseClass} home-page-modal` : baseClass;
   }
@@ -76,13 +76,13 @@ export class LoginComponent implements OnInit {
       const credentials = new LoginDto(
         this.loginForm.get('username')?.value,
         this.loginForm.get('password')?.value
-      );  
-    
+      );
+
     this.loginService.login(credentials).subscribe({
       next: (user) => {
         this.loggedIn.emit(true);
         this.toastService.showSuccessWithHeader(
-          'Login successful', 
+          'Login successful',
           `Welcome ${user.first_name || user.username}`
         );
       },

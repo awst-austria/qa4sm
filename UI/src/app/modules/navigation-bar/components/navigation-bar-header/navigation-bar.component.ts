@@ -1,15 +1,16 @@
-import {Component, HostListener, OnInit, signal, ViewChild} from '@angular/core';
-import {MenuItem} from 'primeng/api';
-import {AuthService} from '../../../core/services/auth/auth.service';
-import {Event, NavigationEnd, Router} from '@angular/router';
-import {ToastService} from '../../../core/services/toast/toast.service';
-import {SettingsService} from '../../../core/services/global/settings.service';
-import {LoginComponent} from 'src/app/modules/user/login/login.component';
+import { Component, HostListener, OnInit, signal, ViewChild } from '@angular/core';
+import { MenuItem } from 'primeng/api';
+import { AuthService } from '../../../core/services/auth/auth.service';
+import { Event, NavigationEnd, Router } from '@angular/router';
+import { ToastService } from '../../../core/services/toast/toast.service';
+import { SettingsService } from '../../../core/services/global/settings.service';
+import { LoginComponent } from 'src/app/modules/user/login/login.component';
 
 @Component({
   selector: 'qa-navigation-bar-header',
   templateUrl: './navigation-bar.component.html',
-  styleUrls: ['./navigation-bar.component.scss']
+  styleUrls: ['./navigation-bar.component.scss'],
+  standalone: false,
 })
 export class NavigationBarComponent implements OnInit {
   isMaintenancePossible = false;

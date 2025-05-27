@@ -1,13 +1,14 @@
-import {Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges} from '@angular/core';
-import {UserDataFileDto} from '../../services/user-data-file.dto';
-import {DataManagementGroupsDto} from '../../services/data-management-groups.dto';
-import {UserDatasetsService} from '../../services/user-datasets.service';
-import {BehaviorSubject} from 'rxjs';
+import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
+import { UserDataFileDto } from '../../services/user-data-file.dto';
+import { DataManagementGroupsDto } from '../../services/data-management-groups.dto';
+import { UserDatasetsService } from '../../services/user-datasets.service';
+import { BehaviorSubject } from 'rxjs';
 
 @Component({
   selector: 'qa-share-user-data',
   templateUrl: './share-user-data.component.html',
-  styleUrls: ['./share-user-data.component.scss']
+  styleUrls: ['./share-user-data.component.scss'],
+  standalone: false
 })
 export class ShareUserDataComponent implements OnInit, OnChanges{
 

@@ -1,15 +1,16 @@
-import {Component, OnInit} from '@angular/core';
-import {AuthService} from '../../modules/core/services/auth/auth.service';
-import {ActivatedRoute, Router} from '@angular/router';
-import {ToastService} from '../../modules/core/services/toast/toast.service';
-import {EMPTY, Observable} from 'rxjs';
-import {catchError} from 'rxjs/operators';
-import {CustomHttpError} from '../../modules/core/services/global/http-error.service';
+import { Component, OnInit } from '@angular/core';
+import { AuthService } from '../../modules/core/services/auth/auth.service';
+import { ActivatedRoute, Router } from '@angular/router';
+import { ToastService } from '../../modules/core/services/toast/toast.service';
+import { EMPTY, Observable } from 'rxjs';
+import { catchError } from 'rxjs/operators';
+import { CustomHttpError } from '../../modules/core/services/global/http-error.service';
 
 @Component({
   selector: 'qa-password-reset-validate-token',
   templateUrl: './password-reset-validate-token.component.html',
-  styleUrls: ['./password-reset-validate-token.component.scss']
+  styleUrls: ['./password-reset-validate-token.component.scss'],
+  standalone: false
 })
 export class PasswordResetValidateTokenComponent implements OnInit {
   tokenError = undefined;

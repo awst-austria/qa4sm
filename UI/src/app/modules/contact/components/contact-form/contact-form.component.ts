@@ -1,14 +1,15 @@
-import {Component} from '@angular/core';
-import {FormBuilder, Validators} from '@angular/forms';
-import {ToastService} from '../../../core/services/toast/toast.service';
-import {AuthService} from '../../../core/services/auth/auth.service';
-import {ContactForm} from '../../../core/services/form-interfaces/contact-form';
-import {CustomHttpError} from '../../../core/services/global/http-error.service';
+import { Component } from '@angular/core';
+import { FormBuilder, Validators } from '@angular/forms';
+import { ToastService } from '../../../core/services/toast/toast.service';
+import { AuthService } from '../../../core/services/auth/auth.service';
+import { ContactForm } from '../../../core/services/form-interfaces/contact-form';
+import { CustomHttpError } from '../../../core/services/global/http-error.service';
 
 @Component({
   selector: 'qa-contact-form',
   templateUrl: './contact-form.component.html',
-  styleUrls: ['./contact-form.component.scss']
+  styleUrls: ['./contact-form.component.scss'],
+  standalone: false,
 })
 export class ContactFormComponent {
 

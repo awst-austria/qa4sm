@@ -6,7 +6,8 @@ import { DatasetComponentSelectionModel } from '../../../dataset/components/data
 @Component({
   selector: 'qa-threshold-filter',
   templateUrl: './threshold-filter.component.html',
-  styleUrls: ['./threshold-filter.component.scss']
+  styleUrls: ['./threshold-filter.component.scss'],
+  standalone: false,
 })
 export class ThresholdFilterComponent implements OnInit {
 

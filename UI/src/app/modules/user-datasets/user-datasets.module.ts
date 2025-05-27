@@ -16,24 +16,25 @@ import {ShareUserDataComponent} from './components/share-user-data/share-user-da
 
 
 @NgModule({
-  declarations: [UserFileUploadComponent, UserDataRowComponent, AllowedNameDirective, ShareUserDataComponent],
+  declarations: [UserFileUploadComponent, UserDataRowComponent, ShareUserDataComponent],
     exports: [
         UserFileUploadComponent,
         UserDataRowComponent,
         ShareUserDataComponent
     ],
-    imports: [
-        CommonModule,
-        ButtonModule,
-        DialogModule,
-        RouterModule,
-        ReactiveFormsModule,
-        InputTextModule,
-        TooltipModule,
-        DropdownModule,
-        FormsModule,
-        PanelModule,
-        ScrollPanelModule
-    ]
+  imports: [
+    CommonModule,
+    ButtonModule,
+    DialogModule,
+    RouterModule,
+    ReactiveFormsModule,
+    InputTextModule,
+    TooltipModule,
+    DropdownModule,
+    FormsModule,
+    PanelModule,
+    ScrollPanelModule,
+    AllowedNameDirective
+  ]
 })
 export class UserDatasetsModule { }

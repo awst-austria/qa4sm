@@ -1,12 +1,13 @@
-import {Component, Input,} from '@angular/core';
-import {LegendItem} from '../legend-item';
-import {DomSanitizer} from '@angular/platform-browser';
+import { Component, Input } from '@angular/core';
+import { LegendItem } from '../legend-item';
+import { DomSanitizer } from '@angular/platform-browser';
 
 
 @Component({
   selector: 'qa-map-legend',
   templateUrl: './map-legend.component.html',
-  styleUrls: ['./map-legend.component.scss']
+  styleUrls: ['./map-legend.component.scss'],
+  standalone: false,
 })
 export class MapLegendComponent {
   @Input() legendItems: LegendItem[] = [];

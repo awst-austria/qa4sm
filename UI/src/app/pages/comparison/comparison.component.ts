@@ -1,14 +1,15 @@
-import {Component, OnInit} from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import {
   Validations2CompareModel
 } from '../../modules/comparison/components/validation-selector/validation-selection.model';
-import {ComparisonService} from '../../modules/comparison/services/comparison.service';
-import {ToastService} from '../../modules/core/services/toast/toast.service';
+import { ComparisonService } from '../../modules/comparison/services/comparison.service';
+import { ToastService } from '../../modules/core/services/toast/toast.service';
 
 @Component({
   selector: 'qa-comparison',
   templateUrl: './comparison.component.html',
-  styleUrls: ['./comparison.component.scss']
+  styleUrls: ['./comparison.component.scss'],
+  standalone: false
 })
 export class ComparisonComponent implements OnInit {
   comparisonModel: Validations2CompareModel;
