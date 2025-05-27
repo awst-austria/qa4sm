@@ -1,6 +1,6 @@
-import {Component, Input, OnInit, signal} from '@angular/core';
-import {AnomaliesModel} from './anomalies-model';
-import {BehaviorSubject} from 'rxjs';
+import { Component, Input, OnInit, signal } from '@angular/core';
+import { AnomaliesModel } from './anomalies-model';
+import { BehaviorSubject } from 'rxjs';
 
 // The following constants come from the validation_run database model
 export const ANOMALIES_NONE: string = 'none';
@@ -15,7 +15,8 @@ export const ANOMALIES_35D_MA_DESC: string = '35 day moving average';
 @Component({
   selector: 'qa-anomalies',
   templateUrl: './anomalies.component.html',
-  styleUrls: ['./anomalies.component.scss']
+  styleUrls: ['./anomalies.component.scss'],
+  standalone: false,
 })
 export class AnomaliesComponent implements OnInit {
 

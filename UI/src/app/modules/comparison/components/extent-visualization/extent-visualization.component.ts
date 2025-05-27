@@ -1,15 +1,16 @@
-import {Component, EventEmitter, OnInit, Output} from '@angular/core';
-import {Validations2CompareModel} from '../validation-selector/validation-selection.model';
-import {HttpParams} from '@angular/common/http';
-import {SafeUrl} from '@angular/platform-browser';
-import {ExtentModel} from '../spatial-extent/extent-model';
-import {ComparisonService} from '../../services/comparison.service';
-import {WebsiteGraphicsService} from '../../../core/services/global/website-graphics.service';
+import { Component, EventEmitter, OnInit, Output } from '@angular/core';
+import { Validations2CompareModel } from '../validation-selector/validation-selection.model';
+import { HttpParams } from '@angular/common/http';
+import { SafeUrl } from '@angular/platform-browser';
+import { ExtentModel } from '../spatial-extent/extent-model';
+import { ComparisonService } from '../../services/comparison.service';
+import { WebsiteGraphicsService } from '../../../core/services/global/website-graphics.service';
 
 @Component({
   selector: 'qa-extent-visualization',
   templateUrl: './extent-visualization.component.html',
-  styleUrls: ['./extent-visualization.component.scss']
+  styleUrls: ['./extent-visualization.component.scss'],
+  standalone: false,
 })
 
 export class ExtentVisualizationComponent implements OnInit {

@@ -1,14 +1,14 @@
-import {Component, EventEmitter, OnInit, Output} from '@angular/core';
-import {ComparisonService} from '../../services/comparison.service';
-import {HttpParams} from '@angular/common/http';
-import {Validations2CompareModel} from '../validation-selector/validation-selection.model';
-import {MetricsComparisonDto} from '../../services/metrics-comparison.dto';
-import {SafeUrl} from '@angular/platform-browser';
-import {PlotDto} from '../../../core/services/global/plot.dto';
-import {WebsiteGraphicsService} from '../../../core/services/global/website-graphics.service';
-import {ExtentModel} from '../spatial-extent/extent-model';
-import {debounceTime} from 'rxjs/operators';
-import {CustomHttpError} from '../../../core/services/global/http-error.service';
+import { Component, EventEmitter, OnInit, Output } from '@angular/core';
+import { ComparisonService } from '../../services/comparison.service';
+import { HttpParams } from '@angular/common/http';
+import { Validations2CompareModel } from '../validation-selector/validation-selection.model';
+import { MetricsComparisonDto } from '../../services/metrics-comparison.dto';
+import { SafeUrl } from '@angular/platform-browser';
+import { PlotDto } from '../../../core/services/global/plot.dto';
+import { WebsiteGraphicsService } from '../../../core/services/global/website-graphics.service';
+import { ExtentModel } from '../spatial-extent/extent-model';
+import { debounceTime } from 'rxjs/operators';
+import { CustomHttpError } from '../../../core/services/global/http-error.service';
 
 // types of plots to show up. Shouldn't be hardcoded
 const PLOT_TYPES = ['boxplot', 'mapplot'];
@@ -17,6 +17,7 @@ const PLOT_TYPES = ['boxplot', 'mapplot'];
   selector: 'qa-plots',
   templateUrl: './plots.component.html',
   styleUrls: ['./plots.component.scss'],
+  standalone: false,
 })
 
 export class PlotsComponent implements OnInit {

@@ -1,17 +1,18 @@
-import {Component, OnInit, signal} from '@angular/core';
-import {Validations2CompareModel} from '../validation-selector/validation-selection.model';
-import {ComparisonService} from '../../services/comparison.service';
-import {ExtentModel} from '../spatial-extent/extent-model';
-import {ValidationResultModel} from '../../../../pages/validation-result/validation-result-model';
-import {ValidationrunService} from '../../../core/services/validation-run/validationrun.service';
-import {DatasetConfigurationService} from '../../../validation-result/services/dataset-configuration.service';
-import {catchError} from 'rxjs/operators';
-import {EMPTY} from 'rxjs';
+import { Component, OnInit, signal } from '@angular/core';
+import { Validations2CompareModel } from '../validation-selector/validation-selection.model';
+import { ComparisonService } from '../../services/comparison.service';
+import { ExtentModel } from '../spatial-extent/extent-model';
+import { ValidationResultModel } from '../../../../pages/validation-result/validation-result-model';
+import { ValidationrunService } from '../../../core/services/validation-run/validationrun.service';
+import { DatasetConfigurationService } from '../../../validation-result/services/dataset-configuration.service';
+import { catchError } from 'rxjs/operators';
+import { EMPTY } from 'rxjs';
 
 @Component({
   selector: 'qa-comparison-summary',
   templateUrl: './comparison-summary.component.html',
-  styleUrls: ['./comparison-summary.component.scss']
+  styleUrls: ['./comparison-summary.component.scss'],
+  standalone: false,
 })
 export class ComparisonSummaryComponent implements OnInit {
   comparisonModel: Validations2CompareModel = new Validations2CompareModel(

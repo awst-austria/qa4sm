@@ -19,7 +19,8 @@ const N_MAX_VALIDATIONS = 2; // A maximum of two validation results can be compa
 @Component({
   selector: 'qa-validation-selector',
   templateUrl: './validation-selector.component.html',
-  styleUrls: ['./validation-selector.component.scss']
+  styleUrls: ['./validation-selector.component.scss'],
+  standalone: false,
 })
 export class ValidationSelectorComponent implements OnInit {
 
