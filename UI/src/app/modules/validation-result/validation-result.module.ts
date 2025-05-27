@@ -33,12 +33,12 @@ import { ToggleButtonModule } from 'primeng/togglebutton';
 import { MenuModule } from 'primeng/menu';
 import { CoreModule } from '../core/core.module';
 import { FilteringFormComponent } from './components/filtering-form/filtering-form.component';
-import { CalendarModule } from 'primeng/calendar';
 import { AccordionModule } from 'primeng/accordion';
 import { ChipModule } from 'primeng/chip';
 import { CardModule } from 'primeng/card';
 import { Ripple } from 'primeng/ripple';
 import { Select } from 'primeng/select';
+import { DatePicker } from 'primeng/datepicker';
 
 @NgModule({
   declarations: [ValidationrunRowComponent,
@@ -63,33 +63,33 @@ import { Select } from 'primeng/select';
     PublishingComponent,
     ExistingValidationComponent,
   ],
-    imports: [
-        CommonModule,
-        PanelModule,
-        TooltipModule,
-        FontAwesomeModule,
-        RouterModule,
-        MultiSelectModule,
-        CalendarModule,
-        FormsModule,
-        InputTextModule,
-        ButtonModule,
-        ReactiveFormsModule,
-        GalleriaModule,
-        DialogModule,
-        PanelMenuModule,
-        FieldsetModule,
-        CheckboxModule,
-        SelectButtonModule,
-        ToggleButtonModule,
-        MenuModule,
-        CoreModule,
-        AccordionModule,
-        ChipModule,
-        CardModule,
-        Ripple,
-        Select
-    ]
+  imports: [
+    CommonModule,
+    PanelModule,
+    TooltipModule,
+    FontAwesomeModule,
+    RouterModule,
+    MultiSelectModule,
+    FormsModule,
+    InputTextModule,
+    ButtonModule,
+    ReactiveFormsModule,
+    GalleriaModule,
+    DialogModule,
+    PanelMenuModule,
+    FieldsetModule,
+    CheckboxModule,
+    SelectButtonModule,
+    ToggleButtonModule,
+    MenuModule,
+    CoreModule,
+    AccordionModule,
+    ChipModule,
+    CardModule,
+    Ripple,
+    Select,
+    DatePicker
+  ]
 })
 export class ValidationResultModule {
 }

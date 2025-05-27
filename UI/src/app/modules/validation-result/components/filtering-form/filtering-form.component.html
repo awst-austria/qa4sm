@@ -38,14 +38,14 @@
                [placeholder]="selectedFilter.optionPlaceHolder"
                [style]="{'width': '100%'}"/>
 
-        <p-calendar *ngSwitchCase="'date'"
+        <p-datePicker *ngSwitchCase="'date'"
                     [ngModel]="selectedFilter.value"
                     (ngModelChange)="onTextInputChange($event)"
                     dateFormat="dd/mm/yy"
                     selectionMode="range"
                     [style]="{'width': '100%'}"
                     [placeholder]="selectedFilter.optionPlaceHolder">
-        </p-calendar>
+        </p-datePicker>
     </ng-container>
 
     <p-fieldset *ngIf="validationFilters().length" legend="Selected Filters: ">
