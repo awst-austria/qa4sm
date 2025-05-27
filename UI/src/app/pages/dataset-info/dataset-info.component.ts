@@ -3,7 +3,7 @@ import { DatasetService } from '../../modules/core/services/dataset/dataset.serv
 import { DatasetVersionService } from '../../modules/core/services/dataset/dataset-version.service';
 import { FilterService } from '../../modules/core/services/filter/filter.service';
 import { combineLatest, EMPTY, Observable } from 'rxjs';
-import { catchError, map, tap } from 'rxjs/operators';
+import { catchError, map } from 'rxjs/operators';
 
 @Component({
   selector: 'qa-dataset-info',
@@ -34,7 +34,6 @@ export class DatasetInfoComponent {
     this.versionService.getAllVersions(),
     this.filterService.getAllFilters()
   ]).pipe(
-    tap(dss => console.log(dss)),
     map(([datasets, versions, filters]) =>
       datasets.map(
         dataset => {
