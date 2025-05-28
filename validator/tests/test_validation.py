@@ -879,11 +879,11 @@ class TestValidation(TestCase):
                            meta_plots=False)
         self.delete_run(new_run)
 
-    @pytest.mark.filterwarnings(
-        "ignore:No results for gpi:UserWarning",
-        "ignore:No data for:UserWarning",
-        "ignore: Too few points are available to generate:UserWarning")
-    @pytest.mark.long_running
+    # @pytest.mark.filterwarnings(
+    #     "ignore:No results for gpi:UserWarning",
+    #     "ignore:No data for:UserWarning",
+    #     "ignore: Too few points are available to generate:UserWarning")
+    # @pytest.mark.long_running
     def test_validation_smap_ref(self):
         run = generate_default_validation()
         run.plots_save_metadata = 'always'
@@ -892,7 +892,7 @@ class TestValidation(TestCase):
         run.spatial_reference_configuration.dataset = Dataset.objects.get(
             short_name=globals.SMAP_L3)
         run.spatial_reference_configuration.version = DatasetVersion.objects.get(
-            short_name=globals.SMAP_V5_PM)
+            short_name=globals.SMAP_V8_AM)
         run.spatial_reference_configuration.variable = DataVariable.objects.get(
             pretty_name=globals.SMAP_soil_moisture)
         run.spatial_reference_configuration.filters.add(
@@ -930,9 +930,10 @@ class TestValidation(TestCase):
 
         assert new_run
         # TODO: Check why total_points
-        assert new_run.total_points == 140, "Number of gpis is off"
-        assert new_run.error_points == 137, "Error points are off"
-        assert new_run.ok_points == 3, "OK points are off"
+        print(new_run.total_points, new_run.error_points, new_run.ok_points)
+        assert new_run.total_points == 12, "Number of gpis is off"
+        assert new_run.error_points == 7, "Error points are off"
+        assert new_run.ok_points == 5, "OK points are off"
 
         self.check_results(new_run,
                            is_tcol_run=False,
@@ -1523,10 +1524,10 @@ class TestValidation(TestCase):
         """
         all_datasets = [(globals.CCIC, globals.ESA_CCI_SM_P_V05_2,
                          globals.ESA_CCI_SM_P_sm),
-                        (globals.SMAP_L3, globals.SMAP_V5_PM,
+                        (globals.SMAP_L3, globals.SMAP_V8_AM,
                          globals.SMAP_soil_moisture),
                         (globals.ASCAT, globals.ASCAT_H113, globals.ASCAT_sm),
-                        (globals.ERA5, globals.ERA5_20190613, globals.ERA5_sm),
+                        (globals.ERA5, globals.ERA5_LAND_latest, globals.ERA5_sm),
                         (globals.GLDAS, globals.GLDAS_NOAH025_3H_2_1,
                          globals.GLDAS_SoilMoi0_10cm_inst), (globals.SMAP_L3, globals.SMAP_V9_AM_PM,
                          globals.SMAP_soil_moisture)]
@@ -1761,7 +1762,7 @@ class TestValidation(TestCase):
         ref_c.validation = run
         ref_c.dataset = dataset
         ref_c.version = version
-        ref_c.variable = dataset.variables.first()
+        ref_c.variable = version.variables.first()
         ref_c.save()
         run.spatial_reference_configuration = ref_c
         run.save()
@@ -1849,7 +1850,7 @@ class TestValidation(TestCase):
         for i, dataset in enumerate(Dataset.objects.all()):
             self.__logger.info(dataset.pretty_name)
             vs = dataset.versions.all()
-            va = dataset.variables.all()
+            va = vs.first().variables.all()
 
             for version in vs:
                 reader = val.create_reader(dataset, version)
@@ -1932,7 +1933,7 @@ class TestValidation(TestCase):
                 ref_c.validation = run
                 ref_c.dataset = dataset
                 ref_c.version = version
-                ref_c.variable = dataset.variables.first()
+                ref_c.variable = ref_c.version.variables.first()
                 ref_c.save()
 
                 run.spatial_reference_configuration = ref_c

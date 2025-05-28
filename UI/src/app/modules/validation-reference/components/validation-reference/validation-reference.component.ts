@@ -1,7 +1,7 @@
-import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
-import {BehaviorSubject, Observable} from 'rxjs';
-import {DatasetConfigModel} from '../../../../pages/validate/dataset-config-model';
-import {ValidationModel} from '../../../../pages/validate/validation-model';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { BehaviorSubject, Observable } from 'rxjs';
+import { DatasetConfigModel } from '../../../../pages/validate/dataset-config-model';
+import { ValidationModel } from '../../../../pages/validate/validation-model';
 
 @Component({
   selector: 'qa-validation-reference',
@@ -10,13 +10,10 @@ import {ValidationModel} from '../../../../pages/validate/validation-model';
 })
 export class ValidationReferenceComponent implements OnInit {
 
-  datasets$: Observable<any> = new Observable();
-
   @Input() validationModel: ValidationModel;
   @Input() referenceType: string;
   @Output() hoverOverDataset = new EventEmitter<any>();
 
-  chosenDatasets$: BehaviorSubject<DatasetConfigModel[]> = new BehaviorSubject<DatasetConfigModel[]>(null);
   selectionModel$: BehaviorSubject<DatasetConfigModel> = new BehaviorSubject<DatasetConfigModel>(null);
   selectedValue: DatasetConfigModel;
   constructor() {
@@ -28,40 +25,35 @@ export class ValidationReferenceComponent implements OnInit {
   }
 
   onDatasetChange(reference = null): void {
-    if (!reference){
+    if (!reference) {
       this.selectedValue[this.referenceType].next(false);
     }
     this.selectedValue = this.selectionModel$.getValue();
     this.selectedValue[this.referenceType].next(true);
   }
 
-  onHoverOverDataset(item, highlight): void{
-    this.hoverOverDataset.emit({hoveredDataset: item, highlight});
+  onHoverOverDataset(item, highlight): void {
+    this.hoverOverDataset.emit({ hoveredDataset: item, highlight });
   }
 
-  verifyOptions(): BehaviorSubject<DatasetConfigModel[]>{
-    this.chosenDatasets$.next(this.validationModel.datasetConfigurations);
-    if (this.referenceType === 'spatialReference$'){
-      const listOfISMNDatasets = this.validationModel.datasetConfigurations.filter(dataset =>
-        dataset.datasetModel.selectedDataset?.short_name === 'ISMN');
-      const listOfServiceDatasets = this.validationModel.datasetConfigurations.filter(dataset =>
-      !dataset.datasetModel.selectedDataset?.user);
-      if (listOfISMNDatasets.length !== 0){
-        this.chosenDatasets$.next(listOfISMNDatasets);
-      } else if (listOfServiceDatasets.length < this.validationModel.datasetConfigurations.length) {
-        this.chosenDatasets$.next(listOfServiceDatasets);
+  verifyOptions(): BehaviorSubject<DatasetConfigModel[]> {
+    const availableDatasets = this.validationModel.datasetConfigurations;
+    if (this.referenceType === 'spatialReference$') {
+      const listOfISMNDatasets = availableDatasets.filter(dataset => dataset.datasetModel.selectedDataset.short_name === 'ISMN');
+      if (listOfISMNDatasets.length) {
+        return new BehaviorSubject(listOfISMNDatasets);
       }
     }
-    return this.chosenDatasets$;
+    return new BehaviorSubject(availableDatasets);
   }
 
-  verifyChosenValue(): BehaviorSubject<DatasetConfigModel>{
+  verifyChosenValue(): Observable<DatasetConfigModel> {
     this.selectedValue = this.validationModel.datasetConfigurations.find(datasetConfig => datasetConfig[this.referenceType].getValue());
     this.selectionModel$.next(this.selectedValue);
     return this.selectionModel$;
   }
 
-  setReference(reference: DatasetConfigModel): void{
+  setReference(reference: DatasetConfigModel): void {
     this.selectionModel$.next(reference);
     this.onDatasetChange(reference);
   }

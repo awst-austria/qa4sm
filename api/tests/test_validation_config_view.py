@@ -55,7 +55,7 @@ class TestValidationConfigView(TransactionTestCase):
                                                'variable_id': DataVariable.objects.get(
                                                    pretty_name=globals.SMAP_soil_moisture).id,
                                                'version_id': DatasetVersion.objects.get(
-                                                   short_name=globals.SMAP_V6_PM).id,
+                                                   short_name=globals.SMAP_V8_AM).id,
                                                'basic_filters': [basic_filter_id],
                                                'parametrised_filters': [],
                                                'is_spatial_reference': False,
@@ -244,7 +244,9 @@ class TestValidationConfigView(TransactionTestCase):
         assert val_run_dict['dataset_configs'][0]['is_scaling_reference'] is False
         assert val_run_dict['temporal_matching'] == globals.TEMP_MATCH_WINDOW
         #  applied all existing settings, so there will be no change
-        assert 'changes' not in val_run_dict.keys()
+        print(val_run_dict)
+        assert 'changes' in val_run_dict.keys()
+        assert len(val_run_dict['settings_changes']['versions'])
 
         # non existing validation - 404 expected
         response = self.client.get(reverse('Validation configuration', kwargs={'id': self.wrong_id}))

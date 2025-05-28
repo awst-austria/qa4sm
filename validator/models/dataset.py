@@ -1,6 +1,6 @@
 from django.db import models
 # from validator.models.filter import DataFilter
-from validator.models.variable import DataVariable
+# from validator.models.variable import DataVariable
 from validator.models.version import DatasetVersion
 from django.conf import settings
 
@@ -20,7 +20,7 @@ class Dataset(models.Model):
     is_spatial_reference = models.BooleanField(default=False)
 
     versions = models.ManyToManyField(DatasetVersion, related_name='versions')
-    variables = models.ManyToManyField(DataVariable, related_name='variables')
+
 
     # filters = models.ManyToManyField(DataFilter, related_name='filters') #TODO this must be put into version.py
     resolution = models.JSONField(null=True)

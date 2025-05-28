@@ -18,7 +18,8 @@ export interface ValidationRunConfigDto {
   scale_to: string;
   name_tag: string;
   temporal_matching: number;
-  changes?: ConfigurationChanges;
+  changes?: boolean;
+  settings_changes?: ConfigurationChanges;
 }
 
 export interface ValidationRunDatasetConfigDto {
@@ -47,6 +48,9 @@ export interface ConfigurationChanges {
   filters: {dataset: string, filter_desc: string[]}[];
   anomalies: boolean;
   scaling: boolean;
+  versions: {version: string, dataset: string}[];
+  variables: {variable: string, dataset: string}[];
+  newer_version_instead: {version: string, dataset: string}[];
 }
 
 export interface IntraAnnualMetricsDto{

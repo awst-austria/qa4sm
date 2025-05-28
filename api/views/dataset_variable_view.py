@@ -2,10 +2,10 @@ from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.permissions import AllowAny
 from rest_framework.serializers import ModelSerializer
 
-from validator.models import Dataset, DataVariable
+from validator.models import DataVariable, DatasetVersion
 
 
 @api_view(['GET'])
@@ -28,8 +28,8 @@ def dataset_variable_by_id(request, **kwargs):
 
 @api_view(['GET'])
 @permission_classes([AllowAny])
-def dataset_variable_by_dataset(request, **kwargs):
-    variables = get_object_or_404(Dataset, id=kwargs['dataset_id']).variables.order_by('id')
+def dataset_variable_by_version(request, **kwargs):
+    variables = get_object_or_404(DatasetVersion, id=kwargs['version_id']).variables.order_by('-id')
     serializer = DatasetVariableSerializer(variables, many=True)
 
     return JsonResponse(serializer.data, status=status.HTTP_200_OK, safe=False)

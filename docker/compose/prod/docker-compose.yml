@@ -26,7 +26,7 @@ services:
     restart: always
 
   web:
-    image: "awst/qa4sm:3.0.4"
+    image: "awst/qa4sm:3.1.0.1"
     restart: always
     environment:
       POSTGRES_PASSWORD: "${POSTGRES_PASSWORD}"
@@ -67,16 +67,16 @@ services:
         max-file: "3"
 
   proxy:
-    image: "awst/qa4sm-proxy:3.0.4"
+    image: "awst/qa4sm-proxy:3.1.0.1"
     restart: always
     ports:
       - "8080:80"
   ui:
-    image: "awst/qa4sm-ui:3.0.4"
+    image: "awst/qa4sm-ui:3.1.0.1"
     restart: always
 
   worker-1:
-    image: "awst/qa4sm-worker:3.0.4"
+    image: "awst/qa4sm-worker:3.1.0.1"
     restart: always
     environment:
       QA4SM_DB_HOST: "${QA4SM_DB_HOST}"

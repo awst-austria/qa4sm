@@ -6,7 +6,8 @@
       <h5 class="pt-2">
         You are not logged in.
         You can check validation options, but cannot start a validation.
-        <a (click)="authService.switchLoginModal(true)" class="mt-5 cursor-pointer">Click here</a> or on the Validate button
+        <a (click)="authService.switchLoginModal(true)" class="mt-5 cursor-pointer">Click here</a> or on the Validate
+        button
         to log in or use
         <a [routerLink]="'/signup'" class="mt-5">this form</a>
         to register.
@@ -40,7 +41,7 @@
                                 [class]="{'highlighted': (item.highlighted$|async),
                             'is-reference': ((item.spatialReference$|async) || (item.temporalReference$|async) || (item.scalingReference$|async))}">
 
-                  <qa-dataset *ngIf="validationModel.datasetConfigurations[datasetIdx].datasetModel.selectedDataset"
+                  <qa-dataset *ngIf="validationModel.datasetConfigurations[datasetIdx].datasetModel.selectedDataset && validationModel.datasetConfigurations[datasetIdx].datasetModel.selectedVersion"
                               [selectionModel]="validationModel.datasetConfigurations[datasetIdx].datasetModel"
                               [removable]="true" (changeDataset)="onDatasetChange($event)"/>
 
@@ -58,23 +59,23 @@
                   <qa-threshold-filter *ngIf="validationModel.datasetConfigurations[datasetIdx].smosRfiFilter$|async"
                                        [datasetModel]="validationModel.datasetConfigurations[datasetIdx].datasetModel"
                                        [filterModel$]="validationModel.datasetConfigurations[datasetIdx].smosRfiFilter$"
-                                       [minThreshold]="0." [increment]="0.05" maxThreshold="1." [units]="' [-]'" />
+                                       [minThreshold]="0." [increment]="0.05" [maxThreshold]="1.0" [units]="' [-]'"/>
 
                   <qa-threshold-filter *ngIf="validationModel.datasetConfigurations[datasetIdx].smosChi2Filter$|async"
                                        [datasetModel]="validationModel.datasetConfigurations[datasetIdx].datasetModel"
                                        [filterModel$]="validationModel.datasetConfigurations[datasetIdx].smosChi2Filter$"
-                                       [minThreshold]="0." [increment]="0.05" maxThreshold="1." [units]="' [-]'" />
+                                       [minThreshold]="0." [increment]="0.05" [maxThreshold]="1.0" [units]="' [-]'"/>
 
 
                   <qa-threshold-filter *ngIf="validationModel.datasetConfigurations[datasetIdx].vegetationWaterFilter$|async"
                                        [datasetModel]="validationModel.datasetConfigurations[datasetIdx].datasetModel"
                                        [filterModel$]="validationModel.datasetConfigurations[datasetIdx].vegetationWaterFilter$"
-                                       [minThreshold]="0" [increment]="1" maxThreshold="60" [units]="' [kg/m3]'" />
+                                       [minThreshold]="0" [increment]="1" [maxThreshold]="60" [units]="' [kg/m3]'" />
 
                   <qa-threshold-filter *ngIf="validationModel.datasetConfigurations[datasetIdx].staticWaterFilter$|async"
                                        [datasetModel]="validationModel.datasetConfigurations[datasetIdx].datasetModel"
                                        [filterModel$]="validationModel.datasetConfigurations[datasetIdx].staticWaterFilter$"
-                                       [minThreshold]="0." [increment]="0.05" maxThreshold="1." [units]="' [-]'" />
+                                       [minThreshold]="0" [increment]="0.05" [maxThreshold]="1.0" [units]="' [-]'" />
 
                   <div *ngIf="validationModel.datasetConfigurations[datasetIdx].ismnNetworkFilter$|async">
                     <qa-ismn-network-filter
@@ -86,7 +87,7 @@
                     <qa-ismn-depth-filter
                       (depthSelectionChanged)="onIsmnDepthSelectionChange($event)"
                       [datasetModel]="validationModel.datasetConfigurations[datasetIdx].datasetModel"
-                      [filterModel$]="validationModel.datasetConfigurations[datasetIdx].ismnDepthFilter$" />
+                      [filterModel$]="validationModel.datasetConfigurations[datasetIdx].ismnDepthFilter$"/>
                   </div>
 
                   <div style="width: 100%;text-align: right">
@@ -132,8 +133,8 @@
                 <label for="spatial-reference"
                        class="mb-4"
                        pTooltip="Choose the spatial reference dataset. If the ISMN dataset belongs to the dataset pool,
-                   it has to be chosen as the spatial reference. Due to technical limitations, user dataset
-                   can't be chosen as the spatial reference."
+                   it has to be chosen as the spatial reference. Due to technical limitations, we cannot guarantee that
+                   using user data as the spatial reference will always produce results. Therefore, we recommend using one of the datasets provided in the app."
                        tooltipPosition="bottom">
                   <span class="pi pi-question-circle"></span>
                   Spatial reference
@@ -149,32 +150,32 @@
               <hr class="w-11 mt-2" style="opacity: 1.0;">
 
               <!--             temporal reference-->
-                <label for="temporal-reference"
-                       class="mb-4"
-                       pTooltip="Choose the temporal reference dataset. Please note, that we do not recommend selecting ISMN."
-                       tooltipPosition="bottom">
-                  <span class="pi pi-question-circle"></span>
-                  Temporal reference
-                </label>
-                <qa-validation-reference
-                  id="temporal-reference"
-                  #temporalReference
-                  [validationModel]="validationModel"
-                  [referenceType]="'temporalReference$'"
-                  (hoverOverDataset)="onHoverOverReferenceDataset($event)"/>
+              <label for="temporal-reference"
+                     class="mb-4"
+                     pTooltip="Choose the temporal reference dataset. Please note, that we do not recommend selecting ISMN."
+                     tooltipPosition="bottom">
+                <span class="pi pi-question-circle"></span>
+                Temporal reference
+              </label>
+              <qa-validation-reference
+                id="temporal-reference"
+                #temporalReference
+                [validationModel]="validationModel"
+                [referenceType]="'temporalReference$'"
+                (hoverOverDataset)="onHoverOverReferenceDataset($event)"/>
 
 
-                <!--      Temporal matching-->
-                <label  for="temporal-matching"
-                        pTooltip="Select the size of the temporal matching window used to collocate the 'reference' and 'data' measurements in time.
+              <!--      Temporal matching-->
+              <label for="temporal-matching"
+                     pTooltip="Select the size of the temporal matching window used to collocate the 'reference' and 'data' measurements in time.
                                   The specified temporal window is centered on the reference measurements (i.e., with edges at +- half size distance from each considered measurement point).
                                   NOTE: the size of the window influences the number of observations used in the validation and could lead to no results in case no matches are found."
-                        tooltipPosition="bottom">
+                     tooltipPosition="bottom">
                 <span class="pi pi-question-circle"></span>
                 Temporal matching window
-                </label>
-                <qa-temporal-matching id="temporal-matching"
-                [temporalMatchingModel]="validationModel.temporalMatchingModel"/>
+              </label>
+              <qa-temporal-matching id="temporal-matching"
+                                    [temporalMatchingModel]="validationModel.temporalMatchingModel"/>
             </p-panel>
 
 

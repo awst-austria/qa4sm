@@ -59,30 +59,27 @@ DATASETS = qr_globals.DATASETS
 
 MAX_NUM_DS_PER_VAL_RUN = qr_globals.MAX_NUM_DS_PER_VAL_RUN
 
-# dataset versions
+# dataset versions - keep it up to date with the current status of used versions
 C3S_V201706 = 'C3S_V201706'
 C3S_V201812 = 'C3S_V201812'
 C3S_V201912 = 'C3S_V201912'
 C3S_V202012 = 'C3S_V202012'
 C3S_V202212 = 'C3S_V202212'
-ISMN_V20180712_MINI = 'ISMN_V20180712_MINI'
-ISMN_V20191211 = 'ISMN_V20191211'
-ISMN_V20210131 = 'ISMN_V20210131'
-ISMN_VRelease2_Verification = 'ISMN_VRelease2_Verification'
+C3S_V202312 = 'C3S_V202312'
 ISMN_V20230110 = 'ISMN_V20230110'
-SMAP_V5_PM = 'SMAP_V5_PM'
-SMAP_V6_PM = 'SMAP_V6_PM'
-SMAP_V5_AM = 'SMAP_V5_AM'
-SMAP_V6_AM = 'SMAP_V6_AM'
+ISMN_V20240314 = 'ISMN_V20240314'
+SMAP_V8_AM = 'SMAP_V8_AM'
 SMAP_V9_AM_PM = 'SMAP_V9_AM_PM'
 SMOS_105_ASC = 'SMOS_105_ASC'
 GLDAS_NOAH025_3H_2_1 = 'GLDAS_NOAH025_3H_2_1'
 ASCAT_H113 = 'ASCAT_H113'
+ASCAT_H119 = 'ASCAT_H119'
+
 ERA5_20190613 = 'ERA5_20190613'
+ERA5_latest = 'ERA5_latest'
 ERA5_Land_V20190904 = 'ERA5_LAND_V20190904'
-ESA_CCI_SM_A_V04_4 = 'ESA_CCI_SM_A_V04_4'
-ESA_CCI_SM_P_V04_4 = 'ESA_CCI_SM_P_V04_4'
-ESA_CCI_SM_C_V04_4 = 'ESA_CCI_SM_C_V04_4'
+ERA5_LAND_latest = 'ERA5_LAND_latest'
+
 ESA_CCI_SM_A_V04_5 = 'ESA_CCI_SM_A_V04_5'
 ESA_CCI_SM_P_V04_5 = 'ESA_CCI_SM_P_V04_5'
 ESA_CCI_SM_C_V04_5 = 'ESA_CCI_SM_C_V04_5'
@@ -167,6 +164,7 @@ METADATA_PLOT_NAMES = {
     "Climate classification": "metadata_climate_KG",
     "Soil type classification": "metadata_instrument_depth_and_soil_type",
     "FRM classification": "metadata_frm_class",
+    "Networks": "metadata_network"
 }
 
 TEMP_MATCH_WINDOW = ValidationRun.TEMP_MATCH_WINDOW

@@ -107,7 +107,7 @@ class TestModels(TestCase):
             dc.validation = run
             dc.dataset = Dataset.objects.get(pk=i)
             dc.version = dc.dataset.versions.first()
-            dc.variable = dc.dataset.variables.first()
+            dc.variable = dc.version.variables.first()
             dc.save()
 
         run.spatial_reference_configuration = dc
