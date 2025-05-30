@@ -131,6 +131,16 @@ def request_api_token(request):
             'error': str(e)
         }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_api_token(request):
+    token_data = {
+        'token': '123456789abcdefgh',
+        'status': 'approved'
+    }
+    return JsonResponse(token_data, status=200)
+
+
 
 @api_view(['DELETE'])
 @permission_classes([IsAuthenticated])

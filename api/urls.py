@@ -16,7 +16,7 @@ from api.views.validation_config_view import start_validation, get_validation_co
 from api.views.uptime_view import uptime_ping, get_uptime
 from api.views.comparison_view import get_comparison_table, get_comparison_plots_for_metric, \
     download_comparison_table, get_comparison_metrics, get_spatial_extent
-from api.views.user_view import signup_post, user_update, user_delete, password_update, verify_email, request_api_token
+from api.views.user_view import signup_post, user_update, user_delete, password_update, verify_email, request_api_token, get_api_token
 from api.views.validation_run_view import published_results, my_results, validation_run_by_id, \
     custom_tracked_validation_runs, get_validations_for_comparison, get_copied_validations, is_validation_finished
 from api.views.dataset_configuration_view import dataset_configuration, dataset_configuration_by_validation
@@ -134,6 +134,7 @@ urlpatterns = [
     path('archive-multiple-validations', archive_multiple_results, name='Archive Multiple Results'),
     #path('api-obtain-token/', views.obtain_auth_token, name='Obtain token'),
     path('request-api-token', request_api_token, name='request-api-token'),
+    path('get-api-token', get_api_token, name='get-api-token'),
     path('update-dataset-version', update_dataset_version, name='Update Dataset Version'),
     path('run-auto-cleanup', run_auto_cleanup_script, name='Run Auto Cleanup'),
     path('password-update', password_update, name='Password Update'),

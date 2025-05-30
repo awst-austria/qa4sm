@@ -152,6 +152,33 @@
         <label for="active">some label</label>
       </div>
 
+      <hr class="w-12 mt-2" style="opacity: 1.0;">
+
+      <div *ngIf="userData" class="py-3">
+        <span class="p-float-label">
+          <input #tokenInput
+                 class="form-field" 
+                 id="api-token" 
+                 type="text" 
+                 pInputText 
+                 [value]="apiToken || 'No token assigned'" 
+                 readonly>
+          <label for="api-token">API Token</label>
+          <span
+             *ngIf="!hasToken()"
+            pTooltip="Unique user token required to submit validations via API call."
+            class="pi pi-question-circle">
+          </span>
+          <button *ngIf="hasToken()"
+                  pButton
+                  type="button"
+                  icon="pi pi-copy"
+                  class="p-button-rounded p-button-text p-button-sm"
+                  (click)="copyToken(tokenInput)"
+                  pTooltip="Copy token to clipboard">
+          </button>
+        </span>
+      </div>
 
       <p>
       <button *ngIf="userData"

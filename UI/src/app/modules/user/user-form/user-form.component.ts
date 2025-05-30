@@ -11,12 +11,13 @@ import {UserData} from '../../core/services/form-interfaces/UserDataForm';
 import {CustomHttpError} from '../../core/services/global/http-error.service';
 import {SettingsService} from "../../core/services/global/settings.service";
 import { ConfirmationService } from 'primeng/api';
+import { TokenService } from '../../core/services/token/token.service';
 
 @Component({
   selector: 'qa-user-form',
   templateUrl: './user-form.component.html',
   styleUrls: ['./user-form.component.scss'],
-  providers: [ConfirmationService]
+  //providers: [ConfirmationService]
 }) 
 export class UserFormComponent implements OnInit {
   userForm = this.formBuilder.group<UserData>({
@@ -39,6 +40,7 @@ export class UserFormComponent implements OnInit {
   formErrors: any;
   sliderValues = [];
   maintenanceMode = false;
+  private _apiToken: string | null = '1234567890abcdef'; 
 
   signUpObserver = {
     next: () => this.onSignUpNext(),
@@ -59,19 +61,23 @@ export class UserFormComponent implements OnInit {
   @Input() userData: UserDto;
   @Output() doRefresh = new EventEmitter();
 
-  constructor(private userFormService: LocalApiService,
-              private formBuilder: FormBuilder,
-              private userService: AuthService,
-              private router: Router,
-              private toastService: ToastService,
-              private settingsService: SettingsService,
-              private confirmationService: ConfirmationService) {
+  constructor(
+    private userFormService: LocalApiService,
+    private formBuilder: FormBuilder,
+    private userService: AuthService,
+    private router: Router,
+    private toastService: ToastService,
+    private settingsService: SettingsService,
+    private confirmationService: ConfirmationService,
+    private tokenService: TokenService,
+  ) {
   }
 
   ngOnInit(): void {
     this.countries$ = this.userFormService.getCountryList();
     if (this.userData) {
       this.setDefaultValues();
+      this.loadApiToken();
     }
     this.userForm.get('honeypot').valueChanges.subscribe(value => {
       this.handleSliderChange(value);
@@ -127,15 +133,16 @@ export class UserFormComponent implements OnInit {
   }
 
   requestApiToken() {
-    this.userService.requestApiToken().subscribe(
-        response => {
-            this.toastService.showSuccess('API token request has been sent to administrators');
-        },
-        error => {
-            this.toastService.showErrorWithHeader('Failed to request API token', error.message);
-        }
-    );
-}
+    this.tokenService.requestToken().subscribe({
+      next: (response) => {
+        this._apiToken = response.token;
+        this.toastService.showSuccess('API token request has been sent to administrators');
+      },
+      error: (error) => {
+        this.toastService.showErrorWithHeader('Failed to request API token', error.message);
+      }
+    });
+  }
 
   setDefaultValues(): void {
     this.userForm.patchValue(this.userData)
@@ -172,4 +179,34 @@ export class UserFormComponent implements OnInit {
     this.router.navigate(['/set-password'])
   }
 
+  copyToken(inputElement: HTMLInputElement): void {
+    inputElement.select();
+    try {
+      navigator.clipboard.writeText(inputElement.value).then(() => {
+        this.toastService.showSuccess('Token copied to clipboard');
+      }).catch(() => {
+        document.execCommand('copy');
+        this.toastService.showSuccess('Token copied to clipboard');
+      });
+    } catch (err) {
+      this.toastService.showErrorWithHeader('Copy failed', 'Please manually select and copy the token');
+    }
+    window.getSelection()?.removeAllRanges();
+  }
+
+  get apiToken(): string | null {
+    return this._apiToken;
+  }
+
+  hasToken(): boolean {
+    return this._apiToken !== null && this._apiToken !== undefined;
+  }
+
+  private loadApiToken(): void {
+    //this._apiToken = '1234567890abcdef';
+    this.tokenService.getToken().subscribe({
+      next: (response) => this._apiToken = response.token,
+      error: () => this._apiToken = null
+    });
+  }
 }

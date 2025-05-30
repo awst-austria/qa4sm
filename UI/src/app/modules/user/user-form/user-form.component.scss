@@ -39,3 +39,29 @@ div.alert{
   left: -100vw;
   display: none;
 }
+.token-container {
+  position: relative;
+  margin: 1rem 0;
+  
+  .token-input {
+    width: 100%;
+    font-family: monospace;
+    background-color: #f8f9fa;
+    cursor: default;
+    padding-right: 2.5rem;
+  }
+
+  .p-button-rounded {
+    position: absolute;
+    right: 0.5rem;
+    top: 50%;
+    transform: translateY(-50%);
+  }
+
+  .token-hint {
+    color: #6c757d;
+    font-style: italic;
+    margin-top: 0.25rem;
+    display: block;
+  }
+}
