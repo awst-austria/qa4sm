@@ -6,9 +6,10 @@ from django.db.models import Case, When
 from django.http import JsonResponse
 from django.utils import timezone
 from rest_framework import status, serializers
-from rest_framework.decorators import api_view, permission_classes
+from rest_framework.decorators import api_view, permission_classes, authentication_classes
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.serializers import ModelSerializer
+from rest_framework.authentication import TokenAuthentication
 
 from api.views.auxiliary_functions import get_fields_as_list
 from api.views.validation_run_view import ValidationRunSerializer
@@ -417,3 +418,19 @@ class ValidationConfigurationModelSerializer(ModelSerializer):
     class Meta:
         model = ValidationRun
         fields = get_fields_as_list(model)
+
+
+@api_view(['POST'])
+@authentication_classes([TokenAuthentication])
+@permission_classes([IsAuthenticated])
+def start_validation_with_token(request):
+
+    try:
+        # Reuse existing validation logic
+        return start_validation(request)
+
+    except Exception as e:
+        return JsonResponse({
+            'error': 'Validation failed',
+            'detail': str(e)
+        }, status=status.HTTP_400_BAD_REQUEST)

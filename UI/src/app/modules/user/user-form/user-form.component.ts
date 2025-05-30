@@ -40,7 +40,7 @@ export class UserFormComponent implements OnInit {
   formErrors: any;
   sliderValues = [];
   maintenanceMode = false;
-  private _apiToken: string | null = '1234567890abcdef'; 
+  private _apiToken: string | null; 
 
   signUpObserver = {
     next: () => this.onSignUpNext(),
@@ -203,7 +203,6 @@ export class UserFormComponent implements OnInit {
   }
 
   private loadApiToken(): void {
-    //this._apiToken = '1234567890abcdef';
     this.tokenService.getToken().subscribe({
       next: (response) => this._apiToken = response.token,
       error: () => this._apiToken = null

@@ -13,6 +13,7 @@ from validator.mailer import send_new_user_signed_up, send_user_account_removal_
     send_user_status_changed, send_new_user_verification, user_api_token_request
 from django.contrib.auth import update_session_auth_hash
 from django.conf import settings
+from rest_framework.authtoken.models import Token
 
 from rest_framework.response import Response
 
@@ -134,11 +135,15 @@ def request_api_token(request):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def get_api_token(request):
-    token_data = {
-        'token': '123456789abcdefgh',
-        'status': 'approved'
-    }
-    return JsonResponse(token_data, status=200)
+    try:
+        token = Token.objects.get(user=request.user)
+        token_data = {
+            'token': token.key,
+            'status': 'approved'
+        }
+        return JsonResponse(token_data, status=200)
+    except Token.DoesNotExist:
+        return JsonResponse({'message': 'No token found'}, status=404)
 
 
 
