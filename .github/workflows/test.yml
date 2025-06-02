@@ -17,7 +17,6 @@ jobs:
   build:
     env:
       DOI_ACCESS_TOKEN_ENV: ${{ secrets.DOI_ACCESS_TOKEN_ENV }}
-      PIP_USE_PEP517: 1
     name: Build py${{ matrix.python-version }} @ ${{ matrix.os }} 🐍
     runs-on: ${{ matrix.os }}
     defaults:
