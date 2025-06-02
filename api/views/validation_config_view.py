@@ -30,9 +30,8 @@ def get_scaling_methods(request):
     return JsonResponse(scaling_methods, status=status.HTTP_200_OK, safe=False)
 
 
-@api_view(['POST'])
-@permission_classes([IsAuthenticated])
-def start_validation(request):
+def _start_validation_run(request):
+    # Validation run job submission logic, called by either logged in or token-authenticated api users.
     check_for_existing_validation = request.query_params.get('check_for_existing_validation', False)
 
     ser = ValidationConfigurationSerializer(data=request.data)
@@ -64,6 +63,20 @@ def start_validation(request):
     p.start()
     serializer = ValidationRunSerializer(new_val_run)
     return JsonResponse(serializer.data, status=status.HTTP_200_OK, safe=False)
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def start_validation(request):
+    # validation run with session authentication for logged-in users
+    return _start_validation_run(request)
+
+@api_view(['POST'])
+@authentication_classes([TokenAuthentication])
+@permission_classes([IsAuthenticated])
+def start_validation_with_token(request):
+    # validation run with token authentication for public API users
+    return _start_validation_run(request)
 
 
 @api_view(['GET'])
@@ -418,19 +431,3 @@ class ValidationConfigurationModelSerializer(ModelSerializer):
     class Meta:
         model = ValidationRun
         fields = get_fields_as_list(model)
-
-
-@api_view(['POST'])
-@authentication_classes([TokenAuthentication])
-@permission_classes([IsAuthenticated])
-def start_validation_with_token(request):
-
-    try:
-        # Reuse existing validation logic
-        return start_validation(request)
-
-    except Exception as e:
-        return JsonResponse({
-            'error': 'Validation failed',
-            'detail': str(e)
-        }, status=status.HTTP_400_BAD_REQUEST)

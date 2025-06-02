@@ -15,6 +15,7 @@ import { UserFormComponent } from './user-form/user-form.component';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ConfirmationService } from 'primeng/api';
 import { ToastModule } from 'primeng/toast';
+import { DividerModule } from 'primeng/divider';
 
 @NgModule({
   declarations: [
@@ -39,7 +40,8 @@ import { ToastModule } from 'primeng/toast';
     RouterModule,
     SliderModule,
     TooltipModule,
-    ToastModule
+    ToastModule,
+    DividerModule
   ],
   providers: [
     ConfirmationService

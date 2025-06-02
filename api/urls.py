@@ -12,7 +12,7 @@ from api.views.ismn_network_view import get_ismn_networks
 from api.views.login_view import api_login
 from api.views.logout_view import api_logout
 from api.views.path_var_test_endpoint import path_var_get
-from api.views.validation_config_view import start_validation, get_validation_configuration, get_scaling_methods
+from api.views.validation_config_view import start_validation, get_validation_configuration, get_scaling_methods, start_validation_with_token
 from api.views.uptime_view import uptime_ping, get_uptime
 from api.views.comparison_view import get_comparison_table, get_comparison_plots_for_metric, \
     download_comparison_table, get_comparison_metrics, get_spatial_extent
@@ -80,6 +80,7 @@ urlpatterns = [
     path('my-results', my_results, name='My results'),
     re_path(r'^validation-configuration/(?P<id>.+)$', get_validation_configuration, name='Validation configuration'),
     path('start-validation', start_validation, name='Run new validation'),
+    path('start-validation-with-token', start_validation_with_token, name='Run token validation'),
     path('param-filter', data_parameterised_filter, name='Parameterised filter'),
     path('stop-validation/<uuid:result_uuid>', stop_validation, name='Stop validation'),
     path('custom-tracked-run', custom_tracked_validation_runs, name='Copied custom run'),

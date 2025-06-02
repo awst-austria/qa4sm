@@ -152,7 +152,22 @@
         <label for="active">some label</label>
       </div>
 
-      <hr class="w-12 mt-2" style="opacity: 1.0;">
+
+      <button *ngIf="!userData"
+              pButton
+              type="submit"
+              label="Submit"
+              [disabled]="!userForm.valid">
+      </button>
+      <button *ngIf="userData"
+              pButton
+              type="submit"
+              label="Save"
+      >
+      </button>
+    </form>
+
+    <hr class="w-12 mt-4" style="opacity: 1.0;">
 
       <div *ngIf="userData" class="py-3">
         <span class="p-float-label">
@@ -179,7 +194,7 @@
           </button>
         </span>
       </div>
-
+    
       <p>
       <button *ngIf="userData"
               pButton
@@ -188,21 +203,11 @@
               (click)="confirmRequestToken()"
               class="p-button-request">
       </button>
-      </p>
-
-      <button *ngIf="!userData"
-              pButton
-              type="submit"
-              label="Submit"
-              [disabled]="!userForm.valid">
-      </button>
-      <button *ngIf="userData"
-              pButton
-              type="submit"
-              label="Save"
-      >
-      </button>
-    </form>
+      <span
+        pTooltip="Request an unique API token that can be used to submit validations via public API access."
+        class="pi pi-question-circle">
+      </span>
+    </p>
     <p>
       <button *ngIf="userData"
               pButton
