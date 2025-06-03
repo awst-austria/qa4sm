@@ -167,7 +167,8 @@ def create_reader(dataset, version) -> GriddedNcTs:
 
     if (dataset.short_name == globals.CCIC or
             dataset.short_name == globals.CCIA or
-            dataset.short_name == globals.CCIP):
+            dataset.short_name == globals.CCIP or
+            dataset.short_name == globals.CCI_RZSM):
         reader = CCITs(folder_name, ioclass_kws={'read_bulk': True})
 
     if dataset.short_name == globals.GLDAS:
