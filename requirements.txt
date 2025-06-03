@@ -95,7 +95,7 @@ sqlparse==0.5.3
 tblib==3.0.0
 tomli==2.2.1
 toolz==1.0.0
-tornado==6.4.2
+tornado==6.5.1
 tqdm==4.67.1
 trollsift==0.2.1
 typing-extensions==4.12.2
