@@ -107,12 +107,12 @@
         <button pButton
                 id="cancel-button"
                 (click)="handleModalWindow(false)"
-                label="Cancel">
+                pButtonLabel="Cancel">
         </button>
         <button pButton
                 id="submit-button"
                 (click)="publish()"
-                label="Publish now!"
+                pButtonLabel="Publish now!"
                 [disabled]="!publishingForm.valid">
         </button>
       </div>

@@ -14,7 +14,8 @@ import {UserFileMetadata} from '../../../core/services/form-interfaces/UserFileM
 @Component({
   selector: 'qa-user-file-upload',
   templateUrl: './user-file-upload.component.html',
-  styleUrls: ['./user-file-upload.component.scss']
+  styleUrls: ['./user-file-upload.component.scss'],
+  standalone: false
 })
 export class UserFileUploadComponent {
   // variables to store file information

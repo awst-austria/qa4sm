@@ -1,11 +1,12 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ValidationPeriodComponent } from './components/validation-period/validation-period.component';
-import {PanelModule} from 'primeng/panel';
-import {TooltipModule} from 'primeng/tooltip';
-import {CalendarModule} from 'primeng/calendar';
-import {FormsModule} from '@angular/forms';
+import { PanelModule } from 'primeng/panel';
+import { TooltipModule } from 'primeng/tooltip';
+import { FormsModule } from '@angular/forms';
+import { DatePicker } from 'primeng/datepicker';
 
+1;
 
 
 @NgModule({
@@ -17,8 +18,8 @@ import {FormsModule} from '@angular/forms';
     CommonModule,
     PanelModule,
     TooltipModule,
-    CalendarModule,
-    FormsModule
+    FormsModule,
+    DatePicker
   ]
 })
 export class ValidationPeriodModule { }

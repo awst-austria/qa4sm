@@ -1,11 +1,12 @@
-import {Component, Input} from '@angular/core';
-import {TemporalMatchingModel} from './temporal-matching-model';
-import {GlobalParamsService} from '../../../core/services/global/global-params.service';
+import { Component, Input } from '@angular/core';
+import { TemporalMatchingModel } from './temporal-matching-model';
+import { GlobalParamsService } from '../../../core/services/global/global-params.service';
 
 @Component({
   selector: 'qa-temporal-matching',
   templateUrl: './temporal-matching.component.html',
-  styleUrls: ['./temporal-matching.component.scss']
+  styleUrls: ['./temporal-matching.component.scss'],
+  standalone: false,
 })
 export class TemporalMatchingComponent  {
 

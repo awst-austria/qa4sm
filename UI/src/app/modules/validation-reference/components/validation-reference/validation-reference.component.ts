@@ -6,7 +6,8 @@ import { ValidationModel } from '../../../../pages/validate/validation-model';
 @Component({
   selector: 'qa-validation-reference',
   templateUrl: './validation-reference.component.html',
-  styleUrls: ['./validation-reference.component.scss']
+  styleUrls: ['./validation-reference.component.scss'],
+  standalone: false
 })
 export class ValidationReferenceComponent implements OnInit {
 

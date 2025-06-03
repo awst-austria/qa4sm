@@ -1,22 +1,23 @@
-import {Component, Input, OnInit, signal, WritableSignal} from '@angular/core';
-import {EMPTY, Observable, of, tap} from 'rxjs';
-import {MetricsPlotsDto} from '../../../core/services/validation-run/metrics-plots.dto';
-import {ValidationrunService} from '../../../core/services/validation-run/validationrun.service';
-import {HttpParams} from '@angular/common/http';
-import {ValidationrunDto} from '../../../core/services/validation-run/validationrun.dto';
-import {WebsiteGraphicsService} from '../../../core/services/global/website-graphics.service';
-import {fas} from '@fortawesome/free-solid-svg-icons';
-import {catchError, map} from 'rxjs/operators';
-import {PlotDto} from '../../../core/services/global/plot.dto';
-import {SafeUrl} from '@angular/platform-browser';
-import {GlobalParamsService} from '../../../core/services/global/global-params.service';
-import {CustomHttpError} from '../../../core/services/global/http-error.service';
-import {ToastService} from '../../../core/services/toast/toast.service';
+import { Component, Input, OnInit, signal, WritableSignal } from '@angular/core';
+import { EMPTY, Observable, of, tap } from 'rxjs';
+import { MetricsPlotsDto } from '../../../core/services/validation-run/metrics-plots.dto';
+import { ValidationrunService } from '../../../core/services/validation-run/validationrun.service';
+import { HttpParams } from '@angular/common/http';
+import { ValidationrunDto } from '../../../core/services/validation-run/validationrun.dto';
+import { WebsiteGraphicsService } from '../../../core/services/global/website-graphics.service';
+import { fas } from '@fortawesome/free-solid-svg-icons';
+import { catchError, map } from 'rxjs/operators';
+import { PlotDto } from '../../../core/services/global/plot.dto';
+import { SafeUrl } from '@angular/platform-browser';
+import { GlobalParamsService } from '../../../core/services/global/global-params.service';
+import { CustomHttpError } from '../../../core/services/global/http-error.service';
+import { ToastService } from '../../../core/services/toast/toast.service';
 
 @Component({
   selector: 'qa-result-files',
   templateUrl: './result-files.component.html',
-  styleUrls: ['./result-files.component.scss']
+  styleUrls: ['./result-files.component.scss'],
+  standalone: false,
 })
 export class ResultFilesComponent implements OnInit {
   @Input() validation: ValidationrunDto;

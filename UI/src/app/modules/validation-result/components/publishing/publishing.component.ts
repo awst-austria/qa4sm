@@ -1,15 +1,16 @@
-import {Component, EventEmitter, Input, OnInit, Output, signal} from '@angular/core';
-import {ValidationrunService} from '../../../core/services/validation-run/validationrun.service';
-import {HttpParams} from '@angular/common/http';
-import {FormBuilder, Validators} from '@angular/forms';
-import {PublishingForm} from '../../../core/services/form-interfaces/publishing-form';
-import {CustomHttpError} from '../../../core/services/global/http-error.service';
-import {ToastService} from '../../../core/services/toast/toast.service';
+import { Component, EventEmitter, Input, OnInit, Output, signal } from '@angular/core';
+import { ValidationrunService } from '../../../core/services/validation-run/validationrun.service';
+import { HttpParams } from '@angular/common/http';
+import { FormBuilder, Validators } from '@angular/forms';
+import { PublishingForm } from '../../../core/services/form-interfaces/publishing-form';
+import { CustomHttpError } from '../../../core/services/global/http-error.service';
+import { ToastService } from '../../../core/services/toast/toast.service';
 
 @Component({
   selector: 'qa-publishing',
   templateUrl: './publishing.component.html',
-  styleUrls: ['./publishing.component.scss']
+  styleUrls: ['./publishing.component.scss'],
+  standalone: false,
 })
 export class PublishingComponent implements OnInit {
   formErrors: any;

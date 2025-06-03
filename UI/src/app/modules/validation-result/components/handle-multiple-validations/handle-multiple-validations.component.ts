@@ -1,15 +1,20 @@
-import {Component, input, model} from '@angular/core';
-import {ValidationrunDto} from '../../../core/services/validation-run/validationrun.dto';
-import {ValidationrunService} from '../../../core/services/validation-run/validationrun.service';
-import {MenuItem} from 'primeng/api';
-import {CustomHttpError} from '../../../core/services/global/http-error.service';
-import {ToastService} from '../../../core/services/toast/toast.service';
-import {ActionMenuItem, getDefaultValidationActionState, MultipleValidationAction} from "./multiple-validation-action";
+import { Component, input, model } from '@angular/core';
+import { ValidationrunDto } from '../../../core/services/validation-run/validationrun.dto';
+import { ValidationrunService } from '../../../core/services/validation-run/validationrun.service';
+import { MenuItem } from 'primeng/api';
+import { CustomHttpError } from '../../../core/services/global/http-error.service';
+import { ToastService } from '../../../core/services/toast/toast.service';
+import {
+  ActionMenuItem,
+  getDefaultValidationActionState,
+  MultipleValidationAction
+} from './multiple-validation-action';
 
 @Component({
   selector: 'qa-handle-multiple-validations',
   templateUrl: './handle-multiple-validations.component.html',
-  styleUrls: ['./handle-multiple-validations.component.scss']
+  styleUrls: ['./handle-multiple-validations.component.scss'],
+  standalone: false,
 })
 export class HandleMultipleValidationsComponent {
   validations = input([] as ValidationrunDto[]);

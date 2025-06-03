@@ -105,7 +105,7 @@
         </span>
       <div *ngIf="(editVariable.opened)">
         <label for="variable-dropdown">Variable: </label>
-        <p-dropdown
+        <p-select
           [disabled]="!variable.shortName()"
           id="variable-dropdown"
           class="form-field"
@@ -118,7 +118,7 @@
           placeholder="Choose"
           editable="true"
           ngDefaultControl>
-        </p-dropdown>
+        </p-select>
         <button
           pButton
           type="button"
@@ -231,12 +231,12 @@
 
 
 <!--  <div class="p-float-label my-4" *ngIf="addToGroupModalWindow">-->
-<!--      <p-dropdown [options]="dataManagementGroups"-->
+<!--      <p-select [options]="dataManagementGroups"-->
 <!--                  optionLabel="name"-->
 <!--                  [style]="{width: '40%'}"-->
 <!--                  [(ngModel)]="groupToUpdate"-->
 <!--                  id="group-selector">-->
-<!--      </p-dropdown>-->
+<!--      </p-select>-->
 <!--      <label for="group-selector">Choose a group</label>-->
 
 <!--    <button pButton-->
@@ -284,10 +284,10 @@
 
 
 <!--&lt;!&ndash;  <div class="p-float-label mb-4">&ndash;&gt;-->
-<!--&lt;!&ndash;  <p-dropdown [options]="dataManagementGroups"&ndash;&gt;-->
+<!--&lt;!&ndash;  <p-select [options]="dataManagementGroups"&ndash;&gt;-->
 <!--&lt;!&ndash;              optionLabel="name"&ndash;&gt;-->
 <!--&lt;!&ndash;              id="group-selector">&ndash;&gt;-->
-<!--&lt;!&ndash;  </p-dropdown>&ndash;&gt;-->
+<!--&lt;!&ndash;  </p-select>&ndash;&gt;-->
 <!--&lt;!&ndash;      <label for="group-selector">Choose a group</label>&ndash;&gt;-->
 
 

@@ -1,9 +1,9 @@
-import {Component, HostListener, OnInit, Renderer2} from '@angular/core';
-import {AuthService} from '../../modules/core/services/auth/auth.service';
-import {SettingsService} from '../../modules/core/services/global/settings.service';
-import {ActivatedRoute, Router} from '@angular/router';
-import {DomSanitizer} from '@angular/platform-browser';
-import {ToastService} from 'src/app/modules/core/services/toast/toast.service';
+import { Component, HostListener, OnInit, Renderer2 } from '@angular/core';
+import { AuthService } from '../../modules/core/services/auth/auth.service';
+import { SettingsService } from '../../modules/core/services/global/settings.service';
+import { ActivatedRoute, Router } from '@angular/router';
+import { DomSanitizer } from '@angular/platform-browser';
+import { ToastService } from 'src/app/modules/core/services/toast/toast.service';
 
 const logoUrlPrefix = '/static/images/logo/';
 
@@ -12,6 +12,7 @@ const logoUrlPrefix = '/static/images/logo/';
   selector: 'qa-home',
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.scss'],
+  standalone: false
 })
 export class HomeComponent implements OnInit {
 
@@ -129,7 +130,7 @@ export class HomeComponent implements OnInit {
   }
 
   ngOnInit() {
-    
+
     // handle opening the login modal window when directed from user email verification
     if (Object.keys(this.route.snapshot.queryParams).length > 0) {
       this.route.queryParams.subscribe(params => {

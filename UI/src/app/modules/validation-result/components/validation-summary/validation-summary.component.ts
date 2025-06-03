@@ -1,26 +1,27 @@
-import {Component, EventEmitter, Input, OnDestroy, OnInit, Output, signal} from '@angular/core';
-import {ValidationResultModel} from '../../../../pages/validation-result/validation-result-model';
-import {combineLatest, EMPTY, Observable, of} from 'rxjs';
-import {DatasetService} from '../../../core/services/dataset/dataset.service';
-import {DatasetVersionService} from '../../../core/services/dataset/dataset-version.service';
-import {DatasetVariableService} from '../../../core/services/dataset/dataset-variable.service';
-import {FilterService} from '../../../core/services/filter/filter.service';
-import {catchError, map} from 'rxjs/operators';
-import {GlobalParamsService} from '../../../core/services/global/global-params.service';
-import {ValidationrunService} from '../../../core/services/validation-run/validationrun.service';
-import {AuthService} from '../../../core/services/auth/auth.service';
-import {fas} from '@fortawesome/free-solid-svg-icons';
-import {Router} from '@angular/router';
-import {ValidationrunDto} from '../../../core/services/validation-run/validationrun.dto';
-import {ValidationRunConfigService} from '../../../../pages/validate/service/validation-run-config.service';
-import {CustomHttpError} from '../../../core/services/global/http-error.service';
-import {ToastService} from '../../../core/services/toast/toast.service';
+import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, signal } from '@angular/core';
+import { ValidationResultModel } from '../../../../pages/validation-result/validation-result-model';
+import { combineLatest, EMPTY, Observable, of } from 'rxjs';
+import { DatasetService } from '../../../core/services/dataset/dataset.service';
+import { DatasetVersionService } from '../../../core/services/dataset/dataset-version.service';
+import { DatasetVariableService } from '../../../core/services/dataset/dataset-variable.service';
+import { FilterService } from '../../../core/services/filter/filter.service';
+import { catchError, map } from 'rxjs/operators';
+import { GlobalParamsService } from '../../../core/services/global/global-params.service';
+import { ValidationrunService } from '../../../core/services/validation-run/validationrun.service';
+import { AuthService } from '../../../core/services/auth/auth.service';
+import { fas } from '@fortawesome/free-solid-svg-icons';
+import { Router } from '@angular/router';
+import { ValidationrunDto } from '../../../core/services/validation-run/validationrun.dto';
+import { ValidationRunConfigService } from '../../../../pages/validate/service/validation-run-config.service';
+import { CustomHttpError } from '../../../core/services/global/http-error.service';
+import { ToastService } from '../../../core/services/toast/toast.service';
 
 
 @Component({
   selector: 'qa-validation-summary',
   templateUrl: './validation-summary.component.html',
-  styleUrls: ['./validation-summary.component.scss']
+  styleUrls: ['./validation-summary.component.scss'],
+  standalone: false,
 })
 export class ValidationSummaryComponent implements OnInit, OnDestroy {
 

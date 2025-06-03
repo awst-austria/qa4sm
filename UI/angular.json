@@ -35,8 +35,6 @@
             ],
             "styles": [
               "node_modules/primeicons/primeicons.css",
-              "node_modules/primeng/resources/themes/lara-light-blue/theme.css",
-              "node_modules/primeng/resources/primeng.min.css",
               "node_modules/primeflex/primeflex.css",
               "src/styles.scss"
             ],
@@ -49,13 +47,6 @@
             }
           },
           "configurations": {
-            "development": {
-              "sourceMap": {
-                "scripts": true,
-                "styles": true,
-                "hidden": false
-              }
-            },
             "production": {
               "fileReplacements": [
                 {
@@ -96,9 +87,6 @@
           "configurations": {
             "production": {
               "buildTarget": "UI:build:production"
-            },
-            "development": {
-              "buildTarget": "UI:build:development"
             }
           }
         },

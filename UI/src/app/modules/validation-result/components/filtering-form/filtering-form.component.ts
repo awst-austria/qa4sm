@@ -1,14 +1,15 @@
-import {Component, input, model, signal} from '@angular/core';
-import {FilterConfig} from './filter-payload.interface';
+import { Component, input, model, signal } from '@angular/core';
+import { FilterConfig } from './filter-payload.interface';
 
-import {DatasetDto} from 'src/app/modules/core/services/dataset/dataset.dto';
-import {Observable, Subject} from "rxjs";
-import {debounceTime} from "rxjs/operators";
+import { DatasetDto } from 'src/app/modules/core/services/dataset/dataset.dto';
+import { Observable, Subject } from 'rxjs';
+import { debounceTime } from 'rxjs/operators';
 
 @Component({
-    selector: 'qa-filtering-form',
-    templateUrl: './filtering-form.component.html',
-    styleUrl: './filtering-form.component.scss'
+  selector: 'qa-filtering-form',
+  templateUrl: './filtering-form.component.html',
+  styleUrl: './filtering-form.component.scss',
+  standalone: false,
 })
 export class FilteringFormComponent {
     validationFilters = model<FilterConfig[]>()

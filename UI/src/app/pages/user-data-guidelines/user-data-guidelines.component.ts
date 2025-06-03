@@ -1,9 +1,10 @@
-import {Component} from '@angular/core';
+import { Component } from '@angular/core';
 
 @Component({
   selector: 'qa-user-data-guidelines',
   templateUrl: './user-data-guidelines.component.html',
-  styleUrls: ['./user-data-guidelines.component.scss']
+  styleUrls: ['./user-data-guidelines.component.scss'],
+  standalone: false
 })
 export class UserDataGuidelinesComponent {
   public pageUrl = '/user-data-guidelines';
