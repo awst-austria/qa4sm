@@ -44,7 +44,6 @@ jobs:
       - name: Activate Environment
         run: |
           conda activate qa4sm
-          pip install --no-deps smos==0.3.1
       - name: Print environment infos
         run: |
           conda info -a
