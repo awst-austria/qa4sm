@@ -81,14 +81,14 @@ python-dateutil==2.9.0.post0
 pytz==2024.1
 pyyaml==6.0.2
 qa4sm-reader==0.11.2
-qa4sm-preprocessing
+qa4sm-preprocessing==0.5
 redis==5.2.0
 requests==2.32.4
 scipy==1.15.1
 setuptools==78.1.1
 shapely==2.0.7
 six==1.17.0
-smos
+smos==0.4
 smap-io==0.6
 sortedcontainers==2.4.0
 sqlparse==0.5.3
