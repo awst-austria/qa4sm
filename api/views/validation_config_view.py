@@ -6,10 +6,11 @@ from django.db.models import Case, When
 from django.http import JsonResponse
 from django.utils import timezone
 from rest_framework import status, serializers
-from rest_framework.decorators import api_view, permission_classes, authentication_classes
+from rest_framework.decorators import api_view, permission_classes, authentication_classes, throttle_classes
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.serializers import ModelSerializer
 from rest_framework.authentication import TokenAuthentication
+from rest_framework.throttling import UserRateThrottle
 
 from api.views.auxiliary_functions import get_fields_as_list
 from api.views.validation_run_view import ValidationRunSerializer
@@ -21,6 +22,9 @@ from validator.validation.validation import compare_validation_runs
 
 def _check_if_settings_exist():
     pass
+
+class TenPerMinuteUserThrottle(UserRateThrottle):
+    rate = '10/minute'
 
 
 @api_view(['GET'])
@@ -67,6 +71,7 @@ def _start_validation_run(request):
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
+@throttle_classes([TenPerMinuteUserThrottle])
 def start_validation(request):
     # validation run with session authentication for logged-in users
     return _start_validation_run(request)
@@ -74,6 +79,7 @@ def start_validation(request):
 @api_view(['POST'])
 @authentication_classes([TokenAuthentication])
 @permission_classes([IsAuthenticated])
+@throttle_classes([TenPerMinuteUserThrottle])
 def start_validation_with_token(request):
     # validation run with token authentication for public API users
     return _start_validation_run(request)

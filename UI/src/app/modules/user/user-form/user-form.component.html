@@ -181,33 +181,34 @@
           <label for="api-token">API Token</label>
           <span
              *ngIf="!hasToken()"
-            pTooltip="Unique user token required to submit validations via API call."
+            pTooltip="Unique user token required to submit validations via public API."
             class="pi pi-question-circle">
           </span>
           <button *ngIf="hasToken()"
                   pButton
                   type="button"
                   icon="pi pi-copy"
-                  class="p-button-rounded p-button-text p-button-sm"
+                  class="p-button-text p-button-sm"
+                  style="margin-left: -0.5rem"
                   (click)="copyToken(tokenInput)"
                   pTooltip="Copy token to clipboard">
           </button>
         </span>
       </div>
     
-      <p>
-      <button *ngIf="userData"
-              pButton
-              type="button"
-              label="Request API token"
-              (click)="confirmRequestToken()"
-              class="p-button-request">
-      </button>
-      <span
-        pTooltip="Request an unique API token that can be used to submit validations via public API access."
-        class="pi pi-question-circle">
-      </span>
-    </p>
+      <p class="flex align-items-center gap-2">
+        <button *ngIf="userData"
+                pButton
+                type="button"
+                label="Request API token"
+                (click)="confirmRequestToken()"
+                class="p-button-request">
+        </button>
+        <span
+          pTooltip="Request an unique API token that can be used to submit validations via public API access."
+          class="pi pi-question-circle">
+        </span>
+      </p>
     <p>
       <button *ngIf="userData"
               pButton
