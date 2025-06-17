@@ -62,16 +62,16 @@ services:
         max-size: "300m"
         max-file: "3"
   proxy:
-    image: "awst/qa4sm-proxy:latest"
+    image: "awst/qa4sm-proxy:3.2.0"
     restart: always
     ports:
       - "8081:80"
   ui:
-    image: "awst/qa4sm-ui:latest"
+    image: "awst/qa4sm-ui:3.2.0"
     restart: always
 
   worker-1:
-    image: "awst/qa4sm-worker:latest"
+    image: "awst/qa4sm-worker:3.2.0"
     restart: always
     environment:
       QA4SM_DB_HOST: "${QA4SM_DB_HOST}"
