@@ -22,7 +22,7 @@ services:
     restart: always
 
   web:
-    image: "awst/qa4sm:latest"
+    image: "awst/qa4sm:3.2.0"
     restart: always
     environment:
       POSTGRES_PASSWORD: "${POSTGRES_PASSWORD}"
