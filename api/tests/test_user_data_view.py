@@ -31,6 +31,10 @@ def _clean_up_data(file_entry):
     file_entry.delete()
     assert not os.path.exists(outdir)
 
+def _clean_up_log_folder(path):
+    log_path = Path(path) / 'log'
+    if log_path.exists():
+        shutil.rmtree(log_path)
 
 def _get_headers(metadata):
     return {
@@ -187,7 +191,7 @@ class TestUploadUserDataView(TransactionTestCase):
 
         self.client.logout()
         self.client.login(**self.auth_data)
-        assert len(os.listdir(self.test_user_data_path)) == 3
+        assert len(os.listdir(self.test_user_data_path)) == 4
         self._remove_user_datafiles(self.test_user)
         assert not os.path.exists(self.test_user_data_path)
 
@@ -200,6 +204,8 @@ class TestUploadUserDataView(TransactionTestCase):
             entry.delete()
 
         assert len(UserDatasetFile.objects.all()) == 0
+        assert not os.path.exists(self.test_user_data_path)
+
 
     @patch('api.views.upload_user_data_view.preprocess_file', side_effect=mock_preprocess_file)
     def test_get_user_data_file_by_id(self, mock_preprocess_file):
@@ -257,7 +263,8 @@ class TestUploadUserDataView(TransactionTestCase):
         assert len(DatasetVersion.objects.all()) == 1
         assert len(DataVariable.objects.all()) == 1
         assert len(UserDatasetFile.objects.all()) == 1
-        assert len(os.listdir(self.test_user_data_path)) == 1
+        assert len(os.listdir(self.test_user_data_path)) == 2
+        
 
         # checking if another user can remove it:
         self.client.logout()
@@ -271,8 +278,8 @@ class TestUploadUserDataView(TransactionTestCase):
         assert len(DatasetVersion.objects.all()) == 1
         assert len(DataVariable.objects.all()) == 1
         assert len(UserDatasetFile.objects.all()) == 1
+        _clean_up_log_folder(self.test_user_data_path)
         assert len(os.listdir(self.test_user_data_path)) == 1
-
         # loging in as the proper user:
         self.client.login(**self.auth_data)
 
@@ -308,7 +315,7 @@ class TestUploadUserDataView(TransactionTestCase):
         assert len(DatasetVersion.objects.all()) == 1
         assert len(DataVariable.objects.all()) == 1
         assert len(UserDatasetFile.objects.all()) == 1
-        assert len(os.listdir(self.test_user_data_path)) == 1
+        assert len(os.listdir(self.test_user_data_path)) == 2 #log folder also there
 
         # checking if another user can remove it:
         self.client.logout()
@@ -322,7 +329,9 @@ class TestUploadUserDataView(TransactionTestCase):
         assert len(DatasetVersion.objects.all()) == 1
         assert len(DataVariable.objects.all()) == 1
         assert len(UserDatasetFile.objects.all()) == 1
+        _clean_up_log_folder(self.test_user_data_path)
         assert len(os.listdir(self.test_user_data_path)) == 1
+        
 
         # loging in as the proper user:
         self.client.login(**self.auth_data)
@@ -341,7 +350,9 @@ class TestUploadUserDataView(TransactionTestCase):
         assert len(DatasetVersion.objects.all()) == 1
         assert len(DataVariable.objects.all()) == 1
         assert len(UserDatasetFile.objects.all()) == 1
+        _clean_up_log_folder(self.test_user_data_path)
         assert len(os.listdir(self.test_user_data_path)) == 0
+        
 
         assert Dataset.objects.all()[0].storage_path == ''
         assert not UserDatasetFile.objects.all()[0].file
@@ -362,7 +373,7 @@ class TestUploadUserDataView(TransactionTestCase):
         file_entry = existing_files[0]
         file_dir = file_entry.get_raw_file_path
 
-        assert len(os.listdir(self.test_user_data_path)) == 1
+        assert len(os.listdir(self.test_user_data_path)) == 2
         assert os.path.exists(file_dir)
 
         assert file_entry.dataset.short_name == self.metadata_correct.get(USER_DATA_DATASET_FIELD_NAME)
@@ -377,6 +388,8 @@ class TestUploadUserDataView(TransactionTestCase):
         existing_files = UserDatasetFile.objects.all()
         assert len(existing_files) == 0
         assert not os.path.exists(file_dir)
+        assert len(os.listdir(self.test_user_data_path)) == 1
+        _clean_up_log_folder(self.test_user_data_path)
         assert len(os.listdir(self.test_user_data_path)) == 0
 
     @patch('api.views.upload_user_data_view.preprocess_file', side_effect=mock_preprocess_file)
@@ -395,7 +408,7 @@ class TestUploadUserDataView(TransactionTestCase):
         file_entry = existing_files[0]
         file_dir = file_entry.get_raw_file_path
 
-        assert len(os.listdir(self.test_user_data_path)) == 1
+        assert len(os.listdir(self.test_user_data_path)) == 2
         assert os.path.exists(file_dir)
 
         file_entry.delete()
@@ -404,6 +417,8 @@ class TestUploadUserDataView(TransactionTestCase):
         existing_files = UserDatasetFile.objects.all()
         assert len(existing_files) == 0
         assert not os.path.exists(file_dir)
+        assert len(os.listdir(self.test_user_data_path)) == 1
+        _clean_up_log_folder(self.test_user_data_path)
         assert len(os.listdir(self.test_user_data_path)) == 0
 
     @patch('api.views.upload_user_data_view.preprocess_file', side_effect=mock_preprocess_file)
@@ -423,7 +438,7 @@ class TestUploadUserDataView(TransactionTestCase):
         file_entry = existing_files[0]
         file_dir = file_entry.get_raw_file_path
 
-        assert len(os.listdir(self.test_user_data_path)) == 1
+        assert len(os.listdir(self.test_user_data_path)) == 2
         assert os.path.exists(file_dir)
 
         file_entry.delete()
@@ -432,7 +447,10 @@ class TestUploadUserDataView(TransactionTestCase):
         existing_files = UserDatasetFile.objects.all()
         assert len(existing_files) == 0
         assert not os.path.exists(file_dir)
+        assert len(os.listdir(self.test_user_data_path)) == 1
+        _clean_up_log_folder(self.test_user_data_path)
         assert len(os.listdir(self.test_user_data_path)) == 0
+
 
     def test_upload_user_data_not_porper_extension(self):
         file_to_upload = _create_test_file(self.not_netcdf_file)
@@ -447,6 +465,8 @@ class TestUploadUserDataView(TransactionTestCase):
         # checking if nothing got to the db and to the data path
         existing_files = UserDatasetFile.objects.all()
         assert len(existing_files) == 0
+        assert len(os.listdir(self.test_user_data_path)) == 1
+        _clean_up_log_folder(self.test_user_data_path)
         assert len(os.listdir(self.test_user_data_path)) == 0
 
     @patch('api.views.upload_user_data_view.preprocess_file', side_effect=mock_preprocess_file)
@@ -464,6 +484,8 @@ class TestUploadUserDataView(TransactionTestCase):
         # checking if nothing got to the db and to the data path
         existing_files = UserDatasetFile.objects.all()
         assert len(existing_files) == 0
+        assert len(os.listdir(self.test_user_data_path)) == 1
+        _clean_up_log_folder(self.test_user_data_path)
         assert len(os.listdir(self.test_user_data_path)) == 0
 
     def test_post_incorrect_metadata_form(self):
@@ -476,6 +498,7 @@ class TestUploadUserDataView(TransactionTestCase):
 
         existing_files = UserDatasetFile.objects.all()
         assert len(existing_files) == 0
+        
 
     @patch('api.views.upload_user_data_view.preprocess_file', side_effect=mock_preprocess_file)
     def test_update_metadata(self, mock_preprocess_file):
