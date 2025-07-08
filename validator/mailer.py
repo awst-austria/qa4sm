@@ -176,7 +176,7 @@ def user_api_token_request(user):
 def send_autocleanup_failed(message):
     __logger.info('Sending mail about failing cleanup')
     subject = '[QA4SM INTERNAL] Cleanup failed'
-    body = f'Dear admins,\nRunning auto cleanup failed. The error is {message} \nBest regards,\nYour webapp'
+    body = f'Dear admins,\nRunning auto cleanup process failed. The error is {message} \nBest regards,\nYour webapp'
     print(body)
     _send_email(recipients=[settings.EMAIL_FROM],
                 subject=subject,
