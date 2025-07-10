@@ -1530,7 +1530,8 @@ class TestValidation(TestCase):
                         (globals.ERA5, globals.ERA5_LAND_latest, globals.ERA5_sm),
                         (globals.GLDAS, globals.GLDAS_NOAH025_3H_2_1,
                          globals.GLDAS_SoilMoi0_10cm_inst), (globals.SMAP_L3, globals.SMAP_V9_AM_PM,
-                         globals.SMAP_soil_moisture)]
+                         globals.SMAP_soil_moisture), (globals.CCI_RZSM,
+                         globals.ESA_CCI_RZSM_V09_2, globals.ESA_CCI_RZSM_0_10cm)]
 
         for ds, version, variable in all_datasets:
             self.validation_upscaling_for_dataset(ds, version, variable)
