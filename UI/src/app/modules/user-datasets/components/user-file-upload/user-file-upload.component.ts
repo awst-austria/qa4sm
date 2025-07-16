@@ -1,15 +1,15 @@
-import {Component} from '@angular/core';
-import {FormBuilder, Validators} from '@angular/forms';
-import {UserDatasetsService} from '../../services/user-datasets.service';
-import {ToastService} from '../../../core/services/toast/toast.service';
-import {BehaviorSubject, Subscription} from 'rxjs';
-import {finalize} from 'rxjs/operators';
-import {HttpEventType} from '@angular/common/http';
-import {allowedNameValidator} from '../../services/allowed-name.directive';
+import { Component } from '@angular/core';
+import { FormBuilder, Validators } from '@angular/forms';
+import { UserDatasetsService } from '../../services/user-datasets.service';
+import { ToastService } from '../../../core/services/toast/toast.service';
+import { BehaviorSubject, Subscription } from 'rxjs';
+import { finalize } from 'rxjs/operators';
+import { HttpEventType } from '@angular/common/http';
+import { allowedNameValidator } from '../../services/allowed-name.directive';
 import * as uuid from 'uuid';
 import * as JSZip from 'jszip';
-import {AuthService} from '../../../core/services/auth/auth.service';
-import {UserFileMetadata} from '../../../core/services/form-interfaces/UserFileMetadataForm';
+import { AuthService } from '../../../core/services/auth/auth.service';
+import { UserFileMetadata } from '../../../core/services/form-interfaces/UserFileMetadataForm';
 
 @Component({
   selector: 'qa-user-file-upload',
@@ -32,7 +32,7 @@ export class UserFileUploadComponent {
 
   uploadObserver = {
     next: (event: any) => this.onUploadNext(event),
-    error: () => this.onUploadError(),
+    error: (error: any) => this.onUploadError(error),
     complete: () => this.onUploadComplete()
   }
 
@@ -45,9 +45,9 @@ export class UserFileUploadComponent {
   });
 
   constructor(private userDatasetService: UserDatasetsService,
-              private formBuilder: FormBuilder,
-              private toastService: ToastService,
-              public authService: AuthService) {
+    private formBuilder: FormBuilder,
+    private toastService: ToastService,
+    public authService: AuthService) {
   }
 
   private verifyZipContent(): void {
@@ -115,9 +115,14 @@ export class UserFileUploadComponent {
     }
   }
 
-  private onUploadError(): void {
-    this.toastService.showErrorWithHeader('File not saved',
-      `File could not be uploaded. Please try again or contact our team.`);
+  private onUploadError(error: any): void {
+    let errorMessage = 'File could not be uploaded. Please try again or contact our team.';
+
+    if (error.errorMessage && error.errorMessage.message) {
+      errorMessage = error.errorMessage.message;
+    }
+
+    this.toastService.showErrorWithHeader('File not saved', errorMessage);
   }
 
   private onUploadComplete(): void {
@@ -144,7 +149,7 @@ export class UserFileUploadComponent {
   }
 
 
-  getISMNList(): void{
+  getISMNList(): void {
     this.userDatasetService.getISMNList();
   }
 
