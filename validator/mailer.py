@@ -14,23 +14,58 @@ from valentina.settings_conf import EMAIL_HOST_USER
 __logger = logging.getLogger(__name__)
 
 
-def send_failed_preprocessing_notification(file_entry, too_long_variable_name=False):
-    __logger.info(f'Sending mail about failed preprocessing of the {file_entry.id} to user {file_entry.owner}...')
+def send_failed_preprocessing_notification(file_entry,
+                                           full_traceback=None,
+                                           too_long_variable_name=False):
+    # Check if this is a format validation error
+    is_format_validation_error = hasattr(
+        file_entry, 'format_validation_error_msg'
+    ) and file_entry.format_validation_error_msg
+
+    stage = 'uploaded file format check' if is_format_validation_error else 'data preprocessing pipeline'
+    __logger.info(
+        f'Sending mail about failed {stage} of file {file_entry.id} to user {file_entry.owner}...'
+    )
+
     guidelines_url = settings.SITE_URL + get_angular_url('my-datasets')
 
-    file_problem_body = (f"Your file containing data for dataset {file_entry.dataset.pretty_name}, version "
-                         f"{file_entry.version.pretty_name} could not be processed. Please check if you "
-                         f"uploaded proper file and if your file hs been prepared according to our"
-                         f" guidelines ({guidelines_url}).\n")
+    # Build the email body based on the type of error
+    if is_format_validation_error:
+        problem_body = (
+            f"\nYour file containing data for dataset {file_entry.dataset.pretty_name}, version "
+            f"{file_entry.version.pretty_name} failed format validation.\n\n"
+            f"{file_entry.format_validation_error_msg}\n\n"
+            f"Please check if you uploaded the proper file and ensure it has been prepared "
+            f"according to our guidelines ({guidelines_url}).\n")
+    elif too_long_variable_name:
+        problem_body = (
+            f"\nThe variable name used in your file for dataset {file_entry.dataset.pretty_name}, "
+            f"version {file_entry.version.pretty_name} is too long. Please note that variable "
+            f"names cannot be longer than 30 characters and long_name cannot be longer than "
+            f"100 characters.\n")
+    else:
+        problem_body = (
+            f"\nYour file containing data for dataset {file_entry.dataset.pretty_name}, version "
+            f"{file_entry.version.pretty_name} could not be processed. \n\nPlease check if you "
+            f"uploaded the proper file and ensure it has been prepared according to our "
+            f"guidelines ({guidelines_url}).\n")
 
-    variable_problem_body = (f"Looks like the variable name used in the file is too long. Please note that the "
-                             f"variable name can not be longer than 30 characters and the long_name can not be "
-                             f"longer than 100 characters.\n")
+    # switch off once failed uploads are properly displayed with log file in upload section
+    traceback = ""
+    if full_traceback:
+        traceback = "\n\n\n-------------------------------------------------------------------------------"
+        traceback += f"\nFor Advanced Users: \n\nIf your file format already follows our guidelines, "
+        traceback += f"the detailed error traceback below may help diagnose the issue: \n\n{full_traceback}"
 
-    subject = '[QA4SM] File preprocessing failed'
-    body = f"""Dear {file_entry.owner.first_name} {file_entry.owner.last_name}, \n\n
-    {file_problem_body if not too_long_variable_name else variable_problem_body}
-    In case of further problems, please contact our team.\n\nBest regards,\nQA4SM team'"""
+    subject = f'[QA4SM] {stage.title()} Failed'
+    display_name = f"{file_entry.owner.first_name} {file_entry.owner.last_name}".strip(
+    ) or file_entry.owner.username
+    body = f"""Dear {display_name},
+    {problem_body}
+    \nIn case of further problems, please contact our team.
+
+    \nBest regards,
+    \nQA4SM team {traceback}"""
 
     _send_email(recipients=[file_entry.owner.email],
                 subject=subject,
@@ -38,7 +73,8 @@ def send_failed_preprocessing_notification(file_entry, too_long_variable_name=Fa
 
 
 def send_val_done_notification(val_run):
-    __logger.info('Sending mail about validation {} to user {}...'.format(val_run.id, val_run.user))
+    __logger.info('Sending mail about validation {} to user {}...'.format(
+        val_run.id, val_run.user))
 
     url = settings.SITE_URL + get_angular_url('result', val_run.id)
 
@@ -53,7 +89,8 @@ def send_val_done_notification(val_run):
                 dataset_string += ", "
                 if (i == and_position):
                     dataset_string += "and "
-            dataset_string += "{} ({})".format(dc.dataset.pretty_name, dc.version.pretty_name)
+            dataset_string += "{} ({})".format(dc.dataset.pretty_name,
+                                               dc.version.pretty_name)
             i += 1
 
     subject = '[QA4SM] Validation finished'
@@ -71,9 +108,7 @@ def send_val_done_notification(val_run):
         url,
         val_run.expiry_date)
 
-    _send_email(recipients=[val_run.user.email],
-                subject=subject,
-                body=body)
+    _send_email(recipients=[val_run.user.email], subject=subject, body=body)
 
     # url = settings.SITE_URL + '/login/?next=' + get_angular_url('result', val_run.id)
 
@@ -81,7 +116,9 @@ def send_val_done_notification(val_run):
 def send_val_expiry_notification(val_runs):
     val_ids = ', '.join([str(val.id) for val in val_runs])
     user = val_runs[0].user
-    __logger.info('Sending mail about expiry of validation {} to user {}...'.format(val_ids, user))
+    __logger.info(
+        'Sending mail about expiry of validation {} to user {}...'.format(
+            val_ids, user))
 
     if user is not None:
         for val_run in val_runs:
@@ -90,8 +127,10 @@ def send_val_expiry_notification(val_runs):
 
         subject = '[QA4SM] Validation expiring soon'
         greetings_form = f'{user.first_name}  {user.last_name}' if user.first_name and user.last_name else user.username
-        threshold_date = timezone.now() - timedelta(days=settings.VALIDATION_EXPIRY_DAYS)
-        removal_date = timezone.now() + timedelta(days=settings.VALIDATION_EXPIRY_WARNING_DAYS)
+        threshold_date = timezone.now() - timedelta(
+            days=settings.VALIDATION_EXPIRY_DAYS)
+        removal_date = timezone.now() + timedelta(
+            days=settings.VALIDATION_EXPIRY_WARNING_DAYS)
         help_url = settings.SITE_URL + get_angular_url('help')
         my_results_url = settings.SITE_URL + get_angular_url('validations')
 
@@ -103,38 +142,33 @@ def send_val_expiry_notification(val_runs):
         '''
 
         if user.email:
-            _send_email(recipients=[user.email],
-                        subject=subject,
-                        body=body)
+            _send_email(recipients=[user.email], subject=subject, body=body)
         else:
             __logger.exception('The user has no email assigned')
 
 
 def send_new_user_signed_up(user):
-    __logger.info('Sending mail about new user {} to admins...'.format(user.username))
+    __logger.info('Sending mail about new user {} to admins...'.format(
+        user.username))
 
     url = settings.SITE_URL
 
     subject = '[QA4SM] New user signed up'
     body = 'Dear admins,\n\nnew user {} {} ({}) has signed up from {}. A verification email has been sent to their provided address\nKind regards,\nYour webapp'.format(
-        user.first_name,
-        user.last_name,
-        user.username,
-        url)
+        user.first_name, user.last_name, user.username, url)
 
-    _send_email(recipients=[settings.EMAIL_FROM],
-                subject=subject,
-                body=body)
+    _send_email(recipients=[settings.EMAIL_FROM], subject=subject, body=body)
+
 
 def send_new_user_verification(user, token):
     __logger.info('Sending email verification to user {}...'.format(user.id))
-    
+
     contact_url = settings.SITE_URL + get_angular_url('contact-us')
 
     verification_url = f"{settings.SITE_URL}/api/verify-email/{user.id}/{token}/"
-    
+
     subject = '[QA4SM] Verify your email address'
-    
+
     body = f'''
     Dear {user.first_name or user.username},
     
@@ -149,11 +183,10 @@ def send_new_user_verification(user, token):
     '''
 
     try:
-        _send_email(recipients=[user.email],
-                    subject=subject,
-                    body=body)
+        _send_email(recipients=[user.email], subject=subject, body=body)
     except Exception as e:
-        __logger.error(f'Failed to send verification email to user {user.id}: {str(e)}')
+        __logger.error(
+            f'Failed to send verification email to user {user.id}: {str(e)}')
         raise
 
 def user_api_token_request(user):
@@ -178,32 +211,26 @@ def send_autocleanup_failed(message):
     subject = '[QA4SM INTERNAL] Cleanup failed'
     body = f'Dear admins,\nRunning auto cleanup process failed. The error is {message} \nBest regards,\nYour webapp'
     print(body)
-    _send_email(recipients=[settings.EMAIL_FROM],
-                subject=subject,
-                body=body)
+    _send_email(recipients=[settings.EMAIL_FROM], subject=subject, body=body)
 
 
 def send_user_account_removal_request(user):
-    __logger.info('Sending mail about user removal request ({}) to admins...'.format(user.username))
+    __logger.info(
+        'Sending mail about user removal request ({}) to admins...'.format(
+            user.username))
 
-    url = settings.SITE_URL + reverse('admin:validator_user_change', kwargs={'object_id': user.id})
+    url = settings.SITE_URL + reverse('admin:validator_user_change',
+                                      kwargs={'object_id': user.id})
     subject = '[QA4SM] User profile removal request'
     body = 'Dear admins,\n\n A new user account removal request has arrived from {} {} ({}).\nPlease review the account and delete it as soon as possible. \nUser account: {}\n\nBest regards,\nYour webapp'.format(
-        user.first_name,
-        user.last_name,
-        user.username,
-        url)
+        user.first_name, user.last_name, user.username, url)
 
-    _send_email(recipients=[settings.EMAIL_FROM],
-                subject=subject,
-                body=body)
+    _send_email(recipients=[settings.EMAIL_FROM], subject=subject, body=body)
 
 
 def send_user_status_changed(user, activate):
     __logger.info('Sending mail to user {} about {}...'.format(
-        user.username,
-        ('activation' if activate else 'deactivation')
-    ))
+        user.username, ('activation' if activate else 'deactivation')))
 
     subject = '[QA4SM] Account ' + ('activated' if activate else 'deactivated')
     body = 'Dear {} {},\n\nyour account "{}" has been {}.'.format(
@@ -215,22 +242,19 @@ def send_user_status_changed(user, activate):
 
     if activate:
         url = settings.SITE_URL + get_angular_url('login')
-        body += '\nYou can now log in here: {}'.format(
-            url)
+        body += '\nYou can now log in here: {}'.format(url)
 
     body += '\n\nBest regards,\nQA4SM team'
 
-    _send_email(recipients=[user.email],
-                subject=subject,
-                body=body)
+    _send_email(recipients=[user.email], subject=subject, body=body)
 
 
 def send_user_link_to_reset_password(user, message):
-    __logger.info('Sending mail about resetting their password to user {}...'.format(user.username))
+    __logger.info(
+        'Sending mail about resetting their password to user {}...'.format(
+            user.username))
     subject = '[QA4SM] Password reset for QA4SM webservice'
-    _send_email(recipients=[user.email],
-                subject=subject,
-                body=message)
+    _send_email(recipients=[user.email], subject=subject, body=message)
 
 
 def send_user_help_request(user_name, user_email, message, send_copy_to_user):
@@ -238,7 +262,8 @@ def send_user_help_request(user_name, user_email, message, send_copy_to_user):
     subject = "[USER MESSAGE] - Sent via contact form"
     final_message = f'''Sent by: {user_name} \nReply to: {user_email} \n\n{message}'''
     print(final_message)
-    _send_email(recipients=[EMAIL_HOST_USER, user_email] if send_copy_to_user else [EMAIL_HOST_USER],
+    _send_email(recipients=[EMAIL_HOST_USER, user_email]
+                if send_copy_to_user else [EMAIL_HOST_USER],
                 subject=subject,
                 body=final_message)
 
@@ -249,7 +274,8 @@ def _send_email(recipients, subject, body, html_message=None):
         connection.open()
         messages = list()
         for recipient in recipients:
-            msg = EmailMultiAlternatives(subject, body, settings.EMAIL_FROM, [recipient])
+            msg = EmailMultiAlternatives(subject, body, settings.EMAIL_FROM,
+                                         [recipient])
             if html_message:
                 msg.attach_alternative(html_message, "text/html")
             messages.append(msg)
