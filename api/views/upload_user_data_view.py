@@ -18,7 +18,7 @@ import logging
 from validator.validation.globals import USER_DATASET_MIN_ID, USER_DATASET_VERSION_MIN_ID, USER_DATASET_VARIABLE_MIN_ID
 from multiprocessing.context import Process
 
-from validator.validation.user_data_processing import user_data_preprocessing
+from validator.validation.user_data_processing import user_data_preprocessing, run_upload_format_check
 from django.db import transaction, connections
 
 __logger = logging.getLogger(__name__)
@@ -210,11 +210,6 @@ class UploadedFileError(BaseException):
         self.message = message
 
 
-def _verify_file_extension(file_name):
-    return file_name.endswith('.nc4') or file_name.endswith(
-        '.nc') or file_name.endswith('.zip')
-
-
 @api_view(['PUT', 'POST'])
 @permission_classes([IsAuthenticated])
 @parser_classes([FileUploadParser])
@@ -225,19 +220,6 @@ def upload_user_data(request, filename):
     user_path.mkdir(parents=True, exist_ok=True)
 
     file = request.FILES['file']
-    # I don't think it is possible not to meet this condition, but just in case
-    if file.name != filename:
-        return JsonResponse({'error': 'Wrong file name'},
-                            status=500,
-                            safe=False)
-    if not _verify_file_extension(filename):
-        return JsonResponse({'error': 'Wrong file format'},
-                            status=500,
-                            safe=False)
-    if request.user.space_left and file.size > request.user.space_left:
-        return JsonResponse({'error': 'File is too big'},
-                            status=500,
-                            safe=False)
 
     #  get metadata
     metadata = json.loads(request.META.get('HTTP_FILEMETADATA'))
@@ -282,7 +264,7 @@ def upload_user_data(request, filename):
         # saving file
         try:
             file_serializer.save()
-        except:
+        except Exception as e:
             new_dataset.delete()
             new_variable.delete()
             new_version.delete()
@@ -294,6 +276,15 @@ def upload_user_data(request, filename):
                 },
                 status=500,
                 safe=False)
+
+        success, msg, status = run_upload_format_check(
+            file=file,
+            filename=filename,
+            file_uuid=file_serializer.data['id'],
+            user_path=user_path)
+        if not success:
+            # angular error flow handles both str or dict (userFileUpload)
+            return JsonResponse(msg, status=status, safe=False)
 
         # need to get the path and assign it to the dataset as well as pass it to preprocessing function, so I don't
         # have to open the db connection before file preprocessing.
