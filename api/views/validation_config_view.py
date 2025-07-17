@@ -24,7 +24,7 @@ def _check_if_settings_exist():
     pass
 
 class TenPerMinuteUserThrottle(UserRateThrottle):
-    rate = '10/minute'
+    rate = '18/minute'
 
 
 @api_view(['GET'])
