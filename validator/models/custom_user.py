@@ -19,6 +19,8 @@ class User(AbstractUser):
     POWER_USER = 'power_user'
     LARGE = 'large'
     UNLIMITED = 'unlimited'
+    LARGE = 'large'
+    # make email unique
 
     DATA_SPACE_LEVELS = (
         (NO_DATA, 1),  # 1 byte
