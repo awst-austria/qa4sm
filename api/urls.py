@@ -12,11 +12,11 @@ from api.views.ismn_network_view import get_ismn_networks
 from api.views.login_view import api_login
 from api.views.logout_view import api_logout
 from api.views.path_var_test_endpoint import path_var_get
-from api.views.validation_config_view import start_validation, get_validation_configuration, get_scaling_methods
+from api.views.validation_config_view import start_validation, get_validation_configuration, get_scaling_methods, start_validation_with_token
 from api.views.uptime_view import uptime_ping, get_uptime
 from api.views.comparison_view import get_comparison_table, get_comparison_plots_for_metric, \
     download_comparison_table, get_comparison_metrics, get_spatial_extent
-from api.views.user_view import signup_post, user_update, user_delete, password_update, verify_email
+from api.views.user_view import signup_post, user_update, user_delete, password_update, verify_email, request_api_token, get_api_token
 from api.views.validation_run_view import published_results, my_results, validation_run_by_id, \
     custom_tracked_validation_runs, get_validations_for_comparison, get_copied_validations, is_validation_finished
 from api.views.dataset_configuration_view import dataset_configuration, dataset_configuration_by_validation
@@ -80,6 +80,7 @@ urlpatterns = [
     path('my-results', my_results, name='My results'),
     re_path(r'^validation-configuration/(?P<id>.+)$', get_validation_configuration, name='Validation configuration'),
     path('start-validation', start_validation, name='Run new validation'),
+    path('start-validation-with-token', start_validation_with_token, name='Run token validation'),
     path('param-filter', data_parameterised_filter, name='Parameterised filter'),
     path('stop-validation/<uuid:result_uuid>', stop_validation, name='Stop validation'),
     path('custom-tracked-run', custom_tracked_validation_runs, name='Copied custom run'),
@@ -132,7 +133,9 @@ urlpatterns = [
     path('user-manual', get_user_manual, name='Get user manual'),
     path('get-ismn-list-file', get_ismn_list_file, name='Get ISMN csv file'),
     path('archive-multiple-validations', archive_multiple_results, name='Archive Multiple Results'),
-    path('api-obtain-token/', views.obtain_auth_token, name='Obtain token'),
+    #path('api-obtain-token/', views.obtain_auth_token, name='Obtain token'),
+    path('request-api-token', request_api_token, name='request-api-token'),
+    path('get-api-token', get_api_token, name='get-api-token'),
     path('update-dataset-version', update_dataset_version, name='Update Dataset Version'),
     path('run-auto-cleanup', run_auto_cleanup_script, name='Run Auto Cleanup'),
     path('password-update', password_update, name='Password Update'),
