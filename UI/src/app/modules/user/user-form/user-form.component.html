@@ -1,3 +1,6 @@
+<p-toast></p-toast>
+<p-confirmDialog key="apiTokenConfirm" [style]="{width: '30vw'}" [baseZIndex]="10000"></p-confirmDialog>
+
 <div class="center">
   <qa-maintenance-mode *ngIf="maintenanceMode" [action]="userData ? 'update your data' : 'sign up'"/>
   <div *ngIf="!maintenanceMode">
@@ -149,6 +152,7 @@
         <label for="active">some label</label>
       </div>
 
+
       <button *ngIf="!userData"
               pButton
               type="submit"
@@ -162,6 +166,49 @@
       >
       </button>
     </form>
+
+    <hr class="w-12 mt-4" style="opacity: 1.0;">
+
+      <div *ngIf="userData" class="py-3">
+        <span class="p-float-label">
+          <input #tokenInput
+                 class="form-field" 
+                 id="api-token" 
+                 type="text" 
+                 pInputText 
+                 [value]="apiToken || 'No token assigned'" 
+                 readonly>
+          <label for="api-token">API Token</label>
+          <span
+             *ngIf="!hasToken()"
+            pTooltip="Unique user token required to submit validations via public API."
+            class="pi pi-question-circle">
+          </span>
+          <button *ngIf="hasToken()"
+                  pButton
+                  type="button"
+                  icon="pi pi-copy"
+                  class="p-button-text p-button-sm"
+                  style="margin-left: -0.5rem"
+                  (click)="copyToken(tokenInput)"
+                  pTooltip="Copy token to clipboard">
+          </button>
+        </span>
+      </div>
+    
+      <p class="flex align-items-center gap-2">
+        <button *ngIf="userData"
+                pButton
+                type="button"
+                label="Request API token"
+                (click)="confirmRequestToken()"
+                class="p-button-request">
+        </button>
+        <span
+          pTooltip="Request an unique API token that can be used to submit validations via public API access."
+          class="pi pi-question-circle">
+        </span>
+      </p>
     <p>
       <button *ngIf="userData"
               pButton
