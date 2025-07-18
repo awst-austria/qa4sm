@@ -209,7 +209,7 @@ class TestUserView(TestCase):
         user_form_correct = {'username': 'geraltOfRivia',
                              'password1':'roachRoach',
                              'password2':'roachRoach',
-                             'email': 'geralt@of.rivia.pl',
+                             'email': 'geraltOfRivia@of.rivia.pl',
                              'first_name': '',
                              'last_name': '',
                              'organisation': '',
@@ -219,9 +219,10 @@ class TestUserView(TestCase):
                              'active': False,
                              'honeypot': 100}
         response = self.client.post(signup_url, user_form_correct, format='json')
+        assert response.status_code == 200
+
         new_user = User.objects.get(username='geraltOfRivia')
 
-        assert response.status_code == 200
         assert new_user
         assert not new_user.is_active # the account has been created but not activated
 
