@@ -21,6 +21,7 @@ class User(AbstractUser):
     UNLIMITED = 'unlimited'
     LARGE = 'large'
     # make email unique
+    email = models.EmailField(unique=True)
 
     DATA_SPACE_LEVELS = (
         (NO_DATA, 1),  # 1 byte
