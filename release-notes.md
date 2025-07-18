@@ -1,3 +1,8 @@
+QA$SM v3.2.0 - Release notes 2025-06-19
+======================================================
+# Updates
+1. Added new dataset versions ( ESA_CCI_SM_(active, passive, combinded) V9.2 and ESA_CCI_RZSM V9.2)
+
 QA4SM v3.1.0.1 - Release notes 2025-05-13
 =======================================================
 # Fixes
