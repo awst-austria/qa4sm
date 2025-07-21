@@ -35,7 +35,7 @@ class TestDatasetVersionView(TestCase):
         # check versions based on the given dataset
         response = self.client.get(reverse(dataset_version_by_dataset_url_name, kwargs={'dataset_id': 1}))  # C3S
         assert response.status_code == 200
-        assert len(response.json()) == 6  # there at least 6 C3S versions currently
+        assert len(response.json()) >= 7  # there at least 7 C3S versions currently
 
         # check wrong dataset id
         response = self.client.get(reverse(dataset_version_by_dataset_url_name, kwargs={'dataset_id': 100}))  # wrong
