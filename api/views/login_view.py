@@ -8,12 +8,13 @@ from rest_framework.permissions import AllowAny
 from rest_framework.serializers import ModelSerializer
 from rest_framework.fields import DateTimeField, CharField
 from django_countries.serializer_fields import CountryField
+from django.contrib.auth import get_user_model
 from validator.models import User
 
 # Predefined response bodies
 resp_invalid_credentials = JsonResponse({'message': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
 resp_unauthorized = JsonResponse({'message': 'Unauthorized :-('}, status=status.HTTP_401_UNAUTHORIZED)
-
+UserModel = get_user_model()
 
 @api_view(['POST', 'GET'])
 @permission_classes([AllowAny])
@@ -41,13 +42,29 @@ def api_login(request):
 
         user = auth.authenticate(username=login_data.username, password=login_data.password)
 
+
+            # If not found, try email as username:
+        if user is None:
+            try:
+                u = UserModel.objects.get(email=login_data.username)
+                if u.check_password(login_data.password):
+                    user = u
+            except UserModel.DoesNotExist:
+                pass
+
         if user:
-            if user is not None:
-                login(request, user)
-                user_serializer = UserSerializer(request.user)
-                return JsonResponse(user_serializer.data, status=status.HTTP_200_OK)
+            login(request, user)
+            user_serializer = UserSerializer(user)
+            return JsonResponse(user_serializer.data, status=status.HTTP_200_OK)
 
         return resp_invalid_credentials
+
+ #       if user:
+ #           if user is not None:
+ #               login(request, user)
+ #               user_serializer = UserSerializer(request.user)
+ #               return JsonResponse(user_serializer.data, status=status.HTTP_200_OK)
+ #       return resp_invalid_credentials
 
     elif request.method == 'GET':
         cookies = request.COOKIES

@@ -32,6 +32,7 @@ class TestAdmin(TestCase):
     def setUp(self):
         self.user_credentials = {
             'username': 'testuser',
+            'email': 'testuser@example.com',
             'password': 'secret',
             'is_staff' : False,
             'is_active' : True,
@@ -40,6 +41,7 @@ class TestAdmin(TestCase):
 
         self.staff_credentials = {
             'username': 'dilbert',
+            'email': 'dilbert@example.com',
             'password': 'treblid',
             'is_staff' : True,
         }
@@ -47,6 +49,7 @@ class TestAdmin(TestCase):
 
         self.admin_credentials = {
             'username': 'chuck_norris',
+            'email': 'chuck@example.com',
             'password': 'superpassword!',
             'is_staff' : True,
             'is_superuser' : True,
