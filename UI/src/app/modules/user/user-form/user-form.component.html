@@ -204,7 +204,7 @@
                 (click)="confirmRequestToken()"
                 class="p-button-request">
         </button>
-        <span
+        <span *ngIf="userData"
           pTooltip="Request an unique API token that can be used to submit validations via public API access."
           class="pi pi-question-circle">
         </span>
