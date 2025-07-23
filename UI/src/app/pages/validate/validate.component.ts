@@ -257,12 +257,22 @@ export class ValidateComponent implements OnInit, AfterViewInit {
                 if (paramFilter.id === SMOS_RFI_FILTER_ID) {
                   datasetConfigModel.smosRfiFilter$.value.parameters$.next(paramFilter.parameters);
                 }
+                if (paramFilter.id === SMOS_CHI2_FILTER_ID) {
+                  datasetConfigModel.smosChi2Filter$.value.parameters$.next(paramFilter.parameters);
+                }
                 if (paramFilter.id === ISMN_NETWORK_FILTER_ID) {
                   datasetConfigModel.ismnNetworkFilter$.value.parameters$.next(paramFilter.parameters);
                 }
                 if (paramFilter.id === ISMN_DEPTH_FILTER_ID) {
                   datasetConfigModel.ismnDepthFilter$.value.parameters$.next(paramFilter.parameters);
                 }
+                if (paramFilter.id == SMAP_L3_V9_VWC_FILTER_ID){
+                  datasetConfigModel.vegetationWaterFilter$.value.parameters$.next(paramFilter.parameters);
+                }
+                if (paramFilter.id == SMAP_L3_STATIC_WATER_FILTER_ID){
+                  datasetConfigModel.staticWaterFilter$.value.parameters$.next(paramFilter.parameters);
+                }
+
               });
             });
         },
@@ -820,7 +830,6 @@ export class ValidateComponent implements OnInit, AfterViewInit {
       name_tag: this.validationModel.nameTag$.getValue(),
       temporal_matching: this.validationModel.temporalMatchingModel.size$.getValue()
     };
-
     this.validationConfigService.startValidation(newValidation, checkForExistingValidation)
       .subscribe(this.startValidationObserver);
   }

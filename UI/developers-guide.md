@@ -47,6 +47,10 @@ defined in
 After installing the project dependencies the angular application can be started by 
 executing `ng serve` from the `UI` directory.
 
+Note that you can also execute `ng serve --configuration development` from the `UI` directory
+to view more detailed error information in the browser console if you encounter JavaScript 
+or Angular errors.
+
 Since django runs in the root context, the UI application needs another one. (We don't want to 
 mix django, django rest and angular urls). The angular application has the /ui/ context path, 
 all relative urls defined in the application are relative to this path.

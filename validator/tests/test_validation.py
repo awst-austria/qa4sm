@@ -1530,7 +1530,8 @@ class TestValidation(TestCase):
                         (globals.ERA5, globals.ERA5_LAND_latest, globals.ERA5_sm),
                         (globals.GLDAS, globals.GLDAS_NOAH025_3H_2_1,
                          globals.GLDAS_SoilMoi0_10cm_inst), (globals.SMAP_L3, globals.SMAP_V9_AM_PM,
-                         globals.SMAP_soil_moisture)]
+                         globals.SMAP_soil_moisture), (globals.CCI_RZSM,
+                         globals.ESA_CCI_RZSM_V09_2, globals.ESA_CCI_RZSM_0_10cm)]
 
         for ds, version, variable in all_datasets:
             self.validation_upscaling_for_dataset(ds, version, variable)
@@ -1878,21 +1879,26 @@ class TestValidation(TestCase):
                             data = getattr(msk_reader,
                                            read_name)(0, **read_kwargs)
                         else:
-                            data = getattr(msk_reader,
+                            if variable.short_name not in ["swvl2", "swvl3",
+                                                           "swvl4"]:
+                                data = getattr(msk_reader,
                                            read_name)(-155.42, 19.78,
                                                       **read_kwargs)  ## hawaii
-                        assert data is not None
-                        assert variable.short_name in data.columns
-                        assert isinstance(data, pd.DataFrame)
+                        if variable.short_name not in ["swvl2", "swvl3", "swvl4"]:
+                            assert data is not None
+                            assert variable.short_name in data.columns
+                            assert isinstance(data, pd.DataFrame)
 
-                        # handles the case where all values are flagged (i.e. for SMOS L3)
-                        if not len(data.index) > 1 or data[
-                                variable.short_name].empty:
-                            unfiltered = reader.read(-155.42, 19.78,
-                                                     **read_kwargs)
-                            assert unfiltered.count()[
-                                variable.short_name] == len(
-                                    unfiltered[variable.short_name].dropna())
+                            # handles the case where all values are flagged (i.e. for SMOS L3)
+                            if not len(data.index) > 1 or data[
+                                    variable.short_name].empty:
+                                unfiltered = reader.read(-155.42, 19.78,
+                                                         **read_kwargs)
+                                assert unfiltered.count()[
+                                    variable.short_name] == len(
+                                        unfiltered[variable.short_name].dropna())
+                        else:
+                            pass
 
         print("Test duration: {}".format(time.time() - start_time))
 

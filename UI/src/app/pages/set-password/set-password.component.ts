@@ -85,7 +85,7 @@ export class SetPasswordComponent implements OnInit {
   }
 
   private onSetPasswordNext(): void {
-    this.router.navigate(['/login']).then(() =>
+    this.router.navigate(['home'], {queryParams: {showLogin: 'true'}}).then(() =>
       this.toastService.showSuccessWithHeader('Password changed', 'You can log in using the new password'));
   }
 

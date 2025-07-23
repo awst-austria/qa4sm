@@ -17,6 +17,7 @@ jobs:
   build:
     env:
       DOI_ACCESS_TOKEN_ENV: ${{ secrets.DOI_ACCESS_TOKEN_ENV }}
+      PIP_USE_PEP517: 1
     name: Build py${{ matrix.python-version }} @ ${{ matrix.os }} 🐍
     runs-on: ${{ matrix.os }}
     defaults:
@@ -43,7 +44,6 @@ jobs:
       - name: Activate Environment
         run: |
           conda activate qa4sm
-          pip install --no-deps smos==0.3.1
       - name: Print environment infos
         run: |
           conda info -a

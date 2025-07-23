@@ -1,6 +1,6 @@
 from django.db import models
 # from validator.models.filter import DataFilter
-# from validator.models.variable import DataVariable
+from validator.models.variable import DataVariable
 from validator.models.version import DatasetVersion
 from django.conf import settings
 

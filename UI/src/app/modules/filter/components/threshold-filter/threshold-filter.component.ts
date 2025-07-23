@@ -1,7 +1,7 @@
-import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
-import {FilterModel} from "../basic-filter/filter-model";
-import {BehaviorSubject} from "rxjs";
-import {DatasetComponentSelectionModel} from "../../../dataset/components/dataset/dataset-component-selection-model";
+import { Component, Input, OnInit } from '@angular/core';
+import { FilterModel } from '../basic-filter/filter-model';
+import { BehaviorSubject } from 'rxjs';
+import { DatasetComponentSelectionModel } from '../../../dataset/components/dataset/dataset-component-selection-model';
 
 @Component({
   selector: 'qa-threshold-filter',
@@ -16,6 +16,7 @@ export class ThresholdFilterComponent implements OnInit {
   @Input() maxThreshold: number = 1.;
   @Input() increment: number = 0.05;
   @Input() units: string = "fraction";
+  maxFractionDigits = 2; // if needed, make it input value
 
   editThreshold = "0";
 
@@ -36,6 +37,6 @@ export class ThresholdFilterComponent implements OnInit {
   }
 
   public saveNewValue(event): void {
-    this.filterModel$.value.parameters$.next(event.value);
+    this.filterModel$.value.parameters$.next(event.value.toFixed(this.maxFractionDigits));
   }
 }
