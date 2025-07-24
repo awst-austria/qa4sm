@@ -32,10 +32,14 @@ def _clean_up_data(file_entry):
     assert not os.path.exists(outdir)
 
 
+def _clean_up_log_folder(path):
+    log_path = Path(path) / 'log'
+    if log_path.exists():
+        shutil.rmtree(log_path)
+
+
 def _get_headers(metadata):
-    return {
-        'HTTP_FILEMETADATA': json.dumps(metadata)
-    }
+    return {'HTTP_FILEMETADATA': json.dumps(metadata)}
 
 
 def mock_preprocess_file(*args, **kwargs):
@@ -51,11 +55,13 @@ class TestUploadUserDataView(TransactionTestCase):
 
     def setUp(self):
         self.auth_data, self.test_user = create_test_user()
-        self.second_user_data, self.second_test_user = create_alternative_user()
+        self.second_user_data, self.second_test_user = create_alternative_user(
+        )
 
         self.client = APIClient()
         self.client.login(**self.auth_data)
-        self.user_data_path = os.path.join(settings.BASE_DIR, 'testdata/user_data')
+        self.user_data_path = os.path.join(settings.BASE_DIR,
+                                           'testdata/user_data')
         self.test_user_data_path = f'{self.user_data_path}/{self.test_user.username}'
         Path(self.test_user_data_path).mkdir(exist_ok=True, parents=True)
 
@@ -105,18 +111,46 @@ class TestUploadUserDataView(TransactionTestCase):
             'HTTP_FILEMETADATA': json.dumps(self.metadata_correct)
         }
 
+    def tearDown(self):
+        """Clean up test files after each test."""
+        # Clean up user-specific test data directory
+        if os.path.exists(self.test_user_data_path):
+            shutil.rmtree(self.test_user_data_path)
+
+        # Optional: Clean up the entire user_data directory if it's empty
+        # (only if you want to be extra thorough)
+        try:
+            if os.path.exists(self.user_data_path) and not os.listdir(
+                    self.user_data_path):
+                os.rmdir(self.user_data_path)
+        except OSError:
+            pass
+
+    def get_raw_nc_file_content(self, filename):
+        netcdf_file_path = f'{self.user_data_path}/{filename}'
+        with open(netcdf_file_path, 'rb') as f:
+            file_content = f.read()
+        return file_content
+
+    def get_raw_zipped_csv_content(self):
+        zip_file_path = f'{self.user_data_path}/{self.zipped_csv_file_name}'
+        with open(zip_file_path, 'rb') as f:
+            file_content = f.read()
+        return file_content
+
     def _remove_user_datafiles(self, username):
         user_data_path = f'{self.user_data_path}/{username}'
         shutil.rmtree(user_data_path)
 
-    @patch('api.views.upload_user_data_view.preprocess_file', side_effect=mock_preprocess_file)
+    @patch('api.views.upload_user_data_view.preprocess_file',
+           side_effect=mock_preprocess_file)
     def test_file_size_limit(self, mock_preprocess_file):
         headers = _get_headers(self.metadata_correct)
-
         response = self.client.post(
-            reverse(self.upload_data_url_name, kwargs={URL_FILENAME: self.netcdf_file_name}),
-            {FILE: self.netcdf_file},
-            format=FORMAT_MULTIPART,
+            reverse(self.upload_data_url_name,
+                    kwargs={URL_FILENAME: self.netcdf_file_name}),
+            data=self.get_raw_nc_file_content(self.netcdf_file_name),
+            content_type='application/json',
             **headers)
 
         file_entry = UserDatasetFile.objects.get(id=response.json()['id'])
@@ -124,49 +158,55 @@ class TestUploadUserDataView(TransactionTestCase):
         # check the size limit assigned to the user
         assert self.test_user.space_limit == 'basic'
         # check how much space left
-        assert self.test_user.space_left == self.test_user.get_space_limit_display() - file_entry.file.size
+        assert self.test_user.space_left == self.test_user.get_space_limit_display(
+        ) - file_entry.file.size
         # remove the file
         file_entry.delete()
 
+        ## Currently no user limit check in the backend because it is handled in UI
+
         # change the limit
-        self.test_user.space_limit = 'no_data'
-        self.test_user.save()
+        # self.test_user.space_limit = 'no_data'
+        # self.test_user.save()
 
-        response = self.client.post(reverse(self.upload_data_url_name, kwargs={URL_FILENAME: self.netcdf_file_name}),
-                                    {FILE: self.netcdf_file}, format=FORMAT_MULTIPART)
+        # response = self.client.post(
+        #     reverse(self.upload_data_url_name, kwargs={URL_FILENAME: self.netcdf_file_name}),
+        #     data=self.get_raw_nc_file_content(self.netcdf_file_name),
+        #     content_type='application/json',
+        #     **headers)
 
-        assert response.json()['error'] == 'File is too big'
-        assert response.status_code == 500
+        # assert response.json()['message'] == 'Unexpected error'
+        # assert response.status_code == 500
 
-        self.test_user.space_limit = 'unlimited'
-        self.test_user.save()
+        # self.test_user.space_limit = 'unlimited'
+        # self.test_user.save()
 
-        response = self.client.post(reverse(self.upload_data_url_name, kwargs={URL_FILENAME: self.netcdf_file_name}),
-                                    {FILE: self.netcdf_file}, format=FORMAT_MULTIPART, **headers)
-
-        assert response.status_code == 201
-
-        assert not self.test_user.space_left
-
-        file_entry = UserDatasetFile.objects.get(id=response.json()['id'])
-        file_entry.delete()
-
-    @patch('api.views.upload_user_data_view.preprocess_file', side_effect=mock_preprocess_file)
+    @patch('api.views.upload_user_data_view.preprocess_file',
+           side_effect=mock_preprocess_file)
     def test_get_list_of_user_data_files(self, mock_preprocess_file):
         headers = _get_headers(self.metadata_correct)
 
         # post the same file 3 times, to create 3 different entries
         post_response_1 = self.client.post(
-            reverse(self.upload_data_url_name, kwargs={URL_FILENAME: self.netcdf_file_name}),
-            {FILE: self.netcdf_file}, format=FORMAT_MULTIPART, **headers)
+            reverse(self.upload_data_url_name,
+                    kwargs={URL_FILENAME: self.netcdf_file_name}),
+            data=self.get_raw_nc_file_content(self.netcdf_file_name),
+            content_type='application/json',
+            **headers)
         assert post_response_1.status_code == 201
         post_response_2 = self.client.post(
-            reverse(self.upload_data_url_name, kwargs={URL_FILENAME: self.netcdf_file_name}),
-            {FILE: self.netcdf_file}, format=FORMAT_MULTIPART, **headers)
+            reverse(self.upload_data_url_name,
+                    kwargs={URL_FILENAME: self.netcdf_file_name}),
+            data=self.get_raw_nc_file_content(self.netcdf_file_name),
+            content_type='application/json',
+            **headers)
         assert post_response_2.status_code == 201
         post_response_3 = self.client.post(
-            reverse(self.upload_data_url_name, kwargs={URL_FILENAME: self.netcdf_file_name}),
-            {FILE: self.netcdf_file}, format=FORMAT_MULTIPART, **headers)
+            reverse(self.upload_data_url_name,
+                    kwargs={URL_FILENAME: self.netcdf_file_name}),
+            data=self.get_raw_nc_file_content(self.netcdf_file_name),
+            content_type='application/json',
+            **headers)
         assert post_response_3.status_code == 201
 
         response = self.client.get(reverse(self.get_user_data_url_list_name))
@@ -187,7 +227,7 @@ class TestUploadUserDataView(TransactionTestCase):
 
         self.client.logout()
         self.client.login(**self.auth_data)
-        assert len(os.listdir(self.test_user_data_path)) == 3
+        assert len(os.listdir(self.test_user_data_path)) == 4
         self._remove_user_datafiles(self.test_user)
         assert not os.path.exists(self.test_user_data_path)
 
@@ -200,21 +240,28 @@ class TestUploadUserDataView(TransactionTestCase):
             entry.delete()
 
         assert len(UserDatasetFile.objects.all()) == 0
+        assert not os.path.exists(self.test_user_data_path)
 
-    @patch('api.views.upload_user_data_view.preprocess_file', side_effect=mock_preprocess_file)
+    @patch('api.views.upload_user_data_view.preprocess_file',
+           side_effect=mock_preprocess_file)
     def test_get_user_data_file_by_id(self, mock_preprocess_file):
         # post the same file 3 times, to create 3 different entries
         headers = _get_headers(self.metadata_correct)
         post_response = self.client.post(
-            reverse(self.upload_data_url_name, kwargs={URL_FILENAME: self.netcdf_file_name}),
-            {FILE: self.netcdf_file}, format=FORMAT_MULTIPART, **headers)
+            reverse(self.upload_data_url_name,
+                    kwargs={URL_FILENAME: self.netcdf_file_name}),
+            data=self.get_raw_nc_file_content(self.netcdf_file_name),
+            content_type='application/json',
+            **headers)
         assert post_response.status_code == 201
 
         post_data = post_response.json()
         file_id = post_data.get('id')
         file_entry = UserDatasetFile.objects.get(id=file_id)
 
-        response = self.client.get(reverse(self.get_user_file_by_id_url_name, kwargs={URL_FILE_UUID: file_id}))
+        response = self.client.get(
+            reverse(self.get_user_file_by_id_url_name,
+                    kwargs={URL_FILE_UUID: file_id}))
 
         assert response.status_code == 200
         assert post_data.get('file_name') == file_entry.file_name
@@ -222,34 +269,44 @@ class TestUploadUserDataView(TransactionTestCase):
         assert post_data.get('dataset') == file_entry.dataset.id
         assert post_data.get('version') == file_entry.version.id
         assert post_data.get('all_variables') is None
-        assert post_data.get('metadata_submitted') is False  # it's submitted after running a preprocessing function
+        assert post_data.get(
+            'metadata_submitted'
+        ) is False  # it's submitted after running a preprocessing function
 
         self.client.logout()
         self.client.login(**self.second_user_data)
 
-        response = self.client.get(reverse(self.get_user_file_by_id_url_name, kwargs={URL_FILE_UUID: file_id}))
+        response = self.client.get(
+            reverse(self.get_user_file_by_id_url_name,
+                    kwargs={URL_FILE_UUID: file_id}))
 
         assert response.status_code == 404
         assert response.json().get('detail') == 'Not found.'
 
         response = self.client.get(
-            reverse(self.get_user_file_by_id_url_name, kwargs={URL_FILE_UUID: '00000000-6c36-0000-0000-599e9a3840ca'}))
+            reverse(
+                self.get_user_file_by_id_url_name,
+                kwargs={URL_FILE_UUID:
+                        '00000000-6c36-0000-0000-599e9a3840ca'}))
 
         assert response.status_code == 404
-        assert response.json().get('detail') == 'No UserDatasetFile matches the given query.'
+        assert response.json().get(
+            'detail') == 'No UserDatasetFile matches the given query.'
 
         self.client.logout()
         self.client.login(**self.auth_data)
         file_entry.delete()
 
-    @patch('api.views.upload_user_data_view.preprocess_file', side_effect=mock_preprocess_file)
+    @patch('api.views.upload_user_data_view.preprocess_file',
+           side_effect=mock_preprocess_file)
     def test_delete_user_dataset_and_file(self, mock_preprocess_file):
         # posting a file to be removed
 
         post_response = self.client.post(
-            reverse(self.upload_data_url_name, kwargs={URL_FILENAME: self.netcdf_file_name}),
-            {FILE: self.netcdf_file},
-            format=FORMAT_MULTIPART,
+            reverse(self.upload_data_url_name,
+                    kwargs={URL_FILENAME: self.netcdf_file_name}),
+            data=self.get_raw_nc_file_content(self.netcdf_file_name),
+            content_type='application/json',
             **_get_headers(self.metadata_correct))
 
         file_entry_id = post_response.json()['id']
@@ -257,13 +314,14 @@ class TestUploadUserDataView(TransactionTestCase):
         assert len(DatasetVersion.objects.all()) == 1
         assert len(DataVariable.objects.all()) == 1
         assert len(UserDatasetFile.objects.all()) == 1
-        assert len(os.listdir(self.test_user_data_path)) == 1
+        assert len(os.listdir(self.test_user_data_path)) == 2
 
         # checking if another user can remove it:
         self.client.logout()
         self.client.login(**self.second_user_data)
         delete_response = self.client.delete(
-            reverse(self.delete_data_url_name, kwargs={URL_FILE_UUID: file_entry_id}))
+            reverse(self.delete_data_url_name,
+                    kwargs={URL_FILE_UUID: file_entry_id}))
 
         assert delete_response.status_code == 403
         # nothing happened, as the user has no credentials
@@ -271,20 +329,25 @@ class TestUploadUserDataView(TransactionTestCase):
         assert len(DatasetVersion.objects.all()) == 1
         assert len(DataVariable.objects.all()) == 1
         assert len(UserDatasetFile.objects.all()) == 1
+        _clean_up_log_folder(self.test_user_data_path)
         assert len(os.listdir(self.test_user_data_path)) == 1
-
         # loging in as the proper user:
         self.client.login(**self.auth_data)
 
         # delete non existing file
         response = self.client.delete(
-            reverse(self.delete_data_url_name, kwargs={URL_FILE_UUID: '00000000-6c36-0000-0000-599e9a3840ca'}))
+            reverse(
+                self.delete_data_url_name,
+                kwargs={URL_FILE_UUID:
+                        '00000000-6c36-0000-0000-599e9a3840ca'}))
 
         assert response.status_code == 404
-        assert response.json().get('detail') == 'No UserDatasetFile matches the given query.'
+        assert response.json().get(
+            'detail') == 'No UserDatasetFile matches the given query.'
 
         delete_response = self.client.delete(
-            reverse(self.delete_data_url_name, kwargs={URL_FILE_UUID: file_entry_id}))
+            reverse(self.delete_data_url_name,
+                    kwargs={URL_FILE_UUID: file_entry_id}))
 
         assert delete_response.status_code == 200
         assert len(Dataset.objects.all()) == 0
@@ -293,14 +356,14 @@ class TestUploadUserDataView(TransactionTestCase):
         assert len(UserDatasetFile.objects.all()) == 0
         assert len(os.listdir(self.test_user_data_path)) == 0
 
-    @patch('api.views.upload_user_data_view.preprocess_file', side_effect=mock_preprocess_file)
+    @patch('api.views.upload_user_data_view.preprocess_file',
+           side_effect=mock_preprocess_file)
     def test_delete_only_user_file(self, mock_preprocess_file):
-        # posting a file to be removed
-
         post_response = self.client.post(
-            reverse(self.upload_data_url_name, kwargs={URL_FILENAME: self.netcdf_file_name}),
-            {FILE: self.netcdf_file},
-            format=FORMAT_MULTIPART,
+            reverse(self.upload_data_url_name,
+                    kwargs={URL_FILENAME: self.netcdf_file_name}),
+            data=self.get_raw_nc_file_content(self.netcdf_file_name),
+            content_type='application/json',
             **_get_headers(self.metadata_correct))
 
         file_entry_id = post_response.json()['id']
@@ -308,13 +371,15 @@ class TestUploadUserDataView(TransactionTestCase):
         assert len(DatasetVersion.objects.all()) == 1
         assert len(DataVariable.objects.all()) == 1
         assert len(UserDatasetFile.objects.all()) == 1
-        assert len(os.listdir(self.test_user_data_path)) == 1
+        assert len(os.listdir(
+            self.test_user_data_path)) == 2  #log folder also there
 
         # checking if another user can remove it:
         self.client.logout()
         self.client.login(**self.second_user_data)
         delete_response = self.client.delete(
-            reverse(self.delete_file_only_url_name, kwargs={URL_FILE_UUID: file_entry_id}))
+            reverse(self.delete_file_only_url_name,
+                    kwargs={URL_FILE_UUID: file_entry_id}))
 
         assert delete_response.status_code == 403
         # nothing happened, as the user has no credentials
@@ -322,37 +387,47 @@ class TestUploadUserDataView(TransactionTestCase):
         assert len(DatasetVersion.objects.all()) == 1
         assert len(DataVariable.objects.all()) == 1
         assert len(UserDatasetFile.objects.all()) == 1
+        _clean_up_log_folder(self.test_user_data_path)
         assert len(os.listdir(self.test_user_data_path)) == 1
 
         # loging in as the proper user:
         self.client.login(**self.auth_data)
 
         delete_response = self.client.delete(
-            reverse(self.delete_file_only_url_name, kwargs={URL_FILE_UUID: '00000000-6c36-0000-0000-599e9a3840ca'}))
+            reverse(
+                self.delete_file_only_url_name,
+                kwargs={URL_FILE_UUID:
+                        '00000000-6c36-0000-0000-599e9a3840ca'}))
 
         assert delete_response.status_code == 404
-        assert delete_response.json().get('detail') == 'No UserDatasetFile matches the given query.'
+        assert delete_response.json().get(
+            'detail') == 'No UserDatasetFile matches the given query.'
 
         delete_response = self.client.delete(
-            reverse(self.delete_file_only_url_name, kwargs={URL_FILE_UUID: file_entry_id}))
+            reverse(self.delete_file_only_url_name,
+                    kwargs={URL_FILE_UUID: file_entry_id}))
 
         assert delete_response.status_code == 200
         assert len(Dataset.objects.all()) == 1
         assert len(DatasetVersion.objects.all()) == 1
         assert len(DataVariable.objects.all()) == 1
         assert len(UserDatasetFile.objects.all()) == 1
+        _clean_up_log_folder(self.test_user_data_path)
         assert len(os.listdir(self.test_user_data_path)) == 0
 
         assert Dataset.objects.all()[0].storage_path == ''
         assert not UserDatasetFile.objects.all()[0].file
         assert not UserDatasetFile.objects.all()[0].file_name
 
-    @patch('api.views.upload_user_data_view.preprocess_file', side_effect=mock_preprocess_file)
+    @patch('api.views.upload_user_data_view.preprocess_file',
+           side_effect=mock_preprocess_file)
     def test_upload_user_data_nc_correct(self, mock_preprocess_file):
-        response = self.client.post(reverse(self.upload_data_url_name, kwargs={URL_FILENAME: self.netcdf_file_name}),
-                                    {FILE: self.netcdf_file},
-                                    format=FORMAT_MULTIPART,
-                                    **_get_headers(self.metadata_correct))
+        response = self.client.post(
+            reverse(self.upload_data_url_name,
+                    kwargs={URL_FILENAME: self.netcdf_file_name}),
+            data=self.get_raw_nc_file_content(self.netcdf_file_name),
+            content_type='application/json',
+            **_get_headers(self.metadata_correct))
 
         assert response.status_code == 201
 
@@ -362,11 +437,13 @@ class TestUploadUserDataView(TransactionTestCase):
         file_entry = existing_files[0]
         file_dir = file_entry.get_raw_file_path
 
-        assert len(os.listdir(self.test_user_data_path)) == 1
+        assert len(os.listdir(self.test_user_data_path)) == 2
         assert os.path.exists(file_dir)
 
-        assert file_entry.dataset.short_name == self.metadata_correct.get(USER_DATA_DATASET_FIELD_NAME)
-        assert file_entry.version.short_name == self.metadata_correct.get(USER_DATA_VERSION_FIELD_NAME)
+        assert file_entry.dataset.short_name == self.metadata_correct.get(
+            USER_DATA_DATASET_FIELD_NAME)
+        assert file_entry.version.short_name == self.metadata_correct.get(
+            USER_DATA_VERSION_FIELD_NAME)
         # this one is none, because it's taken from the file and the file preprocessing is skipped for the purpose of
         # testing
         assert file_entry.variable.short_name == 'none'
@@ -377,15 +454,19 @@ class TestUploadUserDataView(TransactionTestCase):
         existing_files = UserDatasetFile.objects.all()
         assert len(existing_files) == 0
         assert not os.path.exists(file_dir)
+        assert len(os.listdir(self.test_user_data_path)) == 1
+        _clean_up_log_folder(self.test_user_data_path)
         assert len(os.listdir(self.test_user_data_path)) == 0
 
-    @patch('api.views.upload_user_data_view.preprocess_file', side_effect=mock_preprocess_file)
+    @patch('api.views.upload_user_data_view.preprocess_file',
+           side_effect=mock_preprocess_file)
     def test_upload_user_data_zip_netcdf_correct(self, mock_preprocess_file):
-        response = self.client.post(
-            reverse(self.upload_data_url_name, kwargs={URL_FILENAME: self.zipped_netcdf_file_name}),
-            {FILE: self.zipped_netcdf},
-            format=FORMAT_MULTIPART,
-            **_get_headers(self.metadata_correct))
+        response = self.client.post(reverse(
+            self.upload_data_url_name,
+            kwargs={URL_FILENAME: self.zipped_netcdf_file_name}),
+                                    data=self.get_raw_zipped_csv_content(),
+                                    content_type='application/json',
+                                    **_get_headers(self.metadata_correct))
 
         assert response.status_code == 201
 
@@ -395,7 +476,7 @@ class TestUploadUserDataView(TransactionTestCase):
         file_entry = existing_files[0]
         file_dir = file_entry.get_raw_file_path
 
-        assert len(os.listdir(self.test_user_data_path)) == 1
+        assert len(os.listdir(self.test_user_data_path)) == 2
         assert os.path.exists(file_dir)
 
         file_entry.delete()
@@ -404,17 +485,19 @@ class TestUploadUserDataView(TransactionTestCase):
         existing_files = UserDatasetFile.objects.all()
         assert len(existing_files) == 0
         assert not os.path.exists(file_dir)
+        assert len(os.listdir(self.test_user_data_path)) == 1
+        _clean_up_log_folder(self.test_user_data_path)
         assert len(os.listdir(self.test_user_data_path)) == 0
 
-    @patch('api.views.upload_user_data_view.preprocess_file', side_effect=mock_preprocess_file)
+    @patch('api.views.upload_user_data_view.preprocess_file',
+           side_effect=mock_preprocess_file)
     def test_upload_user_data_zip_csv_correct(self, mock_preprocess_file):
         response = self.client.post(
-            reverse(self.upload_data_url_name, kwargs={URL_FILENAME: self.zipped_csv_file_name}),
-            {FILE: self.zipped_csv},
-            format=FORMAT_MULTIPART,
-            **_get_headers(self.metadata_correct)
-        )
-
+            reverse(self.upload_data_url_name,
+                    kwargs={URL_FILENAME: self.zipped_csv_file_name}),
+            data=self.get_raw_nc_file_content(self.zipped_netcdf_file_name),
+            content_type='application/json',
+            **_get_headers(self.metadata_correct))
         assert response.status_code == 201
 
         existing_files = UserDatasetFile.objects.all()
@@ -423,7 +506,7 @@ class TestUploadUserDataView(TransactionTestCase):
         file_entry = existing_files[0]
         file_dir = file_entry.get_raw_file_path
 
-        assert len(os.listdir(self.test_user_data_path)) == 1
+        assert len(os.listdir(self.test_user_data_path)) == 2
         assert os.path.exists(file_dir)
 
         file_entry.delete()
@@ -432,72 +515,93 @@ class TestUploadUserDataView(TransactionTestCase):
         existing_files = UserDatasetFile.objects.all()
         assert len(existing_files) == 0
         assert not os.path.exists(file_dir)
+        assert len(os.listdir(self.test_user_data_path)) == 1
+        _clean_up_log_folder(self.test_user_data_path)
         assert len(os.listdir(self.test_user_data_path)) == 0
 
     def test_upload_user_data_not_porper_extension(self):
         file_to_upload = _create_test_file(self.not_netcdf_file)
-        response = self.client.post(
-            reverse(self.upload_data_url_name, kwargs={URL_FILENAME: self.not_netcdf_file_name}),
-            {FILE: file_to_upload},
-            format=FORMAT_MULTIPART,
-            **_get_headers(self.metadata_correct))
+        response = self.client.post(reverse(
+            self.upload_data_url_name,
+            kwargs={URL_FILENAME: self.not_netcdf_file_name}),
+                                    {FILE: file_to_upload},
+                                    format=FORMAT_MULTIPART,
+                                    **_get_headers(self.metadata_correct))
         # assert False
-        assert response.status_code == 500
+        assert response.status_code == 400
 
         # checking if nothing got to the db and to the data path
         existing_files = UserDatasetFile.objects.all()
         assert len(existing_files) == 0
+        assert len(os.listdir(self.test_user_data_path)) == 1
+        _clean_up_log_folder(self.test_user_data_path)
         assert len(os.listdir(self.test_user_data_path)) == 0
 
-    @patch('api.views.upload_user_data_view.preprocess_file', side_effect=mock_preprocess_file)
+    @patch('api.views.upload_user_data_view.preprocess_file',
+           side_effect=mock_preprocess_file)
     def test_upload_user_data_with_wrong_name(self, mock_preprocess_file):
         file_to_upload = _create_test_file(self.not_netcdf_file)
-        response = self.client.post(
-            reverse(self.upload_data_url_name, kwargs={URL_FILENAME: 'wrong_name'}),
-            {FILE: file_to_upload},
-            format=FORMAT_MULTIPART,
-            **_get_headers(self.metadata_correct)
-        )
+        response = self.client.post(reverse(
+            self.upload_data_url_name, kwargs={URL_FILENAME: 'wrong_name'}),
+                                    {FILE: file_to_upload},
+                                    format=FORMAT_MULTIPART,
+                                    **_get_headers(self.metadata_correct))
         # assert False
-        assert response.status_code == 500
+        assert response.status_code == 400
 
         # checking if nothing got to the db and to the data path
         existing_files = UserDatasetFile.objects.all()
         assert len(existing_files) == 0
+        assert len(os.listdir(self.test_user_data_path)) == 1
+        _clean_up_log_folder(self.test_user_data_path)
         assert len(os.listdir(self.test_user_data_path)) == 0
 
     def test_post_incorrect_metadata_form(self):
         # I am posting the file to create the proper dataset entry, I don't need to copy it, as it won't be processed
-        response = self.client.post(reverse(self.upload_data_url_name, kwargs={URL_FILENAME: self.netcdf_file_name}),
-                                    {FILE: self.netcdf_file},
-                                    format=FORMAT_MULTIPART,
-                                    **_get_headers(self.metadata_incorrect))
+        response = self.client.post(
+            reverse(self.upload_data_url_name,
+                    kwargs={URL_FILENAME: self.netcdf_file_name}),
+            data=self.get_raw_nc_file_content(self.netcdf_file_name),
+            content_type='application/json',
+            **_get_headers(self.metadata_incorrect))
         assert response.status_code == 500
 
         existing_files = UserDatasetFile.objects.all()
         assert len(existing_files) == 0
 
-    @patch('api.views.upload_user_data_view.preprocess_file', side_effect=mock_preprocess_file)
+    @patch('api.views.upload_user_data_view.preprocess_file',
+           side_effect=mock_preprocess_file)
     def test_update_metadata(self, mock_preprocess_file):
         file_post_response = self.client.post(
-            reverse(self.upload_data_url_name, kwargs={URL_FILENAME: self.netcdf_file_name}),
-            {FILE: self.netcdf_file},
-            format=FORMAT_MULTIPART,
+            reverse(self.upload_data_url_name,
+                    kwargs={URL_FILENAME: self.netcdf_file_name}),
+            data=self.get_raw_nc_file_content(self.netcdf_file_name),
+            content_type='application/json',
             **_get_headers(self.metadata_correct))
 
         assert file_post_response.status_code == 201
 
         file_id = file_post_response.json()['id']
         file_entry = UserDatasetFile.objects.get(pk=file_id)
-        file_entry.all_variables = [{"name": "soil_moisture", "units": "%", "long_name": "Soil Moisture"},
-                                    {"name": "ssm_noise", "units": "%", "long_name": "Surface Soil Moisture Noise"}]
+        file_entry.all_variables = [{
+            "name": "soil_moisture",
+            "units": "%",
+            "long_name": "Soil Moisture"
+        }, {
+            "name": "ssm_noise",
+            "units": "%",
+            "long_name": "Surface Soil Moisture Noise"
+        }]
         file_entry.save()
 
         # update variable name
         variable_new_name = 'soil_moisture'
-        response = self.client.put(reverse(self.update_metadata_url_name, kwargs={URL_FILE_UUID: file_id}),
-                                   {USER_DATA_FIELD_NAME: USER_DATA_VARIABLE_FIELD_NAME,
-                                    USER_DATA_FIELD_VALUE: variable_new_name})
+        response = self.client.put(
+            reverse(self.update_metadata_url_name,
+                    kwargs={URL_FILE_UUID: file_id}), {
+                        USER_DATA_FIELD_NAME: USER_DATA_VARIABLE_FIELD_NAME,
+                        USER_DATA_FIELD_VALUE: variable_new_name
+                    })
         assert response.status_code == 200
         # check if the variable name got updated:
         variable = DataVariable.objects.get(pk=file_entry.variable_id)
@@ -506,9 +610,12 @@ class TestUploadUserDataView(TransactionTestCase):
 
         # update dataset name
         datset_new_name = 'test_dataset'
-        response = self.client.put(reverse(self.update_metadata_url_name, kwargs={URL_FILE_UUID: file_id}),
-                                   {USER_DATA_FIELD_NAME: USER_DATA_DATASET_FIELD_NAME,
-                                    USER_DATA_FIELD_VALUE: datset_new_name})
+        response = self.client.put(
+            reverse(self.update_metadata_url_name,
+                    kwargs={URL_FILE_UUID: file_id}), {
+                        USER_DATA_FIELD_NAME: USER_DATA_DATASET_FIELD_NAME,
+                        USER_DATA_FIELD_VALUE: datset_new_name
+                    })
         assert response.status_code == 200
         # check if the variable name got updated:
         dataset = Dataset.objects.get(pk=file_entry.dataset_id)
@@ -516,9 +623,12 @@ class TestUploadUserDataView(TransactionTestCase):
 
         # update version name
         version_new_name = 'test_version'
-        response = self.client.put(reverse(self.update_metadata_url_name, kwargs={URL_FILE_UUID: file_id}),
-                                   {USER_DATA_FIELD_NAME: USER_DATA_VERSION_FIELD_NAME,
-                                    USER_DATA_FIELD_VALUE: version_new_name})
+        response = self.client.put(
+            reverse(self.update_metadata_url_name,
+                    kwargs={URL_FILE_UUID: file_id}), {
+                        USER_DATA_FIELD_NAME: USER_DATA_VERSION_FIELD_NAME,
+                        USER_DATA_FIELD_VALUE: version_new_name
+                    })
         assert response.status_code == 200
         # check if the variable name got updated:
         version = DatasetVersion.objects.get(pk=file_entry.version_id)

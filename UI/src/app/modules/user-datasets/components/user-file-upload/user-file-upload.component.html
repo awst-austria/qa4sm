@@ -127,7 +127,7 @@
 <p-dialog id="uploading-data-spinner" [modal]="true" [showHeader]="false" [(visible)]="spinnerVisible"
           class="text-center">
   <span class="pi pi-spinner loading-spinner" title="We are uploading your data..."></span>
-  <div class="uploading-message">Do not close this tab. We are uploading your data...</div>
+  <div class="uploading-message">Do not close this tab. We are uploading your data and performing initial validation checks...</div>
   <div *ngIf="(uploadProgress|async) < 100" class="uploading-message pt-3">Progress {{ uploadProgress|async }} %</div>
   <div *ngIf="(uploadProgress|async) === 100" class="uploading-message pt-3">Your file has been uploaded. We still need
     a few seconds to preprocess it..
