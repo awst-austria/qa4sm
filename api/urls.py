@@ -12,7 +12,10 @@ from api.views.ismn_network_view import get_ismn_networks
 from api.views.login_view import api_login
 from api.views.logout_view import api_logout
 from api.views.path_var_test_endpoint import path_var_get
-from api.views.validation_config_view import start_validation, get_validation_configuration, get_scaling_methods, start_validation_with_token
+from api.views.validation_config_view import (
+    start_validation, get_validation_configuration, get_scaling_methods, start_validation_with_token,
+    download_result_file_with_token, list_my_validation_runs_with_token,
+)
 from api.views.uptime_view import uptime_ping, get_uptime
 from api.views.comparison_view import get_comparison_table, get_comparison_plots_for_metric, \
     download_comparison_table, get_comparison_metrics, get_spatial_extent
@@ -140,5 +143,7 @@ urlpatterns = [
     path('run-auto-cleanup', run_auto_cleanup_script, name='Run Auto Cleanup'),
     path('password-update', password_update, name='Password Update'),
     path('update-fixture-in-git', update_fixture_in_github, name='Update-Fixture'),
-    path('verify-email/<int:user_id>/<str:token>/', verify_email, name='verify_email')
+    path('verify-email/<int:user_id>/<str:token>/', verify_email, name='verify_email'),
+    path('download-result-file-with-token/<uuid:validation_id>/<str:file_type>', download_result_file_with_token, name='Download result file with token'),
+    path('my-validation-runs-with-token', list_my_validation_runs_with_token, name='My validation runs with token')
 ]

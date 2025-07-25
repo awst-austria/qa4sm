@@ -3,7 +3,7 @@ from multiprocessing.context import Process
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import transaction, connections
 from django.db.models import Case, When
-from django.http import JsonResponse
+from django.http import JsonResponse, FileResponse, Http404
 from django.utils import timezone
 from rest_framework import status, serializers
 from rest_framework.decorators import api_view, permission_classes, authentication_classes, throttle_classes
@@ -18,6 +18,7 @@ from validator.models import ValidationRun, DatasetConfiguration, DataFilter, Pa
     DatasetVersion, DataVariable
 from validator.validation import run_validation, globals
 from validator.validation.validation import compare_validation_runs
+import os
 
 
 def _check_if_settings_exist():
@@ -437,3 +438,54 @@ class ValidationConfigurationModelSerializer(ModelSerializer):
     class Meta:
         model = ValidationRun
         fields = get_fields_as_list(model)
+
+
+@api_view(['GET'])
+@authentication_classes([TokenAuthentication])
+@permission_classes([IsAuthenticated])
+def download_result_file_with_token(request, validation_id, file_type):
+    """
+    Download a result file for a given validation run via token authentication.
+    Only the owner of the validation run can download the file.
+    """
+    try:
+        val_run = ValidationRun.objects.get(id=validation_id)
+        if val_run.user != request.user:
+            return JsonResponse({'error': 'You do not have permission to access this file.'}, status=403)
+
+        file_path = None
+        if file_type == 'zip':
+            file_path = val_run.get_graphics_path() if hasattr(val_run, 'get_graphics_path') else None
+        else:
+            file_path = val_run.output_file.path if val_run.output_file else None
+
+        if not file_path or not os.path.exists(file_path):
+            raise Http404("Requested file does not exist.")
+
+        response = FileResponse(open(file_path, 'rb'), as_attachment=True)
+        return response
+    except ValidationRun.DoesNotExist:
+        return JsonResponse({'error': 'Validation run not found.'}, status=404)
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
+
+
+@api_view(['GET'])
+@authentication_classes([TokenAuthentication])
+@permission_classes([IsAuthenticated])
+def list_my_validation_runs_with_token(request):
+    """
+    Return list of the users validation runs with token authentication. 
+    """
+    user = request.user
+    val_runs = ValidationRun.objects.filter(user=user)
+    results = []
+    for run in val_runs:
+        datasets = list(run.dataset_configurations.values_list('dataset__pretty_name', flat=True))
+        results.append({
+            'id': str(run.id),
+            'name': run.name_tag,
+            'datasets': datasets,
+            'progress': run.progress
+        })
+    return JsonResponse({'validation_runs': results}, status=200)
