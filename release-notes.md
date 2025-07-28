@@ -1,3 +1,14 @@
+QA$SM v3.2.1 - Release notes 2025-07-28
+======================================================
+# Updates
+New dataset versions: 
+ISMN: Version 20250617, Extended time period, additional sensors
+ESA_CCI_active_passive_combined: Version 9.2, time until 2024-12-31
+ESA_CCI_RZSM: New rootzone soilmoisture product, time until 2024-12-31, 
+	different rootzone soiltmoisture layers: 0-10 cm, 10-40 cm, 40 cm - 1m + weighted average over 1 meter
+ERA5, ERA5_LAND: New layers swvl1-4, stl1-4, 
+GLDAS: time extension to 2024-12-31
+
 QA$SM v3.2.0 - Release notes 2025-06-19
 ======================================================
 # Updates
