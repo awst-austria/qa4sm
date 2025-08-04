@@ -530,9 +530,13 @@ class TestUploadUserDataView(TransactionTestCase):
         # assert False
         assert response.status_code == 400
 
-        # checking if nothing got to the db and to the data path
+        # checking if entry is created but marked as failed
         existing_files = UserDatasetFile.objects.all()
-        assert len(existing_files) == 0
+        assert len(existing_files) == 1
+        assert existing_files[0].status == 'failed'
+
+        # cleanup
+        existing_files[0].delete()
         assert len(os.listdir(self.test_user_data_path)) == 1
         _clean_up_log_folder(self.test_user_data_path)
         assert len(os.listdir(self.test_user_data_path)) == 0
@@ -549,9 +553,13 @@ class TestUploadUserDataView(TransactionTestCase):
         # assert False
         assert response.status_code == 400
 
-        # checking if nothing got to the db and to the data path
+        # checking if entry is created but marked as failed
         existing_files = UserDatasetFile.objects.all()
-        assert len(existing_files) == 0
+        assert len(existing_files) == 1
+        assert existing_files[0].status == 'failed'
+
+        # cleanup
+        existing_files[0].delete()
         assert len(os.listdir(self.test_user_data_path)) == 1
         _clean_up_log_folder(self.test_user_data_path)
         assert len(os.listdir(self.test_user_data_path)) == 0
