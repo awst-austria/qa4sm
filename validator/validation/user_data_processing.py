@@ -89,7 +89,6 @@ def user_data_preprocessing(file_uuid, file_path, file_raw_path, user_path):
     except Exception as e:
         import traceback
         full_traceback = traceback.format_exc()
-        file_entry = get_object_or_404(UserDatasetFile, id=file_uuid)
         file_entry.log_info += f"\nPreprocessing failed: {full_traceback}"
         file_entry.status = 'failed'
         file_entry.error_message = f"Unexpected error during preprocessing"

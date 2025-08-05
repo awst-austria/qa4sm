@@ -2,9 +2,12 @@
 
   <ng-template pTemplate="header">
     <div class="my-0 text-2xl">
-      <span class="font-weight-normal">
-      {{ userDataset.file ? "Size: " + getTheFileSize() : "File has been removed" }}
+      <span class="font-weight-normal" *ngIf="getFileUploadStatus() === 'failed'; else fileStatus">
+        File upload failed
       </span>
+      <ng-template #fileStatus>
+        {{ userDataset.file ? 'Size: ' + getTheFileSize() : 'File has been removed' }}
+      </ng-template>
     </div>
   </ng-template>
   <ng-template pTemplate="icons" class="font-weight-normal">
