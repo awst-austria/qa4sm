@@ -63,12 +63,19 @@ export class NavigationBarComponent implements OnInit {
     routerLink: ['user-data-guidelines']
   };
 
+  uploadDataHelpMenuItem2: MenuItem = {
+    label: 'Upload help',
+    icon: 'pi pi-fw pi-question',
+    routerLink: ['user-data-guidelines2']
+  };
+
   datasetUploadMenuItem: MenuItem = {
     label: 'Dataset upload',
     icon: 'pi pi-fw pi-upload',
     items: [
-      this.uploadDataHelpMenuItem,
       this.uploadDataMenuItem,
+      this.uploadDataHelpMenuItem,
+      this.uploadDataHelpMenuItem2
     ]
   };
 
