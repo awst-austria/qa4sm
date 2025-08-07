@@ -41,11 +41,11 @@ export class ValidationSelectorComponent implements OnInit {
   datasetErrorSelector: boolean = false;
 
   constructor(private datasetService: DatasetService,
-              private versionService: DatasetVersionService,
-              private validationrunService: ValidationrunService,
-              private comparisonService: ComparisonService,
-              private toastService: ToastService,
-              private datasetVariableService: DatasetVariableService) {
+    private versionService: DatasetVersionService,
+    private validationrunService: ValidationrunService,
+    private comparisonService: ComparisonService,
+    private toastService: ToastService,
+    private datasetVariableService: DatasetVariableService) {
   }
 
   ngOnInit(): void {
@@ -82,36 +82,54 @@ export class ValidationSelectorComponent implements OnInit {
     // get all datasets
     this.datasetService.getAllDatasets(true)
       .pipe(
-       catchError(() => {
-         this.datasetErrorSelector = true;
-         return EMPTY
-       })
+        catchError(() => {
+          this.datasetErrorSelector = true;
+          return EMPTY
+        })
       )
       .subscribe(datasets => {
-      model.datasetModel.selectedDataset = datasets.find(dataset => dataset.short_name === 'ISMN');
-      this.selectValidationLabel = 'Wait for validations to be loaded';
-      // then get all versions for the first dataset in the result list
-      this.versionService.getVersionsByDataset(model.datasetModel.selectedDataset.id)
-        .pipe(
-          //todo: when updating the component think of a better way of handling this error here
-          catchError(() => EMPTY)
-        )
-        .subscribe(versions => {
-        model.datasetModel.selectedVersion = versions.find(version => version.pretty_name === '20210131 global');
-        this.getValidations4comparison(String(model.datasetModel.selectedDataset.short_name),
-          String(model.datasetModel.selectedVersion.short_name));
-        // get all variables
-        this.datasetVariableService.getVariablesByVersion(model.datasetModel.selectedVersion.id)
+        model.datasetModel.selectedDataset = datasets.find(dataset => dataset.short_name === 'ISMN');
+        this.selectValidationLabel = 'Wait for validations to be loaded';
+        // then get all versions for the first dataset in the result list
+        this.versionService.getVersionsByDataset(model.datasetModel.selectedDataset.id)
           .pipe(
             //todo: when updating the component think of a better way of handling this error here
-            //todo: fix the issue of empty variable for the comparison summary
             catchError(() => EMPTY)
           )
-          .subscribe(variables => {
-          model.datasetModel.selectedVariable = variables[0];
-        });
+          .subscribe(versions => {
+            if (!versions || versions.length === 0) {
+              console.warn('No versions received or versions array is empty for dataset ID:', model.datasetModel.selectedDataset.id);
+              return;
+            }
+
+            // --- MODIFICATION START ---
+            // Sort versions by pretty_name in descending order to get the newest first
+            // This assumes pretty_name format 'YYYYMMDD global' allows for string comparison to work as date comparison
+            versions.sort((a, b) => b.pretty_name.localeCompare(a.pretty_name));
+
+            // Select the first (newest) version after sorting
+            model.datasetModel.selectedVersion = versions[0];
+            //console.log('Selected newest version:', model.datasetModel.selectedVersion);
+
+            // Optional: Add a check if a version was actually found
+            if (!model.datasetModel.selectedVersion) {
+              console.error('Could not determine a selected version from the available versions.');
+              return;
+            }
+            this.getValidations4comparison(String(model.datasetModel.selectedDataset.short_name),
+              String(model.datasetModel.selectedVersion.short_name));
+            // get all variables
+            this.datasetVariableService.getVariablesByVersion(model.datasetModel.selectedVersion.id)
+              .pipe(
+                //todo: when updating the component think of a better way of handling this error here
+                //todo: fix the issue of empty variable for the comparison summary 
+                catchError(() => EMPTY)
+              )
+              .subscribe(variables => {
+                model.datasetModel.selectedVariable = variables[0];
+              });
+          });
       });
-    });
   }
 
   getValidations4comparison(refDataset?, refVersion?): void {
@@ -133,18 +151,18 @@ export class ValidationSelectorComponent implements OnInit {
         })
       )
       .subscribe(response => {
-      if (response) {
-        this.validations4Comparison = response;
-        this.selectedValidation = response[0];
-        this.selectValidationLabel = 'Select a validation';
-      } else {
-         this.noValidationsAvailable()
-      }
-    });
+        if (response) {
+          this.validations4Comparison = response;
+          this.selectedValidation = response[0];
+          this.selectValidationLabel = 'Select a validation';
+        } else {
+          this.noValidationsAvailable()
+        }
+      });
 
   }
 
-  noValidationsAvailable(): void{
+  noValidationsAvailable(): void {
     this.validations4Comparison = [];
     this.selectValidationLabel = 'There are no validations available';
   }

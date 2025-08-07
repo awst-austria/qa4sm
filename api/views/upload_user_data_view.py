@@ -18,6 +18,7 @@ import logging
 from validator.validation.globals import USER_DATASET_MIN_ID, USER_DATASET_VERSION_MIN_ID, USER_DATASET_VARIABLE_MIN_ID
 from multiprocessing.context import Process
 
+from validator.validation.util import has_csv_in_zip
 from validator.validation.user_data_processing import user_data_preprocessing, run_upload_format_check
 from django.db import transaction, connections
 
@@ -90,7 +91,7 @@ def create_version_entry(version_name, version_pretty_name,
         raise Exception(version_serializer.errors)
 
 
-def create_dataset_entry(dataset_name, dataset_pretty_name, version, user):
+def create_dataset_entry(dataset_name, dataset_pretty_name, version, user, is_scattered_data=False):
     current_max_id = Dataset.objects.all().last().id if Dataset.objects.all(
     ) else 0
     dataset_data = {
@@ -104,6 +105,7 @@ def create_dataset_entry(dataset_name, dataset_pretty_name, version, user):
         'resolution': None,
         'user': user.pk,
         'versions': [version.pk],
+        'is_scattered_data': is_scattered_data,
     }
 
     dataset_serializer = DatasetSerializer(data=dataset_data)
@@ -238,6 +240,9 @@ def upload_user_data(request, filename):
         USER_DATA_VERSION_FIELD_PRETTY_NAME] if metadata[
             USER_DATA_VERSION_FIELD_PRETTY_NAME] else version_name
 
+    # needs file operation bc zip could also contain nc file (i.e.: internal case not relevant for users)
+    is_scattered = has_csv_in_zip(file)
+
     # creating version entry
 
     new_variable = create_variable_entry('none', 'none', dataset_pretty_name,
@@ -246,7 +251,7 @@ def upload_user_data(request, filename):
                                        dataset_pretty_name, request.user,
                                        new_variable)
     new_dataset = create_dataset_entry(dataset_name, dataset_pretty_name,
-                                       new_version, request.user)
+                                       new_version, request.user, is_scattered_data=is_scattered)
 
     file_data = {
         'file': file,
@@ -327,7 +332,7 @@ class DatasetSerializer(ModelSerializer):
         fields = [
             'id', 'short_name', 'pretty_name', 'help_text', 'storage_path',
             'detailed_description', 'source_reference', 'citation', 'versions',
-            'user'
+            'user', 'is_scattered_data'
         ]
 
 
