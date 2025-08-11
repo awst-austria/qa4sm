@@ -6,37 +6,6 @@ from validator.mailer import send_failed_preprocessing_notification
 import logging
 from pathlib import Path
 
-class FileProcessingLogger:
-    _loggers = {}
-
-    @classmethod
-    def get_logger(cls, file_uuid, user_path):
-        """Get or create a logger for the file processing."""
-        logger_key = f"{__name__}.{file_uuid}"
-
-        if logger_key not in cls._loggers:
-            logger = logging.getLogger(logger_key)
-            if not logger.handlers:
-                handler = logging.FileHandler(Path(user_path) / f"{file_uuid}.log")
-                handler.setFormatter(
-                    logging.Formatter('%(asctime)s - %(levelname)s - %(message)s'))
-                logger.addHandler(handler)
-                logger.setLevel(logging.INFO)
-            cls._loggers[logger_key] = logger
-
-        return cls._loggers[logger_key]
-
-    @classmethod
-    def cleanup_logger(cls, file_uuid):
-        """Clean up logger resources."""
-        logger_key = f"{__name__}.{file_uuid}"
-        if logger_key in cls._loggers:
-            logger = cls._loggers[logger_key]
-            for handler in logger.handlers[:]:
-                handler.close()
-                logger.removeHandler(handler)
-            del cls._loggers[logger_key]
-
 
 def get_sm_variable_names(variables):
     key_sm_words = [
@@ -66,32 +35,33 @@ def get_sm_variable_names(variables):
 
 def run_upload_format_check(file, filename, file_uuid, user_path):
     """Validate uploaded file format and handle results."""
-    file_logger = FileProcessingLogger.get_logger(file_uuid, user_path)
+    file_entry = get_object_or_404(UserDatasetFile, id=file_uuid)
+    # Update file entry with validation results
+    file_entry.log_info = f"Starting format validation for file {file_uuid}"
 
     try:
-        file_logger.info(f"Starting format validation for file {file_uuid}")
         success, msg, status = validate_file_upload(file, filename)
-
-        # Update file entry with validation results
-        file_entry = get_object_or_404(UserDatasetFile, id=file_uuid)
-        file_entry.format_validation_error_msg = msg
-        file_entry.save()
-
+         
         if not success:
-            file_logger.error(f"Format validation failed: {msg}")
-            send_failed_preprocessing_notification(file_entry)
-            file_entry.delete()
-            FileProcessingLogger.cleanup_logger(file_uuid)
-        else:
-            file_logger.info(f"Format validation successful for file {file_uuid}")
+            file_entry.log_info += f"\n{msg}"
+        
+        file_entry.log_info += f"\nFormat validation {'succeeded' if success else 'failed'}"
+        file_entry.status = 'success' if success else 'failed'
+        file_entry.error_message = f"{msg}"
+        file_entry.metadata_submitted = True
+        file_entry.save()
 
         return success, msg, status
 
     except Exception as e:
-        file_logger.error(f"Validation error: {str(e)}")
-        FileProcessingLogger.cleanup_logger(file_uuid)
-        return
+        file_entry.log_info += f"\nExeption in Format Validation: {str(e)}"
+        file_entry.status = 'failed'
+        file_entry.error_message = f"Unexpected error during format validation"
+        file_entry.metadata_submitted = True
+        file_entry.save()
 
+        #  Same return format for run_upload_format_check
+        return False, "Unexpected error during validation", 500
 
 def get_variables_from_the_reader(reader):
     variables = reader.variable_description()
@@ -110,22 +80,23 @@ def get_variables_from_the_reader(reader):
 
 
 def user_data_preprocessing(file_uuid, file_path, file_raw_path, user_path):
-    file_logger = FileProcessingLogger.get_logger(file_uuid, user_path)
+    file_entry = get_object_or_404(UserDatasetFile, id=file_uuid)
+    file_entry.log_info +=f"\nStarting preprocessing for file {file_uuid}"
+    
     try:
-        file_logger.info(f"Starting preprocessing for file {file_uuid}")
         gridded_reader = preprocess_user_data(file_path,
                                               file_raw_path + '/timeseries')
     except Exception as e:
         import traceback
         full_traceback = traceback.format_exc()
-        file_logger.error(f"Preprocessing failed: {full_traceback}")
-        file_entry = get_object_or_404(UserDatasetFile, id=file_uuid)
-        send_failed_preprocessing_notification(file_entry, full_traceback=full_traceback)
-        file_entry.delete()
-        FileProcessingLogger.cleanup_logger(file_uuid)
+        file_entry.log_info += f"\nPreprocessing failed: {full_traceback}"
+        file_entry.status = 'failed'
+        file_entry.error_message = f"Unexpected error during preprocessing"
+        file_entry.metadata_submitted = True
+        file_entry.save()
+        
         return
 
-    file_entry = get_object_or_404(UserDatasetFile, id=file_uuid)
     sm_variable = get_sm_variable_names(gridded_reader.variable_description())
     all_variables = get_variables_from_the_reader(gridded_reader)
 
@@ -139,18 +110,23 @@ def user_data_preprocessing(file_uuid, file_path, file_raw_path, user_path):
 
     try:
         variable_entry.save()
-        file_logger.info("Variable entry saved successfully")
+        file_entry.log_info +=f"\nVariable entry saved successfully"
+    
     except Exception as e:
         import traceback
         full_traceback = traceback.format_exc()
-        file_logger.error(f"Variable save failed: {full_traceback}")
-        send_failed_preprocessing_notification(file_entry,
-                                               too_long_variable_name=True)
-        file_entry.delete()
-        FileProcessingLogger.cleanup_logger(file_uuid)
+        file_entry.log_info += f"\nVariable save failed: {full_traceback}"
+        file_entry.status = 'failed'
+        file_entry.error_message = f"Variable save failed"
+        file_entry.metadata_submitted = True
+        file_entry.save()
+
         return
 
     file_entry.all_variables = all_variables
+    file_entry.log_info +=f"\nPreprocessing completed successfully"
+    file_entry.status = 'success'
+    file_entry.error_message = f"Success"
     file_entry.metadata_submitted = True
     file_entry.save()
 

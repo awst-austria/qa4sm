@@ -13,7 +13,10 @@ export class UserDataFileDto {
               public owner_validation_list: {val_id: string, val_name: string}[],
               public number_of_other_users_validations: number,
               public metadata_submitted: boolean,
-              public user_groups: number[]
+              public user_groups: number[],
+              public status: string,         
+              public error_message: string, 
+              public log_info: string    
               ) {
   }
 }
