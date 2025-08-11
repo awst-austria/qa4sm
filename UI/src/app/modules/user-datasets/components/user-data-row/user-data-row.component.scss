@@ -1,9 +1,26 @@
+@import "../../../../../style.variables.scss";
+
 .att_val_container{
   background-color: white;
   color: black;
   padding: 0.3em 0.3em 0.3em 0.3em;
   border-bottom: #dddddd solid 1px;
   margin: 0;
+}
+
+.logbutton {
+  background-color: $base-color !important;
+  transition: background-color 0.3s ease, border 0.3s ease;
+  border: 1px solid $base-color;
+
+  &:hover {
+    background-color: darken($base-color, 10%) !important;
+    border-color: darken($base-color, 10%);
+  }
+
+  &:active {
+    border: none !important;
+  }
 }
 
 .small-edit-icon{
@@ -28,7 +45,7 @@
   justify-content: center;
 }
 .warning {
-  color: red;
+  color: $pronouced-button-color;
 }
 .expiry-icons{
   cursor: auto;

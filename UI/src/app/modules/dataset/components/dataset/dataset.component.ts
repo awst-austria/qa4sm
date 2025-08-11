@@ -55,7 +55,7 @@ export class DatasetComponent implements OnInit {
 
 
   ngOnInit(): void {
-    this.allDatasets$ = this.datasetService.getAllDatasets(true);
+    this.allDatasets$ = this.datasetService.getDatasetsWithOkUserStatus();
 
     this.validationConfigService.listOfSelectedConfigs.subscribe(configs => {
       if (configs.filter(config => config.datasetModel.selectedDataset?.short_name === 'ISMN').length !== 0
