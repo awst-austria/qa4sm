@@ -1,11 +1,12 @@
 import {Injectable} from '@angular/core';
 import {HttpClient, HttpParams} from '@angular/common/http';
 import {DatasetDto} from './dataset.dto';
-import {Observable} from 'rxjs';
+import {Observable, of} from 'rxjs';
 import {environment} from '../../../../../environments/environment';
-import {catchError, shareReplay} from 'rxjs/operators';
+import {catchError, map, shareReplay, switchMap, tap} from 'rxjs/operators';
 import {DataCache} from '../../tools/DataCache';
 import {HttpErrorService} from '../global/http-error.service';
+import { UserDatasetsService } from 'src/app/modules/user-datasets/services/user-datasets.service';
 
 // const datasetUrl: string = environment.API_URL + 'api/wrongAdress';
 const datasetUrl: string = environment.API_URL + 'api/dataset';
@@ -13,6 +14,8 @@ const CACHE_KEY_ALL_DATASETS = 'allDatasets';
 const CACHE_USER_DATA_INFO = 'userDataInfo';
 const CACHE_FILE_INFO = 'isThereFileInfo';
 
+// The service is responsible for loading lists of datasets 
+// and a single dataset by ID from the backend, caching the results,
 @Injectable({
   providedIn: 'root'
 })
@@ -27,7 +30,8 @@ export class DatasetService {
   userFileInfoCache = new DataCache<boolean>(5);
 
   constructor(private httpClient: HttpClient,
-              private httpError: HttpErrorService) {
+    private httpError: HttpErrorService,
+    private userDatasets: UserDatasetsService) {
   }
 
   getAllDatasets(userData = false, excludeNoFiles = true): Observable<DatasetDto[]> {
@@ -66,4 +70,42 @@ export class DatasetService {
       );
     }
   }
+
+
+// Returns only user-provided datasets whose user-file status != 'failed'  
+getDatasetsWithOkUserStatus(): Observable<DatasetDto[]> {
+  return this.getAllDatasets(true /* userData */).pipe(
+    switchMap((datasets: DatasetDto[]) =>
+      this.userDatasets.getUserDataList().pipe(
+        map(files => {
+          const statusByDatasetId = new Map<number, string>();
+
+          for (const f of files) {
+            statusByDatasetId.set(f.dataset, f.status);
+          }
+
+          return datasets.filter(ds => {
+            const isUserProvided = ds?.source_reference === 'Data provided by a user';
+            if (!isUserProvided) {
+              return true; // keep all non-user datasets
+            }
+            const status = statusByDatasetId.get(ds.id)?.toLowerCase();
+            return status && status !== 'failed';
+          });
+        })
+      )
+    ),
+    catchError(err => {
+      console.warn('[DatasetService] getDatasetsWithOkUserStatus failed', err);
+      return of([] as DatasetDto[]);
+    })
+  );
+}
+
+
+
+
+
+
+
 }

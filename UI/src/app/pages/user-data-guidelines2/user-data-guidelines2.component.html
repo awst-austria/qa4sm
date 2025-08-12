@@ -10,7 +10,7 @@
   <!-- Pages -->
   <!---------- INFO section ---------->
   <div *ngIf="currentPage === 'info'">
-    <h2>User Data Upload</h2>
+    <h2>File Upload Info</h2>
     <p>
       This new, experimantal feature allows users to upload their own datasets for comparison and
       validation against the reference products available in QA4SM:
@@ -210,7 +210,7 @@ Attributes:
     <h4>File Format Requirements</h4>
     <ul>
       <li>Must include a <strong>header row</strong> with column names <span class="highlight">(same for all files)</span>.</li>
-      <li>The <strong>first column</strong> must contain timestamps (format readable by 
+      <li>The <strong>first column</strong> must contain timestamps (format parseable by 
         <a href="https://dateutil.readthedocs.io/en/stable/parser.html" target="_blank" rel="noopener noreferrer">Python dateutil</a>).
       </li>
       <li>Include one or more <strong>data columns</strong> (e.g., soil moisture values).</li>

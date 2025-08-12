@@ -290,7 +290,7 @@ export class ValidateComponent implements OnInit, AfterViewInit {
       newDatasetConfigModel.temporalReference$.next(datasetConfig.is_temporal_reference);
       newDatasetConfigModel.scalingReference$.next(datasetConfig.is_scaling_reference);
 
-      this.datasetService.getDatasetById(datasetConfig.dataset_id)
+      this.datasetService.getDatasetById(datasetConfig.dataset_id)  
         .pipe(
           catchError(() => EMPTY)
         )

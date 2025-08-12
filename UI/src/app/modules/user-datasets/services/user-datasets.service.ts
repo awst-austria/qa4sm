@@ -45,25 +45,32 @@ export class UserDatasetsService {
     return this.httpClient.post(uploadUrl, formData.get(name),
       { headers: fileHeaders, reportProgress: true, observe: 'events', responseType: 'json' })
       .pipe(
-        catchError(err => {
-          // Check if Django returned a string response (your custom error message)
-          if (err.error && typeof err.error === 'string') {
-            // Create custom error object that matches your app's error structure
-            const customError = {
-              status: err.status,
-              errorMessage: {
-                header: 'Upload Error',
-                message: err.error
-              },
-              form: undefined
-            };
-            return throwError(() => customError);
-          }
+        catchError((err: any) => {
+        // If server returned our unified shape: { success:false, error:"..." }
+        if (err?.error && typeof err.error === 'object' && typeof err.error.error === 'string') {
+          return throwError(() => ({
+            status: err.status,
+            errorMessage: {
+            header: 'Upload Error',
+            message: err.error.error},
+            form: undefined
+          }));
+        }
 
-          // For all other errors, let the HttpErrorService handle them normally
-          return this.httpError.handleError(err);
-        })
-      );
+      // Old path: plain string from server
+        if (typeof err?.error === 'string') {
+          return throwError(() => ({
+            status: err.status,
+            errorMessage: {
+              header: 'Upload Error',
+              message: err.error},
+            form: undefined
+          }));
+        }
+        // Global handler
+        return this.httpError.handleError(err);
+      })
+    );
   }
 
   getUserDataList(): Observable<UserDataFileDto[]> {

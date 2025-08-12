@@ -229,7 +229,7 @@ def upload_user_data(request, filename):
     serializer = UserFileMetadataSerializer(data=metadata)
 
     if not serializer.is_valid():
-        return JsonResponse(serializer.errors, status=500, safe=False)
+        return JsonResponse({"success": False, "error": str(serializer.errors)}, status=500)
 
     dataset_name = metadata[USER_DATA_DATASET_FIELD_NAME]
     dataset_pretty_name = metadata[
@@ -265,6 +265,7 @@ def upload_user_data(request, filename):
     }
 
     file_serializer = UploadFileSerializer(data=file_data)
+
     if file_serializer.is_valid():
         # saving file
         try:
@@ -274,13 +275,9 @@ def upload_user_data(request, filename):
             new_variable.delete()
             new_version.delete()
             return JsonResponse(
-                {
-                    'error':
-                    'We could not save your file. Please try again later or contact our team'
-                    ' to get help.'
-                },
-                status=500,
-                safe=False)
+                {"success": False,
+                 'error':'We could not save your file. Please try again later or contact our team.'},
+                 status=500)
 
         success, msg, status = run_upload_format_check(
             file=file,
@@ -289,12 +286,19 @@ def upload_user_data(request, filename):
             user_path=user_path)
         if not success:
             # angular error flow handles both str or dict (userFileUpload)
-            return JsonResponse(msg, status=status, safe=False)
+            return JsonResponse({"success": False, "error": str(msg)},
+                status=status)
 
         # need to get the path and assign it to the dataset as well as pass it to preprocessing function, so I don't
         # have to open the db connection before file preprocessing.
         file_raw_path = file_serializer.data['get_raw_file_path']
-        preprocess_file(file_serializer, file_raw_path, user_path)
+        try:
+            preprocess_file(file_serializer, file_raw_path, user_path)
+        except Exception as e:
+            return JsonResponse(
+            {"success": False,
+             "error": "Preprocessing failed."},
+            status=500)
 
         return JsonResponse(file_serializer.data, status=201, safe=False)
     else:

@@ -137,7 +137,7 @@
           type="button" 
           icon="pi pi-info-circle" 
           label="See Log Info" 
-          class="p-button-secondary mt-2"
+          class="p-button logbutton"
           (click)="showLogWindow()">
           </button>
         </div>
@@ -207,7 +207,7 @@
                 [pTooltip]="userDataset.is_used_in_validation ? 'Remove the data set file to regain some space. ' +
                  'Validations with this dataset will still be accessible' : 'Remove dataset'"
                 class="p-button-danger"
-                [style]="{'width':'8rem', 'height': '2.5rem', 'margin-right': '0.5rem'}"
+                [style]="{'width':'8rem', 'height': '2.2rem', 'margin-right': '0.5rem'}"
                 (click)="removeDataset(userDataset)">
         </button>
         <div *ngIf="!userDataset.file" [ngClass]="'no-dataset-info'">
