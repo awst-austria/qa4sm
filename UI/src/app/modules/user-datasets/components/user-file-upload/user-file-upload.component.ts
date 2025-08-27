@@ -38,10 +38,10 @@ export class UserFileUploadComponent {
 
   // dataset file form
   metadataForm = this.formBuilder.group<UserFileMetadata>({
-    dataset_name: [null, [Validators.required, Validators.maxLength(30), allowedNameValidator()]],
-    dataset_pretty_name: [null, [Validators.maxLength(30), allowedNameValidator(true)]],
-    version_name: [null, [Validators.required, Validators.maxLength(30), allowedNameValidator()]],
-    version_pretty_name: [null, [Validators.maxLength(30), allowedNameValidator(true)]],
+    dataset_name: [null, [Validators.required, Validators.maxLength(30), Validators.pattern(/^[A-Za-z0-9@+\-_]*$/)]],
+    dataset_pretty_name: [null, [Validators.maxLength(30), Validators.pattern(/^[A-Za-z0-9@+\-_]*$/)]],
+    version_name: [null, [Validators.required, Validators.maxLength(30), Validators.pattern(/^[A-Za-z0-9@+\-_]*$/)]],
+    version_pretty_name: [null, [Validators.maxLength(30), Validators.pattern(/^[A-Za-z0-9@+\-_]*$/)]],
   });
 
   constructor(private userDatasetService: UserDatasetsService,

@@ -209,7 +209,7 @@ class TestUserView(TestCase):
         user_form_correct = {'username': 'geraltOfRivia',
                              'password1':'roachRoach',
                              'password2':'roachRoach',
-                             'email': 'geralt@of.rivia.pl',
+                             'email': 'geralt2@of.rivia.pl',
                              'first_name': '',
                              'last_name': '',
                              'organisation': '',

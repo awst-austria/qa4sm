@@ -33,6 +33,10 @@ class User(AbstractUser):
     )
 
     __logger = logging.getLogger(__name__)
+    
+    # make email required + unique for the DB and admin/forms
+    email = models.EmailField(unique=True, blank=False)
+
     id = models.AutoField(primary_key=True)
     organisation = models.CharField(max_length=50, blank=True)
     country = CountryField(blank=True, blank_label='Country')
