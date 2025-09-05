@@ -35,29 +35,65 @@ export class DatasetService {
   }
 
   getAllDatasets(userData = false, excludeNoFiles = true): Observable<DatasetDto[]> {
-    if (this.arrayRequestCache.isCached(CACHE_KEY_ALL_DATASETS) && this.userDataInfoCache
-      .get(CACHE_USER_DATA_INFO) === userData && this.userDataInfoCache.get(CACHE_FILE_INFO) === excludeNoFiles) {
-      return this.arrayRequestCache.get(CACHE_KEY_ALL_DATASETS).pipe(
-        catchError(err => this.httpError.handleError(err))
-      )
-    } else {
-      const params = new HttpParams().set('userData', String(userData))
-        .set('excludeNoFiles', String(excludeNoFiles));
-      const datasets$ = this.httpClient.get<DatasetDto[]>(datasetUrl, {params})
-        .pipe(
-          shareReplay()
-        );
-      this.arrayRequestCache.push(CACHE_KEY_ALL_DATASETS, datasets$);
-      this.userDataInfoCache.push(CACHE_USER_DATA_INFO, userData);
-      this.userDataInfoCache.push(CACHE_FILE_INFO, excludeNoFiles);
-      return datasets$
-        .pipe(
-          catchError(err => this.httpError.handleError(err))
-        );
+
+  if (this.arrayRequestCache.isCached(CACHE_KEY_ALL_DATASETS) &&
+      this.userDataInfoCache.get(CACHE_USER_DATA_INFO) === userData &&
+      this.userFileInfoCache.get(CACHE_FILE_INFO) === excludeNoFiles) {
+
+    return this.arrayRequestCache.get(CACHE_KEY_ALL_DATASETS).pipe(
+      catchError(err => this.httpError.handleError(err))
+    );
+  } else {
+
+    const params = new HttpParams()
+      .set('userData', String(userData))
+      .set('excludeNoFiles', String(excludeNoFiles));
+
+    // base stream from backend
+    let datasets$ = this.httpClient.get<DatasetDto[]>(datasetUrl, { params });
+    // MINIMAL addition: filter out failed user uploads if userData=true
+    if (userData) {
+      datasets$ = datasets$.pipe(
+        switchMap((datasets: DatasetDto[]) =>
+          this.userDatasets.getUserDataList().pipe(
+            
+            // if not logged in (401/403) or any error
+            catchError(() => of([])),
+            map(files => {
+              const statusByDatasetId = new Map<number, string>();
+              for (const f of files) {
+                statusByDatasetId.set(f.dataset, (f.status ?? '').toLowerCase());
+              }
+
+              return datasets.filter(ds => {
+                const isUserProvided = ds?.source_reference === 'Data provided by a user';
+                if (!isUserProvided) return true; // keep non-user datasets
+
+                const status = statusByDatasetId.get(ds.id);
+                // keep only user datasets whose status is present and not 'failed'
+                return !!status && status !== 'failed';
+              });
+            })
+          )
+        )
+      );
     }
 
-  }
+    // cache the (possibly filtered) stream
+    const shared$ = datasets$.pipe(shareReplay());
 
+    this.arrayRequestCache.push(CACHE_KEY_ALL_DATASETS, shared$);
+    this.userDataInfoCache.push(CACHE_USER_DATA_INFO, userData);
+    this.userFileInfoCache.push(CACHE_FILE_INFO, excludeNoFiles);
+
+    return shared$.pipe(
+      catchError(err => this.httpError.handleError(err))
+    );
+  }
+}
+
+
+  
   getDatasetById(datasetId: number): Observable<DatasetDto> {
     if (this.singleRequestCache.isCached(datasetId)) {
       return this.singleRequestCache.get(datasetId);
@@ -70,39 +106,6 @@ export class DatasetService {
       );
     }
   }
-
-
-// Returns only user-provided datasets whose user-file status != 'failed'  
-getDatasetsWithOkUserStatus(): Observable<DatasetDto[]> {
-  return this.getAllDatasets(true /* userData */).pipe(
-    switchMap((datasets: DatasetDto[]) =>
-      this.userDatasets.getUserDataList().pipe(
-        map(files => {
-          const statusByDatasetId = new Map<number, string>();
-
-          for (const f of files) {
-            statusByDatasetId.set(f.dataset, f.status);
-          }
-
-          return datasets.filter(ds => {
-            const isUserProvided = ds?.source_reference === 'Data provided by a user';
-            if (!isUserProvided) {
-              return true; // keep all non-user datasets
-            }
-            const status = statusByDatasetId.get(ds.id)?.toLowerCase();
-            return status && status !== 'failed';
-          });
-        })
-      )
-    ),
-    catchError(err => {
-      console.warn('[DatasetService] getDatasetsWithOkUserStatus failed', err);
-      return of([] as DatasetDto[]);
-    })
-  );
-}
-
-
 
 
 
