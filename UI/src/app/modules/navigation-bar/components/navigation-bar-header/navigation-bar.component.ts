@@ -80,7 +80,7 @@ export class NavigationBarComponent implements OnInit {
   };
 
   helpMenuItem: MenuItem = {label: 'Help', icon: 'pi pi-fw pi-question', routerLink: ['help']};
-  userManualMenuItem: MenuItem = {label: 'User Manual', icon: 'pi pi-fw pi-book', url: '', target: '_blank'}
+  userManualMenuItem: MenuItem = {label: 'User Manual', icon: 'pi pi-fw pi-book', url: '/api/user-manual', target: '_blank'}
   datasetMenuItem: MenuItem = {label: 'Datasets', icon: 'pi pi-fw pi-save', routerLink: ['datasets']};
   termsMenuItem: MenuItem = {label: 'Terms', icon: 'pi pi-fw pi-briefcase', routerLink: ['terms']};
   infoMenuItem: MenuItem = {
@@ -213,10 +213,7 @@ export class NavigationBarComponent implements OnInit {
   }
 
   setSettingsValues(): void {
-    const userManualItem = this.items.find(item => item.label === 'Info')
-      .items.find(item => item.label === 'User Manual');
     this.settingsService.getAllSettings().subscribe(data => {
-      userManualItem.url = data[0].sum_link;
       this.isMaintenancePossible = data[0].potential_maintenance;
       this.potentialMaintenanceDescription = data[0].potential_maintenance_description;
     });
