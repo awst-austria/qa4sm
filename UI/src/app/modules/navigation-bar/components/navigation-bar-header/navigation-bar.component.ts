@@ -79,9 +79,15 @@ export class NavigationBarComponent implements OnInit {
     ]
   };
 
+  APIMenuItem: MenuItem = {
+    label: 'Public API',
+    icon: 'pi pi-fw pi-globe',
+    routerLink: ['public-api']
+  };
+
   helpMenuItem: MenuItem = {label: 'Help', icon: 'pi pi-fw pi-question', routerLink: ['help']};
   userManualMenuItem: MenuItem = {label: 'User Manual', icon: 'pi pi-fw pi-book', url: '/api/user-manual', target: '_blank'}
-  datasetMenuItem: MenuItem = {label: 'Datasets', icon: 'pi pi-fw pi-save', routerLink: ['datasets']};
+  datasetMenuItem: MenuItem = {label: 'Datasets', icon: 'pi pi-fw pi-database', routerLink: ['datasets']};
   termsMenuItem: MenuItem = {label: 'Terms', icon: 'pi pi-fw pi-briefcase', routerLink: ['terms']};
   infoMenuItem: MenuItem = {
     label: 'Info', icon: 'pi pi-fw pi-info-circle', items: [
@@ -185,6 +191,7 @@ export class NavigationBarComponent implements OnInit {
       this.resultsMenuItem,
       this.datasetUploadMenuItem,
       this.compareResultsMenuItem,
+      this.APIMenuItem,
       this.infoMenuItem,
       this.contactMenuItem,
       this.loginMenuItem,

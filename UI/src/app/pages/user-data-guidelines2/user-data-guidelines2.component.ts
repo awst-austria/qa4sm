@@ -1,11 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterOutlet } from '@angular/router';
+import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'qa-user-data-guidelines2',
   standalone: true, 
-  imports: [CommonModule, RouterOutlet],
+  imports: [CommonModule, RouterLink],
   templateUrl: './user-data-guidelines2.component.html',
   styleUrls: ['./user-data-guidelines2.component.scss']
 })

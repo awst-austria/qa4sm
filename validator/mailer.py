@@ -208,9 +208,12 @@ def user_api_token_request(user):
 
     url = settings.SITE_URL + reverse('admin:validator_user_change',
                                       kwargs={'object_id': user.id})
-    subject = '[QA4SM] User profile removal request'
-    body = 'Dear admins,\n\n A new user account removal request has arrived from {} {} ({}).\nPlease review the account and delete it as soon as possible. \nUser account: {}\n\nBest regards,\nYour webapp'.format(
-        user.first_name, user.last_name, user.username, url)
+    subject = '[QA4SM] User API token request'
+    body = 'Dear admins,\n\nA new user API token request has arrived from {} {} ({}).\nPlease review the account and create a token. \nUser account: {}\n\nKind regards,\nYour webapp'.format(
+        user.first_name,
+        user.last_name,
+        user.username,
+        url)
 
     _send_email(recipients=[settings.EMAIL_FROM], subject=subject, body=body)
 

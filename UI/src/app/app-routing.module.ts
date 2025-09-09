@@ -19,14 +19,12 @@ import {DatasetResolver} from './modules/core/services/dataset/dataset.resolver'
 import {PasswordResetComponent} from './pages/password-reset/password-reset.component';
 import {PasswordResetDoneComponent} from './pages/password-reset-done/password-reset-done.component';
 import {SetPasswordComponent} from './pages/set-password/set-password.component';
-import {
-  PasswordResetValidateTokenComponent
-} from './pages/password-reset-validate-token/password-reset-validate-token.component';
+import {PasswordResetValidateTokenComponent} from './pages/password-reset-validate-token/password-reset-validate-token.component';
 import {MyDatasetsComponent} from './pages/my-datasets/my-datasets.component';
 import { UserDataGuidelinesComponent2 } from './pages/user-data-guidelines2/user-data-guidelines2.component';
 import {UserDataGuidelinesComponent} from './pages/user-data-guidelines/user-data-guidelines.component';
 import {ContactUsComponent} from './pages/contact-us/contact-us.component';
-
+import { PublicApiComponent } from './pages/public-api/public-api.component';
 
 export const routes: Routes = [
   {path: '', redirectTo: '/home', pathMatch: 'full'},
@@ -51,6 +49,7 @@ export const routes: Routes = [
   {path: 'user-data-guidelines', component: UserDataGuidelinesComponent},
   {path: 'user-data-guidelines2', component: UserDataGuidelinesComponent2},
   {path: 'contact-us', component: ContactUsComponent},
+  {path: 'public-api', component: PublicApiComponent},
   {path: '**', component: ErrorPageComponent}
 ];
 
