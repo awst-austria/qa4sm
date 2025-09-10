@@ -134,9 +134,12 @@ def get_used_variables(filters, dataset, variable):
                 variables.append('sat_id')
                 continue
 
-            if fil.name == "FIL_ASCAT_UNFROZEN_UNKNOWN":
+            if fil.name == "FIL_ASCAT_UNFROZEN_UNKNOWN" and dataset:
                 variables.append('ssf')
                 continue
+
+            if fil.name == "FIL_ASCAT_UNFROZEN_UNKNOWN_new" and dataset:
+                variables.append('surface_flag')
 
             if fil.name == "FIL_ASCAT_NO_CONF_FLAGS":
                 variables.append('conf_flag')
@@ -144,6 +147,10 @@ def get_used_variables(filters, dataset, variable):
 
             if fil.name == "FIL_ASCAT_NO_PROC_FLAGS":
                 variables.append('proc_flag')
+                continue
+
+            if fil.name == "FIL_ASCAT_NO_PROC_FLAGS_new":
+                variables.append('processing_flag')
                 continue
 
             if fil.name == "FIL_SMOS_QUAL_RECOMMENDED":
@@ -243,6 +250,14 @@ def get_used_variables(filters, dataset, variable):
                 variables.append('static_water_body_fraction')
                 continue
 
+            if fil.filter.name == "FIL_ASCAT_SUBSURFACE_SCAT_PROB":
+                variables.append('subsurface_scattering_probability')
+                continue
+
+            if fil.filter.name == "FIL_ASCAT_SSM_SENSITIVITY":
+                variables.append('surface_soil_moisture_sensitivity')
+                continue
+
     return variables
 
 
@@ -298,6 +313,18 @@ def setup_filtering(reader, filters, param_filters, dataset,
             param = regex_sub(r'[ ]+,[ ]+', ',', pfil.parameters)
             masking_filters.append(
                 ('static_water_body_fraction', '<=', float(param)))
+            continue
+
+        if pfil.filter.name == "FIL_ASCAT_SUBSURFACE_SCAT_PROB":
+            param = regex_sub(r'[ ]+,[ ]+', ',', pfil.parameters)
+            masking_filters.append(
+                ('subsurface_scattering_probability', '<', float(param)))
+            continue
+
+        if pfil.filter.name == "FIL_ASCAT_SSM_SENSITIVITY":
+            param = regex_sub(r'[ ]+,[ ]+', ',', pfil.parameters)
+            masking_filters.append(
+                ('surface_soil_moisture_sensitivity', '>', float(param)))
             continue
 
         inner_reader = filtered_reader
@@ -386,12 +413,21 @@ def setup_filtering(reader, filters, param_filters, dataset,
                 ('ssf', '<=', 1))  # TODO: really should be == 0 or == 1
             continue
 
+        if fil.name == "FIL_ASCAT_UNFROZEN_UNKNOWN_new":
+            masking_filters.append(
+                ('surface_flag', '<=', 1))  # TODO: really should be == 0 or == 1
+            continue
+
         if fil.name == "FIL_ASCAT_NO_CONF_FLAGS":
             masking_filters.append(('conf_flag', '==', 0))
             continue
 
         if fil.name == "FIL_ASCAT_NO_PROC_FLAGS":
             masking_filters.append(('proc_flag', '==', 0))
+            continue
+
+        if fil.name == "FIL_ASCAT_NO_PROC_FLAGS_new":
+            masking_filters.append(('processing_flag', '==', 0))
             continue
 
         if fil.name == "FIL_SMOS_QUAL_RECOMMENDED":
