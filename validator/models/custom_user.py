@@ -13,23 +13,39 @@ class User(AbstractUser):
     NO_DATA = 'no_data'
     BASIC = 'basic'
     EXTENDED = 'extended'
-    UNLIMITED = 'unlimited'
+    ACTIVE = 'active'
+    REGULAR = 'regular'
+    FREQUENT = 'frequent'
+    POWER_USER = 'power_user'
     LARGE = 'large'
+    UNLIMITED = 'unlimited'
 
     DATA_SPACE_LEVELS = (
-        (NO_DATA, 1),
-        (BASIC, 5 * 10 ** 9),
-        (EXTENDED, 10 ** 10),
-        (LARGE, 200 * 10**9),
-        (UNLIMITED, None)
+        (NO_DATA, 1),  # 1 byte
+        (BASIC, 5 * 10**9),  # 5 GB
+        (EXTENDED, 10**10),  # 10 GB
+        (ACTIVE, 20 * 10**9),  # 20 GB - Active users
+        (REGULAR, 50 * 10**9),  # 50 GB - Regular users
+        (FREQUENT, 75 * 10**9),  # 75 GB - Frequent users
+        (POWER_USER, 100 * 10**9),  # 100 GB - Power users
+        (LARGE, 200 * 10**9),  # 200 GB
+        (UNLIMITED, None)  # No limit
     )
 
     __logger = logging.getLogger(__name__)
+    
+    # make email required + unique for the DB and admin/forms
+    email = models.EmailField(unique=True, blank=False)
+
     id = models.AutoField(primary_key=True)
     organisation = models.CharField(max_length=50, blank=True)
     country = CountryField(blank=True, blank_label='Country')
     orcid = models.CharField(max_length=25, blank=True)
-    space_limit = models.CharField(max_length=25, null=False, blank=True, choices=DATA_SPACE_LEVELS, default=BASIC)
+    space_limit = models.CharField(max_length=25,
+                                   null=False,
+                                   blank=True,
+                                   choices=DATA_SPACE_LEVELS,
+                                   default=BASIC)
 
     @property
     def space_limit_value(self):
@@ -38,7 +54,8 @@ class User(AbstractUser):
 
     @property
     def used_space(self):
-        return sum(file.file_size for file in self.user_datasets.all() if file.file)
+        return sum(file.file_size for file in self.user_datasets.all()
+                   if file.file)
 
     @property
     def space_left(self):
@@ -59,4 +76,6 @@ class User(AbstractUser):
         if self.orcid:
             r = reg_search(settings.ORICD_REGEX, self.orcid)
             if not r or len(r.groups()) < 1:
-                raise ValidationError({'orcid': 'Invalid ORCID identifier.', })
+                raise ValidationError({
+                    'orcid': 'Invalid ORCID identifier.',
+                })

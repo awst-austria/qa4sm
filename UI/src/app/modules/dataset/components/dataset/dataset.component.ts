@@ -55,6 +55,7 @@ export class DatasetComponent implements OnInit {
 
 
   ngOnInit(): void {
+
     this.allDatasets$ = this.datasetService.getAllDatasets(true);
 
     this.validationConfigService.listOfSelectedConfigs.subscribe(configs => {

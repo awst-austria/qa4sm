@@ -1,0 +1,239 @@
+<div class="main-container">
+
+  <!-- Navigation Tabs -->
+  <nav class="upload-nav">
+    <button [class.active]="currentPage === 'info'" (click)="switchPage('info')">Upload Info</button>
+    <button [class.active]="currentPage === 'netcdf'" (click)="switchPage('netcdf')">NetCDF Files</button>
+    <button [class.active]="currentPage === 'csv'" (click)="switchPage('csv')">CSV Files</button>
+  </nav>
+
+  <!-- Pages -->
+  <!---------- INFO section ---------->
+  <div *ngIf="currentPage === 'info'">
+    <h2>File Upload Info</h2>
+    <p>
+      This new, experimantal feature allows users to upload their own datasets for comparison and
+      validation against the reference products available in QA4SM:
+    </p>
+    <ul class="dataset-links">
+      <li>
+        <a routerLink="/datasets" target="_blank" rel="noopener noreferrer">Satellite datasets</a>
+      </li>
+      <li>
+        <a href="https://cds.climate.copernicus.eu/datasets" target="_blank" rel="noopener noreferrer">ERA model data</a>
+      </li>
+      <li>
+        <a href="https://ismn.earth/en/" target="_blank" rel="noopener noreferrer">ISMN monitoring stations</a>
+      </li>
+    </ul>
+
+    <h4>Important Notes</h4>
+    <ul>
+      <li>Your uploaded data is <strong>private</strong> – no other users can see, access, or download it.</li>
+      <li>Uploads must be provided as a <strong>.zip</strong> containing only: 
+        <strong>NetCDF (.nc/.nc4)</strong> or <strong>CSV (.csv)</strong> files.
+      </li>
+      <li>If you plan to upload datasets larger than several GB, please contact us first at 
+        <a href="mailto:support@qa4sm.eu">support&#64;qa4sm.eu</a>.  
+        We’ll help ensure your data is handled efficiently and accessible after upload. 
+      </li>
+      <li>Validation results with uploaded data cannot be published due to limited traceability.</li>
+      <li>Data persistence is not yet guaranteed. Future updates to QA4SM may require you to re-upload your files.</li>
+    </ul>
+
+    <h4>Troubleshooting</h4>
+    <p>If your upload fails or data cannot be processed correctly, please check these common issues:</p>
+    <ul>
+      <li><strong>Invalid file type:</strong> Only <code>.nc</code>, <code>.nc4</code>, or <code>.csv</code> files are supported inside the ZIP archive.</li>
+      <li><strong>Incorrect ZIP structure:</strong> Avoid nested folders or unrelated files.</li>
+      <li><strong>Missing variables:</strong> Ensure your files include <strong>latitude, longitude, and time</strong> information.</li>
+      <li><strong>Format errors:</strong> See examples in 
+        <button class="link-btn" (click)="switchPage('netcdf')">NetCDF</button> or 
+        <button class="link-btn" (click)="switchPage('csv')">CSV</button>.
+      </li>
+      <li><strong>File too large:</strong> Try a smaller dataset or contact support.</li>
+    </ul>
+
+    <p>
+      <strong>You need help?</strong> Don’t hesitate to reach out at 
+      <a href="mailto:support@qa4sm.eu">support&#64;qa4sm.eu</a>. 
+      We are happy to assist you! 
+    </p>
+  </div>
+
+  <!---------- NetCDF section ---------->
+
+  <div *ngIf="currentPage === 'netcdf'">
+    <h2>Upload NetCDF4 Image Stacks</h2>
+    <p>
+      Many Level 3 and Level 4 soil moisture datasets are provided in image format with three data dimensions: 
+      <strong>latitude</strong>, <strong>longitude</strong>, and <strong>time</strong>. 
+      Multiple images can be combined along the time axis to form a <strong>data cube</strong>. 
+      From these cubes, QA4SM extracts time series data for validation.
+    </p>
+
+    <h4>General Requirements</h4>
+    <ul>
+      <li>Only <strong>NetCDF4 format</strong> is supported (<code>.nc</code> or <code>.nc4</code> files).</li>
+      <li>Files must contain exactly <strong>three dimensions</strong>: latitude, longitude, and time.</li>
+      <li>Only numeric data types are supported (<code>integer</code>, <code>float</code>, <code>double</code>).</li>
+      <li>Variable names, dimensions, and attributes:
+        <ul>
+          <li>Should use only <strong>letters, digits, and underscores</strong>.</li>
+          <li>Should not exceed <strong>30 characters</strong>.</li>
+        </ul>
+      </li>
+      <li>At least <strong>one soil moisture variable</strong> must be included.
+      (If multiple are present, you will select one after upload.)</li>
+    </ul>
+
+    <h4>Latitude and Longitude</h4>
+    <ul>
+      <li>Coordinates must follow the <strong>WGS84 reference system</strong>
+        (Longitude: -180° to 180°, Latitude: -90° to 90°).</li>
+      <li>Accepted <strong>units</strong>:
+        <ul>
+          <li>Longitude: <code>degrees_east</code> (or similar variations)</li>
+          <li>Latitude: <code>degrees_north</code> (or similar variations)</li>
+        </ul>
+      </li>
+      <li>Two formats are supported:
+        <ul>
+          <li><strong>1D coordinates</strong> – Separate arrays for lat and lon.</li>
+          <li><strong>2D coordinates</strong> – Arrays with values for every grid point.</li>
+        </ul>
+      </li>
+    </ul>
+
+    <h4>Observation Time</h4>
+    <ul>
+      <li>Time must be a <strong>1D coordinate variable</strong> with the attribute:
+        <pre><code>"&lt;unit&gt; since &lt;reference date&gt;"</code></pre>
+        Example: <code>days since 2000-01-01 00:00:00</code>
+      </li>
+      <li>Recommended attribute: <code>standard_name: time</code></li>
+      <li>A calendar attribute (e.g. proleptic_gregorian) is recommended but optional.</li>
+      <li>If timestamps cannot be globally applied:</li>
+      <ul>
+        <li>A separate <strong>3D time offset</strong> variable (same shape as the data variable) must be provided.</li>
+        <li>The time offset should be given in seconds relative to the base <code>time</code> value</li>
+      </ul>
+    </ul>
+
+    <h4>Naming & Attributes</h4>
+    <ul>
+      <li>Provide clear, unique variable names.</li>
+      <li>Include <strong>units</strong> for all variables.</li>
+      <li>Define <code>valid_range</code>, <code>valid_min</code>, or <code>valid_max</code> where possible.</li>
+      <li>Optional compression attributes: <code>add_offset</code>, <code>scale_factor</code>, <code>zlib</code>.</li>
+    </ul>
+
+    <h4>Tip</h4>
+    <p>
+      Before uploading, test your file locally using Python's 
+      <a href="https://docs.xarray.dev/" target="_blank" rel="noopener noreferrer">xarray</a>:
+    </p>
+    <pre><code>import xarray as xr
+  ds = xr.open_dataset("myDataset.nc")
+  print(ds)</code></pre>
+    <p>
+      This will ensure your NetCDF file is correctly structured and compatible with QA4SM.
+    </p>
+
+    <h4>Example of a User NetCDF File</h4>
+    <p>
+      Below is an example of how user NetCDF dataset might look when opened with 
+      <a href="https://docs.xarray.dev/" target="_blank" rel="noopener noreferrer">xarray</a>:
+    </p>
+
+    <pre><code>&lt;xarray.Dataset&gt; Size: 58kB
+Dimensions:               (locations: 100, time: 10)
+Coordinates:
+    longitude             (locations) float32 4kB ...
+    latitude              (locations) float32 4kB ...
+    elevation             (locations) float32 4kB ...
+  * time                  (time) datetime64[ns] 80B 2023-01-01 ... 2023-01-10
+Dimensions without coordinates: locations
+Data variables:
+    station_id            (locations) int64 7kB ...
+    station_name          (locations) &lt;U20 4kB ...
+    soil_moisture         (locations, time) float32 36kB ...
+Attributes:
+    id:                         USER-SOILMOISTURE-UPLOAD-2023010100...
+    date_created:               20230815T102300Z
+    featureType:                timeSeries
+    title:                      User Soil Moisture Dataset for Validation
+    institution:                User Research Lab, User University
+    contact:                    my.email&#64;email.com
+    data_owner:                 User Name
+    geospatial_vertical_max:    1.0
+    geospatial_lat_units:       degrees_north
+    geospatial_lon_units:       degrees_east
+    geospatial_lat_resolution:  0.1 degree
+    geospatial_lon_resolution:  0.1 degree
+    spatial_resolution:         10km
+</code></pre>
+
+<h4>Example Files</h4>
+<p>
+  You can download example files from our 
+  <a href="https://github.com/awst-austria/qa4sm-testdata/tree/master/user_data" target="_blank" rel="noopener noreferrer">GitHub repository</a>.
+</p>
+
+</div>
+
+  <!---------- CSV section ---------->
+
+  <div *ngIf="currentPage === 'csv'">
+    <h2>Upload Time Series (CSV Format)</h2>
+    <p>
+      This option allows you to upload individual time series files in
+      <strong>CSV format</strong>, bundled into a single <strong>ZIP archive</strong>.
+      It is particularly useful for datasets with <strong>irregular timestamps</strong> 
+      or when uploading data only for specific in-situ locations to avoid large datasets.
+    </p>
+
+    <h4>File Name Convention</h4>
+    <p>Each CSV file inside the ZIP must be named as:</p>
+    <pre><code>&lt;DATASET_NAME&gt;_gpi=&lt;GPI&gt;_lat=&lt;LAT&gt;_lon=&lt;LON&gt;.csv</code></pre>
+
+    <ul class="no-bullets">
+      <li><strong>&lt;DATASET_NAME&gt;</strong> → Dataset name <span class="highlight">(same for all files)</span></li>
+      <li><strong>&lt;GPI&gt;</strong> → Unique grid point index for the location</li>
+      <li><strong>&lt;LAT&gt;</strong> → Latitude in degrees North (-90 to 90)</li>
+      <li><strong>&lt;LON&gt;</strong> → Longitude in degrees East (-180 to 180)</li>
+    </ul>
+
+    <p><strong>Example:</strong></p>
+    <pre><code>myDataset_gpi=000001_lat=38.887_lon=-101.043.csv</code></pre>
+
+    <h4>File Format Requirements</h4>
+    <ul>
+      <li>Must include a <strong>header row</strong> with column names <span class="highlight">(same for all files)</span>.</li>
+      <li>The <strong>first column</strong> must contain timestamps (format parseable by 
+        <a href="https://dateutil.readthedocs.io/en/stable/parser.html" target="_blank" rel="noopener noreferrer">Python dateutil</a>).
+      </li>
+      <li>Include one or more <strong>data columns</strong> (e.g., soil moisture values).</li>
+    </ul>
+
+    <p><strong>Example:</strong></p>
+    <pre><code>Time,SM
+2016-Jun-01 01:30:07,0.18278
+2016-Jun-02 00:51:39,0.2003
+2016-Jun-02 12:08:07,0.181
+2016-Jun-04 01:13:32,0.22323</code></pre>
+
+    <h4>Tip</h4>
+    <p>Verify your CSV files locally before uploading using <a href="https://pandas.pydata.org/" target="_blank" rel="noopener noreferrer">pandas</a>:</p>
+    <pre><code>import pandas as pd
+  df = pd.read_csv("myDataset_gpi=000001_lat=38.887_lon=-101.043.csv",
+  index_col=0, parse_dates=True)</code></pre>
+
+    <h4>Example Files</h4>
+    <p>
+      You can download example files from our 
+      <a href="https://github.com/awst-austria/qa4sm-testdata/tree/master/user_data" target="_blank" rel="noopener noreferrer">GitHub repository</a>.
+    </p>
+  </div>
+
+</div>

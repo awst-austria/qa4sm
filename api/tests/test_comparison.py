@@ -129,7 +129,7 @@ class TestValidationComparisonView(TestCase):
         assert response.get('Content-Length') == response_intersection.get('Content-Length')
 
         metric_list = response_intersection.json()
-        assert len(metric_list) == 13
+        assert len(metric_list) == 12
         metrics_query = []
         for metric in metric_list:
             assert 'metric_pretty_name' in metric.keys()

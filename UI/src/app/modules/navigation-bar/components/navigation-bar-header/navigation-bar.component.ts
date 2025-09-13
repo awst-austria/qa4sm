@@ -63,18 +63,31 @@ export class NavigationBarComponent implements OnInit {
     routerLink: ['user-data-guidelines']
   };
 
+  uploadDataHelpMenuItem2: MenuItem = {
+    label: 'Upload help',
+    icon: 'pi pi-fw pi-question',
+    routerLink: ['user-data-guidelines2']
+  };
+
   datasetUploadMenuItem: MenuItem = {
     label: 'Dataset upload',
     icon: 'pi pi-fw pi-upload',
     items: [
-      this.uploadDataHelpMenuItem,
       this.uploadDataMenuItem,
+      this.uploadDataHelpMenuItem,
+      this.uploadDataHelpMenuItem2
     ]
   };
 
+  APIMenuItem: MenuItem = {
+    label: 'Public API',
+    icon: 'pi pi-fw pi-globe',
+    routerLink: ['public-api']
+  };
+
   helpMenuItem: MenuItem = {label: 'Help', icon: 'pi pi-fw pi-question', routerLink: ['help']};
-  userManualMenuItem: MenuItem = {label: 'User Manual', icon: 'pi pi-fw pi-book', url: '', target: '_blank'}
-  datasetMenuItem: MenuItem = {label: 'Datasets', icon: 'pi pi-fw pi-save', routerLink: ['datasets']};
+  userManualMenuItem: MenuItem = {label: 'User Manual', icon: 'pi pi-fw pi-book', url: '/api/user-manual', target: '_blank'}
+  datasetMenuItem: MenuItem = {label: 'Datasets', icon: 'pi pi-fw pi-database', routerLink: ['datasets']};
   termsMenuItem: MenuItem = {label: 'Terms', icon: 'pi pi-fw pi-briefcase', routerLink: ['terms']};
   infoMenuItem: MenuItem = {
     label: 'Info', icon: 'pi pi-fw pi-info-circle', items: [
@@ -178,6 +191,7 @@ export class NavigationBarComponent implements OnInit {
       this.resultsMenuItem,
       this.datasetUploadMenuItem,
       this.compareResultsMenuItem,
+      this.APIMenuItem,
       this.infoMenuItem,
       this.contactMenuItem,
       this.loginMenuItem,
@@ -206,10 +220,7 @@ export class NavigationBarComponent implements OnInit {
   }
 
   setSettingsValues(): void {
-    const userManualItem = this.items.find(item => item.label === 'Info')
-      .items.find(item => item.label === 'User Manual');
     this.settingsService.getAllSettings().subscribe(data => {
-      userManualItem.url = data[0].sum_link;
       this.isMaintenancePossible = data[0].potential_maintenance;
       this.potentialMaintenanceDescription = data[0].potential_maintenance_description;
     });

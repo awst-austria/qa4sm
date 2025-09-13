@@ -1,0 +1,51 @@
+@import "../../../style.variables";
+
+/* Main container */
+.main-container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 20px;
+  font-family: 'Segoe UI', Tahoma, sans-serif;
+  line-height: 1.6;
+  color: $base-font-color;
+}
+
+/* Headings */
+h2 {
+  font-size: 1.8rem;
+  color: $main-page-color-1;
+  margin-bottom: 10px;
+}
+
+h4 {
+  font-size: 1.3rem;
+  margin-top: 20px;
+  color: $main-page-color-1;
+}
+
+pre.cli {
+  background-color: #111;            // dark shell background
+  color: #e6e6e6;                    // light text
+  padding: 12px 16px;
+  border-radius: 4px;
+  overflow-x: auto;
+  font-family: 'Courier New', monospace;
+  font-size: 0.95rem;
+  line-height: 1.4;
+
+  // subtle border like a terminal window
+  border: 1px solid #333;
+}
+
+pre.cli code {
+  background: none;
+  padding: 0;
+  border-radius: 0;
+  color: inherit;
+}
+
+// optional: style the "prompt" part ($) differently
+pre.cli code .prompt {
+  color: $main-page-color-1;
+  font-weight: bold;
+}

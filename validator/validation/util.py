@@ -2,6 +2,7 @@ import errno
 from os import makedirs, listdir, path
 import warnings
 import inspect
+import zipfile
 
 
 def mkdir_if_not_exists(the_dir):
@@ -39,3 +40,25 @@ def determine_status(progress, end_time, current_status):
         return 'ERROR'
     else:
         return 'RUNNING'
+    
+
+def has_csv_in_zip(file):
+    """
+    Quick check if ZIP contains at least one CSV file
+    """
+    try:
+        # Save current position
+        original_pos = file.tell()
+        file.seek(0)
+
+        with zipfile.ZipFile(file, 'r') as zip_ref:
+            # Just get the file list - no extraction needed
+            file_list = zip_ref.namelist()
+            has_csv = any(f.lower().endswith('.csv') for f in file_list)
+            return has_csv
+
+    except (zipfile.BadZipFile, Exception):
+        return False
+    finally:
+        # Always restore file position
+        file.seek(original_pos)

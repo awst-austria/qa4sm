@@ -70,7 +70,7 @@
           <span class="p-float-label">
             <input class="form-field" id="dataset-name" type="text" pInputText formControlName="dataset_name">
             <label for="dataset-name">Dataset name</label>
-            <span pTooltip="Required. 30 characters or fewer. Letters, digits and @/./+/-/_ only."
+            <span pTooltip="Required. Up to 30 characters. Letters, numbers, and @ . + - _ only."
                   class="pi pi-question-circle">
             </span>
           </span>
@@ -82,7 +82,7 @@
                    formControlName="dataset_pretty_name">
             <label for="dataset-pretty-name">Dataset display name (optional)</label>
             <span
-              pTooltip="Optional. 30 characters or fewer. Letters, digits, space and @/./+/-/_ only. If not provided, the name from the field above will be used."
+              pTooltip="Optional. Up to 30 characters. Letters, digits, space and @ . + - _ only. If not provided, the name from the field above will be used."
               class="pi pi-question-circle">
             </span>
           </span>
@@ -92,7 +92,7 @@
         <span class="p-float-label">
           <input class="form-field" id="version-name" type="text" pInputText formControlName="version_name">
           <label for="version-name">Version name</label>
-          <span pTooltip="Required. 30 characters or fewer. Letters, digits and @/./+/-/_ only."
+          <span pTooltip="Required. Up to 30 characters. Letters, numbers, and @ . + - _ only."
                 class="pi pi-question-circle">
           </span>
         </span>
@@ -104,7 +104,7 @@
                  formControlName="version_pretty_name">
           <label for="version-pretty-name">Version display name (optional)</label>
           <span
-            pTooltip="Optional. 30 characters or fewer. Letters, digits, space and @/./+/-/_ only. If not provided, the name from the field above will be used."
+            pTooltip="Optional. Up to 30 characters. Letters, digits, space and @ . + - _ only. If not provided, the name from the field above will be used."
             class="pi pi-question-circle">
           </span>
         </span>
@@ -127,7 +127,7 @@
 <p-dialog id="uploading-data-spinner" [modal]="true" [showHeader]="false" [(visible)]="spinnerVisible"
           class="text-center">
   <span class="pi pi-spinner loading-spinner" title="We are uploading your data..."></span>
-  <div class="uploading-message">Do not close this tab. We are uploading your data...</div>
+  <div class="uploading-message">Do not close this tab. We are uploading your data and performing initial validation checks...</div>
   <div *ngIf="(uploadProgress|async) < 100" class="uploading-message pt-3">Progress {{ uploadProgress|async }} %</div>
   <div *ngIf="(uploadProgress|async) === 100" class="uploading-message pt-3">Your file has been uploaded. We still need
     a few seconds to preprocess it..

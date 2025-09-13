@@ -165,6 +165,21 @@ def create_reader(dataset, version) -> GriddedNcTs:
         reader = ReaderWithTsExtension(C3STs, c3s_data_folder, ext_folder_name,
                                        ioclass_kws={'read_bulk': True})
 
+    if dataset.short_name == globals.C3SA:
+        c3s_data_folder = path.join(folder_name, 'cdr_active_daily')
+        reader = ReaderWithTsExtension(C3STs, c3s_data_folder, ext_folder_name,
+                                       ioclass_kws={'read_bulk': True})
+
+    if dataset.short_name == globals.C3SP:
+        c3s_data_folder = path.join(folder_name, 'cdr_passive_daily')
+        reader = ReaderWithTsExtension(C3STs, c3s_data_folder, ext_folder_name,
+                                       ioclass_kws={'read_bulk': True})
+
+    if dataset.short_name == globals.C3S_RZSM:
+        c3s_data_folder = path.join(folder_name, 'cdr_rzsm_daily')
+        reader = ReaderWithTsExtension(C3STs, c3s_data_folder, ext_folder_name,
+                                       ioclass_kws={'read_bulk': True})
+
     if (dataset.short_name == globals.CCIC or
             dataset.short_name == globals.CCIA or
             dataset.short_name == globals.CCIP or

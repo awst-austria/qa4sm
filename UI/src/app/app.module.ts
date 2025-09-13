@@ -142,7 +142,8 @@ import {MaintenanceModeComponent} from "./modules/core/maintenance-mode/maintena
         ImageModule,
         ScrollTopModule,
         ContactModule,
-        SelectButtonModule, MaintenanceModeComponent], providers: [
+        SelectButtonModule, 
+        MaintenanceModeComponent], providers: [
         {
             provide: HTTP_INTERCEPTORS,
             useClass: HttpTokenInterceptor,
