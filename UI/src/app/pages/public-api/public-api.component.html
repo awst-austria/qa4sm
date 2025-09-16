@@ -13,12 +13,13 @@
     <h4>Usage</h4>
     <p>
         Here are some examples of how to use your personal API token to interact with the service.
-        Each request must include your token in the <code>Authorization</code> header.
+        Each request must include your token in the Authorization header.
     </p>
     <!-- Description of CONFIG_JSON_FILE -->
     <p>
-        <code>&lt;CONFIG_JSON_FILE&gt;</code> is a JSON file that defines the datasets,
-        filters, time ranges, and metrics for your validation job.
+         <a routerLink="/json-config">
+        <code>&lt;CONFIG_JSON_FILE&gt;</code> </a> 
+        is a JSON file that defines the datasets,filters, time ranges, and metrics for your validation job.
     </p>
     
     <p><strong>Submit validation (test server):</strong></p>
@@ -40,7 +41,7 @@
 https://test.qa4sm.eu/api/start-validation-with-token</code></pre>
 
     <!-- Copy button -->
-    <a class="link-btn" (click)="copy('cmd-start-local')">
+    <a class="copy-btn" (click)="copy('cmd-start-local')">
         <i class="pi pi-fw pi-copy"></i> Copy
     </a>
 
@@ -65,7 +66,7 @@ https://test.qa4sm.eu/api/my-validation-runs-with-token | jq -r '
 &#64;tsv
 ' | column -t</code></pre>
 
-    <a class="link-btn" (click)="copy('cmd-list')"><i class="pi pi-fw pi-copy"></i> Copy</a>
+    <a class="copy-btn" (click)="copy('cmd-list')"><i class="pi pi-fw pi-copy"></i> Copy</a>
   
     <!-- API example -->
     <p><strong>Download results (ZIP):</strong></p>
@@ -82,6 +83,6 @@ https://test.qa4sm.eu/api/my-validation-runs-with-token | jq -r '
 "https://test.qa4sm.eu/api/download-result-file-with-token/&lt;VALIDATION_RUN_ID&gt;/zip" \
 --output &lt;OUTPUT_FILE&gt;.zip</code></pre>
     
-    <a class="link-btn" (click)="copy('cmd-download')"><i class="pi pi-fw pi-copy"></i> Copy</a>
+    <a class="copy-btn" (click)="copy('cmd-download')"><i class="pi pi-fw pi-copy"></i> Copy</a>
 
 </div>

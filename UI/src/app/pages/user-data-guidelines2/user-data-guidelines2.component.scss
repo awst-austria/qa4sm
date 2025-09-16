@@ -113,6 +113,10 @@ code {
 .link-btn:active {
   background-color: $button-active-color;
   color: white;
+}        
+
+.copy-btn {
+  cursor: pointer;
 }
 
 .no-bullets {

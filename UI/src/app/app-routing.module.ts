@@ -25,6 +25,7 @@ import { UserDataGuidelinesComponent2 } from './pages/user-data-guidelines2/user
 import {UserDataGuidelinesComponent} from './pages/user-data-guidelines/user-data-guidelines.component';
 import {ContactUsComponent} from './pages/contact-us/contact-us.component';
 import { PublicApiComponent } from './pages/public-api/public-api.component';
+import { JsonConfigComponent } from './pages/public-api/json-config/json-config.component';
 
 export const routes: Routes = [
   {path: '', redirectTo: '/home', pathMatch: 'full'},
@@ -50,6 +51,7 @@ export const routes: Routes = [
   {path: 'user-data-guidelines2', component: UserDataGuidelinesComponent2},
   {path: 'contact-us', component: ContactUsComponent},
   {path: 'public-api', component: PublicApiComponent},
+  {path: 'json-config', component: JsonConfigComponent},
   {path: '**', component: ErrorPageComponent}
 ];
 

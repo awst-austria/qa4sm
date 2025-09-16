@@ -1,0 +1,55 @@
+@import "../../../../style.variables";
+
+/* Main container */
+.main-container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 20px;
+  font-family: 'Segoe UI', Tahoma, sans-serif;
+  line-height: 1.6;
+  color: $base-font-color;
+}
+
+/* Headings */
+h2 {
+  font-size: 1.8rem;
+  color: $main-page-color-1;
+  margin-bottom: 10px;
+}
+
+h4 {
+  font-size: 1.3rem;
+  margin-top: 20px;
+  color: $main-page-color-1;
+}
+/* Link buttons */
+.btn {
+  background-color: $button-base-color;
+  border: none;
+  color: #fff;
+  padding: 10px 10px;
+  font-size: 15px;
+  font-weight: 600;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn:hover {
+ background-color: $button-hover-color;
+  color: #fff;
+}
+
+
+.btn-remove {
+  
+  background-color: $pronouced-button-color;
+  border: none;
+  color: #fff;
+  padding: 10px 10px;
+  font-size: 15px;
+  font-weight: 600;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}

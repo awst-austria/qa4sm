@@ -133,18 +133,32 @@
       Before uploading, test your file locally using Python's 
       <a href="https://docs.xarray.dev/" target="_blank" rel="noopener noreferrer">xarray</a>:
     </p>
+
+    <textarea id="copy-code" class="sr-only" aria-hidden="true" style="position:absolute;left:-9999px;">
+import xarray as xr
+ds = xr.open_dataset("myDataset.nc")
+print(ds)
+    </textarea>
+
     <pre><code>import xarray as xr
-  ds = xr.open_dataset("myDataset.nc")
-  print(ds)</code></pre>
+ds = xr.open_dataset("myDataset.nc")
+print(ds)</code></pre>
+    
+  <!-- Copy button -->
+    <a class="copy-btn" (click)="copy('copy-code')">
+        <i class="pi pi-fw pi-copy"></i> Copy
+    </a>
+
     <p>
       This will ensure your NetCDF file is correctly structured and compatible with QA4SM.
     </p>
-
-    <h4>Example of a User NetCDF File</h4>
     <p>
       Below is an example of how user NetCDF dataset might look when opened with 
       <a href="https://docs.xarray.dev/" target="_blank" rel="noopener noreferrer">xarray</a>:
     </p>
+
+    <p><strong>NetCDF file example:</strong></p>
+    
 
     <pre><code>&lt;xarray.Dataset&gt; Size: 58kB
 Dimensions:               (locations: 100, time: 10)
@@ -204,30 +218,59 @@ Attributes:
       <li><strong>&lt;LON&gt;</strong> → Longitude in degrees East (-180 to 180)</li>
     </ul>
 
-    <p><strong>Example:</strong></p>
+    <p><strong>CSV file name example:</strong></p>
     <pre><code>myDataset_gpi=000001_lat=38.887_lon=-101.043.csv</code></pre>
 
     <h4>File Format Requirements</h4>
     <ul>
-      <li>Must include a <strong>header row</strong> with column names <span class="highlight">(same for all files)</span>.</li>
+      <li>File must include a <strong>header row</strong> with column names <span class="highlight">(same for all files)</span>.</li>
       <li>The <strong>first column</strong> must contain timestamps (format parseable by 
         <a href="https://dateutil.readthedocs.io/en/stable/parser.html" target="_blank" rel="noopener noreferrer">Python dateutil</a>).
       </li>
-      <li>Include one or more <strong>data columns</strong> (e.g., soil moisture values).</li>
+      <li>File can include one or more <strong>data columns</strong> e.g., soil moisture values <span class="highlight">(same number of columns for all files)</span>.</li>
     </ul>
 
-    <p><strong>Example:</strong></p>
+    <p><strong>CSV file example:</strong></p>
     <pre><code>Time,SM
-2016-Jun-01 01:30:07,0.18278
-2016-Jun-02 00:51:39,0.2003
-2016-Jun-02 12:08:07,0.181
-2016-Jun-04 01:13:32,0.22323</code></pre>
+2016-06-01 01:30:07,0.18278
+2016-06-02 00:51:39,0.2003
+2016-06-02 12:08:07,0.181
+2016-06-04 01:13:32,0.22323</code></pre>
 
     <h4>Tip</h4>
     <p>Verify your CSV files locally before uploading using <a href="https://pandas.pydata.org/" target="_blank" rel="noopener noreferrer">pandas</a>:</p>
+    
+     <textarea id="copy-code" class="sr-only" aria-hidden="true" style="position:absolute;left:-9999px;">
+import pandas as pd
+df = pd.read_csv("myDataset_gpi=000001_lat=38.887_lon=-101.043.csv",
+index_col=0, parse_dates=True)
+    </textarea>
+
     <pre><code>import pandas as pd
-  df = pd.read_csv("myDataset_gpi=000001_lat=38.887_lon=-101.043.csv",
-  index_col=0, parse_dates=True)</code></pre>
+df = pd.read_csv("mydataset_gpi=0_lat=43.01_lon=2.47.csv",
+index_col=0, parse_dates=True)
+print(df)</code></pre>
+  <!-- Copy button -->
+    <a class="copy-btn" (click)="copy('copy-code')">
+        <i class="pi pi-fw pi-copy"></i> Copy
+    </a>
+
+    <h4>Metadata</h4>
+    <p>
+      Metadata for the data variables (column-names in the CSV files) e.g. units, long name, 
+      should be provided in an additional file with the name <strong>metadata.yml</strong>.
+      This should have a similar format to this example.
+    </p>
+    <p><strong>Metadata file example:</strong></p>
+    <pre><code>SM:
+  long_name: soil moisture
+  units: m^3/m^3
+  ⋮
+myvarnameX:
+  long_name: soil moisture x
+  units: m^3/m^3</code></pre>
+
+    <p>All CSV files and optionally the metadata file have to be in the same directory. This directory has to be uploaded as zip file.</p>
 
     <h4>Example Files</h4>
     <p>

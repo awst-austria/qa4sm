@@ -21,4 +21,12 @@ export class UserDataGuidelinesComponent2 implements OnInit {
   switchPage(page: string) {
     this.currentPage = page;
   }
+   copy(id: string) {
+    const el = document.getElementById(id) as HTMLTextAreaElement | null;
+    if (!el) return;
+    el.select();
+    el.setSelectionRange(0, el.value.length);
+    navigator.clipboard?.writeText(el.value);
+  }
+  
 }
