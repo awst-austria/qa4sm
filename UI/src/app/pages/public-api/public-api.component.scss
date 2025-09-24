@@ -56,4 +56,47 @@ pre.cli code .prompt {
 }
 
 
-    
+/* ------------------------------- */
+/* Tablet (601px – 900px)       */
+/* ------------------------------- */
+@media (max-width: 900px) and (min-width: 601px) {
+  pre.cli {
+    font-size: 0.9rem;
+    padding: 12px;
+  }
+  .main-container {
+    max-width: 95%;  /* use more width on tablets */
+  }
+}
+
+/* ------------------------------- */
+/* Very large screens (≥ 1400px)*/
+/* ------------------------------- */
+@media (min-width: 1400px) {
+  .main-container {
+    max-width: 1200px;
+    padding: 40px;
+  }
+
+  h2 { font-size: 2.2rem; }
+  h4 { font-size: 1.5rem; }
+
+  pre.cli {
+    font-size: 1.05rem; /* bump code size */
+    padding: 18px 24px;
+  }
+
+  .copy-btn {
+    font-size: 0.95rem;
+    padding: 6px 12px;
+  }
+}
+
+/* ------------------------------- */
+/*  Ultra-wide (≥ 1800px)        */
+/* ------------------------------- */
+@media (min-width: 1800px) {
+  .main-container {
+    max-width: 1400px;
+  }
+}    

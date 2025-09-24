@@ -89,10 +89,13 @@ export class NavigationBarComponent implements OnInit {
   userManualMenuItem: MenuItem = {label: 'User Manual', icon: 'pi pi-fw pi-book', url: '/api/user-manual', target: '_blank'}
   datasetMenuItem: MenuItem = {label: 'Datasets', icon: 'pi pi-fw pi-database', routerLink: ['datasets']};
   termsMenuItem: MenuItem = {label: 'Terms', icon: 'pi pi-fw pi-briefcase', routerLink: ['terms']};
+  customisePlotsMenuItem: MenuItem = {label: 'Custom Plots', icon: 'pi pi-fw pi-chart-line', routerLink: ['customise-plots']};
+  
   infoMenuItem: MenuItem = {
     label: 'Info', icon: 'pi pi-fw pi-info-circle', items: [
       this.helpMenuItem,
       this.userManualMenuItem,
+      this.customisePlotsMenuItem,
       this.datasetMenuItem,
       this.termsMenuItem,
     ]

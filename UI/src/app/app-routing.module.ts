@@ -26,6 +26,7 @@ import {UserDataGuidelinesComponent} from './pages/user-data-guidelines/user-dat
 import {ContactUsComponent} from './pages/contact-us/contact-us.component';
 import { PublicApiComponent } from './pages/public-api/public-api.component';
 import { JsonConfigComponent } from './pages/public-api/json-config/json-config.component';
+import { CustomisePlotsComponent } from './pages/customise-plots/customise-plots.component';
 
 export const routes: Routes = [
   {path: '', redirectTo: '/home', pathMatch: 'full'},
@@ -52,6 +53,7 @@ export const routes: Routes = [
   {path: 'contact-us', component: ContactUsComponent},
   {path: 'public-api', component: PublicApiComponent},
   {path: 'json-config', component: JsonConfigComponent},
+  {path: 'customise-plots', component: CustomisePlotsComponent},
   {path: '**', component: ErrorPageComponent}
 ];
 

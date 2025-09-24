@@ -125,14 +125,78 @@ code {
   margin-left: 0;
 }
 
-/* Responsive adjustments */
+/* ------------------------------- */
+/*  Mobile (≤ 600px)             */
+/* ------------------------------- */
 @media (max-width: 600px) {
+  .main-container {
+    padding: 12px;
+    font-size: 0.9rem;
+  }
+
   .upload-nav {
     flex-direction: column;
     align-items: center;
+    gap: 10px;
   }
 
   .upload-nav button {
     width: 80%;
+    font-size: 14px;
+    padding: 8px 16px;
+  }
+
+  pre {
+    font-size: 0.85rem;
+  }
+}
+
+/* ------------------------------- */
+/* Tablet (601px – 900px)       */
+/* ------------------------------- */
+@media (max-width: 900px) and (min-width: 601px) {
+  .main-container {
+    max-width: 95%; /* stretch more on tablets */
+  }
+
+  .upload-nav {
+    gap: 12px;
+  }
+
+  .upload-nav button {
+    font-size: 14px;
+    padding: 9px 18px;
+  }
+}
+
+/* ------------------------------- */
+/*   Large / wide screens ≥ 1400px*/
+/* ------------------------------- */
+@media (min-width: 1400px) {
+  .main-container {
+    max-width: 1200px;
+    padding: 40px;
+  }
+
+  h2 { font-size: 2.2rem; }
+  h4 { font-size: 1.5rem; }
+
+  .upload-nav button {
+    font-size: 16px;
+    padding: 12px 24px;
+  }
+
+  pre {
+    font-size: 1.05rem;
+    padding: 14px 20px;
+  }
+}
+
+/* ------------------------------- */
+/*   Ultra-wide ≥ 1800px          */
+/* ------------------------------- */
+@media (min-width: 1800px) {
+  .main-container {
+    max-width: 1400px;
   }
 }
