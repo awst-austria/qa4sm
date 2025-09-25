@@ -66,6 +66,7 @@ psutil==6.1.1
 psycopg2-binary==2.9.10
 pyarrow==19.0.0
 pycparser==2.22
+pygeogrids==0.5.3
 pygrib==2.1.6
 pykdtree==1.4.1
 pyparsing==3.2.1
@@ -80,9 +81,8 @@ pytest-django==4.10.0
 python-dateutil==2.9.0.post0
 pytz==2024.1
 pyyaml==6.0.2
-git+https://github.com/daberer/qa4sm-reader.git@02541722f09a2a13791adac7a3512cd5f58a716f #qa4sm-reader change back to correct reader v. 0.6.4
-git+https://github.com/daberer/pygeogrids.git@1c2735bed77198b7d1155984bc94336230eaf171 #pygeogrids change back to correct pygeogrids and order alphabetically
 qa4sm-preprocessing==0.6.1
+qa4sm-reader==0.11.5
 redis==5.2.0
 requests==2.32.4
 scipy==1.15.1

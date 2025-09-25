@@ -343,6 +343,8 @@ def encoded_comparisonPlots(
     encoded: str
         base64 encoding of the plot image
     """
+    plt.close('all')
+
     comparison = generate_comparison(
         validation_runs=validation_runs,
         extent=extent,
@@ -350,11 +352,14 @@ def encoded_comparisonPlots(
     )
     image = BytesIO()
 
+    plt.tight_layout()
     comparison.wrapper(
         method=plot_type,
         metric=metric
     )
-    plt.savefig(image, format='png')
+    plt.savefig(image, format='png', dpi=100)
+    plt.close('all')
+
     encoded = base64.b64encode(image.getvalue()).decode('utf-8')
 
     return encoded
