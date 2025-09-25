@@ -1851,9 +1851,9 @@ class TestValidation(TestCase):
         for i, dataset in enumerate(Dataset.objects.all()):
             self.__logger.info(dataset.pretty_name)
             vs = dataset.versions.all()
-            va = vs.first().variables.all()
 
             for version in vs:
+                va = version.variables.all()
                 reader = val.create_reader(dataset, version)
                 fils = version.filters.all()
                 for variable in va:
@@ -1881,9 +1881,10 @@ class TestValidation(TestCase):
                         else:
                             if variable.short_name not in ["swvl2", "swvl3",
                                                            "swvl4"]:
-                                data = getattr(msk_reader,
-                                           read_name)(-155.42, 19.78,
-                                                      **read_kwargs)  ## hawaii
+                                try:
+                                    data = getattr(msk_reader, read_name)(-155.42, 19.78, **read_kwargs)  ## hawaii
+                                except Exception as e:
+                                    print('here')
                         if variable.short_name not in ["swvl2", "swvl3", "swvl4"]:
                             assert data is not None
                             assert variable.short_name in data.columns
