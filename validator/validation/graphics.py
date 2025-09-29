@@ -343,8 +343,6 @@ def encoded_comparisonPlots(
     encoded: str
         base64 encoding of the plot image
     """
-    plt.close('all')
-
     comparison = generate_comparison(
         validation_runs=validation_runs,
         extent=extent,
@@ -352,13 +350,12 @@ def encoded_comparisonPlots(
     )
     image = BytesIO()
 
-    plt.tight_layout()
     comparison.wrapper(
         method=plot_type,
         metric=metric
     )
-    plt.savefig(image, format='png', dpi=100)
-    plt.close('all')
+    plt.tight_layout()
+    plt.savefig(image, format='png')
 
     encoded = base64.b64encode(image.getvalue()).decode('utf-8')
 
@@ -406,6 +403,7 @@ def get_extent_image(
             intersection=get_intersection,
             plot_points=True,
         )
+        plt.tight_layout()
         plt.savefig(image, format='png')
         if encoded:
             encoded = base64.encodebytes(image.getvalue()).decode('utf-8')
