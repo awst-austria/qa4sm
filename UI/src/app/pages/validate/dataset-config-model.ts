@@ -11,6 +11,8 @@ export const SMOS_RFI_FILTER_ID = 34;
 export const SMOS_CHI2_FILTER_ID = 35;
 export const SMAP_L3_V9_VWC_FILTER_ID = 49;
 export const SMAP_L3_STATIC_WATER_FILTER_ID = 50;
+export const FIL_ASCAT_SUBSURFACE_SCAT_PROB_ID = 53;
+export const FIL_ASCAT_SSM_SENSITIVITY_ID = 54;
 
 export class DatasetConfigModel {
 
@@ -25,6 +27,8 @@ export class DatasetConfigModel {
               public scalingReference$: BehaviorSubject<boolean>,
               public vegetationWaterFilter$: BehaviorSubject<FilterModel>,
               public staticWaterFilter$: BehaviorSubject<FilterModel>,
+              public filAscatsspFilter$: BehaviorSubject<FilterModel>,
+              public filAscatSsmSensitivityFilter$: BehaviorSubject<FilterModel>,
               public highlighted$?: BehaviorSubject<boolean>,
 
   ) {
@@ -64,6 +68,14 @@ export class DatasetConfigModel {
 
     if (this.staticWaterFilter$.value != null) {
       parameterisedFilters.push({id: SMAP_L3_STATIC_WATER_FILTER_ID, parameters: this.staticWaterFilter$.value.parameters$.value});
+    }
+
+    if (this.filAscatSsmSensitivityFilter$.value != null) {
+      parameterisedFilters.push({id: FIL_ASCAT_SSM_SENSITIVITY_ID, parameters: this.filAscatSsmSensitivityFilter$.value.parameters$.value});
+    }
+
+    if (this.filAscatsspFilter$.value != null) {
+      parameterisedFilters.push({id: FIL_ASCAT_SUBSURFACE_SCAT_PROB_ID, parameters: this.filAscatsspFilter$.value.parameters$.value});
     }
 
     return {
