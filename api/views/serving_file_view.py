@@ -1,5 +1,4 @@
 import base64
-import csv
 import os
 from collections import OrderedDict
 
@@ -83,6 +82,17 @@ def get_metric_names_and_associated_files(request):
     validation = get_object_or_404(ValidationRun, pk=validation_id)
     ref_dataset_name = DatasetConfiguration.objects.get(
         id=validation.spatial_reference_configuration_id).dataset.pretty_name
+
+    # Get all dataset configurations with spatial reference first, then ordered by _order
+    dataset_configs = DatasetConfiguration.objects.filter(
+        validation_id=validation.id
+    ).order_by('-is_spatial_reference', '_order')
+
+    # Create dataset_names with custom ordering: spatial reference first (index 0), then by _order
+    dataset_names = [
+        f"{i}-{config.dataset.short_name}"
+        for i, config in enumerate(dataset_configs)
+    ]
     bulk_prefix = ''
     seasonal_prefix = ''
     seasonal_files_path = ''
@@ -131,7 +141,7 @@ def get_metric_names_and_associated_files(request):
     except FileNotFoundError as e:
         return JsonResponse({'message': str(e)}, status=404)
 
-    pairs, triples, metrics, ref0_config = get_dataset_combis_and_metrics_from_files(validation)
+    pairs, triples, metrics, ref0_config, geotiff_metrics, geotiff_var_list = get_dataset_combis_and_metrics_from_files(validation, dataset_names)
     combis = OrderedDict(sorted({**pairs, **triples}.items()))
     metrics = OrderedDict(sorted([(v, k) for k, v in metrics.items()]))
     response = []
@@ -186,6 +196,8 @@ def get_metric_names_and_associated_files(request):
                        'overview_files': overview_files,
                        'metadata_files': [],
                        'comparison_boxplot': seasonal_metric_file,
+                       'geotiff_metrics': geotiff_metrics,
+                       'geotiff_var_list': geotiff_var_list,
                        'datasets': datasets,
                        }
         response.append(metric_dict)
@@ -291,24 +303,3 @@ def get_ismn_list_file(request):
             return response
     else:
         return HttpResponse("File not found", status=404)
-
-
-@api_view(['GET'])
-@permission_classes([IsAuthenticated])
-def get_tiff_layers(request, result_uuid):
-    # here put the all logic fetching and returning layers
-    #  I guess this is the code that does that:
-    # def available_layers():
-    #     """Return information about all available layers"""
-    #     layers = get_dataset_info()
-    #     return jsonify({
-    #         "layers": layers,
-    #         "currentIndex": current_geotiff_index
-    #     })
-
-    validation = get_object_or_404(ValidationRun, pk=result_uuid)
-    # tiff path can be get based on the result file path, just add proper directories and proper extension of the file
-    # check for missining files => for old validations and when sth goes wrong there will be no tiffs
-    # return layers in proper format
-
-    return JsonResponse({'message': 'ok'}, status=200)

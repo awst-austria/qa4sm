@@ -22,7 +22,7 @@ from pathlib import PosixPath
 cconfig['data_dir'] = path.join(settings.BASE_DIR, 'cartopy')
 
 from validator.validation.globals import OUTPUT_FOLDER, METRICS as READER_METRICS, METRIC_TEMPLATE, TC_METRICS, \
-    TC_METRIC_TEMPLATE, DEFAULT_TSW, STABILITY_METRICS
+    TC_METRIC_TEMPLATE, DEFAULT_TSW, STABILITY_METRICS, QR_METRIC_TEMPLATE
 import os
 from io import BytesIO
 import base64
@@ -85,7 +85,7 @@ def generate_all_graphs(validation_run, temporal_sub_windows: List[str], outfold
                         to_be_deleted=[x for x in temporal_sub_windows if x != DEFAULT_TSW])
 
 
-def get_dataset_combis_and_metrics_from_files(validation_run):
+def get_dataset_combis_and_metrics_from_files(validation_run, dataset_names):
     """
     Go through plots of validation run and detect the dataset names and ids.
     Create combinations of id-REF_and_id-SAT to show the plots on the results
@@ -95,6 +95,8 @@ def get_dataset_combis_and_metrics_from_files(validation_run):
     ----------
     validation_run
         Validation run object
+    dataset_names : list
+        List of dataset names where first element is ref, second is ds
 
     Returns
     -------
@@ -106,8 +108,12 @@ def get_dataset_combis_and_metrics_from_files(validation_run):
         All metrics that are found
     ref0_config : bool or None
         True if the ref has id 0 (sorted ids).
+    geotiff_metrics : dict
+        Transformed metrics for GeoTIFF generation
+    geotiff_var_list : list
+        List of GeoTIFF variable names
     """
-
+    N_OBS_METRIC = "n_obs"
     run_dir = path.join(OUTPUT_FOLDER, str(validation_run.id))
     metric_template = METRIC_TEMPLATE[0]
 
@@ -188,13 +194,45 @@ def get_dataset_combis_and_metrics_from_files(validation_run):
                     if triple not in triples.keys():
                         triples[triple] = pretty_triple
 
+        if dataset_names and len(dataset_names) > 1:
+            geotiff_metrics = {}
+            geotiff_var_list = []
+
+            # Initialize dictionary with metric keys
+            for metric_key in metrics.keys():
+                if metric_key == "n_obs":
+                    geotiff_metrics[metric_key] = [N_OBS_METRIC]
+                else:
+                    geotiff_metrics[metric_key] = []
+
+            # Create all combinations where earlier elements are always ds1
+            for i in range(len(dataset_names)):
+                for j in range(i + 1, len(dataset_names)):
+                    ds1 = dataset_names[i]
+                    ds2 = dataset_names[j]
+
+                    # Add formatted metrics to their respective lists
+                    for metric_key in metrics.keys():
+                        if metric_key != "n_obs":
+                            formatted_metric = f"{metric_key}{QR_METRIC_TEMPLATE.format(ds1=ds1, ds2=ds2)}"
+                            geotiff_metrics[metric_key].append(formatted_metric)
+                            geotiff_var_list.append(formatted_metric)
+
+            # Add n_obs to the list if it exists
+            if "n_obs" in geotiff_metrics:
+                geotiff_var_list.append(N_OBS_METRIC)
+
+    # Remove duplicates from list while preserving order
+    geotiff_var_list = list(dict.fromkeys(geotiff_var_list))
+
+
     # import logging
     # __logger = logging.getLogger(__name__)
     # __logger.debug(f"Pairs: {pairs}")
     # __logger.debug(f"Triples: {triples}")
     # __logger.debug(f"Metrics: {metrics}")
 
-    return pairs, triples, metrics, ref0_config
+    return pairs, triples, metrics, ref0_config, geotiff_metrics, geotiff_var_list
 
 
 def get_inspection_table(validation_run):

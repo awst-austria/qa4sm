@@ -14,6 +14,8 @@ export interface MetricsPlotsDto {
   metadata_files: string[],
   comparison_boxplot: string[],
   datasets: string[],
+  geotiff_metrics: { [key: string]: string },
+  geotiff_var_list: string[],
   boxplotFiles?: Observable<PlotDto[]>,
   overviewFiles?: Observable<PlotDto[]>
   comparisonFile?: Observable<PlotDto[] | null>

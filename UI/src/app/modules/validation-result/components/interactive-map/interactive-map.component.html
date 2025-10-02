@@ -1,4 +1,78 @@
-<div id="tooltip" class="ol-tooltip">
-  <div id="tooltip-content"></div>
+<div class="my-4"></div>
+
+<div class="flex flex-row w-12 gap-4 mb-4">
+  <!-- First dropdown - takes 50% width on large screens -->
+  <div class="flex flex-column lg:w-6 w-10">
+    <span class="p-float-label">
+      <p-dropdown id="metricSelector-map"
+                  [options]="metrics"
+                  [(ngModel)]="selectedMetric"
+                  optionLabel="metric_pretty_name"
+                  (onChange)="onMetricChange($event)"
+                  [style]="{'width': '100%'}">
+      </p-dropdown>
+      <label for="metricSelector-map">Select map metric</label>
+    </span>
+  </div>
+
+  <!-- Second dropdown - takes 50% width on large screens -->
+  <div class="flex flex-column lg:w-6 w-10">
+    <span class="p-float-label">
+      <p-dropdown id="layer-select" 
+                  [options]="getAvailableLayersForCurrentMetric()"
+                  [(ngModel)]="selectedLayerForMetric[selectedMetric?.metric_query_name]" 
+                  optionLabel="name"
+                  [style]="{'width':'100%'}" 
+                  (onChange)="onLayerSelectionChange(selectedMetric?.metric_query_name, $event.value)"
+                  [disabled]="getAvailableLayersForCurrentMetric()?.length <= 1">
+      </p-dropdown>
+      <label for="layer-select">Select Layer</label>
+    </span>
+
+    <div *ngIf="!getAvailableLayersForCurrentMetric()?.length" class="p-field-description mt-2">
+      No layers available for selection.
+    </div>
+  </div>
 </div>
-<div class="map-container" style="width: 100%;height: 400px" id="map"></div>
+
+<div class="my-4"></div>
+
+<hr class="featurette-divider">
+<div class="my-4"></div>
+
+<!-- Simple Enhanced Map Container -->
+<div class="map-wrapper">
+  <div class="map-container" [class.map-loading]="isLoading" style="width: 100%;height: 600px" id="imap">
+
+    <!-- Loading overlay -->
+    <div *ngIf="isLoading" class="map-loading-overlay">
+      <div class="loading-spinner"></div>
+      <span class="loading-text">Loading map...</span>
+    </div>
+
+    <!-- Reset button -->
+    <button type="button" class="map-reset-btn" (click)="resetMapView()" title="Reset View">
+      <i class="pi pi-refresh"></i>
+    </button>
+
+    <div *ngIf="colorbarData && colorbarData.is_categorical === false" class="colorbar-container">
+      <div class="colorbar-wrapper">
+        <div class="colorbar-gradient" [style.background]="colorbarData.gradient">
+        </div>
+        <div class="colorbar-labels">
+          <span class="colorbar-min">{{ colorbarData.vmin | number:'1.1-1' }}</span>
+          <span class="colorbar-title">{{ colorbarData.metric_name }}</span>
+          <span class="colorbar-max">{{ colorbarData.vmax | number:'1.1-1' }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Map Footer with Attribution -->
+  <div class="map-footer">
+    <small>
+      <i class="pi pi-map"></i>
+      © OpenStreetMap contributors
+    </small>
+  </div>
+</div>

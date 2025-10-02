@@ -107,6 +107,10 @@ def set_outfile(validation_run, run_dir):
     if outfile is not None:
         outfile = regex_sub('/?' + OUTPUT_FOLDER + '/?', '', outfile)
         validation_run.output_file.name = outfile
+        
+        # Generate geotiff_path: "hash/filename.nc" -> "hash/DEFAULT_TSW/filename.tif"
+        base_name = os.path.splitext(outfile)[0] + '.tif'
+        validation_run.geotiff_path = os.path.join(os.path.dirname(outfile), DEFAULT_TSW, os.path.basename(base_name))
 
 
 def save_validation_config(validation_run):

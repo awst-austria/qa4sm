@@ -17,6 +17,8 @@ from api.views.validation_config_view import (
     download_result_file_with_token, list_my_validation_runs_with_token,
 )
 from api.views.uptime_view import uptime_ping, get_uptime
+from api.views.interactive_map_view import get_tile, get_pixel_value, get_validation_layer_metadata, \
+    get_layer_range
 from api.views.comparison_view import get_comparison_table, get_comparison_plots_for_metric, \
     download_comparison_table, get_comparison_metrics, get_spatial_extent
 from api.views.user_view import signup_post, user_update, user_delete, password_update, verify_email, request_api_token, get_api_token
@@ -146,5 +148,8 @@ urlpatterns = [
     path('verify-email/<int:user_id>/<str:token>/', verify_email, name='verify_email'),
     path('download-result-file-with-token/<uuid:validation_id>/<str:file_type>', download_result_file_with_token, name='Download result file with token'),
     path('my-validation-runs-with-token', list_my_validation_runs_with_token, name='My validation runs with token'),
-    path('get-tiff-layers/<uuid:result_uuid>/', get_tiff_layers, name='tiff-file')
+    path('<uuid:validation_id>/pixel-value/', get_pixel_value, name='pixel-value'),
+    path('<uuid:validation_id>/tiles/<str:metric_name>/<int:index>/<int:z>/<int:x>/<int:y>.png', get_tile, name='get-tile'),
+    path('<uuid:validation_id>/metadata/', get_validation_layer_metadata, name='validation_metadata'),
+    path('<uuid:validation_id>/range/<str:metric_name>/<int:index>/', get_layer_range, name='layer_range'),
 ]

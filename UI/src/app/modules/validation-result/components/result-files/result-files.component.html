@@ -198,6 +198,16 @@
         </div>
       </div>
     </div>
-    <qa-interactive-map [validationId]="validation.id"/>
   </p-panel>
+<p-panel>
+  <ng-template pTemplate="header">
+    <div class="text-center" style="width: 95%">
+      <h4 class="my-0 py-0 font-weight-normal">Interactive Map</h4>
+    </div>
+  </ng-template>
+
+  <qa-interactive-map 
+    [validationId]="validation.id">
+  </qa-interactive-map>
+</p-panel>
 </div>

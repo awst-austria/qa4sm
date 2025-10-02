@@ -109,6 +109,7 @@ class ValidationRun(models.Model):
     temporal_stability = models.BooleanField(default=False)
 
     output_file = models.FileField(null=True, max_length=250, blank=True)
+    geotiff_path = models.CharField(max_length=350, null=True, blank=True)
 
     is_archived = models.BooleanField(default=False)
     last_extended = models.DateTimeField(null=True, blank=True)

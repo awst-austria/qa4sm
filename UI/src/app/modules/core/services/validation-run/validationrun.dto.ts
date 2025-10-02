@@ -45,7 +45,8 @@ export class ValidationrunDto {
               public intra_annual_type: string | null,
               public comparison_label?: string,
               public contains_user_data?: boolean,
-              public all_files_exist?: boolean) {
+              public all_files_exist?: boolean,
+              public geotiff_path?: string) {
   }
 }
 

@@ -237,3 +237,7 @@ MAX_NUM_DS_PER_VAL_RUN = qr_globals.MAX_NUM_DS_PER_VAL_RUN
 
 ISMN_LIST_FILE_NAME = 'ismn_station_list.csv'
 GEOJSON_FILE_NAME = 'ismn_sensors.json'
+
+QR_METRIC_TEMPLATE = qr_globals.METRIC_TEMPLATE
+QR_COLORMAPS = qr_globals._colormaps
+QR_STATUS_DICT = qr_globals.status
