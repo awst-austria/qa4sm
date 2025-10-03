@@ -12,7 +12,9 @@ import {
   SMAP_L3_STATIC_WATER_FILTER_ID,
   SMAP_L3_V9_VWC_FILTER_ID,
   SMOS_CHI2_FILTER_ID,
-  SMOS_RFI_FILTER_ID
+  SMOS_RFI_FILTER_ID,
+  FIL_ASCAT_SUBSURFACE_SCAT_PROB_ID,
+  FIL_ASCAT_SSM_SENSITIVITY_ID
 } from './dataset-config-model';
 import { FilterService } from '../../modules/core/services/filter/filter.service';
 import { FilterModel } from '../../modules/filter/components/basic-filter/filter-model';
@@ -237,6 +239,8 @@ export class ValidateComponent implements OnInit, AfterViewInit {
         new BehaviorSubject(false),
         new BehaviorSubject(null),
         new BehaviorSubject(null),
+        new BehaviorSubject(null),
+        new BehaviorSubject(null),
         new BehaviorSubject(false)
       );
       this.validationModel.datasetConfigurations.push(newDatasetConfigModel);
@@ -269,8 +273,14 @@ export class ValidateComponent implements OnInit, AfterViewInit {
                 if (paramFilter.id == SMAP_L3_V9_VWC_FILTER_ID){
                   datasetConfigModel.vegetationWaterFilter$.value.parameters$.next(paramFilter.parameters);
                 }
-                if (paramFilter.id == SMAP_L3_STATIC_WATER_FILTER_ID){
+                if (paramFilter.id == SMAP_L3_STATIC_WATER_FILTER_ID) {
                   datasetConfigModel.staticWaterFilter$.value.parameters$.next(paramFilter.parameters);
+                }
+                if (paramFilter.id == FIL_ASCAT_SSM_SENSITIVITY_ID){
+                  datasetConfigModel.filAscatSsmSensitivityFilter$.value.parameters$.next(paramFilter.parameters);
+                }
+                if (paramFilter.id == FIL_ASCAT_SUBSURFACE_SCAT_PROB_ID){
+                  datasetConfigModel.filAscatsspFilter$.value.parameters$.next(paramFilter.parameters);
                 }
 
               });
@@ -413,6 +423,8 @@ export class ValidateComponent implements OnInit, AfterViewInit {
       new BehaviorSubject(false),
       new BehaviorSubject(null),
       new BehaviorSubject(null),
+      new BehaviorSubject(null),
+      new BehaviorSubject(null),
       new BehaviorSubject(false)
     );
     targetArray.push(model);
@@ -496,6 +508,8 @@ export class ValidateComponent implements OnInit, AfterViewInit {
     model.smosChi2Filter$.next(null);
     model.vegetationWaterFilter$.next(null);
     model.staticWaterFilter$.next(null);
+    model.filAscatsspFilter$.next(null);
+    model.filAscatSsmSensitivityFilter$.next(null);
     filters.forEach(filter => {
       if (filter.parameterised) {
         if (filter.id === ISMN_NETWORK_FILTER_ID) {
@@ -573,6 +587,38 @@ export class ValidateComponent implements OnInit, AfterViewInit {
               new BehaviorSubject<string>(filter.default_parameter)));
           } else {
             model.ismnDepthFilter$ = new BehaviorSubject<FilterModel>(new FilterModel(
+              filter,
+              false,
+              false,
+              new BehaviorSubject<string>(filter.default_parameter))
+            );
+          }
+        }
+        else if (filter.id === FIL_ASCAT_SSM_SENSITIVITY_ID) {
+          if (model.filAscatSsmSensitivityFilter$) {
+            model.filAscatSsmSensitivityFilter$.next(new FilterModel(
+              filter,
+              false,
+              false,
+              new BehaviorSubject<string>(filter.default_parameter)));
+          } else {
+            model.filAscatSsmSensitivityFilter$ = new BehaviorSubject<FilterModel>(new FilterModel(
+              filter,
+              false,
+              false,
+              new BehaviorSubject<string>(filter.default_parameter))
+            );
+          }
+        }
+        else if (filter.id === FIL_ASCAT_SUBSURFACE_SCAT_PROB_ID) {
+          if (model.filAscatsspFilter$) {
+            model.filAscatsspFilter$.next(new FilterModel(
+              filter,
+              false,
+              false,
+              new BehaviorSubject<string>(filter.default_parameter)));
+          } else {
+            model.filAscatsspFilter$ = new BehaviorSubject<FilterModel>(new FilterModel(
               filter,
               false,
               false,

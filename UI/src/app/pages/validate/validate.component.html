@@ -77,6 +77,17 @@
                                        [filterModel$]="validationModel.datasetConfigurations[datasetIdx].staticWaterFilter$"
                                        [minThreshold]="0" [increment]="0.05" [maxThreshold]="1.0" [units]="' [-]'" />
 
+                  <qa-threshold-filter *ngIf="validationModel.datasetConfigurations[datasetIdx].filAscatSsmSensitivityFilter$|async"
+                                       [datasetModel]="validationModel.datasetConfigurations[datasetIdx].datasetModel"
+                                       [filterModel$]="validationModel.datasetConfigurations[datasetIdx].filAscatSsmSensitivityFilter$"
+                                       [minThreshold]="0" [increment]="0.01" [maxThreshold]="200" [units]="' [dB]'" />
+
+                  <qa-threshold-filter *ngIf="validationModel.datasetConfigurations[datasetIdx].filAscatsspFilter$|async"
+                                       [datasetModel]="validationModel.datasetConfigurations[datasetIdx].datasetModel"
+                                       [filterModel$]="validationModel.datasetConfigurations[datasetIdx].filAscatsspFilter$"
+                                       [minThreshold]="0" [increment]="0.01" [maxThreshold]="100" [units]="' [%]'" />
+
+
                   <div *ngIf="validationModel.datasetConfigurations[datasetIdx].ismnNetworkFilter$|async">
                     <qa-ismn-network-filter
                       (networkSelectionChanged)="onIsmnNetworkSelectionChange($event)"

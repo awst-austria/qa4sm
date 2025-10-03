@@ -1825,6 +1825,9 @@ class TestValidation(TestCase):
                 reader = val.create_reader(dataset, version)
                 fils = version.filters.all()
                 for variable in va:
+                    if version.short_name == "ASCAT_H121":
+                        variable.short_name = "surface_soil_moisture"
+                        variable.pretty_name = "ASCAT_ssm"
                     for data_filter in fils:
                         self.__logger.debug(
                             "Testing {} version {} variable {} filter {}".
