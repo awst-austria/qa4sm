@@ -300,7 +300,7 @@ export class ValidateComponent implements OnInit, AfterViewInit {
       newDatasetConfigModel.temporalReference$.next(datasetConfig.is_temporal_reference);
       newDatasetConfigModel.scalingReference$.next(datasetConfig.is_scaling_reference);
 
-      this.datasetService.getDatasetById(datasetConfig.dataset_id)
+      this.datasetService.getDatasetById(datasetConfig.dataset_id)  
         .pipe(
           catchError(() => EMPTY)
         )
@@ -511,7 +511,6 @@ export class ValidateComponent implements OnInit, AfterViewInit {
     model.filAscatsspFilter$.next(null);
     model.filAscatSsmSensitivityFilter$.next(null);
     filters.forEach(filter => {
-      console.log(filter);
       if (filter.parameterised) {
         if (filter.id === ISMN_NETWORK_FILTER_ID) {
           model.ismnNetworkFilter$.next(new FilterModel(

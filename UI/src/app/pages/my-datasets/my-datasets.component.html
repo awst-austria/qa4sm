@@ -29,7 +29,7 @@
 
     <hr class="featurette-divider">
     <div class="center">
-      <h2>Uploaded data sets</h2>
+      <h2>Uploaded datasets</h2>
     </div>
     <div *ngIf="(userDatasets$ | async) as userDatasetList">
       <div *ngIf="(dataManagementGroups$ | async) as dataManagementGroups">
@@ -65,7 +65,7 @@
                 </li>
               </ul>
 
-              <span style="" (click)="toggleReadMore()" class="readMoreOrLess pi pi-arrow-up"> Read less</span>
+              <span (click)="toggleReadMore()" class="readMoreOrLess pi pi-arrow-up"> Read less</span>
             </div>
 
           </div>

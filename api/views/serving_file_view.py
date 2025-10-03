@@ -10,7 +10,7 @@ from django.shortcuts import get_object_or_404
 
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny, IsAuthenticated
-from validator.models import ValidationRun, DatasetConfiguration, Dataset, UserManual
+from validator.models import ValidationRun, DatasetConfiguration, Dataset
 
 import mimetypes
 from wsgiref.util import FileWrapper
@@ -258,11 +258,24 @@ def get_summary_statistics(request):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_user_manual(request):
-    file = get_object_or_404(UserManual, id=1)
-    with open(file.file.path, 'rb') as pdf:
-        response = HttpResponse(pdf.read(), content_type='application/pdf')
-        response['Content-Disposition'] = f'filename={file.file}'
-        return response
+    # Read from settings (string path). Support relative paths by resolving against BASE_DIR.
+    manual_path = getattr(settings, "USER_MANUAL_PATH", "")
+    if manual_path and not os.path.isabs(manual_path):
+        manual_path = os.path.abspath(os.path.join(settings.BASE_DIR, manual_path))
+
+    if not manual_path or not os.path.isfile(manual_path):
+        return HttpResponse('User manual not found', status=404)
+
+    try:
+        file_wrapper = FileWrapper(open(manual_path, 'rb'))
+    except FileNotFoundError:
+        return HttpResponse('User manual not found', status=404)
+
+    file_mimetype, _ = mimetypes.guess_type(manual_path)
+    response = HttpResponse(file_wrapper, content_type=file_mimetype or 'application/pdf')
+    # inline in the browser; use 'attachment;' to force download
+    response['Content-Disposition'] = f'inline; filename="{os.path.basename(manual_path)}"'
+    return response
 
 
 @api_view(['GET'])

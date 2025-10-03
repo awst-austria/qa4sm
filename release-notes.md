@@ -1,4 +1,19 @@
-QA$SM v3.2.1 - Release notes 2025-07-28
+QA4SM v3.3.0 - Release notes 2025-09-29
+======================================================
+# Updates
+1. New ASCAT version H121
+2. User manual model discarded and PDF added to the repository instead
+
+# Fixes
+1. Comparison module re-introduced
+
+# New features
+1. Additional format check with improved feedback for user uploads
+2. Improved documentation for upload and advanced plotting
+3. Basic public API with documentation to use the service via CLI
+4. Added is_scattered_data to the validator dataset model
+
+QA4SM v3.2.1 - Release notes 2025-07-28
 ======================================================
 # Updates
 New dataset versions: 
@@ -9,7 +24,7 @@ ESA_CCI_RZSM: New rootzone soilmoisture product, time until 2024-12-31,
 ERA5, ERA5_LAND: New layers swvl1-4, stl1-4, 
 GLDAS: time extension to 2024-12-31
 
-QA$SM v3.2.0 - Release notes 2025-06-19
+QA4SM v3.2.0 - Release notes 2025-06-19
 ======================================================
 # Updates
 1. Added new dataset versions ( ESA_CCI_SM_(active, passive, combinded) V9.2 and ESA_CCI_RZSM V9.2)

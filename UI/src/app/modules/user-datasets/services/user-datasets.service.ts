@@ -1,12 +1,12 @@
-import {Injectable} from '@angular/core';
-import {BehaviorSubject, Observable} from 'rxjs';
-import {HttpClient, HttpHeaders, HttpParams} from '@angular/common/http';
-import {environment} from '../../../../environments/environment';
-import {UserDataFileDto} from './user-data-file.dto';
-import {DataManagementGroupsDto} from './data-management-groups.dto';
-import {saveAs} from 'file-saver-es';
-import {HttpErrorService} from '../../core/services/global/http-error.service';
-import {catchError} from 'rxjs/operators';
+import { Injectable } from '@angular/core';
+import { BehaviorSubject, Observable, throwError } from 'rxjs';
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
+import { environment } from '../../../../environments/environment';
+import { UserDataFileDto } from './user-data-file.dto';
+import { DataManagementGroupsDto } from './data-management-groups.dto';
+import { saveAs } from 'file-saver-es';
+import { HttpErrorService } from '../../core/services/global/http-error.service';
+import { catchError } from 'rxjs/operators';
 
 const urlPrefix = environment.API_URL + 'api';
 const uploadUserDataUrl: string = urlPrefix + '/upload-user-data';
@@ -21,7 +21,7 @@ const getISMNListUrl: string = urlPrefix + '/get-ismn-list-file';
 
 
 const csrfToken = '{{csrf_token}}';
-const headers = new HttpHeaders({'X-CSRFToken': csrfToken});
+const headers = new HttpHeaders({ 'X-CSRFToken': csrfToken });
 
 @Injectable({
   providedIn: 'root'
@@ -35,73 +35,97 @@ export class UserDatasetsService {
   doOpenSharingDataWindow = this.openSharingDataWindow.asObservable();
 
   constructor(private httpClient: HttpClient,
-              private httpError: HttpErrorService) { }
+    private httpError: HttpErrorService) { }
 
   userFileUpload(name: string, file: Blob, fileName: string, metadata: {}): Observable<any> {
     const formData = new FormData();
     formData.append(name, file, fileName);
-    const uploadUrl = uploadUserDataUrl  + '/' + fileName + '/';
-    const fileHeaders = new HttpHeaders({'X-CSRFToken': csrfToken, fileMetadata: JSON.stringify(metadata)});
+    const uploadUrl = uploadUserDataUrl + '/' + fileName + '/';
+    const fileHeaders = new HttpHeaders({ 'X-CSRFToken': csrfToken, fileMetadata: JSON.stringify(metadata) });
     return this.httpClient.post(uploadUrl, formData.get(name),
-      {headers: fileHeaders, reportProgress: true, observe: 'events', responseType: 'json'})
+      { headers: fileHeaders, reportProgress: true, observe: 'events', responseType: 'json' })
       .pipe(
-        catchError(err => this.httpError.handleError(err))
-      );
+        catchError((err: any) => {
+        // If server returned our unified shape: { success:false, error:"..." }
+        if (err?.error && typeof err.error === 'object' && typeof err.error.error === 'string') {
+          return throwError(() => ({
+            status: err.status,
+            errorMessage: {
+            header: 'Upload Error',
+            message: err.error.error},
+            form: undefined
+          }));
+        }
+
+      // Old path: plain string from server
+        if (typeof err?.error === 'string') {
+          return throwError(() => ({
+            status: err.status,
+            errorMessage: {
+              header: 'Upload Error',
+              message: err.error},
+            form: undefined
+          }));
+        }
+        // Global handler
+        return this.httpError.handleError(err);
+      })
+    );
   }
 
-  getUserDataList(): Observable<UserDataFileDto[]>{
+  getUserDataList(): Observable<UserDataFileDto[]> {
     return this.httpClient.get<UserDataFileDto[]>(userDataListUrl)
       .pipe(
         catchError(err => this.httpError.handleError(err))
       );
   }
 
-  getUserDataFileById(fileId: string): Observable<UserDataFileDto>{
-    const userDataFileUrlWithId = userDataFileUrl + '/'  + fileId + '/';
+  getUserDataFileById(fileId: string): Observable<UserDataFileDto> {
+    const userDataFileUrlWithId = userDataFileUrl + '/' + fileId + '/';
     return this.httpClient.get<UserDataFileDto>(userDataFileUrlWithId)
       .pipe(
         catchError(err => this.httpError.handleError(err))
       );
   }
 
-  deleteUserData(dataFileId: string): Observable<any>{
+  deleteUserData(dataFileId: string): Observable<any> {
     const deleteUrl = userDataDeleteUrl + '/' + dataFileId + '/';
-    return this.httpClient.delete(deleteUrl, {headers})
+    return this.httpClient.delete(deleteUrl, { headers })
       .pipe(
         catchError(err => this.httpError.handleError(err, ''))
       );
   }
 
-  deleteUserDataFileOnly(dataFileId: string): Observable<any>{
+  deleteUserDataFileOnly(dataFileId: string): Observable<any> {
     const deleteUrl = userDeleteFileOnlyUrl + '/' + dataFileId + '/';
-    return this.httpClient.delete(deleteUrl, {headers})
+    return this.httpClient.delete(deleteUrl, { headers })
       .pipe(
         catchError(err => this.httpError.handleError(err))
       );
   }
 
 
-  updateMetadata(fieldName: string, fieldValue: string, dataFileId: string): Observable<any>{
+  updateMetadata(fieldName: string, fieldValue: string, dataFileId: string): Observable<any> {
     const updateUrl = updateMetadataUrl + '/' + dataFileId + '/';
-    return this.httpClient.put(updateUrl, {field_name: fieldName, field_value: fieldValue})
+    return this.httpClient.put(updateUrl, { field_name: fieldName, field_value: fieldValue })
       .pipe(
         catchError(err => this.httpError.handleError(err))
       );
   }
 
-  getDataManagementGroups(ids=[]): Observable<DataManagementGroupsDto[]>{
+  getDataManagementGroups(ids = []): Observable<DataManagementGroupsDto[]> {
     let params = new HttpParams();
     ids.forEach((id) => {
       params = params.append('id', id)
     });
-    return this.httpClient.get<DataManagementGroupsDto[]>(dataManagementGroupsUrl, {params})
+    return this.httpClient.get<DataManagementGroupsDto[]>(dataManagementGroupsUrl, { params })
       .pipe(
         catchError(err => this.httpError.handleError(err))
       );
   }
 
-  manageDataInManagementGroup(group_id: number, data_id: string, action: string): Observable<any>{
-    return this.httpClient.put<any>(manageDataInGroupUrl, {group_id, data_id, action})
+  manageDataInManagementGroup(group_id: number, data_id: string, action: string): Observable<any> {
+    return this.httpClient.put<any>(manageDataInGroupUrl, { group_id, data_id, action })
       .pipe(
         catchError(err => this.httpError.handleError(err))
       )
@@ -125,7 +149,7 @@ export class UserDatasetsService {
     return `${Math.round(properSize * 10) / 10} ${units}`;
   }
 
-  getISMNList(): void{
+  getISMNList(): void {
     saveAs(getISMNListUrl);
   }
 

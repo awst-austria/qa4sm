@@ -240,8 +240,7 @@ class TestValidation(TestCase):
         # check netcdf output
         length = -1
         num_vars = -1
-        with ncDataset(run.output_file.path,
-                             mode='r') as ds:  #$$
+        with ncDataset(run.output_file.path, mode='r') as ds:  #$$
             assert ds.qa4sm_version == settings.APP_VERSION
             assert ds.qa4sm_env_url == settings.ENV_FILE_URL_TEMPLATE.format(
                 settings.APP_VERSION)
@@ -262,8 +261,11 @@ class TestValidation(TestCase):
                     #TODO: this is a bit of a hack, we should find a better way to do handle these specific cases
 
                     self_combination_pattern = r'^(.*?_)([^_]+)(_between_\2_and_.*)$'
-                    metric_vars = [tcmetric_var for tcmetric_var in metric_vars
-                                   if not regex_match(self_combination_pattern, tcmetric_var.name)]
+                    metric_vars = [
+                        tcmetric_var
+                        for tcmetric_var in metric_vars if not regex_match(
+                            self_combination_pattern, tcmetric_var.name)
+                    ]
 
                 else:
                     metric_vars = ds.get_variables_by_attributes(
@@ -421,7 +423,6 @@ class TestValidation(TestCase):
 
             assert ds.val_scaling_method == run.scaling_method, ' Wrong validation config attribute. [scaling_method]'
 
-
         # check zipfile of graphics
         zipfile = os.path.join(outdir, 'graphs.zip')
         assert os.path.isfile(zipfile)
@@ -463,11 +464,12 @@ class TestValidation(TestCase):
             boxplot_pngs = [
                 x for x in os.listdir(os.path.join(outdir, DEFAULT_TSW))
                 if any([fnmatch.fnmatch(x, p) for p in patterns])
-            ]   #$$ testing the bulk case
+            ]  #$$ testing the bulk case
 
             self.__logger.debug(f"{boxplot_pngs=}")
-            self.__logger.debug(f"{metric}: Plots are {len(boxplot_pngs)}, "
-                                f"should: {n_metadata_plots} + {n_metric_plots}")
+            self.__logger.debug(
+                f"{metric}: Plots are {len(boxplot_pngs)}, "
+                f"should: {n_metadata_plots} + {n_metric_plots}")
 
             assert len(boxplot_pngs) == n_metadata_plots + n_metric_plots
 
@@ -480,10 +482,9 @@ class TestValidation(TestCase):
             self.__logger.debug(f"{metric}: Plots are {len(overview_pngs)}, "
                                 f"should: {(n_datasets - 1)}")
 
-        assert os.path.isfile(os.path.join(outdir,
-                                           DEFAULT_TSW,
-                                           f'{DEFAULT_TSW}_overview_status.png')
-                              )
+        assert os.path.isfile(
+            os.path.join(outdir, DEFAULT_TSW,
+                         f'{DEFAULT_TSW}_overview_status.png'))
 
     # delete output of test validations, clean up after ourselves
     def delete_run(self, run):
@@ -513,10 +514,11 @@ class TestValidation(TestCase):
         run.interval_from = datetime(1978, 1, 1, tzinfo=UTC)
         run.interval_to = datetime(2018, 12, 31, tzinfo=UTC)
 
-
         run.save()
 
-        self.__logger.debug(f"Intra-Annual params: {run.intra_annual_type=}, {run.intra_annual_metrics=}, {run.intra_annual_overlap=}")
+        self.__logger.debug(
+            f"Intra-Annual params: {run.intra_annual_type=}, {run.intra_annual_metrics=}, {run.intra_annual_overlap=}"
+        )
 
         for i, config in enumerate(run.dataset_configurations.all()):
             if config == run.spatial_reference_configuration:
@@ -546,9 +548,7 @@ class TestValidation(TestCase):
         assert new_run.error_points == 0
         assert new_run.ok_points == 9
 
-        self.check_results(new_run,
-                           is_tcol_run=False,
-                           meta_plots=True)
+        self.check_results(new_run, is_tcol_run=False, meta_plots=True)
         self.delete_run(new_run)
 
     # TODO: fails, if validation contains temporal sub-windows
@@ -571,13 +571,15 @@ class TestValidation(TestCase):
         run.interval_from = datetime(1990, 1, 1, tzinfo=UTC)
         run.interval_to = datetime(2018, 12, 31, tzinfo=UTC)
 
-
         run.save()
 
-        self.__logger.debug(f"Intra-Annual params: {run.intra_annual_type=}, {run.intra_annual_metrics=}, {run.intra_annual_overlap=}")
+        self.__logger.debug(
+            f"Intra-Annual params: {run.intra_annual_type=}, {run.intra_annual_metrics=}, {run.intra_annual_overlap=}"
+        )
 
         self.__logger.debug(
-            f"Intra-Annual params: {run.intra_annual_type=}, {run.intra_annual_metrics=}, {run.intra_annual_overlap=}")
+            f"Intra-Annual params: {run.intra_annual_type=}, {run.intra_annual_metrics=}, {run.intra_annual_overlap=}"
+        )
 
         for i, config in enumerate(run.dataset_configurations.all()):
             if config == run.spatial_reference_configuration:
@@ -666,9 +668,7 @@ class TestValidation(TestCase):
         # the other 4 are okay
         assert new_run.ok_points == 4
 
-        self.check_results(new_run,
-                           is_tcol_run=True,
-                           meta_plots=True)
+        self.check_results(new_run, is_tcol_run=True, meta_plots=True)
         self.delete_run(new_run)
 
     @pytest.mark.filterwarnings(
@@ -767,9 +767,7 @@ class TestValidation(TestCase):
         assert new_run.error_points == 0
         assert new_run.ok_points == 19
 
-        self.check_results(new_run,
-                           is_tcol_run=False,
-                           meta_plots=False)
+        self.check_results(new_run, is_tcol_run=False, meta_plots=False)
         self.delete_run(new_run)
 
     @pytest.mark.filterwarnings(
@@ -821,9 +819,7 @@ class TestValidation(TestCase):
         assert new_run.error_points == 8, "Error points are off"
         assert new_run.ok_points == 16, "OK points are off"
 
-        self.check_results(new_run,
-                           is_tcol_run=False,
-                           meta_plots=False)
+        self.check_results(new_run, is_tcol_run=False, meta_plots=False)
         self.delete_run(new_run)
 
     @pytest.mark.filterwarnings(
@@ -874,9 +870,7 @@ class TestValidation(TestCase):
         assert new_run.error_points == 5, "Error points are off"
         assert new_run.ok_points == 19, "OK points are off"
 
-        self.check_results(new_run,
-                           is_tcol_run=False,
-                           meta_plots=False)
+        self.check_results(new_run, is_tcol_run=False, meta_plots=False)
         self.delete_run(new_run)
 
     # @pytest.mark.filterwarnings(
@@ -935,9 +929,7 @@ class TestValidation(TestCase):
         assert new_run.error_points == 7, "Error points are off"
         assert new_run.ok_points == 5, "OK points are off"
 
-        self.check_results(new_run,
-                           is_tcol_run=False,
-                           meta_plots=False)
+        self.check_results(new_run, is_tcol_run=False, meta_plots=False)
         self.delete_run(new_run)
 
     @pytest.mark.filterwarnings(
@@ -945,7 +937,6 @@ class TestValidation(TestCase):
         "ignore:No data for:UserWarning",
         "ignore: Too few points are available to generate:UserWarning")
     @pytest.mark.long_running
-
     def test_validation_smap_v9_all_orbits(self):
         run = generate_validation_smap_l3_v9()
         run.plots_save_metadata = 'always'
@@ -953,24 +944,25 @@ class TestValidation(TestCase):
 
         for config in run.dataset_configurations.all():
             if config == run.spatial_reference_configuration:
-                config.filters.add(DataFilter.objects.get(name='FIL_ISMN_GOOD'))
+                config.filters.add(
+                    DataFilter.objects.get(name='FIL_ISMN_GOOD'))
             else:
-                config.filters.add(DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
+                config.filters.add(
+                    DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
 
                 param_filters_thresholds = {
                     'FIL_SMAP_L3_V9_static_water_body': '0.5',
-                    'FIL_SMAP_L3_V9_VWC': '30'}
+                    'FIL_SMAP_L3_V9_VWC': '30'
+                }
 
                 for param_name in param_filters_thresholds:
                     pfilter = ParametrisedFilter(
                         filter=DataFilter.objects.get(name=param_name),
                         parameters=param_filters_thresholds[param_name],
-                        dataset_config=config
-                    )
+                        dataset_config=config)
                     pfilter.save()
 
             config.save()
-
 
         run.interval_from = datetime(2017, 1, 1, tzinfo=UTC)
         run.interval_to = datetime(2018, 1, 1, tzinfo=UTC)
@@ -987,7 +979,6 @@ class TestValidation(TestCase):
 
         run.save()
 
-
         run_id = run.id
 
         val.run_validation(run_id)
@@ -999,9 +990,7 @@ class TestValidation(TestCase):
         assert new_run.error_points == 1, "Error points are off"
         assert new_run.ok_points == 8, "OK points are off"
 
-        self.check_results(new_run,
-                           is_tcol_run=False,
-                           meta_plots=True)
+        self.check_results(new_run, is_tcol_run=False, meta_plots=True)
         self.delete_run(new_run)
 
     @pytest.mark.filterwarnings(
@@ -1016,25 +1005,27 @@ class TestValidation(TestCase):
 
         for config in run.dataset_configurations.all():
             if config == run.spatial_reference_configuration:
-                config.filters.add(DataFilter.objects.get(name='FIL_ISMN_GOOD'))
+                config.filters.add(
+                    DataFilter.objects.get(name='FIL_ISMN_GOOD'))
             else:
-                config.filters.add(DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
-                config.filters.add(DataFilter.objects.get(name='FIL_SMAP_L3_V9_ORBIT_ASC'))
+                config.filters.add(
+                    DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
+                config.filters.add(
+                    DataFilter.objects.get(name='FIL_SMAP_L3_V9_ORBIT_ASC'))
 
                 param_filters_thresholds = {
                     'FIL_SMAP_L3_V9_static_water_body': '0.5',
-                    'FIL_SMAP_L3_V9_VWC': '30'}
+                    'FIL_SMAP_L3_V9_VWC': '30'
+                }
 
                 for param_name in param_filters_thresholds:
                     pfilter = ParametrisedFilter(
                         filter=DataFilter.objects.get(name=param_name),
                         parameters=param_filters_thresholds[param_name],
-                        dataset_config=config
-                    )
+                        dataset_config=config)
                     pfilter.save()
 
             config.save()
-
 
         run.interval_from = datetime(2017, 1, 1, tzinfo=UTC)
         run.interval_to = datetime(2018, 1, 1, tzinfo=UTC)
@@ -1051,7 +1042,6 @@ class TestValidation(TestCase):
 
         run.save()
 
-
         run_id = run.id
 
         val.run_validation(run_id)
@@ -1063,9 +1053,7 @@ class TestValidation(TestCase):
         assert new_run.error_points == 1, "Error points are off"
         assert new_run.ok_points == 8, "OK points are off"
 
-        self.check_results(new_run,
-                           is_tcol_run=False,
-                           meta_plots=True)
+        self.check_results(new_run, is_tcol_run=False, meta_plots=True)
         self.delete_run(new_run)
 
     @pytest.mark.filterwarnings(
@@ -1122,9 +1110,7 @@ class TestValidation(TestCase):
         assert new_run.error_points == 6, "Error points are off"
         assert new_run.ok_points == 9, "OK points are off"
 
-        self.check_results(new_run,
-                           is_tcol_run=False,
-                           meta_plots=False)
+        self.check_results(new_run, is_tcol_run=False, meta_plots=False)
         self.delete_run(new_run)
 
     @pytest.mark.filterwarnings(
@@ -1176,9 +1162,7 @@ class TestValidation(TestCase):
         assert new_run.error_points == 6, "Error points are off"
         assert new_run.ok_points == 18, "OK points are off"
 
-        self.check_results(new_run,
-                           is_tcol_run=False,
-                           meta_plots=False)
+        self.check_results(new_run, is_tcol_run=False, meta_plots=False)
         self.delete_run(new_run)
 
     @pytest.mark.filterwarnings(
@@ -1231,9 +1215,7 @@ class TestValidation(TestCase):
         assert new_run.error_points == 0, "Too many error gpis"
         assert new_run.ok_points == 11, "OK points are off"
 
-        self.check_results(new_run,
-                           is_tcol_run=False,
-                           meta_plots=False)
+        self.check_results(new_run, is_tcol_run=False, meta_plots=False)
         self.delete_run(new_run)
 
     @pytest.mark.filterwarnings(
@@ -1278,9 +1260,7 @@ class TestValidation(TestCase):
         assert new_run.error_points == 1
         assert new_run.ok_points == 8
 
-        self.check_results(new_run,
-                           is_tcol_run=False,
-                           meta_plots=True)
+        self.check_results(new_run, is_tcol_run=False, meta_plots=True)
         self.delete_run(new_run)
 
     # TODO: fails, if validation contains temporal sub-windows
@@ -1307,9 +1287,7 @@ class TestValidation(TestCase):
         assert new_run.error_points == 0
         assert new_run.ok_points == 9
 
-        self.check_results(new_run,
-                           is_tcol_run=False,
-                           meta_plots=True)
+        self.check_results(new_run, is_tcol_run=False, meta_plots=True)
         self.delete_run(new_run)
 
     @pytest.mark.filterwarnings(
@@ -1345,9 +1323,7 @@ class TestValidation(TestCase):
         assert new_run.error_points == 0
         assert new_run.ok_points == 9
 
-        self.check_results(new_run,
-                           is_tcol_run=False,
-                           meta_plots=True)
+        self.check_results(new_run, is_tcol_run=False, meta_plots=True)
         self.delete_run(new_run)
 
     @pytest.mark.filterwarnings(
@@ -1383,9 +1359,7 @@ class TestValidation(TestCase):
 
         assert new_run
 
-        self.check_results(new_run,
-                           is_tcol_run=False,
-                           meta_plots=True)
+        self.check_results(new_run, is_tcol_run=False, meta_plots=True)
         self.delete_run(new_run)
 
     @pytest.mark.filterwarnings(
@@ -1427,9 +1401,7 @@ class TestValidation(TestCase):
 
         new_run = ValidationRun.objects.get(pk=run_id)
 
-        self.check_results(new_run,
-                           is_tcol_run=False,
-                           meta_plots=False)
+        self.check_results(new_run, is_tcol_run=False, meta_plots=False)
         self.delete_run(new_run)
 
     # TODO: fails, if validation contains temporal sub-windows
@@ -1465,9 +1437,7 @@ class TestValidation(TestCase):
         assert new_run.error_points == 12
         assert new_run.ok_points == 4
 
-        self.check_results(new_run,
-                           is_tcol_run=False,
-                           meta_plots=False)
+        self.check_results(new_run, is_tcol_run=False, meta_plots=False)
         self.delete_run(new_run)
 
     @pytest.mark.filterwarnings(
@@ -1507,9 +1477,7 @@ class TestValidation(TestCase):
         new_run = ValidationRun.objects.get(pk=run_id)
         assert new_run
 
-        self.check_results(new_run,
-                           is_tcol_run=False,
-                           meta_plots=False)
+        self.check_results(new_run, is_tcol_run=False, meta_plots=False)
         self.delete_run(new_run)
 
     @pytest.mark.filterwarnings(
@@ -1522,16 +1490,19 @@ class TestValidation(TestCase):
         Test a validation for each sat. dataset with ISMN as non-reference, and upscaling option active. Test description
         in the function `validation_upscaling_for_dataset`
         """
-        all_datasets = [(globals.CCIC, globals.ESA_CCI_SM_P_V05_2,
-                         globals.ESA_CCI_SM_P_sm),
-                        (globals.SMAP_L3, globals.SMAP_V8_AM,
-                         globals.SMAP_soil_moisture),
-                        (globals.ASCAT, globals.ASCAT_H113, globals.ASCAT_sm),
-                        (globals.ERA5, globals.ERA5_LAND_latest, globals.ERA5_sm),
-                        (globals.GLDAS, globals.GLDAS_NOAH025_3H_2_1,
-                         globals.GLDAS_SoilMoi0_10cm_inst), (globals.SMAP_L3, globals.SMAP_V9_AM_PM,
-                         globals.SMAP_soil_moisture), (globals.CCI_RZSM,
-                         globals.ESA_CCI_RZSM_V09_2, globals.ESA_CCI_RZSM_0_10cm)]
+        all_datasets = [
+            (globals.CCIC, globals.ESA_CCI_SM_P_V05_2,
+             globals.ESA_CCI_SM_P_sm),
+            (globals.SMAP_L3, globals.SMAP_V8_AM, globals.SMAP_soil_moisture),
+            (globals.ASCAT, globals.ASCAT_H113, globals.ASCAT_sm),
+            (globals.ERA5, globals.ERA5_LAND_latest, globals.ERA5_sm),
+            (globals.GLDAS, globals.GLDAS_NOAH025_3H_2_1,
+             globals.GLDAS_SoilMoi0_10cm_inst),
+            (globals.SMAP_L3, globals.SMAP_V9_AM_PM,
+             globals.SMAP_soil_moisture),
+            (globals.CCI_RZSM, globals.ESA_CCI_RZSM_V09_2,
+             globals.ESA_CCI_RZSM_0_10cm)
+        ]
 
         for ds, version, variable in all_datasets:
             self.validation_upscaling_for_dataset(ds, version, variable)
@@ -1639,9 +1610,7 @@ class TestValidation(TestCase):
         assert new_run.error_points == 0
         assert new_run.ok_points == 9
 
-        self.check_results(new_run,
-                           is_tcol_run=False,
-                           meta_plots=True)
+        self.check_results(new_run, is_tcol_run=False, meta_plots=True)
         self.delete_run(new_run)
 
     def test_errors(self):
@@ -1663,8 +1632,7 @@ class TestValidation(TestCase):
         # Extension test data is only available for one dataset
         reader = val.create_reader(
             Dataset.objects.get(short_name="C3S_combined"),
-            DatasetVersion.objects.get(short_name="C3S_V202212")
-        )
+            DatasetVersion.objects.get(short_name="C3S_V202212"))
         assert isinstance(reader, ReaderWithTsExtension)
         assert reader.ext_reader is not None
 
@@ -1851,9 +1819,9 @@ class TestValidation(TestCase):
         for i, dataset in enumerate(Dataset.objects.all()):
             self.__logger.info(dataset.pretty_name)
             vs = dataset.versions.all()
-            va = vs.first().variables.all()
 
             for version in vs:
+                va = version.variables.all()
                 reader = val.create_reader(dataset, version)
                 fils = version.filters.all()
                 for variable in va:
@@ -1882,12 +1850,14 @@ class TestValidation(TestCase):
                             data = getattr(msk_reader,
                                            read_name)(0, **read_kwargs)
                         else:
-                            if variable.short_name not in ["swvl2", "swvl3",
-                                                           "swvl4"]:
-                                data = getattr(msk_reader,
-                                           read_name)(-155.42, 19.78,
-                                                      **read_kwargs)  ## hawaii
-                        if variable.short_name not in ["swvl2", "swvl3", "swvl4"]:
+                            if variable.short_name not in [
+                                    "swvl2", "swvl3", "swvl4"
+                            ]:
+                                data = getattr(msk_reader, read_name)(
+                                    -155.42, 19.78, **read_kwargs)  ## hawaii
+                        if variable.short_name not in [
+                                "swvl2", "swvl3", "swvl4"
+                        ]:
                             assert data is not None
                             assert variable.short_name in data.columns
                             assert isinstance(data, pd.DataFrame)
@@ -1895,11 +1865,11 @@ class TestValidation(TestCase):
                             # handles the case where all values are flagged (i.e. for SMOS L3)
                             if not len(data.index) > 1 or data[
                                     variable.short_name].empty:
-                                unfiltered = reader.read(-155.42, 19.78,
-                                                         **read_kwargs)
-                                assert unfiltered.count()[
-                                    variable.short_name] == len(
-                                        unfiltered[variable.short_name].dropna())
+                                unfiltered = reader.read(
+                                    -155.42, 19.78, **read_kwargs)
+                                assert unfiltered.count(
+                                )[variable.short_name] == len(
+                                    unfiltered[variable.short_name].dropna())
                         else:
                             pass
 
@@ -2763,9 +2733,7 @@ class TestValidation(TestCase):
         assert copied_run.error_points == 0
         assert copied_run.ok_points == 9
 
-        self.check_results(copied_run,
-                           is_tcol_run=False,
-                           meta_plots=True)
+        self.check_results(copied_run, is_tcol_run=False, meta_plots=True)
 
         # copying again, so to check CopiedValidations model
         new_run = get_object_or_404(ValidationRun, pk=run_id)

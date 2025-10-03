@@ -8,6 +8,8 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.serializers import ModelSerializer, Serializer
 from rest_framework import serializers
 from django.utils import timezone
+from django.conf import settings
+from pathlib import Path
 
 from api.views.auxiliary_functions import get_fields_as_list
 from validator.models import UserDatasetFile, DatasetVersion, DataVariable, Dataset, DataManagementGroup
@@ -16,19 +18,27 @@ import logging
 from validator.validation.globals import USER_DATASET_MIN_ID, USER_DATASET_VERSION_MIN_ID, USER_DATASET_VARIABLE_MIN_ID
 from multiprocessing.context import Process
 
-from validator.validation.user_data_processing import user_data_preprocessing
+from validator.validation.util import has_csv_in_zip
+from validator.validation.user_data_processing import user_data_preprocessing, run_upload_format_check
 from django.db import transaction, connections
 
 __logger = logging.getLogger(__name__)
 
 
-def create_variable_entry(variable_name, variable_pretty_name, dataset_name, user, variable_unit=None, max_value=None,
+def create_variable_entry(variable_name,
+                          variable_pretty_name,
+                          dataset_name,
+                          user,
+                          variable_unit=None,
+                          max_value=None,
                           min_value=None):
-    current_max_id = DataVariable.objects.all().last().id if DataVariable.objects.all().last() else 0
+    current_max_id = DataVariable.objects.all().last(
+    ).id if DataVariable.objects.all().last() else 0
     new_variable_data = {
         'short_name': variable_name,
         'pretty_name': variable_pretty_name,
-        'help_text': f'Variable {variable_name} of dataset {dataset_name} provided by  user {user}.',
+        'help_text':
+        f'Variable {variable_name} of dataset {dataset_name} provided by  user {user}.',
         'min_value': max_value,
         'max_value': min_value,
         'unit': variable_unit if variable_unit else 'n.a.'
@@ -49,12 +59,15 @@ def create_variable_entry(variable_name, variable_pretty_name, dataset_name, use
         raise Exception(variable_serializer.errors)
 
 
-def create_version_entry(version_name, version_pretty_name, dataset_pretty_name, user, variable):
-    current_max_id = DatasetVersion.objects.all().last().id if DatasetVersion.objects.all().last() else 0
+def create_version_entry(version_name, version_pretty_name,
+                         dataset_pretty_name, user, variable):
+    current_max_id = DatasetVersion.objects.all().last(
+    ).id if DatasetVersion.objects.all().last() else 0
     new_version_data = {
         "short_name": version_name,
         "pretty_name": version_pretty_name,
-        "help_text": f'Version {version_pretty_name} of dataset {dataset_pretty_name} provided by user {user}.',
+        "help_text":
+        f'Version {version_pretty_name} of dataset {dataset_pretty_name} provided by user {user}.',
         "time_range_start": None,
         "time_range_end": None,
         "geographical_range": None,
@@ -78,8 +91,9 @@ def create_version_entry(version_name, version_pretty_name, dataset_pretty_name,
         raise Exception(version_serializer.errors)
 
 
-def create_dataset_entry(dataset_name, dataset_pretty_name, version, user):
-    current_max_id = Dataset.objects.all().last().id if Dataset.objects.all() else 0
+def create_dataset_entry(dataset_name, dataset_pretty_name, version, user, is_scattered_data=False):
+    current_max_id = Dataset.objects.all().last().id if Dataset.objects.all(
+    ) else 0
     dataset_data = {
         'short_name': dataset_name,
         'pretty_name': dataset_pretty_name,
@@ -91,6 +105,7 @@ def create_dataset_entry(dataset_name, dataset_pretty_name, version, user):
         'resolution': None,
         'user': user.pk,
         'versions': [version.pk],
+        'is_scattered_data': is_scattered_data,
     }
 
     dataset_serializer = DatasetSerializer(data=dataset_data)
@@ -108,7 +123,8 @@ def create_dataset_entry(dataset_name, dataset_pretty_name, version, user):
         raise Exception(dataset_serializer.errors)
 
 
-def update_file_entry(file_entry, dataset, version, variable, user, all_variables):
+def update_file_entry(file_entry, dataset, version, variable, user,
+                      all_variables):
     # file data
     file_data = {
         'file': file_entry.file,
@@ -136,17 +152,22 @@ def update_file_entry(file_entry, dataset, version, variable, user, all_variable
     return response
 
 
-def preprocess_file(file_serializer, file_raw_path):
+def preprocess_file(file_serializer, file_raw_path, user_path):
     connections.close_all()
-    p = Process(target=user_data_preprocessing, kwargs={"file_uuid": file_serializer.data['id'],
-                                                        "file_path": file_raw_path + file_serializer.data[
-                                                            'file_name'],
-                                                        "file_raw_path": file_raw_path})
+    p = Process(target=user_data_preprocessing,
+                kwargs={
+                    "file_uuid": file_serializer.data['id'],
+                    "file_path":
+                    file_raw_path + file_serializer.data['file_name'],
+                    "file_raw_path": file_raw_path,
+                    "user_path": user_path
+                })
     p.start()
     return
 
 
 # API VIEWS
+
 
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
@@ -159,13 +180,17 @@ def update_metadata(request, file_uuid):
     current_version = file_entry.version
 
     # for variable and dimensions we store a list of potential names and a value from this list can be chosen
-    if field_name not in [USER_DATA_DATASET_FIELD_NAME, USER_DATA_VERSION_FIELD_NAME]:
-        new_item = next(item for item in file_entry.all_variables if item["name"] == field_value)
+    if field_name not in [
+            USER_DATA_DATASET_FIELD_NAME, USER_DATA_VERSION_FIELD_NAME
+    ]:
+        new_item = next(item for item in file_entry.all_variables
+                        if item["name"] == field_value)
 
         current_variable.pretty_name = new_item['long_name']
         current_variable.short_name = new_item['name']
         # can't simply use .get, because the key may exist but the unit assigned can be None
-        current_variable.unit = new_item.get('units') if new_item.get('units') else 'n.a.'
+        current_variable.unit = new_item.get('units') if new_item.get(
+            'units') else 'n.a.'
         current_variable.help_text = f'Variable {new_item["name"]} of dataset ' \
                                      f'{current_dataset.pretty_name} provided by user {request.user}.'
         current_variable.save()
@@ -181,27 +206,22 @@ def update_metadata(request, file_uuid):
 
 
 class UploadedFileError(BaseException):
+
     def __init__(self, message):
         super(BaseException, self).__init__()
         self.message = message
-
-
-def _verify_file_extension(file_name):
-    return file_name.endswith('.nc4') or file_name.endswith('.nc') or file_name.endswith('.zip')
 
 
 @api_view(['PUT', 'POST'])
 @permission_classes([IsAuthenticated])
 @parser_classes([FileUploadParser])
 def upload_user_data(request, filename):
+    user = request.user.username
+    user_data_dir = getattr(settings, 'USER_DATA_DIR', '/tmp/user_data_dir/')
+    user_path = Path(user_data_dir) / user / 'log'
+    user_path.mkdir(parents=True, exist_ok=True)
+
     file = request.FILES['file']
-    # I don't think it is possible not to meet this condition, but just in case
-    if file.name != filename:
-        return JsonResponse({'error': 'Wrong file name'}, status=500, safe=False)
-    if not _verify_file_extension(filename):
-        return JsonResponse({'error': 'Wrong file format'}, status=500, safe=False)
-    if request.user.space_left and file.size > request.user.space_left:
-        return JsonResponse({'error': 'File is too big'}, status=500, safe=False)
 
     #  get metadata
     metadata = json.loads(request.META.get('HTTP_FILEMETADATA'))
@@ -209,22 +229,29 @@ def upload_user_data(request, filename):
     serializer = UserFileMetadataSerializer(data=metadata)
 
     if not serializer.is_valid():
-        return JsonResponse(serializer.errors, status=500, safe=False)
+        return JsonResponse({"success": False, "error": str(serializer.errors)}, status=500)
 
     dataset_name = metadata[USER_DATA_DATASET_FIELD_NAME]
-    dataset_pretty_name = metadata[USER_DATA_DATASET_FIELD_PRETTY_NAME] if metadata[
-        USER_DATA_DATASET_FIELD_PRETTY_NAME] else dataset_name
+    dataset_pretty_name = metadata[
+        USER_DATA_DATASET_FIELD_PRETTY_NAME] if metadata[
+            USER_DATA_DATASET_FIELD_PRETTY_NAME] else dataset_name
     version_name = metadata[USER_DATA_VERSION_FIELD_NAME]
-    version_pretty_name = metadata[USER_DATA_VERSION_FIELD_PRETTY_NAME] if metadata[
-        USER_DATA_VERSION_FIELD_PRETTY_NAME] else version_name
+    version_pretty_name = metadata[
+        USER_DATA_VERSION_FIELD_PRETTY_NAME] if metadata[
+            USER_DATA_VERSION_FIELD_PRETTY_NAME] else version_name
+
+    # needs file operation bc zip could also contain nc file (i.e.: internal case not relevant for users)
+    is_scattered = has_csv_in_zip(file)
 
     # creating version entry
 
     new_variable = create_variable_entry('none', 'none', dataset_pretty_name,
                                          request.user, 'n.a.')
-    new_version = create_version_entry(version_name, version_pretty_name, dataset_pretty_name, request.user,
+    new_version = create_version_entry(version_name, version_pretty_name,
+                                       dataset_pretty_name, request.user,
                                        new_variable)
-    new_dataset = create_dataset_entry(dataset_name, dataset_pretty_name, new_version, request.user)
+    new_dataset = create_dataset_entry(dataset_name, dataset_pretty_name,
+                                       new_version, request.user, is_scattered_data=is_scattered)
 
     file_data = {
         'file': file,
@@ -238,21 +265,40 @@ def upload_user_data(request, filename):
     }
 
     file_serializer = UploadFileSerializer(data=file_data)
+
     if file_serializer.is_valid():
         # saving file
         try:
             file_serializer.save()
-        except:
+        except Exception as e:
             new_dataset.delete()
             new_variable.delete()
             new_version.delete()
-            return JsonResponse({'error': 'We could not save your file. Please try again later or contact our team'
-                                          ' to get help.'}, status=500, safe=False)
+            return JsonResponse(
+                {"success": False,
+                 'error':'We could not save your file. Please try again later or contact our team.'},
+                 status=500)
+
+        success, msg, status = run_upload_format_check(
+            file=file,
+            filename=filename,
+            file_uuid=file_serializer.data['id'],
+            user_path=user_path)
+        if not success:
+            # angular error flow handles both str or dict (userFileUpload)
+            return JsonResponse({"success": False, "error": str(msg)},
+                status=status)
 
         # need to get the path and assign it to the dataset as well as pass it to preprocessing function, so I don't
         # have to open the db connection before file preprocessing.
         file_raw_path = file_serializer.data['get_raw_file_path']
-        preprocess_file(file_serializer, file_raw_path)
+        try:
+            preprocess_file(file_serializer, file_raw_path, user_path)
+        except Exception as e:
+            return JsonResponse(
+            {"success": False,
+             "error": "Preprocessing failed."},
+            status=500)
 
         return JsonResponse(file_serializer.data, status=201, safe=False)
     else:
@@ -262,12 +308,14 @@ def upload_user_data(request, filename):
 
 # SERIALIZERS
 class UploadSerializer(ModelSerializer):
+
     class Meta:
         model = UserDatasetFile
         fields = get_fields_as_list(UserDatasetFile)
 
 
 class UploadFileSerializer(ModelSerializer):
+
     class Meta:
         model = UserDatasetFile
         fields = get_fields_as_list(UserDatasetFile)
@@ -282,34 +330,32 @@ class UploadFileSerializer(ModelSerializer):
 
 
 class DatasetSerializer(ModelSerializer):
+
     class Meta:
         model = Dataset
-        fields = ['id',
-                  'short_name',
-                  'pretty_name',
-                  'help_text',
-                  'storage_path',
-                  'detailed_description',
-                  'source_reference',
-                  'citation',
-                  'versions',
-                  'user'
-                  ]
+        fields = [
+            'id', 'short_name', 'pretty_name', 'help_text', 'storage_path',
+            'detailed_description', 'source_reference', 'citation', 'versions',
+            'user', 'is_scattered_data'
+        ]
 
 
 class DataManagementGroupSerializer(ModelSerializer):
+
     class Meta:
         model = DataManagementGroup
         fields = get_fields_as_list(model)
 
 
 class DatasetVersionSerializer(ModelSerializer):
+
     class Meta:
         model = DatasetVersion
         fields = '__all__'
 
 
 class DatasetVariableSerializer(ModelSerializer):
+
     class Meta:
         model = DataVariable
         fields = '__all__'
@@ -319,9 +365,15 @@ class UserFileMetadataSerializer(Serializer):
     # with this serializer I'm checking if the metadata is properly introduced, but the metadata doesn't refer to any
     # particular model, therefore it's not a model serializer
     dataset_name = serializers.CharField(max_length=30, required=True)
-    dataset_pretty_name = serializers.CharField(max_length=30, required=False, allow_blank=True, allow_null=True)
+    dataset_pretty_name = serializers.CharField(max_length=30,
+                                                required=False,
+                                                allow_blank=True,
+                                                allow_null=True)
     version_name = serializers.CharField(max_length=30, required=True)
-    version_pretty_name = serializers.CharField(max_length=30, required=False, allow_blank=True, allow_null=True)
+    version_pretty_name = serializers.CharField(max_length=30,
+                                                required=False,
+                                                allow_blank=True,
+                                                allow_null=True)
 
     def create(self, validated_data):
         pass

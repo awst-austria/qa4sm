@@ -3,37 +3,37 @@
   <div class="flex flex-column mb-5 mt-4 align-content-center justify-content-center w-12">
     <div class="flex flex-column text-center">
       <h1>Validation comparison</h1>
-<!--      <p class="lead text-muted">-->
-<!--        Compare results from your validations or published ones.-->
-<!--      </p>-->
+
+
+
       <p class="lead text-muted">
-        Due to recent updates in our service, the comparison module is temporarily unavailable. <br>
-        We are working hard to restore this functionality as soon as possible. Thank you for your patience!
+        Compare results from your validations or published ones.
+
       </p>
     </div>
   </div>
 
-<!--  <div class="flex flex-column flex-wrap align-content-center justify-content-center">-->
-<!--    <div class="flex flex-column w-8">-->
-<!--      &lt;!&ndash;   validations selection   &ndash;&gt;-->
-<!--      <qa-validation-selector/>-->
-<!--      <div class="flex flex-column flex-wrap mb-5 mt-4 align-content-center justify-content-center">-->
-<!--        &lt;!&ndash;       summary of the selected comparison  &ndash;&gt;-->
-<!--        <div *ngIf="showComparisonResults" class="flex flex-column w-10 mt-3 comparison-result-container">-->
-<!--          <div  class="text-center">-->
-<!--            <h3 class="my-3">Validation comparison results</h3>-->
-<!--          </div>-->
-<!--          <qa-comparison-summary/>-->
-<!--          &lt;!&ndash;        visualize the validation extent&ndash;&gt;-->
-<!--          <qa-extent-visualization (isError)="handleError($event)"/>-->
-<!--          &lt;!&ndash;  table section  &ndash;&gt;-->
-<!--          <qa-table-comparison (isError)="handleError($event)"/>-->
-<!--          &lt;!&ndash;  plots section  &ndash;&gt;-->
-<!--          <qa-plots (isError)="handleError($event)"/>-->
-<!--        </div>-->
+  <div class="flex flex-column flex-wrap align-content-center justify-content-center">
+    <div class="flex flex-column w-8">
+      <!--   validations selection   -->
+      <qa-validation-selector/>
+      <div class="flex flex-column flex-wrap mb-5 mt-4 align-content-center justify-content-center">
+        <!--       summary of the selected comparison  -->
+        <div *ngIf="showComparisonResults" class="flex flex-column w-10 mt-3 comparison-result-container">
+          <div  class="text-center">
+            <h3 class="my-3">Validation comparison results</h3>
+          </div>
+          <qa-comparison-summary/>
+          <!--        visualize the validation extent-->
+          <qa-extent-visualization (isError)="handleError($event)"/>
+          <!--  table section  -->
+          <qa-table-comparison (isError)="handleError($event)"/>
+          <!--  plots section  -->
+          <qa-plots (isError)="handleError($event)"/>
+        </div>
 
-<!--      </div>-->
-<!--    </div>-->
-<!--  </div>-->
+      </div>
+    </div>
+  </div>
   <p-scrollTop styleClass="scroll-button"></p-scrollTop>
 </main>
