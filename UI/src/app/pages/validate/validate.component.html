@@ -23,7 +23,7 @@
           <!--  data column-->
           <div class="flex flex-column lg:w-6 w-12">
             <!--        here toggleable is set to false, otherwise accordions won't close, that's a bug in primeng 15.4.1-->
-            <p-panel header="Data" [toggleable]="false" class="validation-small-row">
+            <p-panel header="Datasets" [toggleable]="false" class="validation-small-row">
               <ng-template pTemplate="icons">
                 <label class="p-panel-header-icon"
                        pTooltip="The soil moisture dataset which is to be validated, i.e. compared to the 'Reference' data."
@@ -76,6 +76,17 @@
                                        [datasetModel]="validationModel.datasetConfigurations[datasetIdx].datasetModel"
                                        [filterModel$]="validationModel.datasetConfigurations[datasetIdx].staticWaterFilter$"
                                        [minThreshold]="0" [increment]="0.05" [maxThreshold]="1.0" [units]="' [-]'" />
+
+                  <qa-threshold-filter *ngIf="validationModel.datasetConfigurations[datasetIdx].filAscatSsmSensitivityFilter$|async"
+                                       [datasetModel]="validationModel.datasetConfigurations[datasetIdx].datasetModel"
+                                       [filterModel$]="validationModel.datasetConfigurations[datasetIdx].filAscatSsmSensitivityFilter$"
+                                       [minThreshold]="0" [increment]="0.01" [maxThreshold]="200" [units]="' [dB]'" />
+
+                  <qa-threshold-filter *ngIf="validationModel.datasetConfigurations[datasetIdx].filAscatsspFilter$|async"
+                                       [datasetModel]="validationModel.datasetConfigurations[datasetIdx].datasetModel"
+                                       [filterModel$]="validationModel.datasetConfigurations[datasetIdx].filAscatsspFilter$"
+                                       [minThreshold]="0" [increment]="0.01" [maxThreshold]="100" [units]="' [%]'" />
+
 
                   <div *ngIf="validationModel.datasetConfigurations[datasetIdx].ismnNetworkFilter$|async">
                     <qa-ismn-network-filter

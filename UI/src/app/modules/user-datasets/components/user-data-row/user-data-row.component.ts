@@ -57,6 +57,7 @@ export class UserDataRowComponent implements OnInit, OnDestroy {
   }
 
   shareDataModalWindow = false;
+  logWindowVisible: boolean = false;
 
   // groupToUpdate: DataManagementGroupsDto
   // variables$: Observable<DatasetVariableDto>[] = [];
@@ -191,6 +192,23 @@ export class UserDataRowComponent implements OnInit, OnDestroy {
     return this.userDatasetService.getTheSizeInProperUnits(this.userDataset.file_size);
   }
 
+  // in th case when upload fails
+  // get the value of UploadStatus
+  getFileUploadStatus(): string {
+    return this.userDataset.status;
+  }
+  // get the value of Error Message
+  getFileUploadErrorMessage(): string {
+   return this.userDataset.error_message || 'No errors';
+  }
+  // get the value of Log Information
+  getFileUploadLogInfo(): string {
+    return this.userDataset.log_info || 'No logs available';
+  }
+
+  showLogWindow() {
+  this.logWindowVisible = true;
+  }
 
   refreshFilePreprocessingStatus(): void {
     if (!this.userDataset.metadata_submitted) {

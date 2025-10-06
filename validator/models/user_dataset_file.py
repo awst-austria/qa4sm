@@ -33,6 +33,9 @@ class UserDatasetFile(models.Model):
     variable = models.ForeignKey(DataVariable, related_name='user_variable', on_delete=models.SET_NULL, null=True)
     all_variables = models.JSONField(blank=True, null=True)
     upload_date = models.DateTimeField()
+    status = models.CharField(max_length=50, blank=True, null=True)
+    error_message = models.TextField(blank=True, null=True)
+    log_info = models.TextField(blank=True, null=True)
     metadata_submitted = models.BooleanField(default=False)
     # user_groups = models.ManyToManyField(to='DataManagementGroup', related_name='custom_datasets', null=True,
     #                                      blank=True)

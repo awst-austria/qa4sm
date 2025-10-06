@@ -354,7 +354,9 @@ def encoded_comparisonPlots(
         method=plot_type,
         metric=metric
     )
+    plt.tight_layout()
     plt.savefig(image, format='png')
+
     encoded = base64.b64encode(image.getvalue()).decode('utf-8')
 
     return encoded
@@ -401,6 +403,7 @@ def get_extent_image(
             intersection=get_intersection,
             plot_points=True,
         )
+        plt.tight_layout()
         plt.savefig(image, format='png')
         if encoded:
             encoded = base64.encodebytes(image.getvalue()).decode('utf-8')

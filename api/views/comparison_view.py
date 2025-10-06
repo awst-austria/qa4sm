@@ -36,7 +36,7 @@ def get_table(request):
 
     except (SpatialExtentError, ComparisonError) as e:
         return str(e)
-
+    
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
@@ -52,6 +52,8 @@ def get_comparison_table(request):
         )
     except AttributeError as e:
         response = HttpResponse(str(e))
+    except Exception as e:
+        response = HttpResponse(str(e))
     return response
 
 
@@ -66,6 +68,8 @@ def download_comparison_table(request):
         table.to_csv(path_or_buf=response, sep=',', float_format='%.2f', index=False, decimal=".")
 
     except AttributeError as e:
+        response = HttpResponse(str(e))
+    except Exception as e:
         response = HttpResponse(str(e))
 
     return response
@@ -91,7 +95,8 @@ def get_comparison_metrics(request):
 
     except (SpatialExtentError, ComparisonError) as e:
         response = [{'message': str(e)}]
-
+    except Exception as e:
+        response = [{'message': str(e)}]
     return JsonResponse(response, status=200, safe=False)
 
 
@@ -121,6 +126,8 @@ def get_comparison_plots_for_metric(request):
 
         except (SpatialExtentError, ComparisonError):
             continue
+        except Exception as e:
+            continue
 
     if not encoded_plots:
         return JsonResponse(
@@ -145,6 +152,7 @@ def get_spatial_extent(request):
         )
     except SpatialExtentError as e:
         return JsonResponse([{'message': str(e)}], status=200, safe=False)
-
+    except Exception as e:
+        return JsonResponse([{'message': str(e)}], status=200, safe=False)
     if not encoded_image == "error encountered":
         return JsonResponse(encoded_image, status=200, safe=False)
