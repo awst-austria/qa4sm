@@ -55,9 +55,6 @@ services:
         source: "${QA4SM_WORKSPACE}webapp/user_data"
         target: /var/lib/qa4sm-web-val/valentina/data/user_data
       - type: bind
-        source: "${QA4SM_USERMANUAL_FOLDER}"
-        target: /var/lib/qa4sm-web-val/valentina/docs
-      - type: bind
         source: "${QA4SM_WORKSPACE}webapp/cronjob-scripts"
         target: /var/lib/qa4sm-web-val/valentina/cronjob-scripts
     logging:
