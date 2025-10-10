@@ -99,7 +99,7 @@
 
       <div class="py-3">
         <div class="p-float-label">
-          <p-dropdown class="form-field"
+          <p-select class="form-field"
                       inputId="selectCountry"
                       [options]="countries$|async"
                       [style]="{'width':'15rem', 'height': '2.5rem'}"
@@ -108,7 +108,7 @@
                       optionValue="code"
                       placeholder=" "
                       ngDefaultControl>
-          </p-dropdown>
+          </p-select>
           <label for="selectCountry">Country (optional)</label>
           <span pTooltip="Optional. The country where your organisation (or you) resides."
                 [ngClass]="{'pi pi-question-circle': true, 'verticalAlign': this.userForm.controls.country.value===''}"

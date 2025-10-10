@@ -7,7 +7,7 @@
     </div>
   </ng-template>
   <span class="p-float-label">
-  <p-dropdown
+  <p-select
     id="selectAction"
     [options]="actions"
     [(ngModel)]="selectedAction"
@@ -15,7 +15,7 @@
     optionLabel="label"
     placeholder="Select action"
     [style]="{'width': '100%'}">
-  </p-dropdown>
+  </p-select>
     <label for="{{'selectAction'}}">Select action</label>
   </span>
   <p-menu

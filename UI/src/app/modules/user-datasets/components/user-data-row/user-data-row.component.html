@@ -108,7 +108,7 @@
         </span>
       <div *ngIf="(editVariable.opened)">
         <label for="variable-dropdown">Variable: </label>
-        <p-dropdown
+        <p-select
           [disabled]="!variable.shortName()"
           id="variable-dropdown"
           class="form-field"
@@ -121,7 +121,7 @@
           placeholder="Choose"
           editable="true"
           ngDefaultControl>
-        </p-dropdown>
+        </p-select>
         <button
           pButton
           type="button"

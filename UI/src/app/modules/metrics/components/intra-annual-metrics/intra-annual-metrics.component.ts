@@ -6,17 +6,12 @@ import {TooltipModule} from "primeng/tooltip";
 import {FormsModule} from "@angular/forms";
 import {IntraAnnualMetricsDto} from "../../../../pages/validate/service/validation-run-config-dto";
 import {CheckboxModule} from "primeng/checkbox";
+import { SharedPrimeNgModule } from 'src/app/shared.primeNg.module';
 
 @Component({
+    standalone:true,
     selector: 'qa-intra-annual-metrics',
-    imports: [
-        DropdownModule,
-        InputNumberModule,
-        NgIf,
-        TooltipModule,
-        FormsModule,
-        CheckboxModule
-    ],
+    imports: [SharedPrimeNgModule],
     templateUrl: './intra-annual-metrics.component.html',
     styleUrl: './intra-annual-metrics.component.scss'
 })

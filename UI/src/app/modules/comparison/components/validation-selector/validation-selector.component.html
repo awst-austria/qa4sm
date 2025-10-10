@@ -67,13 +67,13 @@
               <div class="col-12">
 
                 <div *ngIf="!noValidationsError" class="p-float-label m-2">
-                  <p-dropdown
+                  <p-select
                     id="validationSelector"
                     [options]="validations4Comparison"
                     [(ngModel)]="this.selectedValidation"
                     optionLabel="comparison_label"
                     [style]="{'width':'100%'}">
-                  </p-dropdown>
+                  </p-select>
                   <label *ngIf="selectedDatasetModel[0]" for="validationSelector">{{ selectValidationLabel }}</label>
                 </div>
                 <div *ngIf="noValidationsError" style="color: gray">

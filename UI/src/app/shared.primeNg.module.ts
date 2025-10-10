@@ -41,6 +41,7 @@ import { MenubarModule } from 'primeng/menubar';
 import { DividerModule } from 'primeng/divider';
 import { ScrollPanelModule } from 'primeng/scrollpanel';
 import { PanelMenuModule } from 'primeng/panelmenu';
+import { SelectModule } from 'primeng/select';
 
 @NgModule({
   imports: [
@@ -78,7 +79,7 @@ import { PanelMenuModule } from 'primeng/panelmenu';
     ScrollPanelModule,
     ScrollTopModule,
     SelectButtonModule,
-    DropdownModule,
+    SelectModule,
     SliderModule,
     ToastModule,
     ToggleButtonModule,
@@ -120,7 +121,7 @@ import { PanelMenuModule } from 'primeng/panelmenu';
     ScrollPanelModule,
     ScrollTopModule,
     SelectButtonModule,
-    DropdownModule,
+    SelectModule,
     SliderModule,
     ToastModule,
     ToggleButtonModule,

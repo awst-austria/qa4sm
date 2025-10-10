@@ -1,7 +1,7 @@
 <div class="grid  align-content-center pt-2">
   <div class="col" style="max-width: 100%">
     <span class="p-float-label mb-3 mt-3" *ngIf="selectionModel$|async">
-    <p-dropdown [inputId]="'datasetSelector_'+ referenceType"
+    <p-select [inputId]="'datasetSelector_'+ referenceType"
                 (onChange)="onDatasetChange()"
                 [options]="verifyOptions()|async"
                 [ngModel]="verifyChosenValue()|async"
@@ -27,7 +27,7 @@
         </div>
 
       </ng-template>
-    </p-dropdown>
+    </p-select>
       <label for="{{'datasetSelector_'+ referenceType}}">Select dataset (version)</label>
     </span>
   </div>
