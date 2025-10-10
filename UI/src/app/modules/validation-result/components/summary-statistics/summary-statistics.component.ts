@@ -14,10 +14,11 @@ import {GlobalParamsService} from '../../../core/services/global/global-params.s
 import {SettingsService} from '../../../core/services/global/settings.service';
 
 @Component({
-  selector: 'qa-summary-statistics',
-  templateUrl: './summary-statistics.component.html',
-  styleUrls: ['./summary-statistics.component.scss'],
-  encapsulation: ViewEncapsulation.None
+    selector: 'qa-summary-statistics',
+    templateUrl: './summary-statistics.component.html',
+    styleUrls: ['./summary-statistics.component.scss'],
+    encapsulation: ViewEncapsulation.None,
+    standalone: false
 })
 export class SummaryStatisticsComponent implements OnInit {
   @Input() validationRun: ValidationrunDto;

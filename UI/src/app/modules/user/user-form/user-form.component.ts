@@ -14,10 +14,10 @@ import { ConfirmationService } from 'primeng/api';
 import { TokenService } from '../../core/services/token/token.service';
 
 @Component({
-  selector: 'qa-user-form',
-  templateUrl: './user-form.component.html',
-  styleUrls: ['./user-form.component.scss'],
-  //providers: [ConfirmationService]
+    selector: 'qa-user-form',
+    templateUrl: './user-form.component.html',
+    styleUrls: ['./user-form.component.scss'],
+    standalone: false
 }) 
 export class UserFormComponent implements OnInit {
   userForm = this.formBuilder.group<UserData>({

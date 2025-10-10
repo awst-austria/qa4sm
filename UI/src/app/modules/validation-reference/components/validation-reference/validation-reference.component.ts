@@ -4,9 +4,10 @@ import { DatasetConfigModel } from '../../../../pages/validate/dataset-config-mo
 import { ValidationModel } from '../../../../pages/validate/validation-model';
 
 @Component({
-  selector: 'qa-validation-reference',
-  templateUrl: './validation-reference.component.html',
-  styleUrls: ['./validation-reference.component.scss']
+    selector: 'qa-validation-reference',
+    templateUrl: './validation-reference.component.html',
+    styleUrls: ['./validation-reference.component.scss'],
+    standalone: false
 })
 export class ValidationReferenceComponent implements OnInit {
 

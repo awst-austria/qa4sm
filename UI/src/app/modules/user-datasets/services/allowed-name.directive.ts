@@ -15,8 +15,9 @@ export function allowedNameValidator(spaceAllowed= false): ValidatorFn {
 }
 
 @Directive({
-  selector: '[qaAllowedName]',
-  providers: [{provide: NG_VALIDATORS, useExisting: AllowedNameDirective, multi: true}]
+    selector: '[qaAllowedName]',
+    providers: [{ provide: NG_VALIDATORS, useExisting: AllowedNameDirective, multi: true }],
+    standalone: false
 })
 export class AllowedNameDirective implements Validator {
 

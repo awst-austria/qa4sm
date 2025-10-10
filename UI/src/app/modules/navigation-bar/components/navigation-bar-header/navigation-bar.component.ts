@@ -7,9 +7,10 @@ import {SettingsService} from '../../../core/services/global/settings.service';
 import {LoginComponent} from 'src/app/modules/user/login/login.component';
 
 @Component({
-  selector: 'qa-navigation-bar-header',
-  templateUrl: './navigation-bar.component.html',
-  styleUrls: ['./navigation-bar.component.scss']
+    selector: 'qa-navigation-bar-header',
+    templateUrl: './navigation-bar.component.html',
+    styleUrls: ['./navigation-bar.component.scss'],
+    standalone: false
 })
 export class NavigationBarComponent implements OnInit {
   isMaintenancePossible = false;

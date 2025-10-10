@@ -13,9 +13,10 @@ export const ANOMALIES_35D_MA: string = 'moving_avg_35_d';
 export const ANOMALIES_35D_MA_DESC: string = '35 day moving average';
 
 @Component({
-  selector: 'qa-anomalies',
-  templateUrl: './anomalies.component.html',
-  styleUrls: ['./anomalies.component.scss']
+    selector: 'qa-anomalies',
+    templateUrl: './anomalies.component.html',
+    styleUrls: ['./anomalies.component.scss'],
+    standalone: false
 })
 export class AnomaliesComponent implements OnInit {
 

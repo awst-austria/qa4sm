@@ -10,9 +10,10 @@ import {catchError} from 'rxjs/operators';
 import {CustomHttpError} from '../../modules/core/services/global/http-error.service';
 
 @Component({
-  selector: 'qa-set-password',
-  templateUrl: './set-password.component.html',
-  styleUrls: ['./set-password.component.scss']
+    selector: 'qa-set-password',
+    templateUrl: './set-password.component.html',
+    styleUrls: ['./set-password.component.scss'],
+    standalone: false
 })
 export class SetPasswordComponent implements OnInit {
   token: string;

@@ -7,9 +7,10 @@ import {CustomHttpError} from '../../../core/services/global/http-error.service'
 import {ToastService} from '../../../core/services/toast/toast.service';
 
 @Component({
-  selector: 'qa-tracked-validations',
-  templateUrl: './tracked-validations.component.html',
-  styleUrls: ['./tracked-validations.component.scss']
+    selector: 'qa-tracked-validations',
+    templateUrl: './tracked-validations.component.html',
+    styleUrls: ['./tracked-validations.component.scss'],
+    standalone: false
 })
 export class TrackedValidationsComponent implements OnInit {
 

@@ -10,9 +10,10 @@ import * as net from "node:net";
 
 
 @Component({
-  selector: 'qa-ismn-network-filter',
-  templateUrl: './ismn-network-filter.component.html',
-  styleUrls: ['./ismn-network-filter.component.scss']
+    selector: 'qa-ismn-network-filter',
+    templateUrl: './ismn-network-filter.component.html',
+    styleUrls: ['./ismn-network-filter.component.scss'],
+    standalone: false
 })
 export class IsmnNetworkFilterComponent implements OnInit {
 

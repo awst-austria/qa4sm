@@ -16,11 +16,10 @@ type UIDataset = {
 };
 
 @Component({
-  selector: 'qa-json-config',
-  standalone: true,
-  imports: [RouterLink, CommonModule, FormsModule],
-  templateUrl: './json-config.component.html',
-  styleUrl: './json-config.component.scss'
+    selector: 'qa-json-config',
+    imports: [RouterLink, CommonModule, FormsModule],
+    templateUrl: './json-config.component.html',
+    styleUrl: './json-config.component.scss'
 })
 export class JsonConfigComponent {
 

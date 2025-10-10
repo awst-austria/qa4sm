@@ -6,9 +6,10 @@ import {ComparisonService} from '../../modules/comparison/services/comparison.se
 import {ToastService} from '../../modules/core/services/toast/toast.service';
 
 @Component({
-  selector: 'qa-comparison',
-  templateUrl: './comparison.component.html',
-  styleUrls: ['./comparison.component.scss']
+    selector: 'qa-comparison',
+    templateUrl: './comparison.component.html',
+    styleUrls: ['./comparison.component.scss'],
+    standalone: false
 })
 export class ComparisonComponent implements OnInit {
   comparisonModel: Validations2CompareModel;

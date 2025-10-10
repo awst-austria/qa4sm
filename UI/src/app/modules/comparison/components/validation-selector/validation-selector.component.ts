@@ -17,9 +17,10 @@ import { catchError } from 'rxjs/operators';
 const N_MAX_VALIDATIONS = 2; // A maximum of two validation results can be compared, at the moment - this shouldn't be hardcoded
 
 @Component({
-  selector: 'qa-validation-selector',
-  templateUrl: './validation-selector.component.html',
-  styleUrls: ['./validation-selector.component.scss']
+    selector: 'qa-validation-selector',
+    templateUrl: './validation-selector.component.html',
+    styleUrls: ['./validation-selector.component.scss'],
+    standalone: false
 })
 export class ValidationSelectorComponent implements OnInit {
 

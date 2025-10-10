@@ -2,9 +2,10 @@ import {Component, EventEmitter, Input, Output} from '@angular/core';
 import {FilterModel} from './filter-model';
 
 @Component({
-  selector: 'qa-basic-filter',
-  templateUrl: './basic-filter.component.html',
-  styleUrls: ['./basic-filter.component.scss']
+    selector: 'qa-basic-filter',
+    templateUrl: './basic-filter.component.html',
+    styleUrls: ['./basic-filter.component.scss'],
+    standalone: false
 })
 export class BasicFilterComponent  {
 

@@ -17,9 +17,10 @@ import {
 } from "../handle-multiple-validations/multiple-validation-action";
 
 @Component({
-  selector: 'qa-validation-page-paginated',
-  templateUrl: './validation-page-paginated.component.html',
-  styleUrls: ['./validation-page-paginated.component.scss']
+    selector: 'qa-validation-page-paginated',
+    templateUrl: './validation-page-paginated.component.html',
+    styleUrls: ['./validation-page-paginated.component.scss'],
+    standalone: false
 })
 export class ValidationPagePaginatedComponent implements OnInit {
   published = input<boolean>();

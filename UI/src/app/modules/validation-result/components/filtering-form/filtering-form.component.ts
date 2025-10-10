@@ -8,7 +8,8 @@ import {debounceTime} from "rxjs/operators";
 @Component({
     selector: 'qa-filtering-form',
     templateUrl: './filtering-form.component.html',
-    styleUrl: './filtering-form.component.scss'
+    styleUrl: './filtering-form.component.scss',
+    standalone: false
 })
 export class FilteringFormComponent {
     validationFilters = model<FilterConfig[]>()

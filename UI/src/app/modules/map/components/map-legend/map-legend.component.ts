@@ -4,9 +4,10 @@ import {DomSanitizer} from '@angular/platform-browser';
 
 
 @Component({
-  selector: 'qa-map-legend',
-  templateUrl: './map-legend.component.html',
-  styleUrls: ['./map-legend.component.scss']
+    selector: 'qa-map-legend',
+    templateUrl: './map-legend.component.html',
+    styleUrls: ['./map-legend.component.scss'],
+    standalone: false
 })
 export class MapLegendComponent {
   @Input() legendItems: LegendItem[] = [];

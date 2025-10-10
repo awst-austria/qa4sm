@@ -7,9 +7,10 @@ import {DatasetConfigModel} from '../../../../pages/validate/dataset-config-mode
 
 
 @Component({
-  selector: 'qa-scaling',
-  templateUrl: './scaling.component.html',
-  styleUrls: ['./scaling.component.scss']
+    selector: 'qa-scaling',
+    templateUrl: './scaling.component.html',
+    styleUrls: ['./scaling.component.scss'],
+    standalone: false
 })
 export class ScalingComponent implements OnInit {
 

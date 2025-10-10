@@ -6,9 +6,10 @@ import {SettingsService} from '../../modules/core/services/global/settings.servi
 const plotsUrlPrefix = '/static/images/help/';
 
 @Component({
-  selector: 'qa-help',
-  templateUrl: './help.component.html',
-  styleUrls: ['./help.component.scss']
+    selector: 'qa-help',
+    templateUrl: './help.component.html',
+    styleUrls: ['./help.component.scss'],
+    standalone: false
 })
 export class HelpComponent {
   // Icons for bullet points

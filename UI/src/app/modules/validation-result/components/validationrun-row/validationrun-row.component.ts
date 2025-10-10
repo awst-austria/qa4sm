@@ -15,9 +15,10 @@ import {DatasetVariableDto} from "../../../core/services/dataset/dataset-variabl
 
 
 @Component({
-  selector: 'qa-validationrun-row',
-  templateUrl: './validationrun-row.component.html',
-  styleUrls: ['./validationrun-row.component.scss']
+    selector: 'qa-validationrun-row',
+    templateUrl: './validationrun-row.component.html',
+    styleUrls: ['./validationrun-row.component.scss'],
+    standalone: false
 })
 export class ValidationrunRowComponent implements OnInit, OnDestroy {
 

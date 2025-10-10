@@ -6,9 +6,10 @@ import { combineLatest, EMPTY, Observable } from 'rxjs';
 import { catchError, map, tap } from 'rxjs/operators';
 
 @Component({
-  selector: 'qa-dataset-info',
-  templateUrl: './dataset-info.component.html',
-  styleUrls: ['./dataset-info.component.scss']
+    selector: 'qa-dataset-info',
+    templateUrl: './dataset-info.component.html',
+    styleUrls: ['./dataset-info.component.scss'],
+    standalone: false
 })
 export class DatasetInfoComponent {
 

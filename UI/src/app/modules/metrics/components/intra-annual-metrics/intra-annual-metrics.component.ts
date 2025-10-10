@@ -8,18 +8,17 @@ import {IntraAnnualMetricsDto} from "../../../../pages/validate/service/validati
 import {CheckboxModule} from "primeng/checkbox";
 
 @Component({
-  selector: 'qa-intra-annual-metrics',
-  standalone: true,
-  imports: [
-    DropdownModule,
-    InputNumberModule,
-    NgIf,
-    TooltipModule,
-    FormsModule,
-    CheckboxModule
-  ],
-  templateUrl: './intra-annual-metrics.component.html',
-  styleUrl: './intra-annual-metrics.component.scss'
+    selector: 'qa-intra-annual-metrics',
+    imports: [
+        DropdownModule,
+        InputNumberModule,
+        NgIf,
+        TooltipModule,
+        FormsModule,
+        CheckboxModule
+    ],
+    templateUrl: './intra-annual-metrics.component.html',
+    styleUrl: './intra-annual-metrics.component.scss'
 })
 export class IntraAnnualMetricsComponent {
   @Input() disabled: boolean = false;

@@ -11,9 +11,10 @@ import {ToastService} from '../../../core/services/toast/toast.service';
 import {CustomHttpError} from '../../../core/services/global/http-error.service';
 
 @Component({
-  selector: 'qa-buttons',
-  templateUrl: './buttons.component.html',
-  styleUrls: ['./buttons.component.scss']
+    selector: 'qa-buttons',
+    templateUrl: './buttons.component.html',
+    styleUrls: ['./buttons.component.scss'],
+    standalone: false
 })
 
 export class ButtonsComponent implements OnInit {

@@ -20,9 +20,10 @@ import {Cluster} from "ol/source";
 import {LegendItem} from '../legend-item';
 
 @Component({
-  selector: 'qa-map',
-  templateUrl: './map.component.html',
-  styleUrls: ['./map.component.scss']
+    selector: 'qa-map',
+    templateUrl: './map.component.html',
+    styleUrls: ['./map.component.scss'],
+    standalone: false
 })
 export class MapComponent implements AfterViewInit, OnInit {
 

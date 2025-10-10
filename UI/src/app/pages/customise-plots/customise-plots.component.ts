@@ -2,11 +2,10 @@ import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 
 @Component({
-  selector: 'qa-customise-plots',
-  standalone: true,
-  imports: [CommonModule],
-  templateUrl: './customise-plots.component.html',
-  styleUrl: './customise-plots.component.scss'
+    selector: 'qa-customise-plots',
+    imports: [CommonModule],
+    templateUrl: './customise-plots.component.html',
+    styleUrl: './customise-plots.component.scss'
 })
 export class CustomisePlotsComponent {
 

@@ -12,9 +12,10 @@ import { AuthService } from '../../../core/services/auth/auth.service';
 import { UserFileMetadata } from '../../../core/services/form-interfaces/UserFileMetadataForm';
 
 @Component({
-  selector: 'qa-user-file-upload',
-  templateUrl: './user-file-upload.component.html',
-  styleUrls: ['./user-file-upload.component.scss']
+    selector: 'qa-user-file-upload',
+    templateUrl: './user-file-upload.component.html',
+    styleUrls: ['./user-file-upload.component.scss'],
+    standalone: false
 })
 export class UserFileUploadComponent {
   // variables to store file information

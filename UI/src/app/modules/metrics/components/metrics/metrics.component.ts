@@ -13,9 +13,10 @@ information.
  */
 
 @Component({
-  selector: 'qa-metrics',
-  templateUrl: './metrics.component.html',
-  styleUrls: ['./metrics.component.scss']
+    selector: 'qa-metrics',
+    templateUrl: './metrics.component.html',
+    styleUrls: ['./metrics.component.scss'],
+    standalone: false
 })
 export class MetricsComponent implements OnInit {
 

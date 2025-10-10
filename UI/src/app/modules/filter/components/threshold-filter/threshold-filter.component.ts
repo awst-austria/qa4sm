@@ -4,9 +4,10 @@ import { BehaviorSubject } from 'rxjs';
 import { DatasetComponentSelectionModel } from '../../../dataset/components/dataset/dataset-component-selection-model';
 
 @Component({
-  selector: 'qa-threshold-filter',
-  templateUrl: './threshold-filter.component.html',
-  styleUrls: ['./threshold-filter.component.scss']
+    selector: 'qa-threshold-filter',
+    templateUrl: './threshold-filter.component.html',
+    styleUrls: ['./threshold-filter.component.scss'],
+    standalone: false
 })
 export class ThresholdFilterComponent implements OnInit {
 

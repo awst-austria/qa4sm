@@ -3,9 +3,10 @@ import {ExtentModel} from './extent-model';
 
 
 @Component({
-  selector: 'qa-spatial-extent',
-  templateUrl: './spatial-extent.component.html',
-  styleUrls: ['./spatial-extent.component.scss']
+    selector: 'qa-spatial-extent',
+    templateUrl: './spatial-extent.component.html',
+    styleUrls: ['./spatial-extent.component.scss'],
+    standalone: false
 })
 export class SpatialExtentComponent {
 
