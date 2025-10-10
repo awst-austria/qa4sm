@@ -1,11 +1,5 @@
 import {Component, Input, model, signal} from '@angular/core';
-import {DropdownModule} from "primeng/dropdown";
-import {InputNumberModule} from "primeng/inputnumber";
-import {NgIf} from "@angular/common";
-import {TooltipModule} from "primeng/tooltip";
-import {FormsModule} from "@angular/forms";
 import {IntraAnnualMetricsDto} from "../../../../pages/validate/service/validation-run-config-dto";
-import {CheckboxModule} from "primeng/checkbox";
 import { SharedPrimeNgModule } from 'src/app/shared.primeNg.module';
 
 @Component({

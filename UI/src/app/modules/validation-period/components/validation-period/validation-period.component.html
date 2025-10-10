@@ -19,10 +19,10 @@
         <div class="w-8 px-0 mx-0">
           <div class="p-fluid">
             <div class="p-float-label">
-              <p-calendar inputId="fromDateInputId" id="fromDateInput" dateFormat="yy-mm-dd"
+              <p-datepicker inputId="fromDateInputId" id="fromDateInput" dateFormat="yy-mm-dd"
                           [maxDate]="validationPeriodModel.intervalTo$|async"
                           [ngModel]="(validationPeriodModel.intervalFrom$|async)"
-                          (ngModelChange)="validationPeriodModel.intervalFrom$.next($event)"></p-calendar>
+                          (ngModelChange)="validationPeriodModel.intervalFrom$.next($event)"></p-datepicker>
               <label for="fromDateInputId">Choose a date</label>
             </div>
           </div>
@@ -40,10 +40,10 @@
         <div class="w-8 px-0 mx-0">
           <div class="p-fluid">
             <div class="p-float-label">
-              <p-calendar inputId="toDateInputId" id="toDateInput" dateFormat="yy-mm-dd"
+              <p-datepicker inputId="toDateInputId" id="toDateInput" dateFormat="yy-mm-dd"
                           [minDate]="validationPeriodModel.intervalFrom$|async"
                           [ngModel]="(validationPeriodModel.intervalTo$|async)"
-                          (ngModelChange)="validationPeriodModel.intervalTo$.next($event)"></p-calendar>
+                          (ngModelChange)="validationPeriodModel.intervalTo$.next($event)"></p-datepicker>
               <label for="toDateInputId">Chose a date</label>
             </div>
           </div>

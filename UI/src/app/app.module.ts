@@ -23,7 +23,6 @@ import {UserProfileComponent} from './pages/user-profile/user-profile.component'
 import {DatasetModule} from './modules/dataset/dataset.module';
 import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
 import {FontAwesomeModule} from '@fortawesome/angular-fontawesome';
-import {DropdownModule} from 'primeng/dropdown';
 import {PanelModule} from 'primeng/panel';
 import {AccordionModule} from 'primeng/accordion';
 import {TooltipModule} from 'primeng/tooltip';
@@ -75,6 +74,7 @@ import {ContactUsComponent} from './pages/contact-us/contact-us.component';
 import {ContactModule} from './modules/contact/contact.module';
 import {SelectButtonModule} from 'primeng/selectbutton';
 import {MaintenanceModeComponent} from "./modules/core/maintenance-mode/maintenance-mode.component";
+import { SharedPrimeNgModule } from './shared.primeNg.module';
 
 @NgModule({ declarations: [
         AppComponent,
@@ -113,7 +113,6 @@ import {MaintenanceModeComponent} from "./modules/core/maintenance-mode/maintena
         NgbModule,
         FontAwesomeModule,
         ToastModule,
-        DropdownModule,
         AccordionModule,
         PanelModule,
         TooltipModule,
@@ -143,6 +142,7 @@ import {MaintenanceModeComponent} from "./modules/core/maintenance-mode/maintena
         ScrollTopModule,
         ContactModule,
         SelectButtonModule, 
+        SharedPrimeNgModule,
         MaintenanceModeComponent], providers: [
         {
             provide: HTTP_INTERCEPTORS,

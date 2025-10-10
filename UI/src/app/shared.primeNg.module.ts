@@ -7,7 +7,7 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { ConfirmationService, MessageService } from 'primeng/api';
 
 // PrimeNG (v20) 
-import { Accordion, AccordionModule } from 'primeng/accordion';
+import { AccordionContent, AccordionHeader, AccordionModule, AccordionPanel } from 'primeng/accordion';
 import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
 import { CarouselModule } from 'primeng/carousel';
@@ -34,8 +34,7 @@ import { ToastModule } from 'primeng/toast';
 import { ToggleButtonModule } from 'primeng/togglebutton';
 import { TooltipModule } from 'primeng/tooltip';
 import { SliderModule } from 'primeng/slider';
-import { CalendarModule } from 'primeng/calendar';
-import { DropdownModule } from 'primeng/dropdown';
+import { DatePickerModule } from 'primeng/datepicker';
 import { PaginatorModule } from 'primeng/paginator';
 import { MenubarModule } from 'primeng/menubar';
 import { DividerModule } from 'primeng/divider';
@@ -52,13 +51,16 @@ import { SelectModule } from 'primeng/select';
 
     // PrimeNG 
     AccordionModule,
+    AccordionPanel,
+    AccordionHeader,
+    AccordionContent,
     ButtonModule,
     CardModule,
     CarouselModule,
     CheckboxModule,
     ChipModule,
     ConfirmDialogModule,
-    CalendarModule,
+    DatePickerModule,
     DialogModule,
     DividerModule,
     FontAwesomeModule,
@@ -92,15 +94,17 @@ import { SelectModule } from 'primeng/select';
     ReactiveFormsModule,
 
     // PrimeNG 
-    Accordion,
     AccordionModule,
+    AccordionPanel,
+    AccordionHeader,
+    AccordionContent,
     ButtonModule,
     CardModule,
     CarouselModule,
     CheckboxModule,
     ChipModule,
     ConfirmDialogModule,
-    CalendarModule,
+    DatePickerModule,
     DialogModule,
     DividerModule,
     FieldsetModule,
