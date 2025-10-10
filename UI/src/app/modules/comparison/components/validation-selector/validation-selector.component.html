@@ -32,7 +32,7 @@
           <div class="col-12">
             <p-accordion multiple="true" activeIndex="0">
               <p-accordionTab [header]="'Non-reference datasets'">
-                <p-checkbox label="{{'Multiple non-reference datasets'}}"
+                <p-checkbox inputId="multipleNonReference"
                             [(ngModel)]="multipleNonReference"
                             [binary]="true"
                             (click)="multipleNonReferenceChange()"
