@@ -1,9 +1,6 @@
 import {NgModule} from '@angular/core';
-import {CommonModule} from '@angular/common';
 import {DatasetComponent} from './components/dataset/dataset.component';
-import {FormsModule} from '@angular/forms';
-import {DropdownModule} from 'primeng/dropdown';
-import {ButtonModule} from 'primeng/button';
+import { SharedPrimeNgModule } from 'src/app/shared.primeNg.module';
 
 @NgModule({
   declarations: [DatasetComponent],
@@ -11,10 +8,7 @@ import {ButtonModule} from 'primeng/button';
         DatasetComponent,
     ],
   imports: [
-    CommonModule,
-    FormsModule,
-    DropdownModule,
-    ButtonModule
+    SharedPrimeNgModule
   ]
 })
 export class DatasetModule {
