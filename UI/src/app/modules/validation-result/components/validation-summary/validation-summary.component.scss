@@ -1,4 +1,4 @@
-@import "../buttons/buttons.component.scss";
+@use 'src/style.variables' as *;
 li{
   word-break: break-word;
 }

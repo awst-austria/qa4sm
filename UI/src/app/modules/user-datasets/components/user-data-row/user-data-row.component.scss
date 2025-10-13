@@ -1,4 +1,4 @@
-@import "../../../../../style.variables.scss";
+@use 'src/style.variables' as *;
 
 .att_val_container{
   background-color: white;

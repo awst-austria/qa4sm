@@ -31,6 +31,7 @@
     "@ng-bootstrap/ng-bootstrap": "^19.0.1",
     "@popperjs/core": "^2.11.8",
     "@primeng/themes": "^20.2.0",
+    "@primeuix/themes": "^1.2.5",
     "@tinkoff/ng-dompurify": "^4.0.0",
     "@types/arcgis-rest-api": "^10.4.8",
     "@types/file-saver": "^2.0.7",

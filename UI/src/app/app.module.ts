@@ -75,6 +75,8 @@ import {ContactModule} from './modules/contact/contact.module';
 import {SelectButtonModule} from 'primeng/selectbutton';
 import {MaintenanceModeComponent} from "./modules/core/maintenance-mode/maintenance-mode.component";
 import { SharedPrimeNgModule } from './shared.primeNg.module';
+import { providePrimeNG } from 'primeng/config';
+import Aura from '@primeuix/themes/aura';
 
 @NgModule({ declarations: [
         AppComponent,
@@ -149,6 +151,11 @@ import { SharedPrimeNgModule } from './shared.primeNg.module';
             useClass: HttpTokenInterceptor,
             multi: true
         },
+            providePrimeNG({
+            theme: {
+              preset: Aura
+            }
+        }),
         MessageService,
         provideHttpClient(withInterceptorsFromDi())
     ] })

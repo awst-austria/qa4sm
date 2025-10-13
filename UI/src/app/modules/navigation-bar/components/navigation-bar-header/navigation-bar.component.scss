@@ -1,4 +1,4 @@
-@import "../../../../../style.variables";
+@use 'src/style.variables' as *;
 
 .navbar {
   width: 100%;

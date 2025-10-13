@@ -1,4 +1,4 @@
-@import "../../../../../style.variables";
+@use 'src/style.variables' as *;
 
 @keyframes spinAndChangeColor {
   from {color: #9CF2F6}

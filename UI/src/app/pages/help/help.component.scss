@@ -1,4 +1,4 @@
-@import "../../../style.variables";
+@use 'src/style.variables' as *;
 
 #help-panel {
   padding: 2rem;

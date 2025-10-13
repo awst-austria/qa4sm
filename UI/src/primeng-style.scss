@@ -1,5 +1,5 @@
 @charset "UTF-8";
-@import "style.variables";
+@use 'style.variables' as *;
 
 
 $font-dialog-header: 1.25rem;
