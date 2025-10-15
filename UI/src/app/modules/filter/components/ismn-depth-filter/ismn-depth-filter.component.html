@@ -3,7 +3,7 @@
     <p-checkbox label="{{filterModel.filterDto.description}}: "
                 [binary]="true" [ngModel]="true" [readonly]=filterModel.filterDto.readonly class="readonly-filter-checkbox">
     </p-checkbox>
-    <a (click)="dialogVisible=true"><span style="padding-left: 5px;cursor: pointer;">select...</span></a>
+    <a (click)="dialogVisible=true"><span style="padding-left: 5px;cursor: pointer;">Select depth</span></a>
   </div>
   <div  [ngClass]="{'col-1': true}">
     <span class="pi pi-question-circle" [pTooltip]="filterModel.filterDto.help_text"></span>

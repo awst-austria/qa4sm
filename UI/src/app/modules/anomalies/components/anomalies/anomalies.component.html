@@ -6,28 +6,25 @@
       <span class="pi pi-question-circle"></span>
     </label>
   </ng-template>
-  <div class="flex flex-row flex-wrap py-4 px-2 justify-content-center align-content-center">
-    <div class="flex flex-row flex-nowrap lg:w-4 w-11 py-2">
-        <div class="small-label w-4">
-          <div class="p-fluid">
-            <div>Method</div>
-          </div>
-        </div>
-        <div class="w-8 px-0">
-          <div class="p-float-label">
-            <p-select id="anomaliesMethodSelector"
+  
+  <div> 
+    <span>Method:</span>
+    <div class="p-float-label mt-2" >
+      <p-select id="anomaliesMethodSelector"
                         inputId="anomaliesMethodSelectorId"
                         [options]="availableAnomalyMethodModels"
                         [ngModel]="selectedMethod$|async"
                         (ngModelChange)="selectedMethod$.next($event)"
-                        optionLabel="description"></p-select>
-            <label for="anomaliesMethodSelectorId">Select</label>
-          </div>
-        </div>
+                        optionLabel="description"
+                        [style]="{'width': '100%'}"
+      >
+      </p-select>
+      <label for="anomaliesMethodSelectorId">Select</label>
     </div>
-    <div class="flex flex-row flex-nowrap lg:w-8 w-11">
-      <qa-anom-climatology *ngIf="((selectedMethod$|async).method$|async)===anomaliesClimatology"
+  </div>
+  
+  <div>
+    <qa-anom-climatology *ngIf="((selectedMethod$|async).method$|async)===anomaliesClimatology"
                            [(anomaliesModel)]="anomaliesModel"/>
-    </div>
   </div>
 </p-panel>

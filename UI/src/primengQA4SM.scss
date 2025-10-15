@@ -1,0 +1,134 @@
+@use 'style.variables' as *;
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;600;700&display=swap');
+
+
+* { box-sizing: border-box;}
+
+body {
+  margin: 0;
+  padding: 0;
+  background-color: $background-color;
+  font-family: 'Roboto', sans-serif;
+  color: $font-color-base;
+}
+
+// here we will overwrite default Aura thema with custom primengQA4SM
+
+@layer primengQA4SM {
+
+  // p-panel styling
+  .p-panel-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: .75rem .75rem;
+    margin-bottom: .75rem;
+    border: 3px solid $base-color;
+    border-top-left-radius: 4px;
+    border-top-right-radius: 4px;
+    font-size: 1.4rem;
+    background: $base-color;
+    color: $font-color-white;
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+  }
+
+  .p-panel-header .p-panel-title {
+    font-weight: 400;      
+    letter-spacing: 1px;
+    text-align: center;
+    flex: 1;               
+  }
+
+  //p-select dropdown list styling
+  .p-float-label > label {
+    font-size: 0.875rem;     // 14px
+    color: $font-color-muted;
+    letter-spacing: 0.3px;
+  }
+  /* when the control is focused or has a value, PrimeNG adds these states */
+  .p-float-label .p-inputwrapper-focus ~ label,
+  .p-float-label .p-inputwrapper-filled ~ label,
+  .p-float-label .p-dropdown.p-focus ~ label,
+  .p-float-label .p-dropdown.p-inputwrapper-filled ~ label {
+    font-size: 0.75rem;      // 12px when floated
+    color: $font-color-muted;
+    opacity: 0.9;            
+  }
+
+  // checkbox styling
+  .p-checkbox.p-highlight .p-checkbox-box {
+  background: $base-color;   
+  }
+
+  .p-checkbox.p-highlight:hover .p-checkbox-box {
+  background: $base-color-hover;   
+  border-color: $base-color-hover;
+  }
+
+  //
+
+  // Buttons styling
+  /* If you set cssLayer:'primeng', do: @layer primeng, app; then wrap rules in @layer app {...} */
+.p-button.p-button-success {
+  background: $success;
+  border-color: $success;
+  color: $font-color-white;
+}
+.p-button.p-button-success:hover,
+.p-button.p-button-success:focus-visible {
+  background: $success-hover;
+  border-color: $success-hover;
+}
+.p-button.p-button-success:focus-visible {
+  box-shadow: 0 0 0 .2rem $success-ring;
+}
+
+/* Outlined + Text variants */
+.p-button.p-button-outlined.p-button-success {
+  color: $success;
+  border-color: $success;
+  background: transparent;
+}
+.p-button.p-button-outlined.p-button-success:hover {
+  background: $success-ring;
+}
+.p-button.p-button-text.p-button-success {
+  color: $success;
+  background: transparent;
+  border-color: transparent;
+}
+.p-button.p-button-text.p-button-success:hover {
+  background: $success-ring;
+}
+
+/* Danger */
+.p-button.p-button-danger {
+  background: $danger;
+  border-color: $danger;
+  color: $font-color-white;
+}
+.p-button.p-button-danger:hover,
+.p-button.p-button-danger:focus-visible {
+  background: $danger-hover;
+  border-color: $danger-hover;
+}
+.p-button.p-button-danger:focus-visible {
+  box-shadow: 0 0 0 .2rem $danger-ring;
+}
+.p-button.p-button-outlined.p-button-danger {
+  color: $danger;
+  border-color: $danger;
+  background: transparent;
+}
+.p-button.p-button-outlined.p-button-danger:hover,
+.p-button.p-button-text.p-button-danger:hover {
+  background: $danger-ring;
+}
+.p-button.p-button-text.p-button-danger {
+  color: $danger;
+  background: transparent;
+  border-color: transparent;
+}
+
+
+}

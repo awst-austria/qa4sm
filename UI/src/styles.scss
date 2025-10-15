@@ -1,8 +1,10 @@
+
 /* You can add global styles to this file, and also import other style files */
 @use 'style.variables' as *;
-@use 'primeng-style' as *;
-
+@use 'primengQA4SM' as *;
 @import "ol/ol.css";
+@layer primengAura, primengQA4SM;  // here we will overwrite default Aura thema with custom primengQA4SM
+
 
 main {
   text-align: left;
@@ -22,6 +24,8 @@ a:hover {
   color: $button-hover-color;
   text-decoration: underline;
 }
+
+
 
 h1, h2, h3, h4, h5, h6 {
   margin-top: 0;

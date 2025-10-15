@@ -16,24 +16,25 @@
   </div>
 </div>
 
-<div *ngIf="selectedMetric().intra_annual_metrics" class="flex flex-row lg:w-8 w-11">
-  <div
-    class="flex flex-row flex-wrap w-12 lg:pt-2 pt-4 lg:justify-content-center justify-content-start gap-0 lg:ml-3">
-    <div class="w-12 lg:w-6 lg:py-2 py-3 flex-nowrap flex lg:justify-content-center justify-content-start">
-      <div class="small-label w-4">
-        <div class="p-fluid">
-          <div>Frequency</div>
-        </div>
+<div *ngIf="selectedMetric().intra_annual_metrics">
+  <div class="p-fluid grid pt-3">
+
+  <div class="col-12 lg:col-6">
+    <div class="grid align-items-center">
+      <div class="col-5 label-cell text-center">
+        <div style="margin-top:-1.5rem;"><b>Frequency:</b></div>
       </div>
-      <div class="p-float-label">
-        <p-select id="intraAnnualMetricTypeSelector"
+      <div class="col-5">
+        <span class="p-float-label">
+          <p-select id="intraAnnualMetricTypeSelector"
                     [options]="intraAnnualMetricTypes"
                     [ngModel]="selectedMetric().intra_annual_type"
                     (ngModelChange)="updateType($event)">
-        </p-select>
-        <label for="intraAnnualMetricTypeSelector">Select</label>
+          </p-select>
+          <label for="intraAnnualMetricTypeSelector">Select</label>
+        </span>
       </div>
-      <div class="w-1 flex lg:justify-content-center justify-content-start">
+      <div class="col-2">
         <label class="p-panel-header-icon"
                pTooltip="The set of temporal sub-windows over which all metrics are calculated:&#10;&#10;&#8226; 'Seasonal': the four meteorological seasons.&#10;&#10;&#8226; 'Monthly': the twelve months.&#10;&#10;Note: Per default, the bulk case (metrics calculated over the entire time series) is always included.&#10;Refer to the manual for the exact definitions."
                tooltipPosition="bottom">
@@ -41,27 +42,32 @@
         </label>
       </div>
     </div>
-    <div class="w-12 lg:w-6 lg:py-2 py-3 flex flex-nowrap lg:justify-content-center justify-content-start">
-      <div class="small-label w-4" style="max-width: 8rem">
-        <div class="p-fluid">
-          <div>Overlap</div>
-        </div>
+  </div>
+
+  <div class="col-12 lg:col-6">
+    <div class="grid align-items-center">
+      <div class="col-5 label-cell text-center">
+        <div style="margin-top:-1.5rem;"><b>Overlap:</b></div>
       </div>
-      <div class="flex px-0 p-float-label align-content-center justify-content-start">
-        <p-inputNumber
-          id="overlapSelector"
-          [showButtons]="true"
-          [maxFractionDigits]="0"
-          [suffix]="selectedMetric().intra_annual_overlap === 1 ? ' day' : ' days'"
-          [ngModel]="selectedMetric().intra_annual_overlap"
-          (ngModelChange)="setOverlap($event)"
-          [step]="1"
-          [min]="0"
-          [max]="maxIntraAnnualOverlap()">
-        </p-inputNumber>
-        <label for="overlapSelector">Select overlap</label>
+      <div class="col-5">
+        <span class="p-float-label">
+          <p-inputNumber
+              class="w-full"
+              inputStyleClass="w-full"
+              id="overlapSelector"
+              [showButtons]="true"
+              [maxFractionDigits]="0"
+              [suffix]="selectedMetric().intra_annual_overlap === 1 ? ' day' : ' days'"
+              [ngModel]="selectedMetric().intra_annual_overlap"
+              (ngModelChange)="setOverlap($event)"
+              [step]="1"
+              [min]="0"
+              [max]="maxIntraAnnualOverlap()">
+          </p-inputNumber>
+          <label for="overlapSelector">Select overlap</label>
+        </span>
       </div>
-      <div class="w-1 flex lg:justify-content-center justify-content-start">
+      <div class="col-2">
         <label class="p-panel-header-icon"
                pTooltip="Extends each temporal sub-window on either side by the specified number of days, i.e. the overlap is symmetric. May be used to increase the sample size, but may introduce correlations between adjacent windows as they will overlap."
                tooltipPosition="bottom">
@@ -70,4 +76,6 @@
       </div>
     </div>
   </div>
+  
+</div>
 </div>

@@ -7,7 +7,7 @@
   padding: 20px;
   font-family: 'Segoe UI', Tahoma, sans-serif;
   line-height: 1.6;
-  color: $base-font-color;
+  color: $font-color-base;
 }
 /* Headings */
 h2 {
@@ -102,7 +102,7 @@ code { padding: 0; border-radius: 4px; }
   border-radius: 8px;
   text-decoration: none;
   cursor: pointer;
-  color: $base-font-color;
+  color: $font-color-base;
 
   &:hover { background: rgba(127,127,127,.06); }
   &:active { transform: translateY(1px); }

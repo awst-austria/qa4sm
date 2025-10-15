@@ -1,29 +1,32 @@
 <div class="grid align-content-center">
   <div class="col">
     <span class="p-float-label mb-4 mt-3">
-    <p-select [inputId]="datasetSelectorId" (onChange)="updateSelectableVersionsAndVariableAndEmmit()" [options]="(datasets$|async)"
-                [(ngModel)]="selectionModel.selectedDataset"
-                optionLabel="pretty_name" [style]="{'width': '100%'}">
-      <ng-template let-item pTemplate="item">
-            <span>{{ item.pretty_name }} <em
-              *ngIf="authService.authenticated.value">{{
-                item.user === authService.currentUser.id ? "  (user data)" :
-                  (item.user !== authService.currentUser.id && item.is_shared ? ' (shared data)' : "")
-              }}</em>
+      <p-select 
+        [inputId]="datasetSelectorId" 
+        (onChange)="updateSelectableVersionsAndVariableAndEmmit()" 
+        [options]="(datasets$|async)"
+        [(ngModel)]="selectionModel.selectedDataset"
+        optionLabel="pretty_name" [style]="{'width': '100%'}">
+          <ng-template let-item pTemplate="item">
+            <span>{{ item.pretty_name }} 
+              <em *ngIf="authService.authenticated.value">
+                {{item.user === authService.currentUser.id ? "  (user data)" :
+                  (item.user !== authService.currentUser.id && item.is_shared ? ' (shared data)' : "")}}
+              </em>
             </span>
-      </ng-template>
-      <ng-template let-item pTemplate="selectedItem">
-         <span>{{ item.pretty_name }} <em
-           *ngIf="authService.authenticated.value">{{
-             item.user === authService.currentUser.id ? "  (user data)" :
-               (item.user !== authService.currentUser.id && item.is_shared ? " (shared data)" : "")
-           }}</em> </span>
-      </ng-template>
-    </p-select>
+          </ng-template>
 
+          <ng-template let-item pTemplate="selectedItem">
+            <span>{{ item.pretty_name }} 
+              <em *ngIf="authService.authenticated.value">
+                {{item.user === authService.currentUser.id ? "  (user data)" :
+               (item.user !== authService.currentUser.id && item.is_shared ? " (shared data)" : "")}}
+              </em>
+            </span>
+          </ng-template>
+      </p-select>
       <label for="{{datasetSelectorId}}">Dataset name</label>
     </span>
-
   </div>
 </div>
 
@@ -38,19 +41,18 @@
                   (onChange)="onVersionChange(selectedVersions)">
 
         <ng-template let-item pTemplate="item">
-            <span>{{ item.pretty_name }}
-              <em class="text-muted" *ngIf="item.id === newestVersionId"> (newest version)</em>
-            </span>
+          <span>{{ item.pretty_name }}
+            <em class="text-muted" *ngIf="item.id === newestVersionId"> (newest version)</em>
+          </span>
         </ng-template>
         <ng-template let-item pTemplate="selectedItem">
-            <span>{{ item.pretty_name }}
-              <em class="text-muted" *ngIf="item.id === newestVersionId"> (newest version)</em>
-            </span>
+          <span>{{ item.pretty_name }}
+            <em class="text-muted" *ngIf="item.id === newestVersionId"> (newest version)</em>
+          </span>
         </ng-template>
       </p-select>
       <label for="{{versionSelectorId}}">Dataset version <span *ngIf="newerVersionExists" class='warning-text'> (newer version available!) </span></label>
     </span>
-
   </div>
 </div>
 
@@ -64,16 +66,13 @@
           <span>
             <span>{{ item.short_name }} [{{ item.unit ? item.unit : 'n.a.' }}]</span>
           </span>
-      </ng-template>
-      <ng-template let-item pTemplate="selectedItem">
-         <span>{{ item.short_name }} [{{ item.unit ? item.unit : 'n.a.' }}]</span>
-      </ng-template>
-
-
+        </ng-template>
+        <ng-template let-item pTemplate="selectedItem">
+          <span>{{ item.short_name }} [{{ item.unit ? item.unit : 'n.a.' }}]</span>
+        </ng-template>
       </p-select>
-      <label for="{{variableSelectorId}}">Variable [units]</label>
+      <label for="{{variableSelectorId}}">Variable [units]</label> 
     </span>
-
   </div>
 </div>
 

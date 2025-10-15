@@ -1,6 +1,6 @@
-<div class="flex flex-row flex-wrap pt-4">
+<div class="flex flex-row flex-wrap">
   <div class="w-12 text-center py-0 my-0">
-    <div class="text-2xl py-0 my-0 text-muted">
+    <div class="py-0 my-0 text-muted">
       Validation Period
       <span class="pi pi-question-circle mb-1"
             pTooltip="Restricts the input and reference data to the time period given. Days 'from' and 'to' are fully included in the interval. The dates are adapted to match the temporal coverage of the selected data sets."
@@ -9,46 +9,48 @@
     </div>
   </div>
   <hr class="flex w-11 pt-0 mt-0 featurette-divider">
-  <div class="flex lg:flex-nowrap flex-wrap lg:gap-8 gap-2 justify-content-center align-content-center w-12">
-    <div class="flex p-2 lg:w-6 w-12" id="fromField">
-        <div class="small-label w-4">
-          <div class="p-fluid">
-            <div>From</div>
-          </div>
+
+  <div class="p-fluid grid pt-3">
+
+    <!-- left  -->
+    <div class="col-12 lg:col-5" id="fromField">
+      <div class="grid align-items-center">
+        <div class="col-2 label-cell text-center">
+          <div style="margin-top:-1.5rem;"><b>From:</b></div>
         </div>
-        <div class="w-8 px-0 mx-0">
-          <div class="p-fluid">
-            <div class="p-float-label">
-              <p-datepicker inputId="fromDateInputId" id="fromDateInput" dateFormat="yy-mm-dd"
+        <div class="col-10">
+          <span class="p-float-label">
+            <p-datepicker inputId="fromDateInputId" id="fromDateInput" dateFormat="yy-mm-dd"
                           [maxDate]="validationPeriodModel.intervalTo$|async"
                           [ngModel]="(validationPeriodModel.intervalFrom$|async)"
                           (ngModelChange)="validationPeriodModel.intervalFrom$.next($event)"></p-datepicker>
-              <label for="fromDateInputId">Choose a date</label>
-            </div>
-          </div>
-
+            <label for="fromDateInputId">Choose a date</label>
+          </span>
         </div>
+
+       </div>     
     </div>
-
-    <div class="flex p-2 lg:w-6 w-12" id="toField">
-<!--      <div class="grid" id="toField">-->
-        <div class="small-label w-4">
-          <div class="p-fluid">
-            <div>To</div>
-          </div>
+    <!-- Middle  -->
+     <div class="col-12 lg:col-2 flex align-items-center justify-content-center">
+   
+    </div>
+    <!-- left  -->
+    <div class="col-12 lg:col-5" id="toField">
+      <div class="grid align-items-center">
+        <div class="col-2 label-cell text-center">
+          <div style="margin-top:-1.5rem;"><b>To:</b></div>
         </div>
-        <div class="w-8 px-0 mx-0">
-          <div class="p-fluid">
-            <div class="p-float-label">
-              <p-datepicker inputId="toDateInputId" id="toDateInput" dateFormat="yy-mm-dd"
+        <div class="col-10">
+          <span class="p-float-label">
+            <p-datepicker inputId="toDateInputId" id="toDateInput" dateFormat="yy-mm-dd"
                           [minDate]="validationPeriodModel.intervalFrom$|async"
                           [ngModel]="(validationPeriodModel.intervalTo$|async)"
                           (ngModelChange)="validationPeriodModel.intervalTo$.next($event)"></p-datepicker>
-              <label for="toDateInputId">Chose a date</label>
-            </div>
-          </div>
+            <label for="toDateInputId">Choose a date</label>
+          </span>
         </div>
-<!--      </div>-->
+
+       </div>     
     </div>
   </div>
 </div>

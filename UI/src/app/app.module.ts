@@ -145,7 +145,9 @@ import Aura from '@primeuix/themes/aura';
         ContactModule,
         SelectButtonModule, 
         SharedPrimeNgModule,
-        MaintenanceModeComponent], providers: [
+        MaintenanceModeComponent], 
+        
+        providers: [
         {
             provide: HTTP_INTERCEPTORS,
             useClass: HttpTokenInterceptor,
@@ -153,7 +155,8 @@ import Aura from '@primeuix/themes/aura';
         },
             providePrimeNG({
             theme: {
-              preset: Aura
+              preset: Aura,
+              options: { cssLayer: 'primengAura' } 
             }
         }),
         MessageService,

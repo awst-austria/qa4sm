@@ -1,4 +1,4 @@
-<p-panel header="Spatial Subsetting" [toggleable]="true" class="validation-row">
+<p-panel header="Spatial Subsetting" [toggleable]="true" styleClass="validation-row">
   <ng-template pTemplate="icons">
     <label class="p-panel-header-icon"
            pTooltip="Restrict the input and reference data to a lat/lon bounding box (specified with lower left and upper right corner coordinates). You can also select the bounding box on the map above."
@@ -6,92 +6,99 @@
       <span class="pi pi-question-circle"></span>
     </label>
   </ng-template>
-  <div class="flex flex-row flex-wrap pt-3">
+  <div class="p-fluid grid pt-2">
 
-    <div class="flex flex-column lg:w-5 w-12 p-2 justify-content-center align-content-center">
-      <div class="flex flex-row" id="lowerLeft">
-        <div class="small-label w-4 p-2">
-          <div class="p-fluid text-center w-12">
-            <div pTooltip="Lower left bounding box corner">Lower left</div>
-          </div>
+    <!-- Left -->
+    <div class="col-12 lg:col-5">
+      <div class="grid align-items-center">
+        <div class="col-4 label-cell text-center">
+          <div pTooltip="Lower left bounding box corner" style="margin-top:-1.5rem;"><b>Lower left:</b> </div>
         </div>
-        <div class="w-4 px-0 mx-0">
-          <div class="p-fluid">
-            <div class="p-float-label">
-              <p-inputNumber inputId="minLatInputId" id="minLatInput" [minFractionDigits]="1" [maxFractionDigits]="3"
-                             [ngModel]="subsetModel.minLat$|async"
-                             [min]="(subsetModel.minLatLimit$|async) ? (subsetModel.minLatLimit$|async) : -90"
-                             [max] ="checkValIfLimited(subsetModel.maxLat$|async, true)"
-                             (ngModelChange)="subsetModel.minLat$.next($event)"></p-inputNumber>
-
-              <label for="minLatInputId">Min. Latitude</label>
-            </div>
-          </div>
-
+        <div class="col-4">
+          <span class="p-float-label">
+            <p-inputNumber 
+                class="w-full"
+                inputStyleClass="w-full"
+                inputId="minLatInputId" id="minLatInput" 
+                [minFractionDigits]="1" [maxFractionDigits]="3"
+                [ngModel]="subsetModel.minLat$|async"
+                [min]="(subsetModel.minLatLimit$|async) ? (subsetModel.minLatLimit$|async) : -90"
+                [max] ="checkValIfLimited(subsetModel.maxLat$|async, true)"
+                (ngModelChange)="subsetModel.minLat$.next($event)">
+            </p-inputNumber>
+            <label for="minLatInputId">Min. Lat</label>
+          </span>
         </div>
-        <div class="w-4 px-0 mx-0">
-          <div class="p-fluid">
-            <div class="p-float-label">
-              <p-inputNumber id="minLonInput" inputId="minLonInputId" [minFractionDigits]="1" [maxFractionDigits]="3"
-                             [ngModel]="subsetModel.minLon$|async"
-                             [min]="(subsetModel.minLonLimit$|async) ? (subsetModel.minLonLimit$|async) : -180"
-                             [max]="checkValIfLimited(subsetModel.maxLon$|async, true)"
-                             (ngModelChange)="subsetModel.minLon$.next($event)"></p-inputNumber>
-
-              <label for="minLonInputId">Min. Longitude</label>
-            </div>
-          </div>
+        <div class="col-4">
+          <span class="p-float-label">
+            <p-inputNumber 
+                class="w-full"
+                inputStyleClass="w-full"
+                id="minLonInput" 
+                inputId="minLonInputId" 
+                [minFractionDigits]="1" [maxFractionDigits]="3"
+                [ngModel]="subsetModel.minLon$|async"
+                [min]="(subsetModel.minLonLimit$|async) ? (subsetModel.minLonLimit$|async) : -180"
+                [max]="checkValIfLimited(subsetModel.maxLon$|async, true)"
+                (ngModelChange)="subsetModel.minLon$.next($event)">
+              </p-inputNumber>
+              <label for="minLonInputId">Min. Lon</label>
+            </span>
         </div>
       </div>
     </div>
 
-    <!--    Clear and map buttons-->
-    <div class="flex flex-column lg:w-2 w-12 p-2 justify-content-center align-content-center">
-      <div class="flex justify-content-center align-content-center">
+    <!-- Middle buttons -->
+    <div class="col-12 lg:col-2 flex align-items-center justify-content-center" style="margin-top:-1.5rem;">
         <button pButton
                 title="clear-coordinates-button"
                 type="button"
                 icon="pi pi-trash"
                 pTooltip="Clear coordinates"
-                class="clearCoordinates p-button-info mr-2"
-                (click)="clearCoordinatesOrSetDefault()"></button>
-      </div>
+                class="clearCoordinates p-button-danger"
+                (click)="clearCoordinatesOrSetDefault()">
+        </button>
     </div>
 
-    <!--    Upper right coordinates-->
-    <div class="flex flex-column lg:w-5 w-12 lg:mt-0 mt-2 p-2 justify-content-center align-content-center">
-      <div class="flex flex-row" id="upperRight">
-        <div class="small-label w-4 p-2">
-          <div class="p-fluid">
-            <div pTooltip="Upper right bounding box corner">Upper right</div>
-          </div>
+    <!--    Right  -->
+    <div class="col-12 lg:col-5">
+      <div class="grid align-items-center">
+        <div class="col-4 label-cell text-center"> 
+          <div pTooltip="Upper right bounding box corner" style="margin-top:-1.5rem;"><b>Upper right:</b></div> 
         </div>
-        <div class="w-4 mx-0 px-0">
-          <div class="p-fluid">
-            <div class="p-float-label ">
-              <p-inputNumber inputId="maxLatInputId" id="maxLatInput" [minFractionDigits]="1" [maxFractionDigits]="3"
-                             [ngModel]="(subsetModel.maxLat$|async)"
-                             [min]="checkValIfLimited(subsetModel.minLat$|async, true)"
-                             [max]="(subsetModel.maxLatLimit$|async) ? (subsetModel.maxLatLimit$|async) : 90"
-                             (ngModelChange)="subsetModel.maxLat$.next($event)"></p-inputNumber>
 
-              <label for="maxLatInputId">Max. Latitude</label>
-            </div>
-          </div>
+        <div class="col-4">
+          <span class="p-float-label ">
+            <p-inputNumber 
+                  class="w-full"
+                  inputStyleClass="w-full"
+                  inputId="maxLatInputId" id="maxLatInput" 
+                  [minFractionDigits]="1" [maxFractionDigits]="3"
+                  [ngModel]="(subsetModel.maxLat$|async)"
+                  [min]="checkValIfLimited(subsetModel.minLat$|async, true)"
+                  [max]="(subsetModel.maxLatLimit$|async) ? (subsetModel.maxLatLimit$|async) : 90"
+                  (ngModelChange)="subsetModel.maxLat$.next($event)">
+            </p-inputNumber>
+            <label for="maxLatInputId">Max. Lat</label>
+          </span>
         </div>
-        <div class="w-4 px-0 mx-0">
-          <div class="p-fluid">
-            <div class="p-float-label ">
-              <p-inputNumber inputId="maxLonInputId" id="maxLonInput" [minFractionDigits]="1" [maxFractionDigits]="3"
-                             [ngModel]="subsetModel.maxLon$|async"
-                             [min]="checkValIfLimited(subsetModel.minLon$|async, true)"
-                             [max]="(subsetModel.maxLonLimit$|async) ? (subsetModel.maxLonLimit$|async) : 180"
-                             (ngModelChange)="subsetModel.maxLon$.next($event)"></p-inputNumber>
 
-              <label for="maxLonInputId">Max. Longitude</label>
-            </div>
-          </div>
+        <div class="col-4">
+            <span class="p-float-label ">
+              <p-inputNumber 
+                  class="w-full"
+                  inputStyleClass="w-full"
+                  inputId="maxLonInputId" id="maxLonInput" 
+                  [minFractionDigits]="1" [maxFractionDigits]="3"
+                  [ngModel]="subsetModel.maxLon$|async"
+                  [min]="checkValIfLimited(subsetModel.minLon$|async, true)"
+                  [max]="(subsetModel.maxLonLimit$|async) ? (subsetModel.maxLonLimit$|async) : 180"
+                  (ngModelChange)="subsetModel.maxLon$.next($event)">
+              </p-inputNumber>
+              <label for="maxLonInputId">Max. Lon</label>
+            </span>  
         </div>
+
       </div>
     </div>
   </div>
