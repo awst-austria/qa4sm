@@ -1,17 +1,22 @@
 <p-toast></p-toast>
 <p-confirmDialog key="apiTokenConfirm" [style]="{width: '30vw'}" [baseZIndex]="10000"></p-confirmDialog>
 
-<div class="center">
+<div class="flex flex-column px-2 w-12 md:w-10 lg:w-10 xl:w-8 2xl:w-7 justify-content-center align-content-center mx-auto">
   <qa-maintenance-mode *ngIf="maintenanceMode" [action]="userData ? 'update your data' : 'sign up'"/>
   <div *ngIf="!maintenanceMode">
     <div class="center">
-      <h1 *ngIf="!userData" class="h3 mb-3 font-weight-normal"> Sign up </h1>
-      <h1 *ngIf="userData" class="h3 mb-3 font-weight-normal">User profile</h1>
+      <h1 *ngIf="!userData"> Sign up </h1>
+      <h1 *ngIf="userData">User profile</h1>
     </div>
     <form [formGroup]="userForm" (ngSubmit)="onSubmit()" *ngIf="!maintenanceMode">
       <div class="py-3">
         <span class="p-float-label">
-          <input class="form-field" id="username" type="text" pInputText formControlName="username">
+          <input pInputText
+            id="username"
+            formControlName="username"
+            class="form-field w-full"  
+            type="text"
+            autocomplete="username">
           <label for="username">Username</label>
           <span pTooltip="Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only."
                 class="pi pi-question-circle">
@@ -25,8 +30,12 @@
 
       <div class="py-3" *ngIf="!userForm.controls['password1'].disabled">
         <span class="p-float-label">
-          <input class="form-field" id="password" type="password" pInputText formControlName="password1"
-                 autocomplete="new-password">
+          <input pInputText 
+            id="password" 
+            formControlName="password1"
+            class="form-field w-full" 
+            type="password" 
+            autocomplete="new-password">
           <label for="password">Password</label>
           <span
             pTooltip="Your password can't be too similar to your other personal information.Your password must contain at least 8 characters. Your password can't be a commonly used password. Your password can't be entirely numeric."
@@ -41,7 +50,11 @@
 
       <div class="py-3" *ngIf="!userForm.controls['password2'].disabled">
         <span class="p-float-label">
-          <input class="form-field" id="password-confirm" type="password" pInputText formControlName="password2">
+          <input pInputText
+            id="password-confirm"
+            class="form-field w-full" 
+            formControlName="password2"
+            type="password">
           <label for="password-confirm">Password confirmation</label>
           <span pTooltip="Enter the same password as before, for verification."
                 class="pi pi-question-circle">
@@ -55,7 +68,12 @@
 
       <div class="py-3">
         <span class="p-float-label">
-          <input class="form-field" id="email" type="email" pInputText formControlName="email">
+          <input pInputText 
+            id="email"
+            formControlName="email"
+            class="form-field w-full"  
+            type="email"
+            autocomplete="email">
           <label for="email">Email address</label>
           <span pTooltip="Required. A valid email address where you can receive notifications about validations."
                 class="pi pi-question-circle">
@@ -69,7 +87,7 @@
 
       <div class="py-3">
         <span class="p-float-label">
-          <input class="form-field" id="first-name" type="text" pInputText formControlName="first_name">
+          <input class="form-field w-full" id="first-name" type="text" pInputText formControlName="first_name">
           <label for="first-name">First name (optional)</label>
           <span pTooltip="Optional."
                 class="pi pi-question-circle">
@@ -79,7 +97,7 @@
 
       <div class="py-3">
         <span class="p-float-label">
-          <input class="form-field" id="last-name" type="text" pInputText formControlName="last_name">
+          <input class="form-field w-full" id="last-name" type="text" pInputText formControlName="last_name">
           <label for="last-name">Last name (optional)</label>
           <span pTooltip="Optional."
                 class="pi pi-question-circle">
@@ -89,7 +107,7 @@
 
       <div class="py-3">
         <span class="p-float-label">
-          <input class="form-field" id="organisation" type="text" pInputText formControlName="organisation">
+          <input class="form-field w-full" id="organisation" type="text" pInputText formControlName="organisation">
           <label for="organisation">Organisation (optional)</label>
           <span pTooltip="Optional. The organisation (university, company, etc.) you work for or represent."
                 class="pi pi-question-circle">
@@ -99,7 +117,7 @@
 
       <div class="py-3">
         <div class="p-float-label">
-          <p-select class="form-field"
+          <p-select class="form-field w-full"
                       inputId="selectCountry"
                       [options]="countries$|async"
                       [style]="{'width':'15rem', 'height': '2.5rem'}"
@@ -119,7 +137,7 @@
 
       <div class="py-3">
         <span class="p-float-label">
-          <input class="form-field" id="orcid" type="text" pInputText formControlName="orcid">
+          <input class="form-field w-full" id="orcid" type="text" pInputText formControlName="orcid">
           <label for="orcid">ORCID (optional)</label>
           <span
             pTooltip="Optional. Your ORCID identifier from https://orcid.org/, e.g. 0000-0002-1825-0097. Will be used to identify you as the author if you publish results to zenodo through QA4SM."
@@ -157,11 +175,13 @@
               pButton
               type="submit"
               label="Submit"
+              class="w-full"
               [disabled]="!userForm.valid">
       </button>
       <button *ngIf="userData"
               pButton
               type="submit"
+              class="w-full"
               label="Save"
       >
       </button>
@@ -172,7 +192,7 @@
       <div *ngIf="userData" class="py-3">
         <span class="p-float-label">
           <input #tokenInput
-                 class="form-field" 
+                 class="form-field w-full" 
                  id="api-token" 
                  type="text" 
                  pInputText 
@@ -202,7 +222,7 @@
                 type="button"
                 label="Request API token"
                 (click)="confirmRequestToken()"
-                class="p-button-request">
+                class="p-button-request w-full">
         </button>
         <span *ngIf="userData"
           pTooltip="Request an unique API token that can be used to submit validations via public API access."
@@ -215,7 +235,7 @@
               type="button"
               label="Update password"
               (click)="redirectToSetPassword()"
-              class="p-button-secondary">
+              class="p-button-secondary w-full">
       </button>
     </p>
     <p>
@@ -224,7 +244,7 @@
               type="button"
               label="Deactivate my account"
               (click)="deactivateAccount()"
-              class="p-button-danger">
+              class="p-button-danger w-full">
       </button>
     </p>
   </div>
