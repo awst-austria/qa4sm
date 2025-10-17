@@ -79,25 +79,14 @@ export class HomeComponent implements OnInit {
 
   qa4smNewsClass = {
     main: 'app-news flex flex-column flex-wrap justify-content-center align-items-center fadeInOut',
-    header: 'line-height-2 lg:text-5xl md:text-4xl sm:text-3xl text-2xl my-1 text-center',
-    div: 'line-height-2 lg:text-2xl md:text-xl sm:text-lg text-base py-1'
+    header: 'line-height-2 lg:text-4xl md:text-4xl sm:text-3xl text-2xl my-1 text-center',
+    div: 'line-height-2 lg:text-xl md:text-xl sm:text-lg text-base py-1'
   }
 
   opinionSectionClass = {
     main: 'app-news flex flex-column flex-wrap justify-content-center align-items-center mb-2 fadeIn',
-    header: 'lg:text-5xl md:text-4xl sm:text-3xl text-2xl mb-2 line-height-2 text-center',
-    div: 'line-height-2 lg:text-2xl md:text-xl sm:text-lg text-base py-1 text-center'
-  }
-
-  verticalLineClass = {
-    main: 'flex flex-column lg:h-6rem h-3rem fadeIn',
-  };
-
-  applicationDescriptionClass = 'application-desc flex flex-column flex-wrap h-auto fadeIn';
-  applicationIntroClass = {
-    main: 'application-intro fadeInOut',
-    h1: 'lg:text-6xl md:text-5xl sm:text-4xl text-3xl',
-    span: 'lg:text-3xl md:text-2xl'
+    header: 'line-height-2 lg:text-4xl md:text-4xl sm:text-3xl text-2xl my-1 text-center',
+    div: 'line-height-2 lg:text-xl md:text-xl sm:text-lg text-base py-1 text-center'
   }
 
   videosClass = {
@@ -109,7 +98,7 @@ export class HomeComponent implements OnInit {
 
   applicationTeamClass = {
     main: 'application-team flex flex-column flex-wrap h-auto lg:my-6 my-4 row-gap-2',
-    h1: 'lg:text-6xl md:text-5xl sm:text-4xl text-3xl fadeInOut',
+    header: 'line-height-2 lg:text-4xl md:text-4xl sm:text-3xl text-2xl my-1 text-center',
     partner: 'flex flex-row flex-wrap w-12 gap-2 align-items-center justify-content-center',
     partnerDesc: 'md:w-8 w-12 px-3 text-justify partner-desc gap-1 lg:text-xl md:text-base text-xs fadeInLeft',
     partnerLogo: 'md:w-3 w-12 partner-logo align-items-center justify-content-center text-center fadeInRight',

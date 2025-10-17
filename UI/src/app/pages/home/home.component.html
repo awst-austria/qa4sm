@@ -1,148 +1,206 @@
-<div id="background"></div>
-<div id="wrapper">
-  <div id="landing">
-    <div id="title-box">
-      <h1 class="page-title">
-        <span style="color:#FFAC04"> <p-image width="300" alt="qa4smLogo" [src]="logoFiles[5].plot"></p-image></span> -
-        Quality Assurance Service <br>
-        for Satellite Soil Moisture Data
-      </h1>
-      <div id="action-buttons">
-        <div *ngIf="userLoggedIn$|async else elseBlock">
-          <p>
-            <a pButton
-               label="See results"
-               routerLink="/published-validations"
-               class="btn-action-home"
-               role="button">
-            </a>
-            <a pButton
-               label="Try it"
-               routerLink="/validate"
-               class="btn-action-home"
-               role="button">
-            </a>
-          </p>
+
+  <section class="hero">
+    <div class="hero-overlay"></div>
+      <div class="hero-content">
+        <div class="hero-title-box">
+          <h1 class="hero-title">
+            <span>
+              <p-image
+                width="300"
+                alt="qa4smLogo"
+                [src]="logoFiles[5].plot">
+              </p-image>
+            </span>
+            <br />
+            Quality Assurance Service <br />
+            <span class="highlight">for Satellite Soil Moisture Data</span>
+          </h1>
+
+          <div class="hero-actions">
+            <div *ngIf="userLoggedIn$ | async; else elseBlock">
+              <a
+                pButton
+                label="See Results"
+                routerLink="/published-validations"
+                class="btn-action-home"
+                role="button">
+              </a>
+              <a
+                pButton
+                label="Try It"
+                routerLink="/validate"
+                class="btn-action-home"
+                role="button">
+              </a>
+            </div>
+            <ng-template #elseBlock>
+              <a
+              pButton
+              label="See Results"
+              routerLink="/published-validations"
+              class="btn-action-home"
+              role="button">
+              </a>
+              <a
+              pButton
+              label="Sign Up"
+              routerLink="/signup"
+              class="btn-action-home"
+              role="button">
+              </a>
+            </ng-template>
+          </div>
         </div>
-        <ng-template #elseBlock>
-          <p>
-            <a pButton
-               label="See results"
-               routerLink="/published-validations"
-               class="btn-action-home"
-               role="button">
-            </a>
-            <a pButton
-               label="Sign up"
-               routerLink="/signup"
-               class="btn-action-home"
-               role="button">
-            </a>
-          </p>
-        </ng-template>
 
+        <div class="scroll-down">
+          <button
+          pButton
+          id="scroll-down-btn"
+          title="Scroll Down"
+          class="btn-scroll-down p-button-rounded p-button-text"
+          icon="pi pi-chevron-down"
+          (click)="goToNews()">
+        </button>
       </div>
-
     </div>
-    <div id="scroll-down">
-      <button
-        pButton
-        id="scroll-down-btn"
-        title="scroll-down"
-        class="btn-scroll-down p-button"
-        icon="pi pi-chevron-down"
-        (click)="goToNews()">
-      </button>
-      <!--      <span class="pi pi-chevron-down" style="color:white"></span>-->
-    </div>
+  </section>
 
-  </div>
-  <div id="about-app">
+  <section class="homeContainer">
+
+    <!-- News Section -->
     <div *ngIf="settings$|async as settings"
          id="qa4smNews"
          [ngClass]="qa4smNewsClass.main">
-      <div [ngClass]="qa4smNewsClass.header">What's new</div>
+      <h1 [ngClass]="qa4smNewsClass.header">What's new</h1>
       <div [innerHTML]=settings[0].news [ngClass]="qa4smNewsClass.div"></div>
     </div>
-    <div id="line-1" [ngClass]="verticalLineClass.main">
-      <div class="vertical-line"></div>
-    </div>
-    <div id='qa4sm-desc' [ngClass]="applicationDescriptionClass">
-      <!--      Application introduction-->
-      <div [ngClass]="applicationIntroClass.main">
-        <h1 [ngClass]="applicationIntroClass.h1"> Service for validation of satellite soil moisture products against
+  </section>
+
+  <!-- about-->
+  <section class="about" aria-labelledby="about-title">
+    <div class="about__container">
+    <!-- Intro -->
+      <header class="about__intro">
+        <h1> Service for validation of satellite soil moisture products against
           in-situ and model reference data </h1>
-        <span [ngClass]="applicationIntroClass.span">
-          that <span class="text-highlighted">brings together methodologies and protocols </span> used for the validation
-          and quality control of soil moisture data products and provides users with
-          <span class="text-highlighted">traceable validation results</span>.
-        </span>
+        <p class="about__lead">
+          A unified platform that <span class="text-highlighted">brings together methodologies and protocols</span> for
+          the validation and quality control of soil moisture data products, delivering
+          <span class="text-highlighted">traceable validation results</span> you can explore, share, and publish.
+        </p>
+        <div class="about__actions">
+          <a
+          pButton
+          label="How it works"
+          routerLink="/help"
+          class="p-button-rounded p-button-outlined"
+          role="button">
+          </a>
+          <a
+          pButton
+          label="Run a validation"
+          routerLink="/validate"
+          class="p-button-rounded p-button-outlined"
+          role="button">
+          </a>
+        </div>
+      </header>
+
+      <!-- Feature Grid -->
+      <div class="about__grid" role="list">
+        <!-- Simple -->
+        <article class="feature-card fadeInLeft" role="listitem"> 
+          <div class="feature-card__icon" aria-hidden="true">
+            <i class="pi pi-compass"></i>
+          </div>
+          <h3 class="feature-card__title">Simple</h3>
+          <p class="feature-card__body">
+            An easy interface for comparing satellite soil moisture data against land surface models and the
+            <a href="https://ismn.earth/" target="_blank" rel="noreferrer noopener">International Soil Moisture Network</a>.
+          </p>
+        </article>
+
+        <!-- Traceable -->
+        <article class="feature-card fadeInLeft" role="listitem">
+          <div class="feature-card__icon" aria-hidden="true">
+            <i class="pi pi-link"></i>
+          </div>
+          <h3 class="feature-card__title">Traceable</h3>
+          <p class="feature-card__body">
+            Download results in netCDF and as visualisations, share them, or publish via
+            <a href="https://zenodo.org/" target="_blank" rel="noreferrer noopener">Zenodo</a>.
+          </p>
+        </article>
+
+        <!-- Free -->
+        <article class="feature-card fadeInRight" role="listitem">
+          <div class="feature-card__icon" aria-hidden="true">
+            <i class="pi pi-unlock"></i>
+          </div>
+          <h3 class="feature-card__title">Free</h3>
+          <p class="feature-card__body">
+            Just set up and account to have full access to all functionalities.
+          </p>
+        </article>
+
+        <!-- Customizable -->
+        <article class="feature-card fadeInRight" role="listitem">
+          <div class="feature-card__icon" aria-hidden="true">
+            <i class="pi pi-sliders-h"></i>
+          </div>
+          <h3 class="feature-card__title">Customizable</h3>
+          <p class="feature-card__body">
+            Upload your own data and apply filtering and scaling options to assess their impact on validation results.
+          </p>
+        </article>
       </div>
-      <!-- Application videos -->
-      <div [ngClass]="videosClass.main">
-        <p-carousel [value]="videos"
+    </div>
+  </section>
+
+  <section class="homeContainer">
+
+    <!-- Application videos -->
+    <div class="about__container">
+      <!-- Video -->
+      <header class="about__intro">
+        <h1> Step-by-step video tutorials to help you get started with QA4SM </h1>
+        <p class="about__lead">
+          Explore a series of short <span class="text-highlighted">hands-on tutorials</span> that guide you through every part of the QA4SM platform — 
+  from setting up your first validation to interpreting results and publishing them.  
+  Learn how to <span class="text-highlighted">upload custom data, compare satellite data,</span> and make the most of QA4SM’s validation tools.
+        </p>
+
+        <div [ngClass]="videosClass.main">
+          <p-carousel [value]="videos"
                     [circular]="true"
                     [numVisible]="1"
                     [numScroll]="1"
                     [showIndicators]="false"
                     [showNavigators]="true">
-          <ng-template let-video pTemplate="item">
-            <div [ngClass]="videosClass.mainDiv">
-              <div [ngClass]="videosClass.rowDiv">
-                <div [ngClass]="videosClass.header">{{video.title}}</div>
-              </div>
-              <div [ngClass]="videosClass.rowDiv">
-                <iframe class="w-11 lg:h-30rem md:h-20rem sm:h-15rem"
+            <ng-template let-video pTemplate="item">
+              <div [ngClass]="videosClass.mainDiv">
+                <div [ngClass]="videosClass.rowDiv">
+                  <div [ngClass]="videosClass.header">{{video.title}}</div>
+                </div>
+                <div [ngClass]="videosClass.rowDiv">
+                  <iframe class="w-11 lg:h-30rem md:h-20rem sm:h-15rem"
                         [src]="video.video"
                         title="YouTube video player"
                         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                         allowfullscreen>
-                </iframe>
+                  </iframe>
+                </div>
               </div>
-            </div>
-          </ng-template>
-        </p-carousel>
-      </div>
-      <!--    Application information -->
-      <div [class]="applicationInfoClass.main">
-        <!--      ROW =========================================================  -->
-        <div [class]="applicationInfoClass.oddRow">
-          <div [class]="applicationInfoClass.tile" id="tileSimple" class="fadeInLeft">
-            <h1 [ngClass]="applicationInfoClass.h1">Simple</h1>
-            <div [ngClass]="applicationInfoClass.div">
-              An easy-to-use interface for comparing satellite soil moisture data against land surface models and the
-              <a href="https://ismn.earth/" target="_blank">International Soil Moisture Network</a>
-            </div>
-          </div>
-          <div [class]="applicationInfoClass.tile" id="tileTraceable" class="fadeInRight">
-            <h1 [ngClass]="applicationInfoClass.h1">Traceable</h1>
-            <div [ngClass]="applicationInfoClass.div">
-              You can download your results in netCDF format and as visualisations, share them with others or publish
-              using <a target="_blank" href="https://zenodo.org/" rel="noreferrer">Zenodo</a> service
-            </div>
-          </div>
-          <!--      ROW ========================================================= -->
+            </ng-template>
+          </p-carousel>
         </div>
-        <div [class]="applicationInfoClass.evenRow">
-          <div [class]="applicationInfoClass.tile" id="tileFree" class="fadeInRight">
-            <h1 [ngClass]="applicationInfoClass.h1">Free</h1>
-            <div [ngClass]="applicationInfoClass.div">
-              Just set up and account to have full access to all functionalities
-            </div>
-          </div>
-          <div [class]="applicationInfoClass.tile" id="tileCustomizable" class="fadeInLeft">
-            <h1 [ngClass]="applicationInfoClass.h1">Customizable</h1>
-            <div [ngClass]="applicationInfoClass.div">
-              You can upload your own data and use various filtering and scaling options to assess the impact of these
-              on
-              the validation results
-            </div>
-          </div>
-        </div>
-      </div>
+      </header>
+    </div>
+  </section>
 
-      <div [ngClass]="applicationTeamClass.main">
-        <h1 [ngClass]="applicationTeamClass.h1"> Project Team and Partners </h1>
+    <!-- Team -->
+    <div [ngClass]="applicationTeamClass.main">
+        <h1 [ngClass]="applicationTeamClass.header"> Project Team and Partners </h1>
         <!--        FFG -->
         <div [ngClass]="applicationTeamClass.partner">
           <div [ngClass]="applicationTeamClass.partnerDesc">
@@ -224,29 +282,19 @@
             <a href="https://www.cesbio.cnrs.fr/homepage/" target="_blank">CESBIO</a>
           </div>
         </div>
-      </div>
-
-
     </div>
 
-    <div id="line-2" [ngClass]="verticalLineClass.main">
-      <div class="vertical-line"></div>
-    </div>
+    <!-- Feedback -->
     <div *ngIf="settings$|async as settings" id="qa4sm-opinion"
          [ngClass]="opinionSectionClass.main">
-      <div [ngClass]="opinionSectionClass.header">Share with us your opinion</div>
+      <h2 [ngClass]="opinionSectionClass.header">Share with us your opinion</h2>
       <div [ngClass]="opinionSectionClass.div">
         If you think we could improve something or you see a missing functionality, please let us know using
         this <b> <a target="_blank" [href]="settings[0].feed_link">feedback form</a> </b>.
       </div>
     </div>
-  </div>
-  <!--    <div>-->
-  <!--      Created by <a href="https://www.geo.tuwien.ac.at/" target="_blank">TU Wien GEO</a>-->
-  <!--      and <a href="https://www.awst.at/" target="_blank">AWST</a>.-->
-  <!--    </div>-->
-  <!--  </footer>-->
 
+  
 
   <p-scrollTop styleClass="scroll-button"></p-scrollTop>
-</div>
+

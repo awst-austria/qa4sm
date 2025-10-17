@@ -21,13 +21,12 @@ body {
 }
 
 a {
-  color: $main-link-color;
+  color: $base-color;
   text-decoration: none;
 }
 
 a:hover {
-  color: $button-hover-color;
-  text-decoration: underline;
+  color: $highlight-color;
 }
 
 
