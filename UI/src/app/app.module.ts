@@ -41,15 +41,12 @@ import {MetricsModule} from './modules/metrics/metrics.module';
 import {AnomaliesModule} from './modules/anomalies/anomalies.module';
 import {ScalingModule} from './modules/scaling/scaling.module';
 import {MapModule} from './modules/map/map.module';
-import {TermsComponent} from './pages/terms/terms.component';
-import {DatasetInfoComponent} from './pages/dataset-info/dataset-info.component';
 import {ComparisonComponent} from './pages/comparison/comparison.component';
 import {ComparisonModule} from './modules/comparison/comparison.module';
 import {
   TemporalMatchingComponent
 } from './modules/temporal-matching/components/temporal-matching/temporal-matching.component';
 import {TemporalMatchingModule} from './modules/temporal-matching/temporal-matching.module';
-import {HelpComponent} from './pages/help/help.component';
 import {CoreModule} from './modules/core/core.module';
 import {SignupComponent} from './pages/signup/signup.component';
 import {UserModule} from './modules/user/user.module';
@@ -87,10 +84,7 @@ import Aura from '@primeuix/themes/aura';
         ValidationResultComponent,
         UserProfileComponent,
         PublishedValidationsComponent,
-        TermsComponent,
-        DatasetInfoComponent,
         ComparisonComponent,
-        HelpComponent,
         SignupComponent,
         SignupCompleteComponent,
         DeactivateUserCompleteComponent,

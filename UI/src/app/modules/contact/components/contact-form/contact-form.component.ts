@@ -36,12 +36,18 @@ export class ContactFormComponent {
 
 
   public onSubmit(): void {
-    this.authService.sendSupportRequest(this.contactForm.value)
-      .subscribe(this.formObserver)
+  if (this.contactForm.invalid) {
+    this.contactForm.markAllAsTouched();
+    return;
+  }
+    this.authService.sendSupportRequest(this.contactForm.getRawValue()).subscribe(this.formObserver);
   }
 
   onSubmitError(error: CustomHttpError){
-    this.toastService.showErrorWithHeader('We could not send your message', error.errorMessage.message);
+    this.toastService.showErrorWithHeader(
+      'We could not send your message',
+      error?.errorMessage?.message ?? 'Unexpected error.'
+    );
   }
 
   onSubmitNext(): void {
@@ -49,6 +55,6 @@ export class ContactFormComponent {
   }
 
   onSubmitComplete(): void {
-    this.contactForm.reset({});
+  this.contactForm.reset({ name: '', email: '', content: '', send_copy_to_user: false, active: false, honeypot: 0 });
   }
 }

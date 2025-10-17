@@ -1,57 +1,83 @@
-<div class="center">
-  <div>
-    <div class="center">
-      <h1 class="h3 mb-3 font-weight-normal"> Contact us: </h1>
+<div class="flex flex-column px-2 w-12 md:w-10 lg:w-10 xl:w-8 2xl:w-7 justify-content-center align-content-center mx-auto">
+  
+  <div class="center">
+    <h1>Contact us:</h1>
+  </div>
+
+  <form [formGroup]="contactForm" (ngSubmit)="onSubmit()">
+      <!-- Email -->
+    <div class="py-3">
+      <span class="p-float-label">
+        <input pInputText
+           id="email"
+           formControlName="email"
+           class="form-field w-full"
+           type="email"
+           autocomplete="email"
+           aria-required="true">
+        <label for="email">E-mail address</label>
+      </span>
     </div>
-    <form [formGroup]="contactForm" (ngSubmit)="onSubmit()">
 
-      <div class="py-3">
-        <span class="p-float-label">
-          <input class="form-field" id="email" type="email" pInputText formControlName="email">
-          <label for="email">E-mail address</label>
-        </span>
-      </div>
+      <!-- Name -->
+    <div class="py-3">
+      <span class="p-float-label">
+        <input pInputText
+           id="name"
+           formControlName="name"
+           class="form-field w-full"
+           type="text"
+           autocomplete="name"
+           aria-required="true">
+        <label for="name">Name</label>
+      </span>
+    </div>
 
-      <div class="py-3">
-        <span class="p-float-label">
-          <input class="form-field" id="name" type="text" pInputText formControlName="name">
-          <label for="name">Name</label>
-        </span>
-      </div>
+      <!-- Message -->
+    <div class="py-3">
+      <span class="p-float-label">
+        <textarea pInputTextarea
+              id="content"
+              formControlName="content"
+              class="form-field w-full"
+              autocomplete="off"
+              aria-required="true"
+              rows="5">
+            </textarea>
+        <label for="content">Message</label>
+      </span>
+    </div>
 
-      <div class="py-3">
-        <span class="p-float-label">
-          <textarea [ngClass]="{'form-field': true}" id="content"
-                    pInputTextarea formControlName="content"> </textarea>
-          <label for="content">Message</label>
-        </span>
-      </div>
+    <!-- Checkboxes -->
+    <div class="py-3">
+      <p-checkbox inputId="copy"
+              formControlName="send_copy_to_user"
+              [binary]="true"></p-checkbox>
+      <label for="copy">Send a copy to me.</label>
+    </div>
 
-      <div class="py-3" style="line-height: 1rem">
-        <p-checkbox inputId="copy" formControlName="send_copy_to_user" binary="true"></p-checkbox>
-        <label for="copy"> Send a copy to me.</label>
-      </div>
+    <!-- Slider -->
+     <div class="py-3">
 
-      <div class="form-control-box">
-        <p-checkbox inputId="active" formControlName="active" binary="true"></p-checkbox>
-        <label for="active">some label</label>
-      </div>
+      <p-slider
+        id="honeypot"                   
+        formControlName="honeypot"
+        [min]="0" [max]="100" [step]="1"
+        [attr.aria-labelledby]="'honeypotLabel'">
+      </p-slider>
 
-      <div class="py-3 flex w-12" style="line-height: 1rem">
-        <div class="p-float-label align-content-center justify-content-center text-center w-12">
-          <p-slider id="honeypot" formControlName="honeypot" ></p-slider>
-          <label for="honeypot"> To prove you're a real person, slide the handle all the way to the right <span class="pi pi-angle-double-right"></span></label>
-        </div>
+      <span class="py-3" id="honeypotLabel">
+        To prove you're a real person, slide the handle all the way to the right
+      <span class="pi pi-angle-double-right"></span>
+      </span>
+    </div>
 
-      </div>
-      <button id="sendMessageForm"
+    <button id="sendMessageForm"
               pButton
               type="submit"
               label="Send"
               [disabled]="!contactForm.valid">
-      </button>
-
-
-    </form>
-  </div>
+    </button>
+  </form> 
 </div>
+

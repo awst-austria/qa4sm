@@ -5,14 +5,19 @@
 @import "ol/ol.css";
 @layer primengAura, primengQA4SM;  // here we will overwrite default Aura thema with custom primengQA4SM
 
-
 main {
-  text-align: left;
   width: 100%;
   margin: auto;
-  font-family: $base-font;
+  
   line-height: 1.5rem;
   padding-top: 2rem; // DO NOT REMOVE THIS ONE!!!!!!!
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Roboto', sans-serif;
+  
 }
 
 a {
@@ -26,44 +31,64 @@ a:hover {
 }
 
 
-
 h1, h2, h3, h4, h5, h6 {
-  margin-top: 0;
-  margin-bottom: 0.5rem;
+  margin-top: 1;
+  margin-bottom: 1rem;
 }
 
 h1, h2, h3, h4, h5, h6,
 .h1, .h2, .h3, .h4, .h5, .h6 {
-  margin-bottom: 0.5rem;
-  font-weight: 500;
+  font-weight: 400;
   line-height: 1.2;
+  color: $base-color;
 }
 
 h1, .h1 {
-  font-size: 2.5rem;
+  font-size: 2rem;
 }
 
 h2, .h2 {
-  font-size: 2rem;
+  font-size: 1.5rem;
 }
 
 h3, .h3 {
-  font-size: 2rem;
+  font-size: 1.17rem;
   orphans: 3;
   widows: 3;
   page-break-after: avoid;
 }
 
 h4, .h4 {
-  font-size: 1.5rem;
+  font-size: 1rem;
 }
 
 h5, .h5 {
-  font-size: 1.25rem;
+  font-size: 0.83rem;
 }
 
 .font-weight-normal {
   font-weight: 400 !important;
+}
+
+/* Code blocks */
+pre {
+  background-color: #000000;
+  
+  padding: 10px;
+  border: 1px solid $base-color;
+  border-left: 4px solid $base-color;
+  overflow-x: auto;
+  font-family: 'Courier New', monospace;
+  font-size: 0.95rem;
+}
+
+code {
+  padding: 2px 4px;
+  color: $base-color;
+}
+
+.copy-btn {
+  cursor: pointer;
 }
 
 
@@ -290,30 +315,7 @@ img {
   margin-left: auto;
 }
 
-.navbar .container,
-.navbar .container-fluid, .navbar .container-sm, .navbar .container-md, .navbar .container-lg, .navbar .container-xl {
-  display: -ms-flexbox;
-  display: flex;
-  -ms-flex-wrap: wrap;
-  flex-wrap: wrap;
-  -ms-flex-align: center;
-  align-items: center;
-  -ms-flex-pack: justify;
-  justify-content: space-between;
-}
 
-
-.navbar-expand > .container,
-.navbar-expand > .container-fluid, .navbar-expand > .container-sm, .navbar-expand > .container-md, .navbar-expand > .container-lg, .navbar-expand > .container-xl {
-  padding-right: 0;
-  padding-left: 0;
-}
-
-.navbar-expand > .container,
-.navbar-expand > .container-fluid, .navbar-expand > .container-sm, .navbar-expand > .container-md, .navbar-expand > .container-lg, .navbar-expand > .container-xl {
-  -ms-flex-wrap: nowrap;
-  flex-wrap: nowrap;
-}
 
 .non-scrollable{
   position: fixed;

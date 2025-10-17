@@ -1,148 +1,164 @@
-<div class="main-container">
-    
-    <a routerLink="/public-api">← Back to Public API</a>
-    <p></p>
-    
-    <h2>Config JSON file</h2>
-    <p>
-        A JSON configuration file defines all the settings used to run a QA4SM validation. 
-        It describes which datasets are compared, the spatial and temporal subsettings, 
-        filters, metrics, scaling, and anomaly options.  
+<main class="flex justify-content-center py-4">
+  <!-- single centered container -->
+  <div class="flex flex-column w-11 lg:w-8 xl:w-6">
+
+    <a routerLink="/public-api" class="mb-4">← Back to Public API</a>
+
+    <h1>Config JSON file</h1>
+
+    <p class="text-700">
+      A JSON configuration file defines all the settings used to run a QA4SM validation.
+      It describes which datasets are compared, the spatial and temporal subsettings,
+      filters, metrics, scaling, and anomaly options.
     </p>
-    <p>
-        You can create such a file to save your chosen parameters and re-use them later, 
-        or share it with others to reproduce the exact same validation setup.
+    <p class="text-700">
+      You can create such a file to save your chosen parameters and re-use them later,
+      or share it with others to reproduce the exact same validation setup.
     </p>
-    <!-- Create JSON File -->
-     <!-- Datasets -->
+
+    <!-- Datasets -->
     <div>
-        <div *ngFor="let d of ui.datasets; let i = index" style="border:1px solid #ddd; padding:8px; margin:8px 0;">
-        <h4>Dataset {{i+1}}</h4>
-        <p>dataset_id: <input type="number" [(ngModel)]="d.dataset_id"></p>
-        <p>variable_id: <input type="number" [(ngModel)]="d.variable_id"></p>
-        <p>version_id: <input type="number" [(ngModel)]="d.version_id"></p>
+      <div *ngFor="let d of ui.datasets; let i = index" style="border:1px solid #ddd; padding:8px; margin:8px 0;">
+        <h4>Dataset {{ i + 1 }}</h4>
 
-    <p>Basic filter IDs (comma-separated): <input type="text" [(ngModel)]="d.basic_filters_csv"></p>
+        <p class="text-700">dataset_id: <input type="number" [(ngModel)]="d.dataset_id"></p>
+        <p class="text-700">variable_id: <input type="number" [(ngModel)]="d.variable_id"></p>
+        <p class="text-700">version_id: <input type="number" [(ngModel)]="d.version_id"></p>
 
-    <p><strong>Parametrised filters</strong></p>
-    <div *ngFor="let pf of d.parametrised_filters; let j = index" style="padding-left:8px;">
-        <p style="display:flex; align-items:center; gap:8px;">
-            id: <input type="number" [(ngModel)]="pf.id">  parameters:<textarea rows="2" [(ngModel)]="pf.parameters"></textarea>
+        <p class="text-700">Basic filter IDs (comma-separated): <input type="text" [(ngModel)]="d.basic_filters_csv"></p>
+
+        <p class="text-700"><strong>Parametrised filters</strong></p>
+        <div *ngFor="let pf of d.parametrised_filters; let j = index" style="padding-left:8px;">
+          <p class="text-700" style="display:flex; align-items:center; gap:8px;">
+            id:
+            <input type="number" [(ngModel)]="pf.id">
+            parameters:
+            <textarea rows="2" [(ngModel)]="pf.parameters"></textarea>
             <button class="btn" type="button" (click)="removeParamFilter(i, j)">
-                <i class="pi pi-trash" aria-hidden="true"></i>
+              <i class="pi pi-trash" aria-hidden="true"></i>
             </button>
+          </p>
+        </div>
+
+        <p class="text-700">
+          <button class="btn" type="button" (click)="addParamFilter(i)">Add parametrised filter</button>
         </p>
+
+        <p class="text-700">
+          <label><input type="checkbox" [(ngModel)]="d.is_spatial_reference"> Spatial reference</label>
+          <label><input type="checkbox" [(ngModel)]="d.is_temporal_reference"> Temporal reference</label>
+          <label><input type="checkbox" [(ngModel)]="d.is_scaling_reference"> Scaling reference</label>
+        </p>
+
+        <p class="text-700">
+          <button class="btn" type="button" (click)="removeDataset(i)">
+            <i class="pi pi-trash" aria-hidden="true"></i> Remove dataset
+          </button>
+        </p>
+      </div>
+
+      <p class="text-700">
+        <button class="btn" type="button" (click)="addDataset()">Add dataset</button>
+      </p>
     </div>
-    <p><button class="btn" type="button" (click)="addParamFilter(i)">Add parametrised filter</button></p>
-
-    <p>
-      <label><input type="checkbox" [(ngModel)]="d.is_spatial_reference"> Spatial reference</label>
-    
-      <label><input type="checkbox" [(ngModel)]="d.is_temporal_reference"> Temporal reference</label>
-    
-      <label><input type="checkbox" [(ngModel)]="d.is_scaling_reference"> Scaling reference</label>
-    </p>
-
-    <p><button class="btn" type="button" (click)="removeDataset(i)"><i class="pi pi-trash" aria-hidden="true"></i> Remove dataset</button></p>
-  </div>
-
-  <p><button class="btn" type="button" (click)="addDataset()">Add dataset</button></p>
-</div>
 
     <!-- Time interval -->
     <div>
-        <h4>Temporal setting</h4>
-        <p>Validation period:</p>
-        <p>
-            From:<input type="datetime-local" [(ngModel)]="ui.interval_from_local"> 
-            To:<input type="datetime-local" [(ngModel)]="ui.interval_to_local">
-        </p>
+      <h4>Temporal setting</h4>
+      <p class="text-700">Validation period:</p>
+      <p class="text-700">
+        From: <input type="datetime-local" [(ngModel)]="ui.interval_from_local">
+        To: <input type="datetime-local" [(ngModel)]="ui.interval_to_local">
+      </p>
     </div>
 
     <!-- Spatial interval -->
     <div>
-        <h4>Spatial setting</h4>
-        <p>
-            Min lat: <input type="number" step="0.1" [(ngModel)]="ui.min_lat">
-            Max lat: <input type="number" step="0.1" [(ngModel)]="ui.max_lat">
-        </p>
-        <p>
-            Min lon: <input type="number" step="0.1" [(ngModel)]="ui.min_lon">
-            Max lon: <input type="number" step="0.1" [(ngModel)]="ui.max_lon">
-        </p>
+      <h4>Spatial setting</h4>
+      <p class="text-700">
+        Min lat: <input type="number" step="0.1" [(ngModel)]="ui.min_lat">
+        Max lat: <input type="number" step="0.1" [(ngModel)]="ui.max_lat">
+      </p>
+      <p class="text-700">
+        Min lon: <input type="number" step="0.1" [(ngModel)]="ui.min_lon">
+        Max lon: <input type="number" step="0.1" [(ngModel)]="ui.max_lon">
+      </p>
     </div>
 
     <!-- Matching / scaling / anomalies -->
     <div>
-        <h4>Additional settings</h4>
-        <p>Temporal matching (hours)
-            <input type="number" min="0" [(ngModel)]="ui.temporal_matching">
-        </p>
+      <h4>Additional settings</h4>
+      <p class="text-700">
+        Temporal matching (hours)
+        <input type="number" min="0" [(ngModel)]="ui.temporal_matching">
+      </p>
 
-        <p>Scaling method
-            <select [(ngModel)]="ui.scaling_method">
-                <option value="none">none</option>
-                <option value="min-max">min/max</option>
-                <option value="linear-regression">linear regresion</option>
-                <option value="mean/standard deviation">mean/standard deviation</option>
-                <option value="CDF matching">CDF matching</option>
-            </select>
-        </p>
-  
-        <p>Scale to (dataset id or 0): <input type="text" [(ngModel)]="ui.scale_to"></p>
-        
-        <p>Anomalies method
-            <select [(ngModel)]="ui.anomalies_method">
-                <option value="none">none</option>
-                <option value="climatology">climatology</option>
-                <option value="35average">35 days moving average</option>
-            </select>
-        </p>
-        
-        <div *ngIf="ui.anomalies_method !== 'none'">
-            <p>Base from: <input type="datetime-local" [(ngModel)]="ui.anom_from_local"></p>
-            <p>Base to: <input type="datetime-local" [(ngModel)]="ui.anom_to_local"></p>
-        </div>
+      <p class="text-700">
+        Scaling method
+        <select [(ngModel)]="ui.scaling_method">
+          <option value="none">none</option>
+          <option value="min-max">min/max</option>
+          <option value="linear-regression">linear regression</option>
+          <option value="mean/standard deviation">mean/standard deviation</option>
+          <option value="CDF matching">CDF matching</option>
+        </select>
+      </p>
+
+      <p class="text-700">Scale to (dataset id or 0): <input type="text" [(ngModel)]="ui.scale_to"></p>
+
+      <p class="text-700">
+        Anomalies method
+        <select [(ngModel)]="ui.anomalies_method">
+          <option value="none">none</option>
+          <option value="climatology">climatology</option>
+          <option value="35average">35 days moving average</option>
+        </select>
+      </p>
+
+      <div *ngIf="ui.anomalies_method !== 'none'">
+        <p class="text-700">Base from: <input type="datetime-local" [(ngModel)]="ui.anom_from_local"></p>
+        <p class="text-700">Base to: <input type="datetime-local" [(ngModel)]="ui.anom_to_local"></p>
+      </div>
     </div>
 
     <!-- Metrics -->
     <div>
-        <h4>Metrics</h4>
-        <p>
-            <label><input type="checkbox" [(ngModel)]="ui.metrics.tcol"> tcol</label>
-            <label><input type="checkbox" [(ngModel)]="ui.metrics.bootstrap_tcol_cis"> bootstrap_tcol_cis</label>
-            <label><input type="checkbox" [(ngModel)]="ui.metrics.stability_metrics"> stability_metrics</label>
-        </p>
+      <h4>Metrics</h4>
+      <p class="text-700">
+        <label><input type="checkbox" [(ngModel)]="ui.metrics.tcol"> tcol</label>
+        <label><input type="checkbox" [(ngModel)]="ui.metrics.bootstrap_tcol_cis"> bootstrap_tcol_cis</label>
+        <label><input type="checkbox" [(ngModel)]="ui.metrics.stability_metrics"> stability_metrics</label>
+      </p>
     </div>
 
     <!-- Intra-annual -->
     <div>
-        <h4>Intra-annual metrics</h4>
-        <p><label><input type="checkbox" [(ngModel)]="ui.intra.enabled"> Enabled</label></p>
-        <p>Type:
-            <input type="text" placeholder="e.g. monthly" [(ngModel)]="ui.intra.type">
-        </p>
-        <p>Overlap:
-            <input type="number" placeholder="leave empty for none" [(ngModel)]="ui.intra.overlap">
-        </p>
+      <h4>Intra-annual metrics</h4>
+      <p class="text-700"><label><input type="checkbox" [(ngModel)]="ui.intra.enabled"> Enabled</label></p>
+      <p class="text-700">Type: <input type="text" placeholder="e.g. monthly" [(ngModel)]="ui.intra.type"></p>
+      <p class="text-700">Overlap: <input type="number" placeholder="leave empty for none" [(ngModel)]="ui.intra.overlap"></p>
     </div>
 
     <!-- Name tag -->
     <div>
-        <p>Name tag:
-            <input type="text" placeholder="Optional label" [(ngModel)]="ui.name_tag"></p>
+      <p class="text-700">Name tag:
+        <input type="text" placeholder="Optional label" [(ngModel)]="ui.name_tag">
+      </p>
     </div>
 
+    <!-- Create & download -->
+    <div>
+      <p class="text-700">
+        <button class="btn" type="button" (click)="createAndDownload()">Create JSON file</button>
+      </p>
+      <p *ngIf="lastDownloadName" class="text-700">Created: {{ lastDownloadName }}</p>
+    </div>
 
+    <!-- (Optional) Preview -->
+    <div>
+      <p class="text-700"><strong>Preview</strong></p>
+      <pre><code>{{ previewJson }}</code></pre>
+    </div>
 
-<!-- Create & download -->
-<div>
-  <p><button class="btn" type="button" (click)="createAndDownload()">Create JSON file</button></p>
-  <p *ngIf="lastDownloadName">Created: {{ lastDownloadName }}</p>
-</div>
-
-<!-- (Optional) Preview -->
-<div>
-  <p><strong>Preview</strong></p>
-  <pre><code>{{ previewJson }}</code></pre>
-</div>
+  </div>
+</main>
