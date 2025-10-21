@@ -4,25 +4,7 @@
   scroll-behavior: smooth;
 }
 
-/* --- HOME CONTAINER --- */
-.homeContainer {
-  background-color: #001C21;
-  color: $font-color-white;
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: flex-start;
-  padding: clamp(2rem, 4vw, 4rem) 2rem;
-  box-sizing: border-box;
-  overflow-x: hidden;
-}
-
-
-span.carousel-desc {
-  line-height: 3rem;
-}
-
+/* --- Hero Section --- */
 .hero {
   position: relative;
   height: 100vh;
@@ -35,34 +17,50 @@ span.carousel-desc {
   justify-content: center;
   text-align: center;
   overflow: hidden;
+  width: 100%;
+  max-width: none;        
+  background-size: cover;
 }
 
-.hero-overlay {
+.hero-overlay{
   position: absolute;
   inset: 0;
-  background: rgba(0, 0, 0, 0.4);
-  z-index: 1;
+  background: rgba(0,0,0,0.4);
+  z-index: 0;              /* under content */
+  pointer-events: none;     /* cannot block clicks */
 }
 
 .hero-content {
   position: relative;
-  z-index: 2;
-  max-width: 900px;
+  z-index: 1;
   padding: 2rem;
-  
 }
 
+/* Fluid logo size; the container controls width */
+.hero-brand {
+  inline-size: clamp(160px, 28vw, 340px); /* 160–340px based on viewport */
+  margin-inline: auto;
+  margin-bottom: 0.75rem;
+}
+
+/* PrimeNG p-image wraps an <img>; ensure it scales */
+.hero-logo{
+  display: block;
+  inline-size: 100%;
+  block-size: auto;
+}
+
+/* Heading is purely text; fluid and balanced */
 .hero-title {
-  font-size: 2.5rem;
+  font-size: clamp(28px, 3.5vw + 12px, 90px);
+  line-height: 1.15;
   font-weight: 400;
-  margin-bottom: 2rem;
-  line-height: 1.3;
-  color: #fff;
+  margin: 0 0 1.25rem;
+  text-wrap: balance;           /* nicer line breaks on modern browsers */
 }
+.hero-title .line { display: block; color: #fff; }
+.hero-title .highlight { color: $highlight-color; font-weight: 400; }
 
-.hero-title span.highlight {
-  color: $highlight-color;
-}
 
 .hero-actions {
   display: flex;
@@ -80,8 +78,8 @@ span.carousel-desc {
   color: #ffffff;
   width: 150px;
   border: 1px solid #fff;
-  font-weight: 600;
-  padding: 0.75rem 1.5rem;
+  font-weight: 400;
+  padding: 0.75rem 0.75rem;
   border-radius: 9999px;
   transition: all 0.3s ease;
 }
@@ -89,20 +87,6 @@ span.carousel-desc {
 .btn-action-home:hover {
   background-color: $highlight-color;
   transform: translateY(-2px);
-}
-
-.scroll-down {
-  margin-top: 2rem;
-}
-
-.btn-scroll-down {
-  font-size: 1.5rem;
-  background-color: transparent;
-  color: white;
-  animation: bounce 2s infinite;
-}
-.btn-scroll-down :hover{
-  background-color: transparent;
 }
 
 @keyframes bounce {
@@ -113,41 +97,35 @@ span.carousel-desc {
 
 /* Responsive tweaks */
 @media (max-width: 768px) {
-  .hero-title {
-    font-size: 1.8rem;
-  }
   .btn-action-home {
     width: 100%;
   }
 }
 
+
+/* --- HOME CONTAINER --- */
+.NewsContainer {
+  background-color: #001C21;
+  color: $font-color-white;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding: clamp(1rem, 2vw, 4rem) 1rem;
+  box-sizing: border-box;
+  overflow-x: hidden;
+}
+
 /* about*/
 .about {
-  padding: clamp(2rem, 4vw + 1rem, 5rem) 1rem;
+  width: 100%;
+  padding: clamp(1rem, 2vw, 4rem) 1rem;
 }
 
 .about__container {
   max-width: 1100px;
   margin: 0 auto;
-}
-
-.about__intro {
-  text-align: center;
-  margin-bottom: clamp(2rem, 5vw, 3.5rem);
-}
-
-.about__title {
-  font-size: clamp(1.5rem, 1rem + 2.2vw, 2.25rem);
-  line-height: 1.3;
-  color: $font-color-base;
-  margin: 0 0 1rem;
-}
-
-.about__lead {
-  font-size: clamp(1rem, 0.9rem + 0.6vw, 1.125rem);
-  line-height: 2rem;
-  margin: 0 auto;
-  max-width: 850px;
 }
 
 .text-highlighted {
@@ -159,7 +137,7 @@ span.carousel-desc {
   display: flex;
   gap: 0.75rem;
   justify-content: center;
-  margin-top: 1.5rem;
+  margin: 1rem;
   flex-wrap: wrap;
 }
 
@@ -212,7 +190,7 @@ span.carousel-desc {
 }
 
 .feature-card__title {
-  font-size: 1.1rem;
+  font-size: var(--fs-h3);
   margin: 0 0 0.35rem;
   color: $highlight-color;
 }
@@ -220,7 +198,7 @@ span.carousel-desc {
 .feature-card__body {
   margin: 0;
   color: $font-color-base;
-  line-height: 1.6;
+  font-size: var(--fs-base);
 }
 
 .feature-card a {
@@ -236,5 +214,132 @@ span.carousel-desc {
 :where(.p-button-rounded) {
   border-radius: 9999px;
   padding: 0.75rem 1.25rem;
+}
+
+/* Responsive 16:9 wrapper for video */
+/* Center slides and give them breathing room */
+.videos-carousel .p-carousel-item {
+  display: flex;
+  justify-content: center;
+}
+
+.video-slide {
+  width: 100%;
+  max-width: 960px;      /* cap wide screens */
+  margin: 0 auto;
+  padding: 0 1rem;
+  text-align: center;
+}
+
+/* Title uses your fluid type tokens if you added them; otherwise clamp it here */
+.video-title {
+  margin: 0 0 .5rem;
+  font-size: clamp(18px, 1.4vw + 14px, 24px);
+  line-height: 1.3;
+  font-weight: 600;
+}
+
+/* Responsive 16:9 wrapper */
+.iframe-container {
+  position: relative;
+  width: 100%;
+  /* Modern browsers */
+  aspect-ratio: 16 / 9;
+  /* Fallback (older): */
+  &::before {
+    content: "";
+    display: block;
+    padding-top: 56.25%;
+  }
+}
+
+.iframe-container > iframe {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  display: block;
+}
+
+/* Make sure carousel doesn’t clip content on small screens */
+.videos-carousel .p-carousel-items-content {
+  overflow: visible; /* default is hidden; letting tooltips/focus rings breathe */
+}
+
+/* Optional: keep arrows from overlapping the video on tight phones */
+.videos-carousel .p-carousel-prev,
+.videos-carousel .p-carousel-next {
+  align-self: center;
+  transform: translateY(-50%);
+  top: 50%;
+}
+
+/* If your theme adds fixed heights anywhere, nuke them */
+.videos-carousel .p-carousel-content,
+.videos-carousel .p-carousel-items-container,
+.videos-carousel .p-carousel-item {
+  height: auto;
+}
+
+/* ===== Small screens (≤ 560px) ===== */
+@media (max-width: 560px) {
+  /* Keep hero from feeling cramped and avoid URL-bar jumps */
+  .hero { height: 100dvh; padding-inline: 1rem; }
+
+ 
+  /* Video slide layout */
+  .video-slide {
+    max-width: 100%;
+    padding: 0 12px;        /* tighter side padding */
+  }
+
+  /* Title: smaller and wraps nicely */
+  .video-title {
+    font-size: clamp(16px, 4vw + 10px, 18px);
+    line-height: 1.25;
+    margin-bottom: .5rem;
+    overflow-wrap: anywhere;  /* long words won’t overflow */
+  }
+
+  /* Keep the video fully visible; round corners optional */
+  .iframe-container {
+    max-width: 100%;
+    border-radius: 8px;
+  }
+
+  /* PrimeNG carousel arrows: bigger tap targets, don’t overlap video */
+  .videos-carousel .p-carousel-prev,
+  .videos-carousel .p-carousel-next {
+    top: 50%;
+    transform: translateY(-50%);
+  }
+  .videos-carousel .p-carousel-prev .p-button,
+  .videos-carousel .p-carousel-next .p-button {
+    width: 44px;
+    height: 44px;        /* minimum recommended touch size */
+  }
+
+  /* Let content define height; some themes fix heights */
+  .videos-carousel .p-carousel-content,
+  .videos-carousel .p-carousel-items-container,
+  .videos-carousel .p-carousel-item {
+    height: auto !important;
+  }
+}
+
+/* ===== Very small phones (≤ 360px) ===== */
+@media (max-width: 360px) {
+  
+  .video-title { font-size: clamp(15px, 5vw + 8px, 17px); }
+  .application-videos { padding-block: .5rem; }
+}
+
+/* iOS safe areas (notches) */
+@supports (padding: max(0px)) {
+  .application-videos {
+    padding-left: max(12px, env(safe-area-inset-left));
+    padding-right: max(12px, env(safe-area-inset-right));
+  }
 }
 

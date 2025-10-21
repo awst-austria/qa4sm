@@ -68,37 +68,21 @@ export class HomeComponent implements OnInit {
   animationFadeInLeftClass = ['fadeinleft', 'animation-duration-1000', 'animation-iteration-1']
   animationFadeInRightClass = ['fadeinright', 'animation-duration-1000', 'animation-iteration-1']
 
-  applicationInfoClass = {
-    main: 'flex flex-wrap flex-column row-gap-0 application-info',
-    oddRow: 'flex flex-row flex-wrap column-gap-0 w-12 application-row',
-    evenRow: 'flex flex-row-reverse flex-wrap column-gap-0 w-12 application-row',
-    tile: 'flex flex-column w-6 align-items-center justify-content-start application-tile',
-    h1: 'lg:text-6xl md:text-4xl sm:text-2xl text-xl',
-    div: 'lg:text-3xl md:text-2xl  sm:text-base text-xs',
-  }
+  responsiveOptions = [
+    { breakpoint: '1024px', numVisible: 1, numScroll: 1 },
+    { breakpoint: '768px',  numVisible: 1, numScroll: 1 },
+    { breakpoint: '560px',  numVisible: 1, numScroll: 1 }
+  ];
+
 
   qa4smNewsClass = {
-    main: 'app-news flex flex-column flex-wrap justify-content-center align-items-center fadeInOut',
-    header: 'line-height-2 lg:text-4xl md:text-4xl sm:text-3xl text-2xl my-1 text-center',
-    div: 'line-height-2 lg:text-xl md:text-xl sm:text-lg text-base py-1'
+    main: 'NewsContainer fadeInOut',
   }
 
-  opinionSectionClass = {
-    main: 'app-news flex flex-column flex-wrap justify-content-center align-items-center mb-2 fadeIn',
-    header: 'line-height-2 lg:text-4xl md:text-4xl sm:text-3xl text-2xl my-1 text-center',
-    div: 'line-height-2 lg:text-xl md:text-xl sm:text-lg text-base py-1 text-center'
-  }
-
-  videosClass = {
-    main: 'application-videos lg:my-5 my-2 w-12 fadeInOut',
-    mainDiv: 'flex flex-column align-content-center justify-content-center w-12',
-    rowDiv: "w-12 py-2 text-center iframe-container",
-    header: "lg:text-3xl md:text-2xl text-base",
-  }
 
   applicationTeamClass = {
     main: 'application-team flex flex-column flex-wrap h-auto lg:my-6 my-4 row-gap-2',
-    header: 'line-height-2 lg:text-4xl md:text-4xl sm:text-3xl text-2xl my-1 text-center',
+    header: 'line-height-2 lg:text-5xl md:text-4xl sm:text-3xl text-2xl my-1 text-center',
     partner: 'flex flex-row flex-wrap w-12 gap-2 align-items-center justify-content-center',
     partnerDesc: 'md:w-8 w-12 px-3 text-justify partner-desc gap-1 lg:text-xl md:text-base text-xs fadeInLeft',
     partnerLogo: 'md:w-3 w-12 partner-logo align-items-center justify-content-center text-center fadeInRight',

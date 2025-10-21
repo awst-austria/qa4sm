@@ -1,53 +1,26 @@
-
+<div class="flex flex-column">
+     
   <section class="hero">
     <div class="hero-overlay"></div>
       <div class="hero-content">
         <div class="hero-title-box">
+          <div class="hero-brand" aria-hidden="true">
+            <img src="/static/images/logo/qa4sm_logo_long.webp" 
+                alt="QA4SM logo" class="hero-logo" />
+          </div>
           <h1 class="hero-title">
-            <span>
-              <p-image
-                width="300"
-                alt="qa4smLogo"
-                [src]="logoFiles[5].plot">
-              </p-image>
-            </span>
-            <br />
-            Quality Assurance Service <br />
-            <span class="highlight">for Satellite Soil Moisture Data</span>
+            <span class="line">Quality Assurance Service</span>
+            <span class="line highlight">for Satellite Soil Moisture Data</span>
           </h1>
 
           <div class="hero-actions">
-            <div *ngIf="userLoggedIn$ | async; else elseBlock">
-              <a
-                pButton
-                label="See Results"
-                routerLink="/published-validations"
-                class="btn-action-home"
-                role="button">
-              </a>
-              <a
-                pButton
-                label="Try It"
-                routerLink="/validate"
-                class="btn-action-home"
-                role="button">
-              </a>
-            </div>
-            <ng-template #elseBlock>
-              <a
-              pButton
-              label="See Results"
-              routerLink="/published-validations"
-              class="btn-action-home"
-              role="button">
-              </a>
-              <a
-              pButton
-              label="Sign Up"
-              routerLink="/signup"
-              class="btn-action-home"
-              role="button">
-              </a>
+            <ng-container *ngIf="userLoggedIn$ | async; else loggedOut">
+              <a pButton label="See Results" routerLink="/published-validations" class="btn-action-home" role="button"></a>
+              <a pButton label="Try It"        routerLink="/validate"               class="btn-action-home" role="button"></a>
+            </ng-container>
+            <ng-template #loggedOut>
+              <a pButton label="See Results" routerLink="/published-validations" class="btn-action-home" role="button"></a>
+              <a pButton label="Sign Up"     routerLink="/signup"                class="btn-action-home" role="button"></a>
             </ng-template>
           </div>
         </div>
@@ -65,14 +38,13 @@
     </div>
   </section>
 
-  <section class="homeContainer">
-
+  <section class="NewsContainer">
     <!-- News Section -->
     <div *ngIf="settings$|async as settings"
          id="qa4smNews"
          [ngClass]="qa4smNewsClass.main">
-      <h1 [ngClass]="qa4smNewsClass.header">What's new</h1>
-      <div [innerHTML]=settings[0].news [ngClass]="qa4smNewsClass.div"></div>
+      <h1>What's new</h1>
+      <div [innerHTML]=settings[0].news></div>
     </div>
   </section>
 
@@ -80,15 +52,14 @@
   <section class="about" aria-labelledby="about-title">
     <div class="about__container">
     <!-- Intro -->
-      <header class="about__intro">
-        <h1> Service for validation of satellite soil moisture products against
-          in-situ and model reference data </h1>
-        <p class="about__lead">
+        <h1 class="text-center">Soil moisture validation service</h1>
+        <h3>Validate satellite soil moisture data against in-situ observations and model references.</h3>
+        <p>
           A unified platform that <span class="text-highlighted">brings together methodologies and protocols</span> for
           the validation and quality control of soil moisture data products, delivering
           <span class="text-highlighted">traceable validation results</span> you can explore, share, and publish.
         </p>
-        <div class="about__actions">
+        <div class="about__actions mb-2">
           <a
           pButton
           label="How it works"
@@ -104,8 +75,6 @@
           role="button">
           </a>
         </div>
-      </header>
-
       <!-- Feature Grid -->
       <div class="about__grid" role="list">
         <!-- Simple -->
@@ -139,7 +108,7 @@
           </div>
           <h3 class="feature-card__title">Free</h3>
           <p class="feature-card__body">
-            Just set up and account to have full access to all functionalities.
+            Just set up an account to have full access to all functionalities.
           </p>
         </article>
 
@@ -157,48 +126,47 @@
     </div>
   </section>
 
-  <section class="homeContainer">
-
+  <section class="NewsContainer">
     <!-- Application videos -->
-    <div class="about__container">
-      <!-- Video -->
-      <header class="about__intro">
-        <h1> Step-by-step video tutorials to help you get started with QA4SM </h1>
-        <p class="about__lead">
-          Explore a series of short <span class="text-highlighted">hands-on tutorials</span> that guide you through every part of the QA4SM platform — 
-  from setting up your first validation to interpreting results and publishing them.  
-  Learn how to <span class="text-highlighted">upload custom data, compare satellite data,</span> and make the most of QA4SM’s validation tools.
-        </p>
+    <h1 class="text-center"> Step-by-step video tutorials</h1>
+    <p class="about__lead">
+      Explore a series of short <span class="text-highlighted">hands-on tutorials</span> that guide you through every part of the QA4SM platform — 
+      from setting up your first validation to interpreting results and publishing them.  
+      Learn how to <span class="text-highlighted">upload custom data, compare satellite data,</span> and make the most of QA4SM’s validation tools.
+    </p>
+    <div class="application-videos">
+      <p-carousel
+          [value]="videos"
+          [circular]="true"
+          [numVisible]="1"
+          [numScroll]="1"
+          [showIndicators]="false"
+          [showNavigators]="true"
+          [responsiveOptions]="responsiveOptions"
+          styleClass="videos-carousel">
 
-        <div [ngClass]="videosClass.main">
-          <p-carousel [value]="videos"
-                    [circular]="true"
-                    [numVisible]="1"
-                    [numScroll]="1"
-                    [showIndicators]="false"
-                    [showNavigators]="true">
-            <ng-template let-video pTemplate="item">
-              <div [ngClass]="videosClass.mainDiv">
-                <div [ngClass]="videosClass.rowDiv">
-                  <div [ngClass]="videosClass.header">{{video.title}}</div>
-                </div>
-                <div [ngClass]="videosClass.rowDiv">
-                  <iframe class="w-11 lg:h-30rem md:h-20rem sm:h-15rem"
-                        [src]="video.video"
-                        title="YouTube video player"
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                        allowfullscreen>
-                  </iframe>
-                </div>
-              </div>
-            </ng-template>
-          </p-carousel>
-        </div>
-      </header>
+        <ng-template let-video pTemplate="item">
+          <div class="video-slide">
+            <h3 class="video-title">{{ video.title }}</h3>
+            <!-- IMPORTANT: the container has the aspect ratio, the iframe fills it -->
+            <div class="iframe-container">
+              <iframe
+                [src]="video.video"
+                title="YouTube video player"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                allowfullscreen>
+              </iframe>
+            </div>
+          </div>
+        </ng-template>
+      </p-carousel>
     </div>
   </section>
 
     <!-- Team -->
+  <section class="about" aria-labelledby="about-title">
+
+
     <div [ngClass]="applicationTeamClass.main">
         <h1 [ngClass]="applicationTeamClass.header"> Project Team and Partners </h1>
         <!--        FFG -->
@@ -285,16 +253,17 @@
     </div>
 
     <!-- Feedback -->
-    <div *ngIf="settings$|async as settings" id="qa4sm-opinion"
-         [ngClass]="opinionSectionClass.main">
-      <h2 [ngClass]="opinionSectionClass.header">Share with us your opinion</h2>
-      <div [ngClass]="opinionSectionClass.div">
+    <div *ngIf="settings$|async as settings" id="qa4sm-opinion">
+      <h1 class="text-center">Share with us your opinion</h1>
+      <p>
         If you think we could improve something or you see a missing functionality, please let us know using
         this <b> <a target="_blank" [href]="settings[0].feed_link">feedback form</a> </b>.
-      </div>
+      </p>
     </div>
 
-  
+  </section>
 
   <p-scrollTop styleClass="scroll-button"></p-scrollTop>
+
+</div>
 
