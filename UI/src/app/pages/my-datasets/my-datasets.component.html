@@ -1,4 +1,4 @@
-<main>
+<main class="flex flex-column align-items-center">
 
   <div *ngIf="hasNoSpaceAssigned">
     <div class="text-center lead text-muted pt-3">
@@ -10,7 +10,7 @@
 
   <div *ngIf="!hasNoSpaceAssigned && !maintenanceMode">
     <div class="center">
-      <h1>Upload your data</h1>
+      <h1 class="text-center">Upload your data</h1>
     </div>
     <div *ngIf="!settingsError else noSettingsFetched">
       <div class="text-center lead text-muted pt-3">
@@ -29,7 +29,7 @@
 
     <hr class="featurette-divider">
     <div class="center">
-      <h2>Uploaded datasets</h2>
+      <h2 class="text-center">Uploaded datasets</h2>
     </div>
     <div *ngIf="(userDatasets$ | async) as userDatasetList">
       <div *ngIf="(dataManagementGroups$ | async) as dataManagementGroups">
