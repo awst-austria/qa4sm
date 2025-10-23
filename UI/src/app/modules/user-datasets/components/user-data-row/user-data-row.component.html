@@ -149,7 +149,7 @@
             [modal]="true" 
             [style]="{width: '60vw'}"
             [dismissableMask]="true">
-        <pre style="white-space: pre-wrap;">{{ getFileUploadLogInfo() }}</pre>
+        <pre style="white-space: pre-wrap; color: rgb(255, 255, 255); font-weight: 500;">{{ getFileUploadLogInfo() }}</pre>
       </p-dialog>
 
     <!-- Error message -->
@@ -159,7 +159,7 @@
 
      </div>
     <!-- validations -->
-    <div class="w-12 md:w-6 pt-2" *ngIf="getFileUploadStatus() === 'success'" [ngClass]="authService.currentUser.is_staff ? 'lg:w-4' : 'lg:w-5'">
+    <div class="w-12 md:w-6 pt-2" *ngIf="getFileUploadStatus() !== 'failed'" [ngClass]="authService.currentUser.is_staff ? 'lg:w-4' : 'lg:w-5'">
       <div><strong>Validation list: </strong></div>
       <p-scrollPanel [style]="{width: '80%', height: '80%'}">
         <div *ngIf="userDataset.owner_validation_list.length || userDataset.number_of_other_users_validations">
@@ -182,7 +182,7 @@
     </div>
    
     <!-- sharing groups-->
-    <div *ngIf="authService.currentUser.is_staff && getFileUploadStatus() === 'success'" class="lg:w-2 md:w-6 w-12 pt-2">
+    <div *ngIf="authService.currentUser.is_staff && getFileUploadStatus() !== 'failed'" class="lg:w-2 md:w-6 w-12 pt-2">
       <div><strong>Shared: </strong></div>
       <p-scrollPanel *ngIf="(datasetGroups()) as managementGroups" [style]="{width: '80%', height: '80%'}">
         <div *ngIf="managementGroups.length !== 0">

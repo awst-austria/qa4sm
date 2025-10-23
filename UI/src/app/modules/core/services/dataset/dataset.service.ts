@@ -70,8 +70,8 @@ export class DatasetService {
                 if (!isUserProvided) return true; // keep non-user datasets
 
                 const status = statusByDatasetId.get(ds.id);
-                // keep only user datasets whose status is present and not 'failed'
-                return !!status && status !== 'failed';
+                // keep only user datasets whose status is 'failed'
+                return status !== 'failed';
               });
             })
           )
@@ -92,8 +92,6 @@ export class DatasetService {
   }
 }
 
-
-  
   getDatasetById(datasetId: number): Observable<DatasetDto> {
     if (this.singleRequestCache.isCached(datasetId)) {
       return this.singleRequestCache.get(datasetId);
@@ -106,9 +104,5 @@ export class DatasetService {
       );
     }
   }
-
-
-
-
 
 }

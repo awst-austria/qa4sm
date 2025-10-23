@@ -1,5 +1,5 @@
 <main class="flex flex-column align-items-center">
-
+<div class="flex flex-column w-11 xl:w-10 justify-content-center align-content-center">
   <div *ngIf="hasNoSpaceAssigned">
     <div class="text-center lead text-muted pt-3">
       You have no space for uploading data assigned. Please contact our team (support(at)qa4sm.eu or via our
@@ -91,7 +91,7 @@
   <qa-maintenance-mode *ngIf="maintenanceMode" [action]="'upload new files'"></qa-maintenance-mode>
 
   <p-scrollTop styleClass="scroll-button"></p-scrollTop>
-
+</div>
 </main>
 
 <!--<p-dialog header="Share your dataset with other users"-->
