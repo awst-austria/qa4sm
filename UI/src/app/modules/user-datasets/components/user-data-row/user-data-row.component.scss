@@ -14,8 +14,8 @@
   border: 1px solid $base-color;
 
   &:hover {
-    background-color: darken($base-color, 10%) !important;
-    border-color: darken($base-color, 10%);
+    background-color: $base-color-hover;
+    border-color: $base-color-hover;
   }
 
   &:active {

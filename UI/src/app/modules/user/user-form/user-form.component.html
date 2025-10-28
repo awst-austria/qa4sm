@@ -1,12 +1,12 @@
 <p-toast></p-toast>
 <p-confirmDialog key="apiTokenConfirm" [style]="{width: '30vw'}" [baseZIndex]="10000"></p-confirmDialog>
 
-<div class="flex flex-column px-2 w-12 md:w-10 lg:w-10 xl:w-8 2xl:w-7 justify-content-center align-content-center mx-auto">
+<div class="w-11 md:w-10 lg:w-12 xl:w-12">
   <qa-maintenance-mode *ngIf="maintenanceMode" [action]="userData ? 'update your data' : 'sign up'"/>
   <div *ngIf="!maintenanceMode">
     <div class="center">
-      <h1 *ngIf="!userData"> Sign up </h1>
-      <h1 *ngIf="userData">User profile</h1>
+      <h1 *ngIf="!userData" class="text-center"> Sign up </h1>
+      <h1 *ngIf="userData" class="text-center">User profile</h1>
     </div>
     <form [formGroup]="userForm" (ngSubmit)="onSubmit()" *ngIf="!maintenanceMode">
       <div class="py-3">
@@ -164,12 +164,6 @@
             class="pi pi-angle-double-right"></span></label>
         </span>
       </div>
-
-      <div class="form-control-box">
-        <p-checkbox inputId="active" formControlName="active" binary="true"></p-checkbox>
-        <label for="active">some label</label>
-      </div>
-
 
       <button *ngIf="!userData"
               pButton

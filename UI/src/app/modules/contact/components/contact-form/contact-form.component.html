@@ -1,10 +1,17 @@
-<div class="flex flex-column px-2 w-12 md:w-10 lg:w-10 xl:w-8 2xl:w-7 justify-content-center align-content-center mx-auto">
+<div class="flex flex-column justify-content-center align-items-center px-2">
+  <div class="w-11 md:w-10 lg:w-8 xl:w-8">
   
-  <div class="center">
-    <h1>Contact us:</h1>
-  </div>
+  <h1 class="text-center">Contact us:</h1>
+  <p class="text-lg mt-3 mb-5 px-3 md:px-0">
+    You are very welcome to contact us with any questions about 
+    <b>soil moisture validation</b>, <b>satellite data</b>, or 
+    the <b>QA4SM platform</b>.  
+    <br />
+    Whether you are a geophysicist, researcher, or simply curious about 
+    how satellite soil moisture data are evaluated — we’d be happy to hear from you.
+  </p>
 
-  <form [formGroup]="contactForm" (ngSubmit)="onSubmit()">
+  <form class="p-fluid" [formGroup]="contactForm" (ngSubmit)="onSubmit()">
       <!-- Email -->
     <div class="py-3">
       <span class="p-float-label">
@@ -79,5 +86,6 @@
               [disabled]="!contactForm.valid">
     </button>
   </form> 
+</div>
 </div>
 
