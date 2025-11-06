@@ -71,57 +71,18 @@ def auto_cleanup():
         no_user_val.delete()
 
 
-def auto_user_upload_cleanup(user_data_dir):
-    user_dir = Path(user_data_dir)
-    cutoff_date = datetime.now() - timedelta(weeks=4)
-
-    for data_upload in user_dir.iterdir():
-        if not data_upload.is_dir():
-            continue
-
-        log_dir = data_upload / "log"
-        if log_dir.exists():
-            # Delete old .log files
-            for log_file in log_dir.glob("*.log"):
-                if datetime.fromtimestamp(
-                        log_file.stat().st_mtime) < cutoff_date:
-                    log_file.unlink()
-
-            # Remove log dir if empty
-            if not any(log_dir.iterdir()):
-                log_dir.rmdir()
-
-        # Remove data_upload dir if empty
-        if not any(data_upload.iterdir()):
-            data_upload.rmdir()
-
-
 @api_view(['POST'])
 @permission_classes([IsAuthenticated, IsAdminUser])
 @authentication_classes([TokenAuthentication])
 def run_auto_cleanup_script(request):
     if str(request.user.auth_token) == settings.ADMIN_ACCESS_TOKEN:
-        errors = []
         try:
             auto_cleanup()
         except Exception as e:
-            errors.append(f"Validation cleanup failed: {str(e)}")
-        try:
-            user_data_dir = getattr(settings, 'USER_DATA_DIR',
-                                    '/tmp/user_data_dir/')
-            auto_user_upload_cleanup(user_data_dir)
-        except Exception as e:
-            errors.append(f"User upload cleanup failed: {str(e)}")
-        if errors:
-            send_autocleanup_failed(" | ".join(errors))
-            return JsonResponse({'message': 'something went wrong'},
-                                status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-        return JsonResponse({'message': 'success'},
-                            status=status.HTTP_200_OK,
-                            safe=False)
+            send_autocleanup_failed(str(e))
+            return JsonResponse({'message': 'something went wrong'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        return JsonResponse({'message': 'success'}, status=status.HTTP_200_OK, safe=False)
     else:
-        send_autocleanup_failed(
-            'provided token does not belong to the admin user.')
-        return JsonResponse(
-            {'message': 'Provided token does not belong to the admin user.'},
-            status=status.HTTP_401_UNAUTHORIZED)
+        send_autocleanup_failed('provided token does not belong to the admin user.')
+        return JsonResponse({'message': 'Provided token does not belong to the admin user.'},
+                            status=status.HTTP_401_UNAUTHORIZED)

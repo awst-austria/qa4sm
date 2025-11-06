@@ -174,9 +174,9 @@ class TestValidationComparisonView(TestCase):
         assert response.status_code == 200
         assert list(response.json()[0].keys()) == ['plot']
         assert response_intersection.status_code == 200
-        assert list(response.json()[0].keys()) == ['plot']
+        assert list(response_intersection.json()[0].keys()) == ['plot']
         assert response_non_overl_extent.status_code == 200
-        assert list(response.json()[0].keys()) == ['plot']
+        assert list(response_non_overl_extent.json()[0].keys()) == ['plot']
 
     def test_get_spatial_extent(self):
         spatial_extent_url = reverse('Extent image')
