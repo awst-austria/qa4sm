@@ -258,7 +258,9 @@
           <div class="label md:w-3 w-12 md:px-1 px-2 text-center">
             <label for="name">Name your validation:</label>
           </div>
-          <input class="form-field md:w-8 w-11"
+          <input 
+                 maxlength="80"
+                 class="form-field md:w-8 w-11"
                  id="name"
                  type="text"
                  pInputText
@@ -266,7 +268,7 @@
                  (ngModelChange)="validationModel.nameTag$.next($event)">
           <div class="w-1">
            <span
-             pTooltip="You can optionally name the validation to make it easier to identify in your list of validations."
+             pTooltip="Optional name for this validation (limit: 80 characters)."
              class="pi pi-question-circle help-field ml-1">
             </span>
           </div>

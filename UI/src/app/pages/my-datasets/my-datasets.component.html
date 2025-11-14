@@ -1,5 +1,5 @@
-<main class="flex flex-column align-items-center">
-<div class="flex flex-column w-11 xl:w-10 justify-content-center align-content-center">
+<main class="flex flex-column align-items-center justify-content-center">
+<div class="flex flex-column w-11 xl:w-10">
   <div *ngIf="hasNoSpaceAssigned">
     <div class="text-center lead text-muted pt-3">
       You have no space for uploading data assigned. Please contact our team (support(at)qa4sm.eu or via our
@@ -9,7 +9,7 @@
   </div>
 
   <div *ngIf="!hasNoSpaceAssigned && !maintenanceMode">
-    <div class="center">
+    <div class="flex justify-content-center">
       <h1 class="text-center">Upload your data</h1>
     </div>
     <div *ngIf="!settingsError else noSettingsFetched">
@@ -22,18 +22,18 @@
       </div>
     </div>
     <ng-template #noSettingsFetched>
-      <div class="center">
+      <div class="flex justify-content-center">
         <p class="lead text-muted">Sorry, uploading data is not possible now.</p>
       </div>
     </ng-template>
 
     <hr class="featurette-divider">
-    <div class="center">
+    <div class="flex justify-content-center">
       <h2 class="text-center">Uploaded datasets</h2>
     </div>
     <div *ngIf="(userDatasets$ | async) as userDatasetList">
       <div *ngIf="(dataManagementGroups$ | async) as dataManagementGroups">
-        <div *ngIf="userDatasetList.length !== 0" class="container mb-5 mt-4" [ngStyle]="pageStyle">
+        <div *ngIf="userDatasetList.length !== 0" class="w-11 xl:w-11 mb-5 mt-2 mx-auto" [ngStyle]="pageStyle">
           <div>
             <div *ngFor="let userDataset of userDatasetList" class="mb-3">
               <qa-user-data-row [userDataset]="userDataset"

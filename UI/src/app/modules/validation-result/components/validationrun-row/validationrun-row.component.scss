@@ -1,0 +1,10 @@
+@use 'src/style.variables' as *;
+
+.doilink {
+  color: #ffffff;        // change to any color you want
+}
+
+.doilink:hover {
+  color: $highlight-color;        // optional hover color
+  text-decoration: underline;
+}
