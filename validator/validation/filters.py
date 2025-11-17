@@ -231,6 +231,14 @@ def get_used_variables(filters, dataset, variable):
                 variables.append('Overpass')
                 continue
 
+            if fil.name == "FIL_CCIGF_GAPMASK":
+                variables.append("gapmask")
+
+            if fil.name == "FIL_CCIGF_FROZENMASK":
+                variables.append("frozenmask")
+
+
+
 
     # meaning these are parametrized filters
     except AttributeError:
@@ -604,6 +612,12 @@ def setup_filtering(reader, filters, param_filters, dataset,
         if fil.name == "FIL_SMAP_L3_V9_ORBIT_DSC":
             masking_filters.append(('Overpass', '==', 1))
             continue
+        # Filters for the CCI GAPFILLED product
+        if fil.name == "FIL_CCIGF_GAPMASK":
+            masking_filters.append(("gapmask", "==", 0))
+        if fil.name == "FIL_CCIGF_FROZENMASK":
+            masking_filters.append(("frozenmask", "==", 0))
+
 
     if len(masking_filters):
         filtered_reader = AdvancedMaskingAdapter(filtered_reader,
