@@ -7,9 +7,10 @@ import {SettingsService} from '../../../core/services/global/settings.service';
 import {LoginComponent} from 'src/app/modules/user/login/login.component';
 
 @Component({
-  selector: 'qa-navigation-bar-header',
-  templateUrl: './navigation-bar.component.html',
-  styleUrls: ['./navigation-bar.component.scss']
+    selector: 'qa-navigation-bar-header',
+    templateUrl: './navigation-bar.component.html',
+    styleUrls: ['./navigation-bar.component.scss'],
+    standalone: false
 })
 export class NavigationBarComponent implements OnInit {
   isMaintenancePossible = false;
@@ -124,9 +125,7 @@ export class NavigationBarComponent implements OnInit {
   isHomePage = signal<boolean | undefined>(undefined)
   isLogoDisplayed = signal<boolean>(true)
 
-  longLogo: Logo = {path:  '/static/images/logo/qa4sm_logo_long.webp', height: '45', shape: 'rectangle'}
-  squareLogo: Logo = {path: '/static/images/logo/qa4sm_logo_square.webp', height: '80', shape: 'square'}
-  logo = signal<Logo>({path: undefined, height: undefined, shape: undefined});
+  Logo = {path:  '/static/images/logo/qa4sm_logo_long.webp', height: '45', shape: 'rectangle'}
 
   minWindowWidthFullLogo = 1583;
   maxWindowWidthForSquareLogo = 960;
@@ -150,31 +149,16 @@ export class NavigationBarComponent implements OnInit {
     this.authService.showLoginModal$.subscribe(
       (state: {show: boolean, message?: string}) => this.showLoginModal = state.show
     );
-    this.updateLogo(window.innerWidth);
-
   }
-
 
   ngOnInit(): void {
     this.authService.authenticated.subscribe(authenticated => this.authStatusChanged(authenticated));
     this.setSettingsValues();
   }
 
-  @HostListener('window:resize', ['$event'])
-  onResize(event) {
-    this.updateLogo(event.target.innerWidth)
-  }
-
-
   onLoginSuccess() {
     // Hide the login modal window on successful login
     this.authService.switchLoginModal(false);
-  }
-
-  private updateLogo(windowWidth: number): void {
-    this.isLogoDisplayed.set(windowWidth > this.noLogoWindowWidth);
-    (windowWidth > this.minWindowWidthFullLogo || windowWidth <= this.maxWindowWidthForSquareLogo)
-      ? this.logo.set(this.longLogo) : this.logo.set(this.squareLogo);
   }
 
   private authStatusChanged(authenticated: boolean): void {

@@ -1,14 +1,7 @@
 import {NgModule} from '@angular/core';
-import {CommonModule} from '@angular/common';
 import {AnomClimatologyComponent} from './components/anom-climatology/anom-climatology.component';
 import {AnomaliesComponent} from './components/anomalies/anomalies.component';
-import {PanelModule} from 'primeng/panel';
-import {TooltipModule} from 'primeng/tooltip';
-import {DropdownModule} from 'primeng/dropdown';
-import {FormsModule} from '@angular/forms';
-import {CalendarModule} from 'primeng/calendar';
-import {InputNumberModule} from 'primeng/inputnumber';
-
+import { SharedPrimeNgModule } from 'src/app/shared.primeNg.module';
 
 @NgModule({
   declarations: [AnomClimatologyComponent, AnomaliesComponent],
@@ -16,13 +9,7 @@ import {InputNumberModule} from 'primeng/inputnumber';
     AnomaliesComponent
   ],
   imports: [
-    CommonModule,
-    PanelModule,
-    TooltipModule,
-    DropdownModule,
-    FormsModule,
-    CalendarModule,
-    InputNumberModule
+    SharedPrimeNgModule
   ]
 })
 export class AnomaliesModule {

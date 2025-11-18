@@ -4,9 +4,10 @@ import {FilterModel} from '../basic-filter/filter-model';
 import {DatasetComponentSelectionModel} from '../../../dataset/components/dataset/dataset-component-selection-model';
 
 @Component({
-  selector: 'qa-ismn-depth-filter',
-  templateUrl: './ismn-depth-filter.component.html',
-  styleUrls: ['./ismn-depth-filter.component.scss']
+    selector: 'qa-ismn-depth-filter',
+    templateUrl: './ismn-depth-filter.component.html',
+    styleUrls: ['./ismn-depth-filter.component.scss'],
+    standalone: false
 })
 export class IsmnDepthFilterComponent implements OnInit {
 

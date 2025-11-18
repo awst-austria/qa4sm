@@ -1,10 +1,6 @@
 import {NgModule} from '@angular/core';
-import {CommonModule} from '@angular/common';
 import {ScalingComponent} from './components/scaling/scaling.component';
-import {PanelModule} from 'primeng/panel';
-import {TooltipModule} from 'primeng/tooltip';
-import {DropdownModule} from 'primeng/dropdown';
-import {FormsModule} from '@angular/forms';
+import { SharedPrimeNgModule } from 'src/app/shared.primeNg.module';
 
 
 @NgModule({
@@ -13,11 +9,7 @@ import {FormsModule} from '@angular/forms';
     ScalingComponent
   ],
   imports: [
-    CommonModule,
-    PanelModule,
-    TooltipModule,
-    DropdownModule,
-    FormsModule
+    SharedPrimeNgModule
   ]
 })
 export class ScalingModule {

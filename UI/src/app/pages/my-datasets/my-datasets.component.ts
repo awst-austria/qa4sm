@@ -7,9 +7,10 @@ import {SettingsService} from '../../modules/core/services/global/settings.servi
 import {catchError} from 'rxjs/operators';
 
 @Component({
-  selector: 'qa-my-datasets',
-  templateUrl: './my-datasets.component.html',
-  styleUrls: ['./my-datasets.component.scss']
+    selector: 'qa-my-datasets',
+    templateUrl: './my-datasets.component.html',
+    styleUrls: ['./my-datasets.component.scss'],
+    standalone: false
 })
 export class MyDatasetsComponent implements OnInit {
   // userDatasets = [];

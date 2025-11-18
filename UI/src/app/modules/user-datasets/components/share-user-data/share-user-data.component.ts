@@ -5,9 +5,10 @@ import {UserDatasetsService} from '../../services/user-datasets.service';
 import {BehaviorSubject} from 'rxjs';
 
 @Component({
-  selector: 'qa-share-user-data',
-  templateUrl: './share-user-data.component.html',
-  styleUrls: ['./share-user-data.component.scss']
+    selector: 'qa-share-user-data',
+    templateUrl: './share-user-data.component.html',
+    styleUrls: ['./share-user-data.component.scss'],
+    standalone: false
 })
 export class ShareUserDataComponent implements OnInit, OnChanges{
 

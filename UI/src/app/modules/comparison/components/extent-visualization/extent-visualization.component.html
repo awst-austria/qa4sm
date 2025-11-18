@@ -2,7 +2,7 @@
   <qa-loading-spinner/>
 </div>
 <div *ngIf="!showLoadingSpinner && errorHappened" class="center alert flex py-2">
-  <h4> Extent plot not available! </h4>
+  <p> Extent plot not available! </p>
 </div>
 
 <div *ngIf="!showLoadingSpinner && ! errorHappened" class="flex no-gutters pb-2">
@@ -10,7 +10,7 @@
     <p-panel class="validation-row">
       <ng-template pTemplate="header">
         <div class="text-center my-1" style="width: 92%">
-          <h4 class="my-0 font-weight-normal">Warning</h4>
+          <p class="my-0 font-weight-normal">Warning</p>
         </div>
       </ng-template>
       <ng-template pTemplate="icons">
@@ -32,7 +32,7 @@
       <p-panel [toggleable]="true" [collapsed]="true">
         <ng-template pTemplate="header">
           <div class="text-center my-1" style="width: 92%">
-            <h4 class="my-0 font-weight-normal">Selected comparison extent</h4>
+            <p class="my-0 font-weight-normal">Selected comparison extent</p>
           </div>
         </ng-template>
         <ng-template pTemplate="icons">

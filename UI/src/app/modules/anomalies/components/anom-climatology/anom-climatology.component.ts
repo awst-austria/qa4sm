@@ -2,9 +2,10 @@ import {Component, model} from '@angular/core';
 import {AnomaliesModel} from '../anomalies/anomalies-model';
 
 @Component({
-  selector: 'qa-anom-climatology',
-  templateUrl: './anom-climatology.component.html',
-  styleUrls: ['./anom-climatology.component.scss']
+    selector: 'qa-anom-climatology',
+    templateUrl: './anom-climatology.component.html',
+    styleUrls: ['./anom-climatology.component.scss'],
+    standalone: false
 })
 export class AnomClimatologyComponent  {
   public minYear = 1971;

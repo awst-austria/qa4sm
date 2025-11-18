@@ -1,36 +1,22 @@
+// Background and font
+$background-color: #ffffff;
+$font-color-base: #333;
+$font-color-white: #ffffff;
+$font-color-muted: #939493;
+
+$base-color: #1BA595;
+$highlight-color: #F2B033;
+$base-color-hover: #168F83; 
+$base-color-active: #168F83;           
+$base-color-transparent: rgba(27, 165, 149, 0.16); 
+
 $main-page-color-1: #1BA595;
 $main-page-color-1-trans: rgba(27, 165, 149, 0.7);
 $main-page-color-2: #87BEA9;
 $main-page-color-3: rgba(0, 76, 89);
 
-$base-color: #1BA595;
-$highlight-shadow: rgba(255, 172, 4, 0.5);
-$highlight-border: #FFAC04;
-//$base-color: #00AAE3; // old one
-$base-font-color: #333;
 $base-font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
-$button-base-color: #17A2B8;
 
-$main-modal-header: #139a96;
-
-//$button-base-color: #007BFF;
-//$button-base-color: #4760E5;
-$button-hover-color: #F8C100;
-$button-active-color: #FFAC04;
-//$button-hover-color: #213FE0;
-$edit-name-button-backgroud-color: #1BA595;
-$dropdown-buttons-background:  #f1f1f1;
+$button-hover-color: #F8C100;  
+$warning-text: #B45309;    
 $pronouced-button-color: #ef4444 ;
-$menu-item-color:  #FFAC04; // #585864; #668B3E - green; //
-$menu-item-focus-color: #F8C100; //#585864; #9E878D - green;//
-$background-color: white;//#F0F4F5; //#74A5B9
-$main-link-color: $main-page-color-1;
-$main-link-hover-color: $main-page-color-3;
-
-$checkbox-main-color: $main-page-color-1;
-$checkbox-hover-color: $main-page-color-2;
-$checkbox-shadow-color: $highlight-shadow;
-$checkbox-focus-color: $highlight-border;
-
-$calendar-picker-main-color: $main-page-color-1;
-

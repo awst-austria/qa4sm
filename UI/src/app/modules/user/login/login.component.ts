@@ -10,10 +10,11 @@ import {Router, NavigationEnd} from '@angular/router';
 
 
 @Component({
-  selector: 'qa-login',
-  templateUrl: './login.component.html',
-  styleUrls: ['./login.component.scss'], 
-  providers: []
+    selector: 'qa-login',
+    templateUrl: './login.component.html',
+    styleUrls: ['./login.component.scss'],
+    providers: [],
+    standalone: false
 })
 export class LoginComponent implements OnInit {
 

@@ -23,7 +23,6 @@ import {UserProfileComponent} from './pages/user-profile/user-profile.component'
 import {DatasetModule} from './modules/dataset/dataset.module';
 import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
 import {FontAwesomeModule} from '@fortawesome/angular-fontawesome';
-import {DropdownModule} from 'primeng/dropdown';
 import {PanelModule} from 'primeng/panel';
 import {AccordionModule} from 'primeng/accordion';
 import {TooltipModule} from 'primeng/tooltip';
@@ -42,15 +41,12 @@ import {MetricsModule} from './modules/metrics/metrics.module';
 import {AnomaliesModule} from './modules/anomalies/anomalies.module';
 import {ScalingModule} from './modules/scaling/scaling.module';
 import {MapModule} from './modules/map/map.module';
-import {TermsComponent} from './pages/terms/terms.component';
-import {DatasetInfoComponent} from './pages/dataset-info/dataset-info.component';
 import {ComparisonComponent} from './pages/comparison/comparison.component';
 import {ComparisonModule} from './modules/comparison/comparison.module';
 import {
   TemporalMatchingComponent
 } from './modules/temporal-matching/components/temporal-matching/temporal-matching.component';
 import {TemporalMatchingModule} from './modules/temporal-matching/temporal-matching.module';
-import {HelpComponent} from './pages/help/help.component';
 import {CoreModule} from './modules/core/core.module';
 import {SignupComponent} from './pages/signup/signup.component';
 import {UserModule} from './modules/user/user.module';
@@ -75,6 +71,9 @@ import {ContactUsComponent} from './pages/contact-us/contact-us.component';
 import {ContactModule} from './modules/contact/contact.module';
 import {SelectButtonModule} from 'primeng/selectbutton';
 import {MaintenanceModeComponent} from "./modules/core/maintenance-mode/maintenance-mode.component";
+import { SharedPrimeNgModule } from './shared.primeNg.module';
+import { providePrimeNG } from 'primeng/config';
+import Aura from '@primeuix/themes/aura';
 
 @NgModule({ declarations: [
         AppComponent,
@@ -85,10 +84,7 @@ import {MaintenanceModeComponent} from "./modules/core/maintenance-mode/maintena
         ValidationResultComponent,
         UserProfileComponent,
         PublishedValidationsComponent,
-        TermsComponent,
-        DatasetInfoComponent,
         ComparisonComponent,
-        HelpComponent,
         SignupComponent,
         SignupCompleteComponent,
         DeactivateUserCompleteComponent,
@@ -113,7 +109,6 @@ import {MaintenanceModeComponent} from "./modules/core/maintenance-mode/maintena
         NgbModule,
         FontAwesomeModule,
         ToastModule,
-        DropdownModule,
         AccordionModule,
         PanelModule,
         TooltipModule,
@@ -143,12 +138,21 @@ import {MaintenanceModeComponent} from "./modules/core/maintenance-mode/maintena
         ScrollTopModule,
         ContactModule,
         SelectButtonModule, 
-        MaintenanceModeComponent], providers: [
+        SharedPrimeNgModule,
+        MaintenanceModeComponent], 
+        
+        providers: [
         {
             provide: HTTP_INTERCEPTORS,
             useClass: HttpTokenInterceptor,
             multi: true
         },
+            providePrimeNG({
+            theme: {
+              preset: Aura,
+              options: { cssLayer: 'primengAura' } 
+            }
+        }),
         MessageService,
         provideHttpClient(withInterceptorsFromDi())
     ] })

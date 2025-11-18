@@ -1,4 +1,5 @@
-@import "../../../../../styles";
+@use 'src/style.variables' as *;
+
 
 .dropdown {
   position: relative;
@@ -8,7 +9,7 @@
 
 .dropdownbutton {
   background-color: inherit;
-  color: $button-base-color;
+  color: $base-color;
   padding: 8px;
   font-size: 1em;
   border: none;
@@ -19,8 +20,8 @@
 .dropdown-content {
   display: none;
   position: absolute;
-  background-color: $dropdown-buttons-background;
-  color: #495057;
+  background-color: $background-color;
+  color: $font-color-base;
   min-width: 160px;
   box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2);
   z-index: 1;
@@ -29,8 +30,6 @@
 .dropdown-content a:hover {background-color: #ddd;}
 
 .dropdown:hover .dropdown-content {display: block;}
-
-.dropdown:hover .dropdownbutton {-webkit-transform: scale(1.1);}
 
 .dropdown-item {
   display: block;
@@ -46,7 +45,7 @@
 }
 
 .dropdown-item:active, .dropdown-item:focus, .dropdown-item:hover {
-  background-color: rgba(248, 193, 0, .5);
+  background-color: $base-color;
 }
 
 a.no-decorations{
@@ -60,9 +59,8 @@ a.no-decorations{
 #publishingInProgress {
   font-family: $base-font;
   text-align: right;
-  font-size: 1.1rem;
+  font-size: 1.0rem;
 }
-
 
 @media screen and (max-width: 714.9px){
   .col-sm{

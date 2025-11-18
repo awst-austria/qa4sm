@@ -4,21 +4,43 @@ import { DatasetVersionService } from '../../modules/core/services/dataset/datas
 import { FilterService } from '../../modules/core/services/filter/filter.service';
 import { combineLatest, EMPTY, Observable } from 'rxjs';
 import { catchError, map, tap } from 'rxjs/operators';
+import { ScrollTop } from 'primeng/scrolltop';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { SelectButtonModule } from 'primeng/selectbutton';
+import { AccordionModule } from 'primeng/accordion';
+
 
 @Component({
-  selector: 'qa-dataset-info',
-  templateUrl: './dataset-info.component.html',
-  styleUrls: ['./dataset-info.component.scss']
+    selector: 'qa-dataset-info',
+    standalone: true,
+    templateUrl: './dataset-info.component.html',
+    styleUrls: ['./dataset-info.component.scss'],
+    imports: [CommonModule, FormsModule, SelectButtonModule, AccordionModule, ScrollTop],
+    
 })
 export class DatasetInfoComponent {
 
+  
   toggleOption = [
-    {label: 'Expand all',
-      value: true},
-    {label: 'Close all',
-      value: false}
-  ]
-  allSelected: boolean;
+    { label: 'Expand all', value: true },
+    { label: 'Close all',  value: false }
+  ];
+
+  allSelected = false;                       // default: closed
+  openPanels: Array<string | number> = [];   // values of open panels
+
+  panelKey(d: any): string | number {
+    // Use a stable unique value for the panel
+    return d.id ?? d.pretty_name;
+  }
+
+  onToggleAll(datasets: any[]): void {
+    this.openPanels = this.allSelected
+      ? datasets.map(d => this.panelKey(d))  // open all
+      : [];                                  // close all
+  }
+
   errorOccured = false;
 
   constructor(private datasetService: DatasetService,

@@ -65,9 +65,10 @@ const MAX_DATASETS_FOR_VALIDATION = 6;  // TODO: this should come from either co
 // const MAX_DATASETS_FOR_VALIDATION = MAX_NUM_DS_PER_VAL_RUN;
 
 @Component({
-  selector: 'qa-validate',
-  templateUrl: './validate.component.html',
-  styleUrls: ['./validate.component.scss'],
+    selector: 'qa-validate',
+    templateUrl: './validate.component.html',
+    styleUrls: ['./validate.component.scss'],
+    standalone: false
 })
 export class ValidateComponent implements OnInit, AfterViewInit {
   @ViewChild(MapComponent) mapComponent: MapComponent;

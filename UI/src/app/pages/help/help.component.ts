@@ -1,26 +1,28 @@
 import {Component} from '@angular/core';
 import {GlobalParamsService} from '../../modules/core/services/global/global-params.service';
-import {fas} from '@fortawesome/free-solid-svg-icons';
-import {SettingsService} from '../../modules/core/services/global/settings.service';
+import { RouterLink, RouterModule } from '@angular/router';
+import { ScrollTop } from 'primeng/scrolltop';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { faArchive, faFileDownload, faRedo, faStop } from '@fortawesome/free-solid-svg-icons';
 
 const plotsUrlPrefix = '/static/images/help/';
 
 @Component({
-  selector: 'qa-help',
-  templateUrl: './help.component.html',
-  styleUrls: ['./help.component.scss']
+    selector: 'qa-help',
+    imports: [RouterLink, RouterModule, FontAwesomeModule, ScrollTop],
+    templateUrl: './help.component.html',
+    styleUrls: ['./help.component.scss'],
+    
 })
 export class HelpComponent {
   // Icons for bullet points
   faIcons = {
-    faArchive: fas.faArchive,
-    faStop: fas.faStop,
-    faFileDownload: fas.faFileDownload,
-    faRedo: fas.faRedo
+    faArchive,
+    faStop,
+    faFileDownload,
+    faRedo
   };
   public pageUrl = '/help';
-
-  plotDivClass = 'w-12 align-items-center inline-block text-center py-2'
 
   menuMinus = plotsUrlPrefix + 'menu_minus.webp';
   menuPlus = plotsUrlPrefix + 'menu_plus.webp';
@@ -56,8 +58,7 @@ export class HelpComponent {
   selectAction = plotsUrlPrefix + 'select-action.webp';
   selectedAction = plotsUrlPrefix + 'selected-action.webp';
 
-  constructor(private globalParamsService: GlobalParamsService,
-              public settingsService: SettingsService) {
+  constructor(private globalParamsService: GlobalParamsService) {
   }
 
   getAdminMail(): string {

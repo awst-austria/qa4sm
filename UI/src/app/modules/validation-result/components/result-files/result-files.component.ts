@@ -14,9 +14,10 @@ import {CustomHttpError} from '../../../core/services/global/http-error.service'
 import {ToastService} from '../../../core/services/toast/toast.service';
 
 @Component({
-  selector: 'qa-result-files',
-  templateUrl: './result-files.component.html',
-  styleUrls: ['./result-files.component.scss']
+    selector: 'qa-result-files',
+    templateUrl: './result-files.component.html',
+    styleUrls: ['./result-files.component.scss'],
+    standalone: false
 })
 export class ResultFilesComponent implements OnInit {
   @Input() validation: ValidationrunDto;

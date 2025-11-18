@@ -10,44 +10,60 @@
             <span class="pi pi-question-circle help-icon"></span>
           </label>
         </ng-template>
-        <p-accordion multiple="true" activeIndex="0">
-          <!-- here dataset/version selection -->
-          <p-accordionTab
-            [header]=" 'Spatial reference selection: ' + (selectedDatasetModel[0].datasetModel.selectedDataset?.pretty_name)+' / '+(selectedDatasetModel[0].datasetModel.selectedVersion?.pretty_name)">
+        <p-accordion [multiple]="true" [value]="['spatialRef']">
+          <p-accordion-panel value="spatialRef">
+            <p-accordion-header>
+              Spatial reference selection:
+              {{ selectedDatasetModel[0]?.datasetModel?.selectedDataset?.pretty_name || '-' }}
+                /
+              {{ selectedDatasetModel[0]?.datasetModel?.selectedVersion?.pretty_name || '-' }}
+            </p-accordion-header>
 
-            <qa-dataset *ngIf="selectedDatasetModel[0].datasetModel.selectedDataset"
-                        [removable]="false"
-                        (changeDataset)="onDatasetChange()"
-                        [selectionModel]="selectedDatasetModel[0].datasetModel"/>
+            <p-accordion-content>
+              <qa-dataset
+                *ngIf="selectedDatasetModel[0]?.datasetModel?.selectedDataset"
+                [removable]="false"
+                (changeDataset)="onDatasetChange()"
+                [selectionModel]="selectedDatasetModel[0].datasetModel">
+              </qa-dataset>
 
-            <div *ngIf="datasetErrorSelector" style="color: gray">
-              There was an error and no datasets could be fetched. Please try again later.
-            </div>
-
-          </p-accordionTab>
+              <div *ngIf="datasetErrorSelector" style="color: gray">
+                There was an error and no datasets could be fetched. Please try again later.
+              </div>
+            </p-accordion-content>
+          </p-accordion-panel>
         </p-accordion>
-
         <!--  here selection of single or multiple non-reference validations. How to divide?  -->
         <div class="grid pt-2">
           <div class="col-12">
-            <p-accordion multiple="true" activeIndex="0">
-              <p-accordionTab [header]="'Non-reference datasets'">
-                <p-checkbox label="{{'Multiple non-reference datasets'}}"
-                            [(ngModel)]="multipleNonReference"
-                            [binary]="true"
-                            (click)="multipleNonReferenceChange()"
-                ></p-checkbox>
-                <label class="p-panel-header-icon"
-                       pTooltip="{{'Toggle to compare validations with 2 non-reference datasets'}}"
-                       tooltipPosition="bottom">
-                  <span class="pi pi-question-circle ml-2"></span>
-                </label>
+            <p-accordion [multiple]="true" [value]="['nonRef']">
+              <p-accordion-panel value="nonRef">
+                <p-accordion-header>
+                  Non-reference datasets
+                </p-accordion-header>
 
-              </p-accordionTab>
+                <p-accordion-content>
+                  <p-checkbox
+                    inputId="multipleNonReference"
+                    [(ngModel)]="multipleNonReference"
+                    [binary]="true"
+                    (click)="multipleNonReferenceChange()">
+                  </p-checkbox>
+
+                  <label for="multipleNonReference" class="ml-2">
+                    Multiple non-reference datasets
+                  </label>
+
+                  <label class="p-panel-header-icon"
+                    pTooltip="Toggle to compare validations with 2 non-reference datasets"
+                    tooltipPosition="bottom">
+                    <span class="pi pi-question-circle ml-2"></span>
+                  </label>
+                </p-accordion-content>
+              </p-accordion-panel>
             </p-accordion>
           </div>
         </div>
-
       </p-panel>
     </div>
 
@@ -56,49 +72,64 @@
       <p-panel header="Validations selection" [toggleable]="false" class="validation-row">
         <ng-template pTemplate="icons">
           <label class="p-panel-header-icon  mb-0" pTooltip="You can choose as many as one or two validations from the list, according to the number of non-reference
-        datasets contained (respectively, two or one). Tip: rename your validations to find them more easily."
+                  datasets contained (respectively, two or one). Tip: rename your validations to find them more easily."
                  tooltipPosition="bottom">
             <span class="pi pi-question-circle help-icon"></span>
           </label>
         </ng-template>
-        <p-accordion multiple="true" activeIndex="0">
-          <p-accordionTab [header]="'Validations available for comparison'">
-            <div class="grid">
-              <div class="col-12">
 
-                <div *ngIf="!noValidationsError" class="p-float-label m-2">
-                  <p-dropdown
-                    id="validationSelector"
-                    [options]="validations4Comparison"
-                    [(ngModel)]="this.selectedValidation"
-                    optionLabel="comparison_label"
-                    [style]="{'width':'100%'}">
-                  </p-dropdown>
-                  <label *ngIf="selectedDatasetModel[0]" for="validationSelector">{{ selectValidationLabel }}</label>
-                </div>
-                <div *ngIf="noValidationsError" style="color: gray">
-                  There was an error and validations could not be fetched. Please try again later.
+        <p-accordion [multiple]="true" [value]="['validations']">
+          <p-accordion-panel value="validations">
+            <p-accordion-header>
+              Validations available for comparison
+            </p-accordion-header>
+
+            <p-accordion-content>
+              <div class="grid">
+                <div class="col-12">
+                  <div *ngIf="!noValidationsError" class="p-float-label m-2">
+                    <p-select
+                      id="validationSelector"
+                      [options]="validations4Comparison"
+                      [(ngModel)]="selectedValidation"
+                      optionLabel="comparison_label"
+                      [style]="{ width: '100%' }">
+                    </p-select>
+                    <label *ngIf="selectedDatasetModel[0]" for="validationSelector">
+                      {{ selectValidationLabel }}
+                    </label>
+                  </div>
+                  <div *ngIf="noValidationsError" style="color: gray">
+                    There was an error and validations could not be fetched. Please try again later.
+                  </div>
                 </div>
               </div>
-            </div>
 
-            <button pButton type="button" label="Add validation" icon="pi pi-plus-circle"
-                    (click)="addValidation2Comparison()"
-                    class="p-button-success mt-2 mb-2" style="padding: 0.2rem;"
-                    [disabled]="addValidationButtonDisabled()"
-                    ngDefaultControl></button>
-
-          </p-accordionTab>
-
-          <button *ngFor="let item of this.comparisonModel.selectedValidations"
-                  pButton
-                  type="button"
-                  (click)="removeValidation(item)"
-                  [label]="'Remove: ' + (item.comparison_label)"
-                  icon="pi pi-trash"
-                  class="p-button-danger mt-2" style="padding: 0.2rem;">
-          </button>
+              <button
+                pButton
+                type="button"
+                label="Add validation"
+                icon="pi pi-plus-circle"
+                (click)="addValidation2Comparison()"
+                class="p-button-success mt-2 mb-2"
+                style="padding: 0.2rem;"
+                [disabled]="addValidationButtonDisabled()">
+              </button>
+            </p-accordion-content>
+          </p-accordion-panel>
         </p-accordion>
+
+        <button
+          *ngFor="let item of comparisonModel.selectedValidations"
+          pButton
+          type="button"
+          (click)="removeValidation(item)"
+          [label]="'Remove: ' + item.comparison_label"
+          icon="pi pi-trash"
+          class="p-button-danger mt-2"
+          style="padding: 0.2rem;">
+        </button>
+
 
       </p-panel>
     </div>

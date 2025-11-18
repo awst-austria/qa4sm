@@ -1,10 +1,7 @@
 import {NgModule} from '@angular/core';
-import {CommonModule} from '@angular/common';
 import {MapComponent} from './components/map/map.component';
 import {MapLegendComponent} from './components/map-legend/map-legend.component';
-import {TooltipModule} from 'primeng/tooltip';
-import {ScrollPanelModule} from 'primeng/scrollpanel';
-
+import { SharedPrimeNgModule } from 'src/app/shared.primeNg.module';
 
 @NgModule({
   declarations: [MapComponent, MapLegendComponent],
@@ -13,9 +10,7 @@ import {ScrollPanelModule} from 'primeng/scrollpanel';
     MapLegendComponent
   ],
     imports: [
-        CommonModule,
-        TooltipModule,
-        ScrollPanelModule
+        SharedPrimeNgModule
     ]
 })
 export class MapModule {

@@ -1,4 +1,20 @@
-QA4SM v3.3.0 - Release notes 2025-09-29
+QA4SM v3.3.0 - Release notes 2025-11-17
+======================================================
+# Updates
+1. Added support for ESA CCI SM GAPFILLED v09.2.
+2. Upgraded the frontend framework: Angular and PrimeNG updated to v20, improving performance and long-term compatibility.
+
+# Fixes
+1. The validation name field is now correctly limited to 80 characters. A clear user notification and input constraint have been introduced to prevent errors.
+
+# New features
+1. A fully redesigned plots interface has been introduced:
+Improved visualization clarity
+Enhanced color schemes and layout consistency
+More intuitive user experience for exploring validation results
+
+
+QA4SM v3.2.2 - Release notes 2025-09-29
 ======================================================
 # Updates
 1. New ASCAT version H121

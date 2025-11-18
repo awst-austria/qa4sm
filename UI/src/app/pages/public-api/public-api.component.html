@@ -1,88 +1,90 @@
-<div class="main-container">
-    <h2>Public API</h2>
-    <p>
-        The QA4SM Public API makes it easy to work with the service from the command line or your own scripts.
-        You can submit validation jobs, track their progress, and download results as soon as they’re ready.
-        Access is secured with your personal API token.
-    </p>
-    <p>
-        You can request a personal API token from your 
-        <a routerLink="/user-profile">User Profile</a> page.
-    </p>
+<main class="flex flex-column align-items-center"> 
+    <div class="flex flex-column w-11 lg:w-8 xl:w-6 justify-content-center align-content-center">
+        <h1>Public API</h1>
+        <p class="text-primary">
+            The QA4SM Public API makes it easy to work with the service from the command line or your own scripts.
+            You can submit validation jobs, track their progress, and download results as soon as they’re ready.
+            Access is secured with your personal API token.
+        </p>
+        <p class="text-primary">
+            You can request a personal API token from your 
+            <a routerLink="/user-profile">User Profile</a> page.
+        </p>
     
-    <h4>Usage</h4>
-    <p>
-        Here are some examples of how to use your personal API token to interact with the service.
-        Each request must include your token in the Authorization header.
-    </p>
-    <!-- Description of CONFIG_JSON_FILE -->
-    <p>
-         <a routerLink="/json-config">
-        <code>&lt;CONFIG_JSON_FILE&gt;</code> </a> 
-        is a JSON file that defines the datasets,filters, time ranges, and metrics for your validation job.
-    </p>
+        <h2>Usage</h2>
+        <p class="text-primary">
+            Here are some examples of how to use your personal API token to interact with the service.
+            Each request must include your token in the Authorization header.
+        </p>
+        <!-- Description of CONFIG_JSON_FILE -->
+        <p class="text-primary">
+            <a routerLink="/json-config">
+            <code>&lt;CONFIG_JSON_FILE&gt;</code> </a> 
+            is a JSON file that defines the datasets, filters, time ranges, and metrics for your validation job.
+        </p>
     
-    <p><strong>Submit validation (test server):</strong></p>
+        <p class="text-primary"><strong>Submit validation:</strong></p>
 
-    <!-- Hidden textarea (used for copy-to-clipboard) -->
-    <textarea id="cmd-start-local" class="sr-only" aria-hidden="true" style="position:absolute;left:-9999px;">
+        <!-- Hidden textarea (used for copy-to-clipboard) -->
+        <textarea id="cmd-start-local" class="sr-only" aria-hidden="true" style="position:absolute;left:-9999px;">
         curl -X POST \
         -H "Authorization: Token <your user token here>" \
         -H "Content-Type: application/json" \
         -d @config.json \
-        https://test.qa4sm.eu/api/start-validation-with-token
+        https://qa4sm.eu/api/start-validation-with-token
     </textarea>
 
-    <!-- Visible command example -->
-    <pre class="cli"><code><span class="prompt">$</span> curl -X POST \
+        <!-- Visible command example -->
+        <pre><code><span class="prompt">$</span> curl -X POST \
 -H "Authorization: Token &lt;YOUR_USER_TOKEN&gt;" \
 -H "Content-Type: application/json" \
 -d &#64;&lt;CONFIG_JSON_FILE&gt; \
-https://test.qa4sm.eu/api/start-validation-with-token</code></pre>
+https://qa4sm.eu/api/start-validation-with-token</code></pre>
 
-    <!-- Copy button -->
-    <a class="copy-btn" (click)="copy('cmd-start-local')">
-        <i class="pi pi-fw pi-copy"></i> Copy
-    </a>
+        <!-- Copy button -->
+        <a class="copy-btn" (click)="copy('cmd-start-local')">
+            <i class="pi pi-fw pi-copy"></i> Copy
+        </a>
 
-    <!-- API example -->
-    <p><strong>List your validation runs:</strong></p>
+        <!-- API example -->
+        <p class="text-primary"><strong>List your validation runs:</strong></p>
 
-    <textarea id="cmd-list" class="sr-only" aria-hidden="true" style="position:absolute;left:-9999px;">
+        <textarea id="cmd-list" class="sr-only" aria-hidden="true" style="position:absolute;left:-9999px;">
         curl -X GET \
     -H "Authorization: Token &lt;YOUR_USER_TOKEN&gt;" \
-    https://test.qa4sm.eu/api/my-validation-runs-with-token | jq -r '
+    https://qa4sm.eu/api/my-validation-runs-with-token | jq -r '
     .validation_runs[] |
     [.id, .name, (.datasets | join("; ")), .progress] |
     @tsv
     ' | column -t
-    </textarea>
+        </textarea>
 
-    <pre class="cli"><code><span class="prompt">$</span> curl -X GET \
+        <pre><code><span class="prompt">$</span> curl -X GET \
 -H "Authorization: Token &lt;YOUR_USER_TOKEN&gt;" \
-https://test.qa4sm.eu/api/my-validation-runs-with-token | jq -r '
+https://qa4sm.eu/api/my-validation-runs-with-token | jq -r '
 .validation_runs[] |
 [.id, .name, (.datasets | join("; ")), .progress] |
 &#64;tsv
 ' | column -t</code></pre>
 
-    <a class="copy-btn" (click)="copy('cmd-list')"><i class="pi pi-fw pi-copy"></i> Copy</a>
+        <a class="copy-btn" (click)="copy('cmd-list')"><i class="pi pi-fw pi-copy"></i> Copy</a>
   
-    <!-- API example -->
-    <p><strong>Download results (ZIP):</strong></p>
+        <!-- API example -->
+        <p class="text-primary"><strong>Download results (ZIP):</strong></p>
 
-    <textarea id="cmd-download" class="sr-only" aria-hidden="true" style="position:absolute;left:-9999px;">
+        <textarea id="cmd-download" class="sr-only" aria-hidden="true" style="position:absolute;left:-9999px;">
         curl -X GET \
         -H "Authorization: Token &lt;YOUR_USER_TOKEN&gt;" \
-        "https://test.qa4sm.eu/api/download-result-file-with-token/&lt;VALIDATION_RUN_ID&gt;/zip" \
+        "https://qa4sm.eu/api/download-result-file-with-token/&lt;VALIDATION_RUN_ID&gt;/zip" \
         --output &lt;OUTPUT_FILE&gt;.zip
-    </textarea>
+        </textarea>
 
-    <pre class="cli"><code><span class="prompt">$</span> curl -X GET \
+        <pre><code><span class="prompt">$</span> curl -X GET \
 -H "Authorization: Token &lt;YOUR_USER_TOKEN&gt;" \
-"https://test.qa4sm.eu/api/download-result-file-with-token/&lt;VALIDATION_RUN_ID&gt;/zip" \
+"https://qa4sm.eu/api/download-result-file-with-token/&lt;VALIDATION_RUN_ID&gt;/zip" \
 --output &lt;OUTPUT_FILE&gt;.zip</code></pre>
     
-    <a class="copy-btn" (click)="copy('cmd-download')"><i class="pi pi-fw pi-copy"></i> Copy</a>
+        <a class="copy-btn" (click)="copy('cmd-download')"><i class="pi pi-fw pi-copy"></i> Copy</a>
 
-</div>
+    </div>
+</main>

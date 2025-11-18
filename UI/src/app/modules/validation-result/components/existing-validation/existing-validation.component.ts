@@ -8,9 +8,10 @@ import {Router} from '@angular/router';
 import {catchError} from 'rxjs/operators';
 
 @Component({
-  selector: 'qa-existing-validation',
-  templateUrl: './existing-validation.component.html',
-  styleUrls: ['./existing-validation.component.scss']
+    selector: 'qa-existing-validation',
+    templateUrl: './existing-validation.component.html',
+    styleUrls: ['./existing-validation.component.scss'],
+    standalone: false
 })
 export class ExistingValidationComponent implements OnInit {
   dateFormat = 'medium';

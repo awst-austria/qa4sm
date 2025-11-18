@@ -7,9 +7,10 @@ import {ToastService} from '../../../core/services/toast/toast.service';
 import {ActionMenuItem, getDefaultValidationActionState, MultipleValidationAction} from "./multiple-validation-action";
 
 @Component({
-  selector: 'qa-handle-multiple-validations',
-  templateUrl: './handle-multiple-validations.component.html',
-  styleUrls: ['./handle-multiple-validations.component.scss']
+    selector: 'qa-handle-multiple-validations',
+    templateUrl: './handle-multiple-validations.component.html',
+    styleUrls: ['./handle-multiple-validations.component.scss'],
+    standalone: false
 })
 export class HandleMultipleValidationsComponent {
   validations = input([] as ValidationrunDto[]);

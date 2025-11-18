@@ -1,280 +1,345 @@
-@import "../../../style.variables";
-
-$home-page-link-color: #CF8400;
+@use 'src/style.variables' as *;
 
 * {
-  font-family: $base-font;
-  line-height: 1.5vw;
   scroll-behavior: smooth;
 }
 
-div#background {
-  display: block;
-  height: 100%;
-  background: url("../../../../../validator/static/images/home/background.webp") center center;
-  background-size: cover;
-  background-repeat: no-repeat;
-  background-attachment: fixed;
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  z-index: -1; /* To ensure it's behind the content */
-}
-
-div#wrapper {
-  display: block;
-  height: 100%;
-}
-
-div#landing {
+/* --- Hero Section --- */
+.hero {
+  position: relative;
   height: 100vh;
-  background: linear-gradient(rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0.25)) center center;
-  background-size: cover;
+  background-image: url("../../../../../validator/static/images/home/background.webp"); 
+  background-position: center;
+  background-repeat: no-repeat;
+  color: white;
   display: flex;
-  flex-direction: column;
-  align-items: center; /* Center horizontally */
+  align-items: center;
   justify-content: center;
-}
-
-div#title-box {
-  color: white;
-  display: inline-block;
-  vertical-align: middle;
-  z-index: 10;
   text-align: center;
-}
-
-.page-title {
-  text-align: center;
-  text-shadow: .1rem .1rem .1rem rgba(0, 0, 0, .45);
-  z-index: 1;
-  line-height: 1.1;
-}
-
-span.carousel-desc {
-  line-height: 3rem;
-}
-
-div#scroll-down {
-  width: 50px;
-  height: 50px;
-  animation: moveDown 4s ease-in-out infinite;
-}
-
-/* Define the animation */
-@keyframes moveDown {
-  0% {
-    transform: translateY(0);
-    opacity: 1;
-  }
-  100% {
-    transform: translateY(50px);
-    opacity: 0;
-  }
-}
-
-div#about-app {
-  color: white;
-  display: flex;
-  flex-direction: column;
-  align-items: center; /* Center horizontally */
+  overflow: hidden;
+  width: 100%;
+  max-width: none;        
   background-size: cover;
-  background: linear-gradient(rgba(0, 0, 0, 0.25), rgba(0, 0, 0, 0.45));
-  transition: filter .5s ease, opacity 1s ease;
 }
 
-@keyframes shimmer {
-  0% {
-    background-position: 0 0;
-  }
-  100% {
-    background-position: 200% 0;
-  }
+.hero-overlay{
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.4);
+  z-index: 0;              /* under content */
+  pointer-events: none;     /* cannot block clicks */
 }
 
-.app-news {
-  width: 40%;
-  border-radius: 5px;
-  color: white;
-  padding: 2vw;
-  background-color: rgba(0, 76, 89, 0.6);
-  border: 2px solid white;
+.hero-content {
+  position: relative;
+  z-index: 1;
+  padding: 2rem;
 }
 
-.application-desc {
-  width: 60%;
-  border: 2px solid $main-page-color-3;
-  border-radius: 5px;
-  background-color: rgba(210, 210, 210, 0.8);
-  opacity: 90%;
+/* Fluid logo size; the container controls width */
+.hero-brand {
+  inline-size: clamp(160px, 28vw, 340px); /* 160–340px based on viewport */
+  margin-inline: auto;
+  margin-bottom: 0.75rem;
 }
 
-.application-project {
-  border: 2px solid lightgray;
-  border-radius: 5px;
+/* PrimeNG p-image wraps an <img>; ensure it scales */
+.hero-logo{
+  display: block;
+  inline-size: 100%;
+  block-size: auto;
 }
 
-.application-intro, .application-team {
-  margin-top: 2.5%;
-  margin-bottom: 2.5%;
-  width: 100%;
-  background-color: transparent;
-  color: $main-page-color-3;
+/* Heading is purely text; fluid and balanced */
+.hero-title {
+  font-size: clamp(28px, 3.5vw + 12px, 90px);
+  line-height: 1.15;
+  font-weight: 400;
+  margin: 0 0 1.25rem;
+  text-wrap: balance;           /* nicer line breaks on modern browsers */
+}
+.hero-title .line { display: block; color: #fff; }
+.hero-title .highlight { color: $highlight-color; font-weight: 400; }
+
+
+.hero-actions {
   display: flex;
-  flex-direction: column;
-  align-items: center; /* Center horizontally */
-  border-radius: 5px;
-  padding: 1% 0 1%;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 3rem;
 }
-
-.application-intro h1, .application-team h1 {
-  text-align: center;
-  line-height: 1.1;
-  width: 85%;
-  margin-bottom: 2vw;
-}
-
-.application-intro span {
-  width: 70%;
-  line-height: 1.2;
-  text-align: center;
-}
-
-.application-team .partner-desc {
-  line-height: 1.2;
-  text-align: center;
-}
-
-.application-team .team-desc {
-  line-height: 1.2;
-}
-
-
-.application-info {
-  width: 100%;
-  height: auto;
-}
-
-.application-tile {
-  padding: 1vw;
-  aspect-ratio: 1 / 0.9;
-  opacity: 1;
-}
-
-.application-info .application-tile:nth-child(even) {
-  background-color: $main-page-color-3;
-}
-
-.application-info .application-tile:nth-child(odd) {
-  background-color: $main-page-color-2;
-  color: $main-page-color-3;
-}
-
-.application-team a{
-  color: #333;
+.hero-actions a{
   text-decoration: none;
 }
 
-.application-tile:nth-child(odd) a {
-  color: #333;
-  text-decoration: underline;
+.btn-action-home {
+  background-color: transparent;
+  color: #ffffff;
+  width: 150px;
+  border: 1px solid #fff;
+  font-weight: 400;
+  padding: 0.75rem 0.75rem;
+  border-radius: 9999px;
+  transition: all 0.3s ease;
 }
 
-.application-tile:nth-child(odd) a:hover, .application-tile:nth-child(even) a:hover,
-.application-team a:hover, .app-news a:hover {
-  color: $home-page-link-color;
+.btn-action-home:hover {
+  background-color: $highlight-color;
+  transform: translateY(-2px);
 }
 
-.application-tile:nth-child(even) a, .app-news a {
-  color: $main-page-color-2;
-  text-decoration: underline;
+@keyframes bounce {
+  0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+  40% { transform: translateY(-10px); }
+  60% { transform: translateY(-5px); }
 }
 
-.application-tile h1 {
-  //font-size: 2.75vw;
-  line-height: 1.2;
-  padding: 2vw;
-  text-align: center;
+/* Responsive tweaks */
+@media (max-width: 768px) {
+  .btn-action-home {
+    width: 100%;
+  }
 }
 
-.application-tile div {
-  font-size: 1.5vw;
-  line-height: 1.2;
-  padding: 2vw;
-  text-align: center;
-}
 
-.application-tile div.image-card {
-  padding: 2vw;
-  width: 75%;
-}
-
-//
-.application-info .application-row:first-child .application-tile:first-child {
-  border-top-left-radius: 5px;
-}
-
-.application-info .application-row:first-child .application-tile:last-child {
-  border-top-right-radius: 5px;
-}
-
-.application-info .application-row:last-child .application-tile:last-child {
-  border-bottom-left-radius: 5px;
-}
-
-.application-info .application-row:last-child .application-tile:first-child {
-  border-bottom-right-radius: 5px;
-}
-
-.vertical-line {
-  height: 100%;
-  width: 2px;
-  background-color: white;
-}
-
-.horizontal-line {
-  width: 85%;
-  height: 2px;
-  background-color: $main-page-color-1;
-}
-
-.partner-logo a {
+/* --- HOME CONTAINER --- */
+.NewsContainer {
+  background-color: #001C21;
+  color: $font-color-white;
   width: 100%;
-  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding: clamp(1rem, 2vw, 4rem) 1rem;
+  box-sizing: border-box;
+  overflow-x: hidden;
 }
 
-.animation-duration-5000 {
-  animation-duration: 5000ms;
+/* about*/
+.about {
+  width: 100%;
+  padding: clamp(1rem, 2vw, 4rem) 1rem;
+}
+
+.about__container {
+  max-width: 1100px;
+  margin: 0 auto;
 }
 
 .text-highlighted {
-  color: white;
+  color: $highlight-color;
+  font-weight: 600;
 }
 
-@media screen and (max-width: 1385px) {
-  .application-desc {
-    width: 83.3333%;
-  }
-  .app-news {
-    width: 60%;
-  }
-  .background-link {
-    width: 2rem;
-    line-height: 1.5;
-    left: 0.5%;
+.about__actions {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: center;
+  margin: 1rem;
+  flex-wrap: wrap;
+}
+
+/* Feature Grid */
+.about__grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: clamp(0.75rem, 2vw, 1.25rem);
+}
+
+@media (max-width: 1024px) {
+  .about__grid {
+    grid-template-columns: repeat(2, 1fr);
   }
 }
 
-@media screen and (max-width: 1000px) {
-  .partner-logo {
-    scale: 0.9;
+@media (max-width: 560px) {
+  .about__grid {
+    grid-template-columns: 1fr;
   }
 }
 
-@media screen and (max-width: 767px) {
-  .partner-logo {
-    scale: 0.8;
+.feature-card {
+  background: #fff;
+  border-radius: 1rem;
+  padding: 1.25rem;
+  box-shadow: 0 8px 24px rgba(14, 30, 37, 0.06);
+  transition: transform 200ms ease, box-shadow 200ms ease;
+  height: 100%;
+}
+
+.feature-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 14px 32px rgba(14, 30, 37, 0.12);
+}
+
+.feature-card__icon {
+  width: 42px;
+  height: 42px;
+  border-radius: 10px;
+  background: rgba(255, 172, 4, 0.14);
+  display: grid;
+  place-items: center;
+  margin-bottom: 0.75rem;
+}
+
+.feature-card__icon .pi {
+  font-size: 1.1rem;
+  color: $highlight-color;
+}
+
+.feature-card__title {
+  font-size: var(--fs-h3);
+  margin: 0 0 0.35rem;
+  color: $highlight-color;
+}
+
+.feature-card__body {
+  margin: 0;
+  color: $font-color-base;
+  font-size: var(--fs-base);
+}
+
+.feature-card a {
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+:where(.p-button) {
+  border: none;
+  font-weight: 600;
+}
+
+:where(.p-button-rounded) {
+  border-radius: 9999px;
+  padding: 0.75rem 1.25rem;
+}
+
+/* Responsive 16:9 wrapper for video */
+/* Center slides and give them breathing room */
+.videos-carousel .p-carousel-item {
+  display: flex;
+  justify-content: center;
+}
+
+.video-slide {
+  width: 100%;
+  max-width: 960px;      /* cap wide screens */
+  margin: 0 auto;
+  padding: 0 1rem;
+  text-align: center;
+}
+
+/* Title uses your fluid type tokens if you added them; otherwise clamp it here */
+.video-title {
+  margin: 0 0 .5rem;
+  font-size: clamp(18px, 1.4vw + 14px, 24px);
+  line-height: 1.3;
+  font-weight: 600;
+}
+
+/* Responsive 16:9 wrapper */
+.iframe-container {
+  position: relative;
+  width: 100%;
+  /* Modern browsers */
+  aspect-ratio: 16 / 9;
+  /* Fallback (older): */
+  &::before {
+    content: "";
+    display: block;
+    padding-top: 56.25%;
   }
 }
+
+.iframe-container > iframe {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  display: block;
+}
+
+/* Make sure carousel doesn’t clip content on small screens */
+.videos-carousel .p-carousel-items-content {
+  overflow: visible; /* default is hidden; letting tooltips/focus rings breathe */
+}
+
+/* Optional: keep arrows from overlapping the video on tight phones */
+.videos-carousel .p-carousel-prev,
+.videos-carousel .p-carousel-next {
+  align-self: center;
+  transform: translateY(-50%);
+  top: 50%;
+}
+
+/* If your theme adds fixed heights anywhere, nuke them */
+.videos-carousel .p-carousel-content,
+.videos-carousel .p-carousel-items-container,
+.videos-carousel .p-carousel-item {
+  height: auto;
+}
+
+/* ===== Small screens (≤ 560px) ===== */
+@media (max-width: 560px) {
+  /* Keep hero from feeling cramped and avoid URL-bar jumps */
+  .hero { height: 100dvh; padding-inline: 1rem; }
+
+ 
+  /* Video slide layout */
+  .video-slide {
+    max-width: 100%;
+    padding: 0 12px;        /* tighter side padding */
+  }
+
+  /* Title: smaller and wraps nicely */
+  .video-title {
+    font-size: clamp(16px, 4vw + 10px, 18px);
+    line-height: 1.25;
+    margin-bottom: .5rem;
+    overflow-wrap: anywhere;  /* long words won’t overflow */
+  }
+
+  /* Keep the video fully visible; round corners optional */
+  .iframe-container {
+    max-width: 100%;
+    border-radius: 8px;
+  }
+
+  /* PrimeNG carousel arrows: bigger tap targets, don’t overlap video */
+  .videos-carousel .p-carousel-prev,
+  .videos-carousel .p-carousel-next {
+    top: 50%;
+    transform: translateY(-50%);
+  }
+  .videos-carousel .p-carousel-prev .p-button,
+  .videos-carousel .p-carousel-next .p-button {
+    width: 44px;
+    height: 44px;        /* minimum recommended touch size */
+  }
+
+  /* Let content define height; some themes fix heights */
+  .videos-carousel .p-carousel-content,
+  .videos-carousel .p-carousel-items-container,
+  .videos-carousel .p-carousel-item {
+    height: auto !important;
+  }
+}
+
+/* ===== Very small phones (≤ 360px) ===== */
+@media (max-width: 360px) {
+  
+  .video-title { font-size: clamp(15px, 5vw + 8px, 17px); }
+  .application-videos { padding-block: .5rem; }
+}
+
+/* iOS safe areas (notches) */
+@supports (padding: max(0px)) {
+  .application-videos {
+    padding-left: max(12px, env(safe-area-inset-left));
+    padding-right: max(12px, env(safe-area-inset-right));
+  }
+}
+

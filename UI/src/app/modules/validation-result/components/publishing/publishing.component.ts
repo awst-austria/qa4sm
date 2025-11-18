@@ -7,9 +7,10 @@ import {CustomHttpError} from '../../../core/services/global/http-error.service'
 import {ToastService} from '../../../core/services/toast/toast.service';
 
 @Component({
-  selector: 'qa-publishing',
-  templateUrl: './publishing.component.html',
-  styleUrls: ['./publishing.component.scss']
+    selector: 'qa-publishing',
+    templateUrl: './publishing.component.html',
+    styleUrls: ['./publishing.component.scss'],
+    standalone: false
 })
 export class PublishingComponent implements OnInit {
   formErrors: any;

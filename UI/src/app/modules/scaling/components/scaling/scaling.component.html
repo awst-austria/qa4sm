@@ -11,14 +11,14 @@
       <div class="col-12">
         <label for="scalingMethod">Method: </label>
       </div>
-      <div class="col-12 pt-3" id="scalingMethod">
+      <div class="col-12" id="scalingMethod">
         <div class="p-float-label">
-          <p-dropdown inputId="scalingMethodSelector"
+          <p-select inputId="scalingMethodSelector"
                       (onChange)="updateScalingMethod()"
                       [options]="scalingMethods"
                       [ngModel]="selectedScalingMethod$|async"
                       (ngModelChange)="selectedScalingMethod$.next($event)"
-                      optionLabel="description" [style]="{'width': '100%'}"></p-dropdown>
+                      optionLabel="description" [style]="{'width': '100%'}"></p-select>
           <label for="scalingMethodSelector">Select scaling method</label>
         </div>
       </div>
@@ -29,7 +29,7 @@
       </div>
       <div class="col-12 pt-3" id="scalingTo">
         <div class="p-float-label">
-          <p-dropdown inputId="scalingReferenceSelector"
+          <p-select inputId="scalingReferenceSelector"
                       (onChange)="updateScaleTo(true)"
                       [options]="validationModel.datasetConfigurations"
                       [ngModel]="verifyScaleToModel()|async"
@@ -50,7 +50,7 @@
               </div>
 
             </ng-template>
-          </p-dropdown>
+          </p-select>
           <label for="scalingReferenceSelector">Select scaling reference</label>
         </div>
       </div>

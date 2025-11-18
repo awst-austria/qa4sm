@@ -1,36 +1,39 @@
 <div class="grid align-content-center">
   <div class="col">
     <span class="p-float-label mb-4 mt-3">
-    <p-dropdown [inputId]="datasetSelectorId" (onChange)="updateSelectableVersionsAndVariableAndEmmit()" [options]="(datasets$|async)"
-                [(ngModel)]="selectionModel.selectedDataset"
-                optionLabel="pretty_name" [style]="{'width': '100%'}">
-      <ng-template let-item pTemplate="item">
-            <span>{{ item.pretty_name }} <em
-              *ngIf="authService.authenticated.value">{{
-                item.user === authService.currentUser.id ? "  (user data)" :
-                  (item.user !== authService.currentUser.id && item.is_shared ? ' (shared data)' : "")
-              }}</em>
+      <p-select 
+        [inputId]="datasetSelectorId" 
+        (onChange)="updateSelectableVersionsAndVariableAndEmmit()" 
+        [options]="(datasets$|async)"
+        [(ngModel)]="selectionModel.selectedDataset"
+        optionLabel="pretty_name" [style]="{'width': '100%'}">
+          <ng-template let-item pTemplate="item">
+            <span>{{ item.pretty_name }} 
+              <em *ngIf="authService.authenticated.value">
+                {{item.user === authService.currentUser.id ? "  (user data)" :
+                  (item.user !== authService.currentUser.id && item.is_shared ? ' (shared data)' : "")}}
+              </em>
             </span>
-      </ng-template>
-      <ng-template let-item pTemplate="selectedItem">
-         <span>{{ item.pretty_name }} <em
-           *ngIf="authService.authenticated.value">{{
-             item.user === authService.currentUser.id ? "  (user data)" :
-               (item.user !== authService.currentUser.id && item.is_shared ? " (shared data)" : "")
-           }}</em> </span>
-      </ng-template>
-    </p-dropdown>
+          </ng-template>
 
+          <ng-template let-item pTemplate="selectedItem">
+            <span>{{ item.pretty_name }} 
+              <em *ngIf="authService.authenticated.value">
+                {{item.user === authService.currentUser.id ? "  (user data)" :
+               (item.user !== authService.currentUser.id && item.is_shared ? " (shared data)" : "")}}
+              </em>
+            </span>
+          </ng-template>
+      </p-select>
       <label for="{{datasetSelectorId}}">Dataset name</label>
     </span>
-
   </div>
 </div>
 
 <div class="grid  align-content-center">
   <div class="col" style="width: 100%;">
     <span class="p-float-label mb-4" *ngIf="(selectableDatasetVersions$|async) as selectedVersions">
-      <p-dropdown [inputId]="versionSelectorId"
+      <p-select [inputId]="versionSelectorId"
                   [style]="{'width': '100%'}"
                   [options]="selectedVersions"
                   [(ngModel)]="selectionModel.selectedVersion"
@@ -38,42 +41,38 @@
                   (onChange)="onVersionChange(selectedVersions)">
 
         <ng-template let-item pTemplate="item">
-            <span>{{ item.pretty_name }}
-              <em class="text-muted" *ngIf="item.id === newestVersionId"> (newest version)</em>
-            </span>
+          <span>{{ item.pretty_name }}
+            <em class="text-muted" *ngIf="item.id === newestVersionId"> (newest version)</em>
+          </span>
         </ng-template>
         <ng-template let-item pTemplate="selectedItem">
-            <span>{{ item.pretty_name }}
-              <em class="text-muted" *ngIf="item.id === newestVersionId"> (newest version)</em>
-            </span>
+          <span>{{ item.pretty_name }}
+            <em class="text-muted" *ngIf="item.id === newestVersionId"> (newest version)</em>
+          </span>
         </ng-template>
-      </p-dropdown>
+      </p-select>
       <label for="{{versionSelectorId}}">Dataset version <span *ngIf="newerVersionExists" class='warning-text'> (newer version available!) </span></label>
     </span>
-
   </div>
 </div>
 
 <div class="grid  align-content-center">
   <div class="col">
     <span class="p-float-label">
-      <p-dropdown [inputId]="variableSelectorId" optionLabel="short_name" [style]="{'width': '100%'}"
+      <p-select [inputId]="variableSelectorId" optionLabel="short_name" [style]="{'width': '100%'}"
                   [options]="(selectableDatasetVariables$|async)"
                   [(ngModel)]="selectionModel.selectedVariable">
         <ng-template let-item pTemplate="item">
           <span>
             <span>{{ item.short_name }} [{{ item.unit ? item.unit : 'n.a.' }}]</span>
           </span>
-      </ng-template>
-      <ng-template let-item pTemplate="selectedItem">
-         <span>{{ item.short_name }} [{{ item.unit ? item.unit : 'n.a.' }}]</span>
-      </ng-template>
-
-
-      </p-dropdown>
-      <label for="{{variableSelectorId}}">Variable [units]</label>
+        </ng-template>
+        <ng-template let-item pTemplate="selectedItem">
+          <span>{{ item.short_name }} [{{ item.unit ? item.unit : 'n.a.' }}]</span>
+        </ng-template>
+      </p-select>
+      <label for="{{variableSelectorId}}">Variable [units]</label> 
     </span>
-
   </div>
 </div>
 

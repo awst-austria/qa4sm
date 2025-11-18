@@ -1,8 +1,6 @@
 import logging
 import shutil
-import tempfile
 from os import path
-from pathlib import Path
 
 import pytest
 from django.test.utils import override_settings
@@ -732,48 +730,3 @@ class TestModifyValidationView(TestCase):
         ## the two expired validations should be have been deleted now
         ended_vals3 = ValidationRun.objects.filter(end_time__isnull=False).count()
         assert ended_vals + 4 == ended_vals3
-
-    
-    @override_settings(ADMIN_ACCESS_TOKEN=tkn_key)
-    def test_autocleanup_upload_logs(self):
-        # Setup test directory structure
-        self.test_dir = Path(tempfile.mkdtemp())
-
-        # Create user directories with log folders
-        chuck_norris_log = self.test_dir / "chuck_norris" / "log"
-        jet_li_log = self.test_dir / "jet_li" / "log"
-        chuck_norris_log.mkdir(parents=True)
-        jet_li_log.mkdir(parents=True)
-
-        # Create test .log files with different ages
-        old_log = chuck_norris_log / "old.log"
-        recent_log = jet_li_log / "recent.log"
-        old_log.touch()
-        recent_log.touch()
-
-        # Set timestamps (old = 5 weeks ago, recent = 1 week ago, cutoff is 4 weeks)
-        old_time = (datetime.now() - timedelta(weeks=5)).timestamp()
-        recent_time = (datetime.now() - timedelta(weeks=1)).timestamp()
-        os.utime(old_log, (old_time, old_time))
-        os.utime(recent_log, (recent_time, recent_time))
-
-        # Mock the USER_DATA_DIR setting
-        with self.settings(USER_DATA_DIR=str(self.test_dir)):
-            run_autocleanup_url = reverse('Run Auto Cleanup')
-            # Add admin user credentials
-            self.test_user.is_staff = True
-            self.test_user.save()
-            token, created = Token.objects.get_or_create(user=self.test_user, key=tkn_key)
-            self.client.credentials(HTTP_AUTHORIZATION=f'Token {token.key}')
-
-            # Call the cleanup
-            response = self.client.post(run_autocleanup_url)
-
-            # Assertions
-            self.assertEqual(response.status_code, 200)
-            self.assertFalse(old_log.exists())  
-            self.assertTrue(recent_log.exists())
-            self.assertFalse((self.test_dir / "chuck_norris").exists())
-            self.assertTrue((self.test_dir / "jet_li").exists())
-
-        shutil.rmtree(self.test_dir)

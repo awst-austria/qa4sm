@@ -2,11 +2,10 @@ import { Component } from '@angular/core';
 import { RouterLink } from '@angular/router';
 
 @Component({
-  selector: 'qa-public-api',
-  standalone: true,
-  imports: [RouterLink],
-  templateUrl: './public-api.component.html',
-  styleUrls: ['./public-api.component.scss']
+    selector: 'qa-public-api',
+    imports: [RouterLink],
+    templateUrl: './public-api.component.html',
+    styleUrls: ['./public-api.component.scss']
 })
 export class PublicApiComponent {
 

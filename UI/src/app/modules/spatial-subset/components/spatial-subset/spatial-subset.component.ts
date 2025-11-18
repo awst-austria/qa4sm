@@ -2,9 +2,10 @@ import {Component, Input} from '@angular/core';
 import {SpatialSubsetModel} from './spatial-subset-model';
 
 @Component({
-  selector: 'qa-spatial-subset',
-  templateUrl: './spatial-subset.component.html',
-  styleUrls: ['./spatial-subset.component.scss']
+    selector: 'qa-spatial-subset',
+    templateUrl: './spatial-subset.component.html',
+    styleUrls: ['./spatial-subset.component.scss'],
+    standalone: false
 })
 export class SpatialSubsetComponent {
 

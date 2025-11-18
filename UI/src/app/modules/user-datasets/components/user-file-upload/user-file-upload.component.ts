@@ -5,16 +5,16 @@ import { ToastService } from '../../../core/services/toast/toast.service';
 import { BehaviorSubject, Subscription } from 'rxjs';
 import { finalize } from 'rxjs/operators';
 import { HttpEventType } from '@angular/common/http';
-import { allowedNameValidator } from '../../services/allowed-name.directive';
 import * as uuid from 'uuid';
 import * as JSZip from 'jszip';
 import { AuthService } from '../../../core/services/auth/auth.service';
 import { UserFileMetadata } from '../../../core/services/form-interfaces/UserFileMetadataForm';
 
 @Component({
-  selector: 'qa-user-file-upload',
-  templateUrl: './user-file-upload.component.html',
-  styleUrls: ['./user-file-upload.component.scss']
+    selector: 'qa-user-file-upload',
+    templateUrl: './user-file-upload.component.html',
+    styleUrls: ['./user-file-upload.component.scss'],
+    standalone: false
 })
 export class UserFileUploadComponent {
   // variables to store file information

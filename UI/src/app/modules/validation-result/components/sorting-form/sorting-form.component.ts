@@ -4,9 +4,10 @@ import {SortOrderModel} from './sort-order-model';
 
 
 @Component({
-  selector: 'qa-sorting-form',
-  templateUrl: './sorting-form.component.html',
-  styleUrls: ['./sorting-form.component.scss']
+    selector: 'qa-sorting-form',
+    templateUrl: './sorting-form.component.html',
+    styleUrls: ['./sorting-form.component.scss'],
+    standalone: false
 })
 export class SortingFormComponent {
   @Output() orderQueryName = new EventEmitter<string>();

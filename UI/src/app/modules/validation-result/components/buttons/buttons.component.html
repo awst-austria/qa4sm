@@ -1,5 +1,5 @@
 <!--Buttons shown on the validation list page (both custom and published)-->
-<div *ngIf="validationList" class="col-sm" style="text-align: right; max-width: 25rem">
+<div *ngIf="validationList" class="btn-bar" style="max-width: 25rem">
   <!--  this one will be shown on custom validation page only due to given conditions-->
   <button *ngIf="validationRun.progress > -1 && validationRun.progress < 100 && validationRun.end_time === null"
           pButton

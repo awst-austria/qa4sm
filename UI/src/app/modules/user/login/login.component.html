@@ -16,6 +16,7 @@
         <input pInputText 
                id="username" 
                formControlName="username"
+               class="w-full"
                [attr.disabled]="isLoading">
         <label for="username">Username or Email</label>
       </span>
@@ -26,6 +27,7 @@
         <input pPassword 
                type="password"
                formControlName="password"
+               class="w-full"
                [feedback]="false"
                [attr.disabled]="isLoading">
         <label for="password">Password</label>

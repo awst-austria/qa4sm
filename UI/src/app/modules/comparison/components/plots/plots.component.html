@@ -11,7 +11,7 @@
     <p-panel [toggleable]="true" [collapsed]="false" class="validation-row">
       <ng-template pTemplate="header">
         <div class="text-center my-1" style="width: 92%">
-          <h4 class="my-0 font-weight-normal">Comparison plots</h4>
+          <p class="my-0 font-weight-normal">Comparison plots</p>
         </div>
       </ng-template>
       <ng-template pTemplate="icons">
@@ -24,6 +24,16 @@
       </ng-template>
 
       <div class="col">
+        <!-- Unavailability message -->
+        <div class="grid center">
+          <div class="col-12 text-center py-5">
+            <p class="font-weight-bold" style="font-size: 1.2rem; color: #666;">
+              We are very sorry, the comparison plots are currently unavailable.
+            </p>
+          </div>
+        </div>
+
+        <!-- COMMENTED OUT: Original plot display code
         <div class="grid center">
           <div class="pb-3">
             {{ plots.length === 1 ?
@@ -68,6 +78,7 @@
               </div>
           </div>
         </div>
+        END COMMENTED OUT SECTION -->
       </div>
 
 
@@ -84,21 +95,21 @@
 <!--                  (click)="downloadResultFiles()">-->
 <!--          </button>-->
 <!--        </div>-->
-        <!--   Metric selector  -->
+        <!--   Metric selector  COMMENTED OUT HERE
         <div class="col mt-4 pt-4">
         <span class="p-float-label mt-4">
-          <p-dropdown id="metricSelector"
+          <p-select id="metricSelector"
                       [options]="this.comparisonMetrics"
                       [(ngModel)]="selectedMetric"
                       (onChange)="onMetricChange()"
                       optionLabel="metric_pretty_name"
                       [style]="{'width': '100%'}">
-          </p-dropdown>
+          </p-select>
           <label for="metricSelector">Select a metric</label>
         </span>
-        </div>
+        </div> END commented out   -->
       </div>
-
+        
     </p-panel>
     <!--  </p-panel>-->
   </div>

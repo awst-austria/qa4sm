@@ -1,6 +1,7 @@
-<div class="main-container">
-    <h2>Custom Plotting Tutorial</h2>
-    <p>
+<main id="top" class="flex flex-column align-items-center">
+  <div id="terms-panel" class="flex flex-column w-11 lg:w-8 xl:w-6 justify-content-center align-content-center">
+    <h1>Custom Plotting Tutorial</h1>
+    <p class="text-primary">
       This <strong>Jupiter Notebook</strong> tutorial demonstrates how to create and customized map plots from the <strong>NetCDF-files </strong>
       produced during the QA4SM validation. The customization is done by varying different kinds 
       of input parameters like title, label, font sizes, colormaps, value ranges, spatial extent and plot size. 
@@ -11,17 +12,17 @@
     <div>
         <p><button class="btn" type="button" (click)="DownloadJupiterNotebook()">Download Jupiter Notebook</button></p>
     </div>
-    <p>
+    <p class="text-primary">
         The plotting uses a <strong>CustomPlotObject</strong> which contains the two functions plot_map and display_metrics_and_datasets.
         The display_metrics_and_datasets function are used to display the available metrics and datasets in the NetCDF file whereas 
         the function plot_map provides the necessary plotting functionality.
     </p>
-    <p>The routine for the plot_map function looks like this:</p>
+    <p class="text-primary">The routine for the plot_map function looks like this:</p>
         <pre><code>"plot_obj.plot_map(metric = 'R',
                   output_path = r"C:\Users\agruber\Desktop\tmp\custom_plots\plot_tests",
                   dataset_list = ['ERA5_LAND', 'C3S_combined'])"</code></pre>
     
-    <p>
+    <p class="text-primary">
         The inputs "metric", "output_path", and "dataset_list" are mandatory, all other plot parameters are optional, if omitted, a standardized plot like on the QA4SM website will be created.
         In order to customize the plot the following parameters can be modified:
     </p>
@@ -37,11 +38,11 @@
       <li>xy_ticks_fontsize: Changes the fontsize of the lat lon labels of the map plot</li>
       <li>plotsize: Changes the overall figure size</li>
     </ul>
-    <p>Now follows a step by step demonstration of different custom plots.</p>
+    <p class="text-primary">Now follows a step by step demonstration of different custom plots.</p>
 
     <section *ngFor="let step of steps; let i = index">
-        <h4>{{ step.title }}:</h4>
-        <p>{{ step.description }}</p>
+        <h3>{{ step.title }}:</h3>
+        <p class="text-primary">{{ step.description }}</p>
 
         <div class="nb-cell nb-code">
             <div class="nb-gutter">
@@ -68,5 +69,6 @@
     </section>
 
 </div>
+</main>
 
             

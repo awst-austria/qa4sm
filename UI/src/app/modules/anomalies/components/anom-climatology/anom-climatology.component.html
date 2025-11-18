@@ -1,42 +1,50 @@
-<div class="flex flex-row flex-wrap w-12 lg:pt-0 pt-4 lg:justify-content-end justify-content-start gap-0 lg:ml-3">
-  <div class="w-12 lg:w-6 lg:py-2 py-3 flex-nowrap flex lg:justify-content-end justify-content-start" id="fromAnomField">
-    <div class="small-label w-3">
-      <div>From</div>
-    </div>
-    <div class="w-7 px-0 mx-0">
-      <div class="p-float-label">
-        <p-inputNumber
-          id="yearFrom"
-          [useGrouping]="false"
-          [showButtons]="true"
-          [maxFractionDigits]="0"
-          [(ngModel)]="anomaliesModel().anomaliesFrom"
-          [step]="1"
-          [min]="minYear"
-          [max]="maxYear">
-        </p-inputNumber>
-        <label for="yearFrom">Choose year</label>
+<div class="grid">
+   <!-- FROM -->
+  <div class="col-12 md:col-6">
+    <div class="grid align-items-center gap-2">
+      <div class="col-12 sm:col-4 md:col-3 text-center sm:text-right md:text-left">
+        <b>From:</b>
+      </div>
+      <div class="col-12 sm:col-8 md:col-9">
+        <span class="p-float-label w-full">
+          <p-inputNumber
+            id="yearFrom"
+            [useGrouping]="false"
+            [showButtons]="true"
+            [maxFractionDigits]="0"
+            [(ngModel)]="anomaliesModel().anomaliesFrom"
+            [step]="1"
+            [min]="minYear"
+            [max]="maxYear"
+            [style]="{ width: '100%' }">
+          </p-inputNumber>
+          <label for="yearFrom">Choose year</label>
+        </span>
       </div>
     </div>
   </div>
 
-  <div class="w-12 lg:w-6 lg:py-2 py-3 flex flex-nowrap lg:justify-content-end justify-content-start" id="toAnomField">
-    <div class="small-label w-3">
-      <div>To</div>
-    </div>
-    <div class="w-7 px-0 mx-0">
-      <div class="p-float-label">
-        <p-inputNumber
-          id="yearTo"
-          [useGrouping]="false"
-          [showButtons]="true"
-          [maxFractionDigits]="0"
-          [(ngModel)]="anomaliesModel().anomaliesTo"
-          [step]="1"
-          [min]="minYear"
-          [max]="maxYear">
-        </p-inputNumber>
-        <label for="yearTo">Choose year</label>
+  <!-- TO -->
+  <div class="col-12 md:col-6">
+    <div class="grid align-items-center gap-2">
+      <div class="col-12 sm:col-4 md:col-3 text-center sm:text-right md:text-left">
+        <b>To:</b>
+      </div>
+      <div class="col-12 sm:col-8 md:col-9">
+        <span class="p-float-label w-full">
+          <p-inputNumber
+            id="yearTo"
+            [useGrouping]="false"
+            [showButtons]="true"
+            [maxFractionDigits]="0"
+            [(ngModel)]="anomaliesModel().anomaliesTo"
+            [step]="1"
+            [min]="minYear"
+            [max]="maxYear"
+            [style]="{ width: '100%' }">
+          </p-inputNumber>
+          <label for="yearTo">Choose year</label>
+        </span>
       </div>
     </div>
   </div>

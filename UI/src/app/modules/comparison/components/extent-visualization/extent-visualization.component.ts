@@ -7,9 +7,10 @@ import {ComparisonService} from '../../services/comparison.service';
 import {WebsiteGraphicsService} from '../../../core/services/global/website-graphics.service';
 
 @Component({
-  selector: 'qa-extent-visualization',
-  templateUrl: './extent-visualization.component.html',
-  styleUrls: ['./extent-visualization.component.scss']
+    selector: 'qa-extent-visualization',
+    templateUrl: './extent-visualization.component.html',
+    styleUrls: ['./extent-visualization.component.scss'],
+    standalone: false
 })
 
 export class ExtentVisualizationComponent implements OnInit {

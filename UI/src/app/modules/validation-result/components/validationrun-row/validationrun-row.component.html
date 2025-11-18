@@ -2,16 +2,21 @@
   <!--Header-->
   <!-- PUBLISHED  -->
   <ng-template *ngIf="published" pTemplate="header">
-    <div class="my-0 lg:text-xl md:text-lg text-base"><span class="line-height-1">Name:</span> {{ valName() }}</div>
-  </ng-template>
-  <ng-template *ngIf="published" pTemplate="icons" class="doilink">
-    <div class="my-0 lg:text-xl md:text-lg text-base"> DOI: <a title="doi-link" class="doilink" target="_blank"
-                              href="{{this.getDoiPrefix()}}{{ validationRun.doi }}">{{ validationRun.doi }}</a>
+    <div class="result-hdr">
+      <div class="result-hdr-left">
+        <span class="label">Name:</span> {{ valName() }}
+      </div>
+      <div class="result-hdr-right">
+        DOI: <a title="doi-link" class="doilink" target="_blank"
+        href="{{this.getDoiPrefix()}}{{ validationRun.doi }}">{{ validationRun.doi }}</a> 
+      </div>  
     </div>
   </ng-template>
+
   <!--  CUSTOM    -->
   <ng-template *ngIf="!published" pTemplate="header">
-    <div class="my-0 lg:text-xl md:text-lg text-base">
+    <div class="result-hdr">
+    <div class="result-hdr-left">
       <!--      if there is expiry date property: -->
       <span *ngIf="validationRun.expiry_date">
           <span *ngIf="validationRun.is_near_expiry && validationRun.progress !== -1  && validationRun.progress !== -100"
@@ -60,11 +65,9 @@
               therefore there is no possibility of rerunning this validation.">
         </span>
       </em>
-
     </div>
-  </ng-template>
-  <ng-template *ngIf="!published" pTemplate="icons" style="min-width: 7rem; max-width: 12rem">
-    <div class="my-0 lg:text-xl md:text-lg text-base">
+
+    <div class="result-hdr-right">
       <span *ngIf="hideElement"
             class="line-height-1">Name: {{ valName() }}
       </span>
@@ -74,8 +77,8 @@
               pTooltip="Validation has been published. There is no possibility of changing its name.">
         </span>
       </span>
-      <ng-template #elseUnpublished>
-        <button
+
+      <button
           pButton
           type="button"
           title="edit-name"
@@ -114,7 +117,8 @@
             (click)="toggleEditing()">
           </button>
         </span>
-      </ng-template>
+
+    </div>
     </div>
   </ng-template>
 
@@ -153,11 +157,10 @@
     </div>
 
     <!-- Action Buttons -->
-    <div class="md:w-2 w-6 p-2" style="max-width: 10rem">
+    <div class="md:w-2 w-6 p-1" style="max-width: 10rem">
       <qa-buttons [validationList]="true" [validationRun]="validationRun" [published]="published"
                   [canBeRerun]="validationRun.all_files_exist"/>
     </div>
-
 
   </div>
 </p-panel>

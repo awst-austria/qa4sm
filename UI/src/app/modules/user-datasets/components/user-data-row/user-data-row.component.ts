@@ -14,9 +14,10 @@ import {CustomHttpError} from '../../../core/services/global/http-error.service'
 import {catchError} from 'rxjs/operators';
 
 @Component({
-  selector: 'qa-user-data-row',
-  templateUrl: './user-data-row.component.html',
-  styleUrls: ['./user-data-row.component.scss']
+    selector: 'qa-user-data-row',
+    templateUrl: './user-data-row.component.html',
+    styleUrls: ['./user-data-row.component.scss'],
+    standalone: false
 })
 export class UserDataRowComponent implements OnInit, OnDestroy {
 

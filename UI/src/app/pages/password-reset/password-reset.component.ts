@@ -9,9 +9,10 @@ import {EMPTY, Observable} from 'rxjs';
 import {CustomHttpError} from '../../modules/core/services/global/http-error.service';
 
 @Component({
-  selector: 'qa-password-reset',
-  templateUrl: './password-reset.component.html',
-  styleUrls: ['./password-reset.component.scss']
+    selector: 'qa-password-reset',
+    templateUrl: './password-reset.component.html',
+    styleUrls: ['./password-reset.component.scss'],
+    standalone: false
 })
 export class PasswordResetComponent {
 

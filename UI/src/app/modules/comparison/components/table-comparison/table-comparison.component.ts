@@ -5,9 +5,10 @@ import {Validations2CompareModel} from '../validation-selector/validation-select
 import {debounceTime} from 'rxjs/operators';
 
 @Component({
-  selector: 'qa-table-comparison',
-  templateUrl: './table-comparison.component.html',
-  styleUrls: ['./table-comparison.component.scss']
+    selector: 'qa-table-comparison',
+    templateUrl: './table-comparison.component.html',
+    styleUrls: ['./table-comparison.component.scss'],
+    standalone: false
 })
 export class TableComparisonComponent implements OnInit {
   @Output() isError = new EventEmitter<boolean>();

@@ -1,6 +1,6 @@
-<p-panel [toggleable]="true" class="side-panel" collapsed="true">
+<p-panel [toggleable]="true" class="side-panel" collapsed="false">
   <ng-template pTemplate="header">
-    <div class="side-menu-header my-2 ml-2">
+    <div class="side-menu-header ml-2">
       Filter validations
       <span class="pi pi-question-circle"
             pTooltip="Select filter from the list.">
@@ -8,14 +8,14 @@
         </div>
     </ng-template>
     <span class="p-float-label mt-2 mb-1">
-          <p-dropdown
+          <p-select
                   id="filterVarSelector"
                   [options]="FILTER_CONFIGS"
                   [(ngModel)]="selectedFilter"
                   placeholder="Select a filter"
                   optionLabel="label"
                   [style]="{'width': '100%'}">
-          </p-dropdown>
+          </p-select>
           <label for="{{'filterVarSelector'}}">Select a filter</label>
     </span>
 

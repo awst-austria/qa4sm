@@ -2,9 +2,10 @@ import {Component} from '@angular/core';
 import {Event, NavigationEnd, Router} from '@angular/router';
 
 @Component({
-  selector: 'qa-navigation-footer',
-  templateUrl: './navigation-footer.component.html',
-  styleUrls: ['./navigation-footer.component.scss']
+    selector: 'qa-navigation-footer',
+    templateUrl: './navigation-footer.component.html',
+    styleUrls: ['./navigation-footer.component.scss'],
+    standalone: false
 })
 
 export class NavigationFooterComponent {

@@ -130,6 +130,4 @@ def user_data_preprocessing(file_uuid, file_path, file_raw_path, user_path):
     file_entry.metadata_submitted = True
     file_entry.save()
 
-    file_logger.info(
-        f"Preprocessing completed successfully for file {file_uuid}")
     return

@@ -12,11 +12,11 @@ import { map, tap } from 'rxjs/operators';
 import { ValidationRunConfigService } from '../../../../pages/validate/service/validation-run-config.service';
 import { AuthService } from '../../../core/services/auth/auth.service';
 
-
 @Component({
-  selector: 'qa-dataset',
-  templateUrl: './dataset.component.html',
-  styleUrls: ['./dataset.component.scss']
+    selector: 'qa-dataset',
+    templateUrl: './dataset.component.html',
+    styleUrls: ['./dataset.component.scss'],
+    standalone: false
 })
 export class DatasetComponent implements OnInit {
 
@@ -53,31 +53,24 @@ export class DatasetComponent implements OnInit {
               public authService: AuthService) {
   }
 
-
   ngOnInit(): void {
 
     this.allDatasets$ = this.datasetService.getAllDatasets(true);
 
     this.validationConfigService.listOfSelectedConfigs.subscribe(configs => {
-      if (configs.filter(config => config.datasetModel.selectedDataset?.short_name === 'ISMN').length !== 0
-        && this.selectionModel.selectedDataset?.short_name !== 'ISMN') {
-        this.datasets$ = this.allDatasets$
-          .pipe(map<DatasetDto[], DatasetDto[]>(datasets => {
-            return datasets.filter(dataset => dataset.pretty_name !== 'ISMN');
-          }));
-      } else if (configs.filter(config => config.datasetModel.selectedDataset?.user).length == configs.length - 1 && !this.selectionModel.selectedDataset?.user) {
-        this.datasets$ = this.allDatasets$
-          .pipe(map<DatasetDto[], DatasetDto[]>(datasets => {
-            return datasets.filter(dataset => !dataset.user);
-          }));
-      } else {
-        this.datasets$ = this.allDatasets$
-          .pipe(map<DatasetDto[], DatasetDto[]>(datasets => {
-            return datasets;
-          }));
-      }
-    });
+    const hasISMN = configs.some(c => c.datasetModel.selectedDataset?.short_name === 'ISMN');
+    const currentIsISMN = this.selectionModel.selectedDataset?.short_name === 'ISMN';
 
+    if (hasISMN && !currentIsISMN) {
+    // ISMN is already selected somewhere else, and the current card is not ISMN -> hide ISMN.
+    this.datasets$ = this.allDatasets$.pipe(
+      map(datasets => datasets.filter(d => d.pretty_name !== 'ISMN'))
+    );
+    } else {
+    // No restrictions on user/non-user — all user datasets can be selected.
+    this.datasets$ = this.allDatasets$;
+    }
+    });
 
     this.selectableDatasetVersions$ = this.datasetVersionService.getVersionsByDataset(this.selectionModel.selectedDataset.id).pipe(
       tap(datasetVersions => this.checkIfNewerVersionExists(datasetVersions))

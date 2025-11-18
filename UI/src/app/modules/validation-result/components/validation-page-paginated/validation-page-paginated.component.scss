@@ -1,4 +1,4 @@
-@import "../../../../../styles";
+@use 'src/style.variables' as *;
 
 div {
   font-family: $base-font;

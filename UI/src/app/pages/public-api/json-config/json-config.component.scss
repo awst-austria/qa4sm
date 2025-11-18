@@ -1,30 +1,7 @@
-@import "../../../../style.variables";
+@use 'src/style.variables' as *;
 
-/* Main container */
-.main-container {
-  max-width: 900px;
-  margin: 0 auto;
-  padding: 20px;
-  font-family: 'Segoe UI', Tahoma, sans-serif;
-  line-height: 1.6;
-  color: $base-font-color;
-}
-
-/* Headings */
-h2 {
-  font-size: 1.8rem;
-  color: $main-page-color-1;
-  margin-bottom: 10px;
-}
-
-h4 {
-  font-size: 1.3rem;
-  margin-top: 20px;
-  color: $main-page-color-1;
-}
-/* Link buttons */
 .btn {
-  background-color: $button-base-color;
+  background-color: $base-color;
   border: none;
   color: #fff;
   padding: 10px 10px;
@@ -36,10 +13,9 @@ h4 {
 }
 
 .btn:hover {
- background-color: $button-hover-color;
+ background-color: $base-color-hover;
   color: #fff;
 }
-
 
 .btn-remove {
   

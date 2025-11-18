@@ -2,7 +2,7 @@
   <p-panel>
     <ng-template pTemplate="header">
       <div class="text-center" style="width: 95%">
-        <h4 class="my-0 py-0 font-weight-normal">Result files</h4>
+        <span class="my-0 py-0 font-weight-normal">Result files</span>
       </div>
     </ng-template>
     <ng-template pTemplate="icons">
@@ -17,25 +17,25 @@
             <div class="flex flex-column w-10"
                  *ngIf="boxplots.length > 1">
                           <span class="p-float-label">
-                              <p-dropdown id="boxplotSelector"
+                              <p-select id="boxplotSelector"
                                           (onChange)="onBoxPlotChange($event)"
                                           [options]="selectedMetric().boxplot_dicts"
                                           [ngModel]="selectedMetric().boxplot_dicts[boxplotIndx]"
                                           optionLabel="name"
                                           [style]="{'width': '100%'}">
-                              </p-dropdown>
+                              </p-select>
                               <label for="boxplotSelector">Select boxplot classification</label>
                             </span>
             </div>
             <div class="flex flex-column w-10">
                       <span class="p-float-label">
-                        <p-dropdown id="metricSelector"
+                        <p-select id="metricSelector"
                                     (onChange)="onMetricChange($event)"
                                     [options]="metrics"
                                     [ngModel]="selectedMetric()"
                                     optionLabel="metric_pretty_name"
                                     [style]="{'width': '100%'}">
-                        </p-dropdown>
+                        </p-select>
                         <label for="metricSelector">Select boxplot/map metric</label>
                       </span>
             </div>

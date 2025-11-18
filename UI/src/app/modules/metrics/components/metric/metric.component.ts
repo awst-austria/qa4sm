@@ -2,9 +2,10 @@ import {Component, input, model} from '@angular/core';
 import {MetricModel} from './metric-model';
 
 @Component({
-  selector: 'qa-metric',
-  templateUrl: './metric.component.html',
-  styleUrls: ['./metric.component.scss']
+    selector: 'qa-metric',
+    templateUrl: './metric.component.html',
+    styleUrls: ['./metric.component.scss'],
+    standalone: false
 })
 export class MetricComponent {
 

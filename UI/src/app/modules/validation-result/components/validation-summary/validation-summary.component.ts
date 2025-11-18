@@ -18,9 +18,10 @@ import {ToastService} from '../../../core/services/toast/toast.service';
 
 
 @Component({
-  selector: 'qa-validation-summary',
-  templateUrl: './validation-summary.component.html',
-  styleUrls: ['./validation-summary.component.scss']
+    selector: 'qa-validation-summary',
+    templateUrl: './validation-summary.component.html',
+    styleUrls: ['./validation-summary.component.scss'],
+    standalone: false
 })
 export class ValidationSummaryComponent implements OnInit, OnDestroy {
 

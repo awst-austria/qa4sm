@@ -1,23 +1,22 @@
-@import "../../../../../style.variables";
+@use 'src/style.variables' as *;
 
 .footer {
-  background: transparent;
-  height: 2rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  padding: 1.5rem;
+  margin-top: 1rem;
+  background-color: transparent;
+  border-top: 1px solid $base-color;
 }
 
-a {
-  color: $main-page-color-3;
-  text-decoration: none;
-}
-
-.footer-dark {
-  background: rgba(0, 0, 0, 0.45);
-}
-.footer-dark a{
-  color: rgba(255, 255, 255, 1.1);
-}
-
-.footer-dark a:hover{
-  color: $highlight-border;
+.footer-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  justify-content: center;
+  align-items: center;
+  font-size: 1rem;
 }
 

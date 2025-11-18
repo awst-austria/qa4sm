@@ -9,9 +9,10 @@ import {catchError} from 'rxjs/operators';
 import {EMPTY} from 'rxjs';
 
 @Component({
-  selector: 'qa-comparison-summary',
-  templateUrl: './comparison-summary.component.html',
-  styleUrls: ['./comparison-summary.component.scss']
+    selector: 'qa-comparison-summary',
+    templateUrl: './comparison-summary.component.html',
+    styleUrls: ['./comparison-summary.component.scss'],
+    standalone: false
 })
 export class ComparisonSummaryComponent implements OnInit {
   comparisonModel: Validations2CompareModel = new Validations2CompareModel(

@@ -1,4 +1,4 @@
-@import "../../../../../style.variables.scss";
+@use 'src/style.variables' as *;
 
 .att_val_container{
   background-color: white;
@@ -14,8 +14,8 @@
   border: 1px solid $base-color;
 
   &:hover {
-    background-color: darken($base-color, 10%) !important;
-    border-color: darken($base-color, 10%);
+    background-color: $base-color-hover;
+    border-color: $base-color-hover;
   }
 
   &:active {
@@ -47,6 +47,9 @@
 .warning {
   color: $pronouced-button-color;
 }
+
+.text-red-600 { color: #dc2626 !important; }
+
 .expiry-icons{
   cursor: auto;
   font-size: 1.5rem;

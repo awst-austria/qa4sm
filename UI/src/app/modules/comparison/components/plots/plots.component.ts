@@ -14,9 +14,10 @@ import {CustomHttpError} from '../../../core/services/global/http-error.service'
 const PLOT_TYPES = ['boxplot', 'mapplot'];
 
 @Component({
-  selector: 'qa-plots',
-  templateUrl: './plots.component.html',
-  styleUrls: ['./plots.component.scss'],
+    selector: 'qa-plots',
+    templateUrl: './plots.component.html',
+    styleUrls: ['./plots.component.scss'],
+    standalone: false
 })
 
 export class PlotsComponent implements OnInit {

@@ -1,8 +1,8 @@
-@import "../../../style.variables";
+@use 'src/style.variables' as *;
 .readMoreOrLess {
   font-size: 1.25rem;
   cursor: pointer;
-  color: $button-base-color;
+  color: $base-color;
 }
 li{
   margin-top: 1.1rem;
