@@ -7,4 +7,6 @@ class UserDatasetFileAdmin(ModelAdmin):
     ordering = ('owner', 'upload_date','dataset', 'version')
 
     def user_groups_list(self, obj):
+        if obj.dataset is None:
+            return "N/A (Dataset deleted)"
         return list(obj.dataset.user_groups.all())
