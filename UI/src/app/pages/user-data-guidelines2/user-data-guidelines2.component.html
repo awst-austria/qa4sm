@@ -30,9 +30,7 @@
       <h2>Important Notes</h2>
       <ul>
         <li>Your uploaded data is <strong>private</strong> – no other users can see, access, or download it.</li>
-        <li>Uploads must be provided as a <strong>.zip</strong> containing only: 
-          <strong>NetCDF (.nc/.nc4)</strong> or <strong>CSV (.csv)</strong> files.
-        </li>
+        <li>Uploads can be either <strong>.zip</strong> files containing <strong>CSV (.csv)</strong> files or <strong>NetCDF (.nc/.nc4)</strong> files.</li>
         <li>If you plan to upload datasets larger than several GB, please contact us first at 
           <a href="mailto:support@qa4sm.eu">support&#64;qa4sm.eu</a>.  
           We’ll help ensure your data is handled efficiently and accessible after upload. 
@@ -44,7 +42,7 @@
       <h2>Troubleshooting</h2>
       <p class="text-primary">If your upload fails or data cannot be processed correctly, please check these common issues:</p>
       <ul>
-        <li><strong>Invalid file type:</strong> Only <code>.nc</code>, <code>.nc4</code>, or <code>.csv</code> files are supported inside the ZIP archive.</li>
+        <li><strong>Invalid file type:</strong> The ZIP archive should contain only <code>.csv</code> files and optionally a <code>metadata.yml</code> file, OR the uploaded file should be a <code>.nc</code> or <code>.nc4</code> file (not zipped).</li>
         <li><strong>Incorrect ZIP structure:</strong> Avoid nested folders or unrelated files.</li>
         <li><strong>Missing variables:</strong> Ensure your files include <strong>latitude, longitude, and time</strong> information.</li>
         <li><strong>Format errors:</strong> See examples in 
