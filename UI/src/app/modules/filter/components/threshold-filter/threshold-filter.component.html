@@ -1,13 +1,21 @@
 <div class="grid no-gutters" style="align-items: center">
-  <div class="col-11">
-    <div class="grid">
-      <div class="col-7 pt-3" *ngIf="filterModel$|async as filterModel">
-        <p-checkbox label="{{filterModel.filterDto.description + ':'}}"
-                    [binary]="true" [ngModel]="true" [readonly]=filterModel.filterDto.readonly [class]="filterModel.filterDto.readonly ?  'readonly-filter-checkbox' : ''">
+  <div class="col-11" *ngIf="filterModel$|async as filterModel">
+    
+      <div class="flex align-items-center" >
+        <p-checkbox 
+          [binary]="true" 
+          [ngModel]="true" 
+          [readonly]=filterModel.filterDto.readonly 
+          [class]="filterModel.filterDto.readonly ?  'readonly-filter-checkbox' : ''">
         </p-checkbox>
+        <label class="ml-2" [for]="'filter-' + filterModel.filterDto.id">
+            {{ filterModel.filterDto.description }}:
+        </label>
+        
       </div>
-      <div class="col-4 mx-0 px-0 p-fluid">
-        <p-inputNumber id="threshold_filter"
+     
+      <p-inputNumber id="threshold_filter"
+                       
                        [minFractionDigits]="0"
                        [maxFractionDigits]=maxFractionDigits
                        [suffix]="units"
@@ -17,9 +25,8 @@
                        [min]=minThreshold
                        [max]=maxThreshold
                        (onInput)="saveNewValue($event)">
-        </p-inputNumber>
-      </div>
-    </div>
+      </p-inputNumber>
+     
   </div>
   <div *ngIf="filterModel$|async as filterModel" [ngClass]="{'col-1': true}">
     <span class="pi pi-question-circle" [pTooltip]="filterModel.filterDto.help_text"></span>
