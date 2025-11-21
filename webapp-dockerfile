@@ -1,4 +1,4 @@
-FROM awst/qa4sm-base:3.3.0
+FROM awst/qa4sm-base:latest
 RUN apt-get update && apt-get -y install apt-utils
 RUN apt-get -y upgrade && apt-get -y install curl apache2 apache2-dev libapache2-mod-wsgi-py3 git gfortran libgeos-dev build-essential qtbase5-dev qt5-qmake rsync libproj-dev wget git postgresql-client
 RUN update-rc.d apache2 disable
