@@ -65,7 +65,17 @@
                         (includeMutual)="this.includeFilter($event, item.basicFilters, filter.enabled)"
                         (updateMap)="onBasicFilterMapUpdate($event)"
                       />
+
                     </ng-container>
+
+                    <hr *ngIf="
+                      (validationModel.datasetConfigurations[datasetIdx].smosRfiFilter$ | async) ||
+                      (validationModel.datasetConfigurations[datasetIdx].smosChi2Filter$ | async) ||
+                      (validationModel.datasetConfigurations[datasetIdx].vegetationWaterFilter$ | async) ||
+                      (validationModel.datasetConfigurations[datasetIdx].staticWaterFilter$ | async) ||
+                      (validationModel.datasetConfigurations[datasetIdx].filAscatSsmSensitivityFilter$ | async) ||
+                      (validationModel.datasetConfigurations[datasetIdx].filAscatsspFilter$ | async)
+                    ">
 
                     <qa-threshold-filter *ngIf="validationModel.datasetConfigurations[datasetIdx].smosRfiFilter$|async"
                                        [datasetModel]="validationModel.datasetConfigurations[datasetIdx].datasetModel"
