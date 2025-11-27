@@ -1223,6 +1223,59 @@ class TestValidation(TestCase):
         "ignore:No data for:UserWarning",
         "ignore: Too few points are available to generate:UserWarning")
     @pytest.mark.long_running
+    def test_validation_esa_cci_C_MR_ref(self):
+        run = generate_default_validation()
+        run.plots_save_metadata = 'always'
+        run.user = self.testuser
+
+        run.spatial_reference_configuration.dataset = Dataset.objects.get(
+            short_name=globals.CCICMR)
+        run.spatial_reference_configuration.version = DatasetVersion.objects.get(
+            short_name=globals.ESA_CCI_SM_C_V09_MR)
+        run.spatial_reference_configuration.variable = DataVariable.objects.get(
+            pretty_name=globals.ESA_CCI_SM_C_sm)
+        run.spatial_reference_configuration.filters.add(
+            DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
+        #        run.spatial_reference_configuration.filters.add(DataFilter.objects.get(name='FIL_ERA5_TEMP_UNFROZEN'))
+
+        run.spatial_reference_configuration.save()
+
+        run.interval_from = datetime(2017, 1, 1, tzinfo=UTC)
+        run.interval_to = datetime(2018, 1, 1, tzinfo=UTC)
+        run.min_lat = self.hawaii_coordinates[0]
+        run.min_lon = self.hawaii_coordinates[1]
+        run.max_lat = self.hawaii_coordinates[2]
+        run.max_lon = self.hawaii_coordinates[3]
+
+        run.save()
+
+        for config in run.dataset_configurations.all():
+            if config != run.spatial_reference_configuration:
+                config.filters.add(
+                    DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
+            config.save()
+
+        run_id = run.id
+
+        ## run the validation
+        val.run_validation(run_id)
+
+        new_run = ValidationRun.objects.get(pk=run_id)
+
+        assert new_run, "Didn't find validation in database"
+
+        assert new_run.total_points == 115, "Number of gpis is off"
+        assert new_run.error_points == 54, "Too many error gpis"
+        assert new_run.ok_points == 61, "OK points are off"
+
+        self.check_results(new_run, is_tcol_run=False, meta_plots=False)
+        self.delete_run(new_run)
+
+    @pytest.mark.filterwarnings(
+        "ignore:No results for gpi:UserWarning",
+        "ignore:No data for:UserWarning",
+        "ignore: Too few points are available to generate:UserWarning")
+    @pytest.mark.long_running
     def test_validation_ascat(self):
         run = generate_default_validation()
         run.plots_save_metadata = 'always'
@@ -1501,7 +1554,9 @@ class TestValidation(TestCase):
             (globals.SMAP_L3, globals.SMAP_V9_AM_PM,
              globals.SMAP_soil_moisture),
             (globals.CCI_RZSM, globals.ESA_CCI_RZSM_V09_2,
-             globals.ESA_CCI_RZSM_0_10cm)
+             globals.ESA_CCI_RZSM_0_10cm),
+            (globals.CCICMR, globals.ESA_CCI_SM_C_V09_MR,
+             globals.ESA_CCI_SM_C_sm)
         ]
 
         for ds, version, variable in all_datasets:
