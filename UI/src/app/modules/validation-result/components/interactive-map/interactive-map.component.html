@@ -1,32 +1,58 @@
-<div class="my-4"></div>
+<!-- These are fine as-is, the TypeScript will add the ol- classes -->
+<div #snapshotButtonContainer class="ol-snapshot-button-container" style="display: none;">
+  <button class="snapshot-btn" (click)="takeSnapshot()">
+    <i class="pi pi-camera"></i>
+  </button>
+</div>
 
-<div class="flex flex-row w-12 gap-4 mb-4">
-  <!-- First dropdown - takes 50% width on large screens -->
-  <div class="flex flex-column lg:w-6 w-10">
+<div #projectionToggleContainer class="ol-projection-toggle-container" style="display: none;">
+  <button class="projection-toggle-btn" (click)="toggleProjection()">
+    <i class="pi pi-globe"></i>
+    {{ currentProjection }}
+  </button>
+</div>
+
+
+
+
+<!-- Snapshot Modal -->
+<div class="snapshot-modal" [class.active]="showSnapshotModal" (click)="closeModal($event)">
+  <div class="snapshot-container">
+    <h3>Snapshot</h3>
+    <img [src]="snapshotImageSrc" alt="Map Snapshot" class="snapshot-img" *ngIf="snapshotImageSrc">
+    <div class="snapshot-actions">
+      <button class="snapshot-download-btn" (click)="downloadSnapshot()">
+        <i class="pi pi-download"></i>
+        Download
+      </button>
+      <button class="snapshot-close-btn" (click)="closeSnapshotModal()">
+        <i class="pi pi-times"></i>
+        Close
+      </button>
+    </div>
+  </div>
+</div>
+<!-- Hidden containers that will be moved into the map -->
+<div #metricDropdownContainer class="ol-metric-dropdown-container" style="display: none;">
+  <div class="flex flex-column">
     <span class="p-float-label">
-      <p-dropdown id="metricSelector-map"
-                  [options]="metrics"
-                  [(ngModel)]="selectedMetric"
-                  optionLabel="metric_pretty_name"
-                  (onChange)="onMetricChange($event)"
-                  [style]="{'width': '100%'}">
+      <p-dropdown id="metricSelector-map" [options]="metrics" [(ngModel)]="selectedMetric"
+        optionLabel="metric_pretty_name" (onChange)="onMetricChange($event)" [style]="{'width': '100%'}">
       </p-dropdown>
-      <label for="metricSelector-map">Select map metric</label>
+      <!-- <label for="metricSelector-map">Select map metric</label> -->
     </span>
   </div>
+</div>
 
-  <!-- Second dropdown - takes 50% width on large screens -->
-  <div class="flex flex-column lg:w-6 w-10">
+<div #layerDropdownContainer class="ol-layer-dropdown-container" style="display: none;">
+  <div class="flex flex-column">
     <span class="p-float-label">
-      <p-dropdown id="layer-select" 
-                  [options]="getAvailableLayersForCurrentMetric()"
-                  [(ngModel)]="selectedLayerForMetric[selectedMetric?.metric_query_name]" 
-                  optionLabel="name"
-                  [style]="{'width':'100%'}" 
-                  (onChange)="onLayerSelectionChange(selectedMetric?.metric_query_name, $event.value)"
-                  [disabled]="getAvailableLayersForCurrentMetric()?.length <= 1">
+      <p-dropdown id="layer-select" [options]="getAvailableLayersForCurrentMetric()"
+        [(ngModel)]="selectedLayerForMetric[selectedMetric?.metric_query_name]" optionLabel="name"
+        [style]="{'width':'100%'}" (onChange)="onLayerSelectionChange(selectedMetric?.metric_query_name, $event.value)"
+        [disabled]="getAvailableLayersForCurrentMetric()?.length <= 1">
       </p-dropdown>
-      <label for="layer-select">Select Layer</label>
+      <!-- <label for="layer-select">Select Layer</label> -->
     </span>
 
     <div *ngIf="!getAvailableLayersForCurrentMetric()?.length" class="p-field-description mt-2">
@@ -35,30 +61,29 @@
   </div>
 </div>
 
-<div class="my-4"></div>
 
-<hr class="featurette-divider">
-<div class="my-4"></div>
 
 <!-- Simple Enhanced Map Container -->
 <div class="map-wrapper">
-  <div class="map-container" [class.map-loading]="isLoading" style="width: 100%;height: 600px" id="imap">
+  <div class="map-container" #mapContainer [class.map-loading]="isLoading" style="width: 100%; aspect-ratio: 4 / 3;"
+    id="imap">
 
-    <!-- Loading overlay -->
+    <!-- Enhanced Loading Overlay with PrimeNG Spinner -->
     <div *ngIf="isLoading" class="map-loading-overlay">
-      <div class="loading-spinner"></div>
-      <span class="loading-text">Loading map...</span>
+      <div class="spinner-container">
+        <i class="pi pi-spin pi-spinner" style="font-size: 3rem"></i>
+        <div class="loading-content">
+          <span class="loading-text">Loading map data...</span>
+          <span class="loading-subtext">Please wait</span>
+        </div>
+      </div>
     </div>
 
-    <!-- Reset button -->
-    <button type="button" class="map-reset-btn" (click)="resetMapView()" title="Reset View">
-      <i class="pi pi-refresh"></i>
-    </button>
+
 
     <div *ngIf="colorbarData && colorbarData.is_categorical === false" class="colorbar-container">
       <div class="colorbar-wrapper">
-        <div class="colorbar-gradient" [style.background]="colorbarData.gradient">
-        </div>
+        <div class="colorbar-gradient" [style.background]="colorbarData.gradient"></div>
         <div class="colorbar-labels">
           <span class="colorbar-min">{{ colorbarData.vmin | number:'1.1-1' }}</span>
           <span class="colorbar-title">{{ colorbarData.metric_name }}</span>
@@ -76,3 +101,151 @@
     </small>
   </div>
 </div>
+
+<!-- Point Value Dialog -->
+<p-dialog [(visible)]="showPointDialog" [modal]="true" [closable]="true" [draggable]="false" [resizable]="false"
+  [style]="{width: '350px'}" [appendTo]="mapContainer">
+
+  <!-- Custom Header with subtitle support -->
+  <ng-template pTemplate="header">
+    <div class="dialog-header-custom">
+      <span class="dialog-title">{{ getDialogHeader() }}</span>
+      <span *ngIf="getDialogSubheader()" class="dialog-subtitle">{{ getDialogSubheader() }}</span>
+    </div>
+  </ng-template>
+
+  <!-- Loading State -->
+  <div *ngIf="pointQueryLoading" class="dialog-state">
+    <p-progressSpinner [style]="{width: '40px', height: '40px'}" strokeWidth="4">
+    </p-progressSpinner>
+    <p class="loading-text">Loading data...</p>
+  </div>
+
+  <!-- Candidate Selection State -->
+  <div *ngIf="!pointQueryLoading && showCandidateSelection" class="dialog-content">
+    <div class="info-section">
+      <p class="selection-prompt">Multiple points found. Please select one:</p>
+    </div>
+    <div class="candidate-list">
+      <button *ngFor="let candidate of candidates; trackBy: trackByGpi" (click)="selectCandidate(candidate)"
+        class="candidate-button" type="button">
+        <div class="candidate-primary">
+          <span class="candidate-name">{{ getCandidateName(candidate) }}</span>
+          <span class="candidate-value">{{ candidate.value }}</span>
+        </div>
+        <div class="candidate-meta">
+          <span *ngIf="isISMNData && candidate.instrument" class="meta-item">
+            <span class="meta-label">Sensor:</span> {{ candidate.instrument }}
+          </span>
+          <span class="meta-item">
+            <span class="meta-label">Lat:</span> {{ candidate.lat.toFixed(3) }}°
+          </span>
+          <span class="meta-item">
+            <span class="meta-label">Lon:</span> {{ candidate.lon.toFixed(3) }}°
+          </span>
+          <span class="meta-item">
+            <span class="meta-label">ID:</span> {{ candidate.gpi }}
+          </span>
+        </div>
+      </button>
+    </div>
+  </div>
+
+  <!-- Success State - ISMN Case -->
+  <div *ngIf="!pointQueryLoading && !showCandidateSelection && selectedPointValue !== null && isISMNData"
+    class="dialog-content">
+
+    <!-- Back button at TOP -->
+    <div *ngIf="multipleFound" class="info-section back-section">
+      <button (click)="showCandidateSelection = true; cdr.detectChanges()"
+        class="p-button p-button-text p-button-sm back-button" type="button">
+        <i class="pi pi-arrow-left"></i>
+        <span>Back to selection ({{ candidates.length }} points)</span>
+      </button>
+    </div>
+
+    <!-- Measurement Value - PRIMARY -->
+    <div class="info-section">
+      <div class="label-value highlight">
+        <span class="label">{{ varName || 'Value' }}</span>
+        <span class="value large">{{ selectedPointValue }}</span>
+      </div>
+    </div>
+
+    <!-- Location + Point ID grouped -->
+    <div class="info-section compact">
+      <div class="label-value">
+        <span class="label">Latitude</span>
+        <span class="value">{{ selectedPointCoords?.lat | number:'1.0-2' }}°</span>
+      </div>
+      <div class="label-value">
+        <span class="label">Longitude</span>
+        <span class="value">{{ selectedPointCoords?.lon | number:'1.0-2' }}°</span>
+      </div>
+      <div class="label-value" *ngIf="pointLoc">
+        <span class="label">Point ID</span>
+        <span class="value">{{ pointLoc }}</span>
+      </div>
+    </div>
+
+    <!-- Additional Metadata -->
+    <div class="info-section metadata" *ngIf="landcoverType || climateKG || frmClass">
+      <div class="label-value" *ngIf="landcoverType">
+        <span class="label">Land Cover</span>
+        <span class="value">{{ landcoverType }}</span>
+      </div>
+      <div class="label-value" *ngIf="climateKG">
+        <span class="label">Climate</span>
+        <span class="value">{{ climateKG }}</span>
+      </div>
+      <div class="label-value" *ngIf="frmClass">
+        <span class="label">FRM Class</span>
+        <span class="value">{{ frmClass }}</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Success State - Gridded Data Case -->
+  <div *ngIf="!pointQueryLoading && !showCandidateSelection && selectedPointValue !== null && !isISMNData"
+    class="dialog-content">
+
+    <!-- Back button at TOP -->
+    <div *ngIf="multipleFound" class="info-section back-section">
+      <button (click)="showCandidateSelection = true; cdr.detectChanges()"
+        class="p-button p-button-text p-button-sm back-button" type="button">
+        <i class="pi pi-arrow-left"></i>
+        <span>Back to selection ({{ candidates.length }} points)</span>
+      </button>
+    </div>
+
+    <!-- Measurement Value - PRIMARY -->
+    <div class="info-section">
+      <div class="label-value highlight">
+        <span class="label">{{ selectedMetric?.metric_query_name || 'Value' }}</span>
+        <span class="value large">{{ selectedPointValue }}</span>
+      </div>
+    </div>
+
+    <!-- Location + Point ID grouped -->
+    <div class="info-section compact">
+      <div class="label-value">
+        <span class="label">Latitude</span>
+        <span class="value">{{ selectedPointCoords?.lat | number:'1.0-4' }}°</span>
+      </div>
+      <div class="label-value">
+        <span class="label">Longitude</span>
+        <span class="value">{{ selectedPointCoords?.lon | number:'1.0-4' }}°</span>
+      </div>
+      <div class="label-value" *ngIf="pointLoc">
+        <span class="label">Point ID</span>
+        <span class="value">{{ pointLoc }}</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="!pointQueryLoading && !showCandidateSelection && selectedPointValue === null" class="dialog-state">
+    <i class="pi pi-info-circle" style="font-size: 2rem; color: #6c757d;"></i>
+    <p class="error-text">{{ pointErrorMessage || 'No data available at this location' }}</p>
+  </div>
+</p-dialog>

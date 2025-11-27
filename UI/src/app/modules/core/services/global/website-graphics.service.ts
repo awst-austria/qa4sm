@@ -46,9 +46,9 @@ export class WebsiteGraphicsService {
     );
   }
 
-  getLayerRange(validationId: string, metricName: string, index: number): Observable<{ vmin: number, vmax: number }> {
+  getLayerRange(validationId: string, metricName: string, layer_name: string): Observable<{ vmin: number, vmax: number }> {
     return this.http.get<{ vmin: number, vmax: number }>(
-      `/api/${validationId}/range/${metricName}/${index}/`
+      `/api/${validationId}/range/${metricName}/${layer_name}/`
     );
   }
 

@@ -141,7 +141,7 @@ def get_metric_names_and_associated_files(request):
     except FileNotFoundError as e:
         return JsonResponse({'message': str(e)}, status=404)
 
-    pairs, triples, metrics, ref0_config, geotiff_metrics, geotiff_var_list = get_dataset_combis_and_metrics_from_files(validation, dataset_names)
+    pairs, triples, metrics, ref0_config, zarr_metrics, zarr_var_list = get_dataset_combis_and_metrics_from_files(validation, dataset_names)
     combis = OrderedDict(sorted({**pairs, **triples}.items()))
     metrics = OrderedDict(sorted([(v, k) for k, v in metrics.items()]))
     response = []
@@ -196,8 +196,8 @@ def get_metric_names_and_associated_files(request):
                        'overview_files': overview_files,
                        'metadata_files': [],
                        'comparison_boxplot': seasonal_metric_file,
-                       'geotiff_metrics': geotiff_metrics,
-                       'geotiff_var_list': geotiff_var_list,
+                       'zarr_metrics': zarr_metrics,
+                       'zarr_var_list': zarr_var_list,
                        'datasets': datasets,
                        }
         response.append(metric_dict)

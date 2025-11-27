@@ -18,11 +18,12 @@ from django.conf import settings
 from cartopy import config as cconfig
 from typing import List, Tuple, Dict, Set
 from pathlib import PosixPath
+from itertools import combinations
 
 cconfig['data_dir'] = path.join(settings.BASE_DIR, 'cartopy')
 
 from validator.validation.globals import OUTPUT_FOLDER, METRICS as READER_METRICS, METRIC_TEMPLATE, TC_METRICS, \
-    TC_METRIC_TEMPLATE, DEFAULT_TSW, STABILITY_METRICS, QR_METRIC_TEMPLATE
+    TC_METRIC_TEMPLATE, DEFAULT_TSW, STABILITY_METRICS, QR_METRIC_TEMPLATE, QR_METRIC_TC_TEMPLATE
 import os
 from io import BytesIO
 import base64
@@ -59,7 +60,8 @@ def generate_all_graphs(validation_run, temporal_sub_windows: List[str], outfold
         temporal_sub_windows=temporal_sub_windows,
         out_dir=outfolder,
         out_type=['png', 'svg'],
-        save_metadata=save_metadata
+        save_metadata=save_metadata,
+        save_zarr=True,
     )
 
     plot_all_output_dict = sort_filenames_to_filetypes((fnb, fnm, fcsv, fncb))
@@ -108,10 +110,10 @@ def get_dataset_combis_and_metrics_from_files(validation_run, dataset_names):
         All metrics that are found
     ref0_config : bool or None
         True if the ref has id 0 (sorted ids).
-    geotiff_metrics : dict
-        Transformed metrics for GeoTIFF generation
-    geotiff_var_list : list
-        List of GeoTIFF variable names
+    zarr_metrics : dict
+        Transformed metrics for map visualisation
+    zarr_var_list : list
+        List of zarr variable names
     """
     N_OBS_METRIC = "n_obs"
     run_dir = path.join(OUTPUT_FOLDER, str(validation_run.id))
@@ -129,10 +131,13 @@ def get_dataset_combis_and_metrics_from_files(validation_run, dataset_names):
     if "bulk" in run_dir:
         bulk_prefix += 'bulk_'
 
+    METRICS = {**READER_METRICS}
+
     if validation_run.stability_metrics:
-        METRICS = {**READER_METRICS, **STABILITY_METRICS}
-    else:
-        METRICS = READER_METRICS
+        METRICS = {**METRICS, **STABILITY_METRICS}
+
+    if validation_run.tcol:
+        METRICS = {**METRICS, **TC_METRICS}
 
     # if validation_run
     for root, dirs, files in os.walk(run_dir):
@@ -184,7 +189,7 @@ def get_dataset_combis_and_metrics_from_files(validation_run, dataset_names):
                     ds2 = f"{parsed['id_sat2']}-{parsed['ds_sat2']}"
                     ds_met = f"{parsed['id_met']}-{parsed['ds_met']}"
 
-                    metric = f"{tcol_metric}_for_{ds_met}"
+                    metric = f"{tcol_metric}_{ds_met}"
 
                     if metric not in metrics.keys():
                         metrics[metric] = f"{TC_METRICS[tcol_metric]} for {ds_met}"
@@ -195,35 +200,39 @@ def get_dataset_combis_and_metrics_from_files(validation_run, dataset_names):
                         triples[triple] = pretty_triple
 
         if dataset_names and len(dataset_names) > 1:
-            geotiff_metrics = {}
-            geotiff_var_list = []
+            zarr_metrics = {}
+            zarr_var_list = []
 
             # Initialize dictionary with metric keys
             for metric_key in metrics.keys():
                 if metric_key == "n_obs":
-                    geotiff_metrics[metric_key] = [N_OBS_METRIC]
+                    zarr_metrics[metric_key] = [N_OBS_METRIC]
                 else:
-                    geotiff_metrics[metric_key] = []
+                    zarr_metrics[metric_key] = []
 
-            # Create all combinations where earlier elements are always ds1
-            for i in range(len(dataset_names)):
-                for j in range(i + 1, len(dataset_names)):
-                    ds1 = dataset_names[i]
-                    ds2 = dataset_names[j]
+            # Create all 2-dataset combinations for regular metrics (not n_obs and not TC metrics)
+            for ds1, ds2 in combinations(dataset_names, 2):
+                for metric_key in metrics:
+                    if metric_key != "n_obs" and not any(metric_key.startswith(tcol) for tcol in TC_METRICS.keys()):
+                        formatted_metric = f"{metric_key}{QR_METRIC_TEMPLATE.format(ds1=ds1, ds2=ds2)}"
+                        zarr_metrics[metric_key].append(formatted_metric)
+                        zarr_var_list.append(formatted_metric)
 
-                    # Add formatted metrics to their respective lists
-                    for metric_key in metrics.keys():
-                        if metric_key != "n_obs":
-                            formatted_metric = f"{metric_key}{QR_METRIC_TEMPLATE.format(ds1=ds1, ds2=ds2)}"
-                            geotiff_metrics[metric_key].append(formatted_metric)
-                            geotiff_var_list.append(formatted_metric)
+            # Create all 3-dataset combinations for triple collocation metrics
+            if len(dataset_names) >= 3:
+                for ds1, ds2, ds3 in combinations(dataset_names, 3):
+                    for metric_key in metrics:
+                        if any(metric_key.startswith(tcol) for tcol in TC_METRICS.keys()):
+                            formatted_metric = f"{metric_key}{QR_METRIC_TC_TEMPLATE.format(ds1=ds1, ds2=ds2, ds3=ds3)}"
+                            zarr_metrics[metric_key].append(formatted_metric)
+                            zarr_var_list.append(formatted_metric)
 
             # Add n_obs to the list if it exists
-            if "n_obs" in geotiff_metrics:
-                geotiff_var_list.append(N_OBS_METRIC)
+            if "n_obs" in zarr_metrics:
+                zarr_var_list.append(N_OBS_METRIC)
 
     # Remove duplicates from list while preserving order
-    geotiff_var_list = list(dict.fromkeys(geotiff_var_list))
+    zarr_var_list = list(dict.fromkeys(zarr_var_list))
 
 
     # import logging
@@ -232,7 +241,7 @@ def get_dataset_combis_and_metrics_from_files(validation_run, dataset_names):
     # __logger.debug(f"Triples: {triples}")
     # __logger.debug(f"Metrics: {metrics}")
 
-    return pairs, triples, metrics, ref0_config, geotiff_metrics, geotiff_var_list
+    return pairs, triples, metrics, ref0_config, zarr_metrics, zarr_var_list
 
 
 def get_inspection_table(validation_run):
