@@ -7,9 +7,8 @@
     </label>
   </ng-template>
   
-  <div> 
-    <span>Method:</span>
-    <div class="p-float-label mt-2" >
+  <div class="mt-5"> 
+    <p-floatLabel >
       <p-select id="anomaliesMethodSelector"
                         inputId="anomaliesMethodSelectorId"
                         [options]="availableAnomalyMethodModels"
@@ -19,12 +18,13 @@
                         [style]="{'width': '100%'}"
       >
       </p-select>
-      <label for="anomaliesMethodSelectorId">Select</label>
-    </div>
+      <label for="anomaliesMethodSelectorId">Select method</label>
+    </p-floatLabel>
   </div>
   
   <div>
-    <qa-anom-climatology *ngIf="((selectedMethod$|async).method$|async)===anomaliesClimatology"
-                           [(anomaliesModel)]="anomaliesModel"/>
+    @if (((selectedMethod$|async).method$|async) === anomaliesClimatology) {
+      <qa-anom-climatology [(anomaliesModel)]="anomaliesModel"/>
+    }
   </div>
 </p-panel>
