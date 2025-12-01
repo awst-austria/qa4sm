@@ -1231,7 +1231,7 @@ class TestValidation(TestCase):
         run.spatial_reference_configuration.dataset = Dataset.objects.get(
             short_name=globals.CCICMR)
         run.spatial_reference_configuration.version = DatasetVersion.objects.get(
-            short_name=globals.ESA_CCI_SM_C_V09_MR)
+            short_name=globals.ESA_CCI_SM_C_MR_v09_2)
         run.spatial_reference_configuration.variable = DataVariable.objects.get(
             pretty_name=globals.ESA_CCI_SM_C_sm)
         run.spatial_reference_configuration.filters.add(
@@ -1555,7 +1555,7 @@ class TestValidation(TestCase):
              globals.SMAP_soil_moisture),
             (globals.CCI_RZSM, globals.ESA_CCI_RZSM_V09_2,
              globals.ESA_CCI_RZSM_0_10cm),
-            (globals.CCICMR, globals.ESA_CCI_SM_C_V09_MR,
+            (globals.CCICMR, globals.ESA_CCI_SM_C_MR_v09_2,
              globals.ESA_CCI_SM_C_sm)
         ]
 
