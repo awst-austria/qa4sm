@@ -17,8 +17,10 @@ import { ConfirmDialogModule } from 'primeng/confirmdialog';
    
 import { DialogModule } from 'primeng/dialog';
 import { FieldsetModule } from 'primeng/fieldset';
+import { FloatLabelModule } from 'primeng/floatlabel';
 import { GalleriaModule } from 'primeng/galleria';
 import { ImageModule } from 'primeng/image';
+import { InputGroupModule } from 'primeng/inputgroup';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { InputTextModule } from 'primeng/inputtext';
 import { MenuModule } from 'primeng/menu';
@@ -65,8 +67,10 @@ import { SelectModule } from 'primeng/select';
     DividerModule,
     FontAwesomeModule,
     FieldsetModule,
+    FloatLabelModule, 
     GalleriaModule,
     ImageModule,
+    InputGroupModule,
     InputNumberModule,
     InputTextModule,
     MenubarModule,
@@ -108,9 +112,11 @@ import { SelectModule } from 'primeng/select';
     DialogModule,
     DividerModule,
     FieldsetModule,
+    FloatLabelModule, 
     FontAwesomeModule,
     GalleriaModule,
     ImageModule,
+    InputGroupModule,
     InputNumberModule,
     InputTextModule,
     MenubarModule,

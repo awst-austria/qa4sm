@@ -3,7 +3,7 @@ import {Map, Overlay, View} from 'ol';
 import {Coordinate} from 'ol/coordinate';
 import {Attribution} from 'ol/control';
 import Projection from 'ol/proj/Projection';
-import {get as GetProjection, transform} from 'ol/proj';
+import {get as GetProjection, transform, transformExtent} from 'ol/proj';
 import {Extent} from 'ol/extent';
 import TileLayer from 'ol/layer/Tile';
 import OSM from 'ol/source/OSM';
@@ -218,6 +218,22 @@ export class MapComponent implements AfterViewInit, OnInit {
     this.Map.addOverlay(tooltipOverlay);
 
     this.Map.addOverlay(tooltipOverlay);
+
+    this.Map.once('postrender', () => {
+      // lon/lat extent: [minLon, minLat, maxLon, maxLat] in EPSG:4326
+      const africaToNorthAmericaExtent4326: Extent = [-180, -60, 180, 80];
+      // transform to the map/view projection (EPSG:3857)
+      const africaToNorthAmericaExtent3857 = transformExtent(
+      africaToNorthAmericaExtent4326,
+        'EPSG:4326',
+        this.view.getProjection().getCode()
+      );
+      this.view.fit(africaToNorthAmericaExtent3857, {
+        size: this.Map.getSize(),
+        padding: [20, 20, 20, 20],
+      });
+    });
+    
 
     this.Map.on('pointermove', (evt) =>{
       const feature  = this.Map.forEachFeatureAtPixel(evt.pixel, (feature) => {

@@ -27,6 +27,7 @@ import { AnomaliesModel } from '../../modules/anomalies/components/anomalies/ano
 import {
   ANOMALIES_NONE,
   ANOMALIES_NONE_DESC,
+  ANOMALIES_CLIMATOLOGY,
   AnomaliesComponent
 } from '../../modules/anomalies/components/anomalies/anomalies.component';
 import { ScalingComponent } from '../../modules/scaling/components/scaling/scaling.component';
@@ -858,6 +859,26 @@ export class ValidateComponent implements OnInit, AfterViewInit {
     this.validationModel.referenceConfigurations.scaling =
       this.validationModel.datasetConfigurations.find(datasetConfig => datasetConfig.scalingReference$);
 
+
+    // build anomalies_from / anomalies_to
+    const anomaliesMethod = this.validationModel.anomalies.method$.getValue();
+    let anomaliesFrom: Date = null;
+    let anomaliesTo: Date = null;
+
+    const fromYear = this.validationModel.anomalies.anomaliesFrom();
+    const toYear   = this.validationModel.anomalies.anomaliesTo();
+
+    if (anomaliesMethod === ANOMALIES_CLIMATOLOGY && fromYear && toYear) {
+      // Use UTC-based dates to avoid local→UTC shift
+      anomaliesFrom = new Date(Date.UTC(fromYear, 0, 1, 0, 0, 0));          // 1 Jan, 00:00 UTC
+      anomaliesTo   = new Date(Date.UTC(toYear, 11, 31, 23, 59, 59));       // 31 Dec, 23:59:59 UTC
+    } else {
+      anomaliesFrom = null;
+      anomaliesTo   = null;
+    }
+
+
+
     const newValidation: ValidationRunConfigDto = {
       dataset_configs: datasets,
       interval_from: this.validationModel.validationPeriodModel.intervalFrom$.getValue(),
@@ -868,9 +889,9 @@ export class ValidateComponent implements OnInit, AfterViewInit {
       max_lon: this.validationModel.spatialSubsetModel.maxLon$.getValue(),
       metrics: metricDtos,
       intra_annual_metrics: this.validationModel.intraAnnualMetrics,
-      anomalies_method: this.validationModel.anomalies.method$.getValue(),
-      anomalies_from: new Date(this.validationModel.anomalies.anomaliesFrom(), 0, 1),
-      anomalies_to: new Date(this.validationModel.anomalies.anomaliesTo(), 11, 31),
+      anomalies_method: anomaliesMethod,
+      anomalies_from: anomaliesFrom,
+      anomalies_to: anomaliesTo,
       scaling_method: this.validationModel.scalingMethod.methodName,
       scale_to: '0',
       name_tag: this.validationModel.nameTag$.getValue(),
