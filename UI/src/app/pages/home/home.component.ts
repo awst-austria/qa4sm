@@ -81,14 +81,12 @@ export class HomeComponent implements OnInit {
 
 
   applicationTeamClass = {
-    main: 'application-team flex flex-column flex-wrap h-auto lg:my-6 my-4 row-gap-2',
-    header: 'line-height-2 lg:text-5xl md:text-4xl sm:text-3xl text-2xl my-1 text-center',
-    partner: 'flex flex-row flex-wrap w-12 gap-2 align-items-center justify-content-center',
-    partnerDesc: 'md:w-8 w-12 px-3 text-justify partner-desc gap-1 lg:text-xl md:text-base text-xs fadeInLeft',
+    partner: 'flex flex-row flex-wrap w-12 gap-1 align-items-center justify-content-center',
+    partnerDesc: 'md:w-8 w-12 px-2 text-justify partner-desc gap-1 fadeInLeft',
     partnerLogo: 'md:w-3 w-12 partner-logo align-items-center justify-content-center text-center fadeInRight',
     team: 'flex flex-row flex-wrap gap-2 w-12 align-items-center justify-content-center mb-2',
-    teamDesc: 'md:w-9 w-12 text-justify team-desc md:pl-8 pl-2 lg:text-xl md:text-base text-xs fadeInRight',
-    teamLogo: 'md:w-2 w-12 md:ml-5 ml-3 partner-logo flex align-items-center justify-content-center text-center fadeInLeft'
+    teamDesc: 'md:w-9 w-12 text-justify team-desc md:pl-2 pl-2 fadeInRight',
+    teamLogo: 'md:w-2 w-12 md:ml-2 ml-2 partner-logo flex align-items-center justify-content-center text-center fadeInLeft'
   }
 
   settings$ = this.settingsService.getAllSettings();
