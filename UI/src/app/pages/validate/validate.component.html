@@ -3,12 +3,12 @@
        [ngClass]="{'non-scrollable': isExistingValidationWindowOpen}">
     <div *ngIf="(authService.authenticated|async)===false"
          class="flex flex-column w-12 alert py-2 mb-2 text-center align-content-center justify-content-center">
-      <h5 class="pt-2">
+      <p class="pt-2">
         You are not logged in. You can check validation options, but cannot start a validation.
-        <a (click)="authService.switchLoginModal(true)" class="mt-5 cursor-pointer">Click here</a> or on the Validate
-        buttonto log in or use
+        <a (click)="authService.switchLoginModal(true)" class="mt-5 cursor-pointer">Click here</a>
+        to log in or use
         <a [routerLink]="'/signup'" class="mt-5">this form</a> to register.
-      </h5>
+      </p>
     </div>
 
     <div class="flex flex-column flex-wrap xl:w-8 lg:w-9 w-10 justify-content-center align-content-center">
@@ -61,8 +61,8 @@
                         [ngClass]="{'ml-1-icon': isIncluded(filter.filterDto.id, item.basicFilters)}"
                         [isIncluded]="isIncluded(filter.filterDto.id, item.basicFilters)"
                         [filterModel]="filter"
-                        (excludeMutual)="this.includeFilter($event, item.basicFilters, false)"
-                        (includeMutual)="this.includeFilter($event, item.basicFilters, filter.enabled)"
+                        (excludeMutual)="includeFilter($event, item.basicFilters, false)"
+                        (includeMutual)="includeFilter($event, item.basicFilters, filter.enabled)"
                         (updateMap)="onBasicFilterMapUpdate($event)"
                       />
 
@@ -161,35 +161,34 @@
                 </label>
               </ng-template>
 
-              <!--             spatial reference-->
-              <div class="pt-2 pb-0">
-                <label for="spatial-reference"
-                       class="mb-4"
-                       pTooltip="Choose the spatial reference dataset. If the ISMN dataset belongs to the dataset pool,
-                   it has to be chosen as the spatial reference. Due to technical limitations, we cannot guarantee that
-                   using user data as the spatial reference will always produce results. Therefore, we recommend using one of the datasets provided in the app."
-                       tooltipPosition="bottom">
-                  <span class="pi pi-question-circle"></span>
-                  Spatial reference
-                </label>
-                <qa-validation-reference
-                  id="spatial-reference"
-                  #spatialReference
-                  [validationModel]="validationModel"
-                  [referenceType]="'spatialReference$'"
-                  (hoverOverDataset)="onHoverOverReferenceDataset($event)"/>
+              <!--spatial reference-->
+              <div class="mt-4">           
+                <span><b>Spatial reference</b></span>
+                <span class="pi pi-question-circle ml-2"
+                      pTooltip="Choose the spatial reference dataset. If the ISMN dataset belongs to the dataset pool,
+                      it has to be chosen as the spatial reference. Due to technical limitations, we cannot guarantee that
+                      using user data as the spatial reference will always produce results. Therefore, we recommend using one
+                      of the datasets provided in the app."
+                      tooltipPosition="bottom">
+                </span>
               </div>
+              <qa-validation-reference
+                id="spatial-reference"
+                #spatialReference
+                [validationModel]="validationModel"
+                [referenceType]="'spatialReference$'"
+                (hoverOverDataset)="onHoverOverReferenceDataset($event)"/>
 
-              <hr class="w-11 mt-2" style="opacity: 1.0;">
+              <p-divider styleClass="my-3 opacity-50"></p-divider>
 
-              <!--             temporal reference-->
-              <label for="temporal-reference"
-                     class="mb-4"
-                     pTooltip="Choose the temporal reference dataset. Please note, that we do not recommend selecting ISMN."
+              <!--temporal reference-->
+              <div>           
+                <span><b>Temporal reference</b></span>
+                <span class="pi pi-question-circle ml-2"
+                      pTooltip="Choose the temporal reference dataset. ISMN is not recommended."
                      tooltipPosition="bottom">
-                <span class="pi pi-question-circle"></span>
-                Temporal reference
-              </label>
+                </span>
+              </div>
               <qa-validation-reference
                 id="temporal-reference"
                 #temporalReference
@@ -198,35 +197,35 @@
                 (hoverOverDataset)="onHoverOverReferenceDataset($event)"/>
 
               <!--      Temporal matching-->
-              <label for="temporal-matching"
-                     pTooltip="Select the size of the temporal matching window used to collocate the 'reference' and 'data' measurements in time.
+              <div class="mt-2">           
+                <span><b>Temporal matching window</b></span>
+                <span class="pi pi-question-circle ml-2"
+                      pTooltip="Select the size of the temporal matching window used to collocate the 'reference' and 'data' measurements in time.
                                   The specified temporal window is centered on the reference measurements (i.e., with edges at +- half size distance from each considered measurement point).
                                   NOTE: the size of the window influences the number of observations used in the validation and could lead to no results in case no matches are found."
                      tooltipPosition="bottom">
-                <span class="pi pi-question-circle"></span>
-                Temporal matching window
-              </label>
+                </span>
+              </div>
               <qa-temporal-matching id="temporal-matching"
                                     [temporalMatchingModel]="validationModel.temporalMatchingModel"/>
             </p-panel>
+
             <!--      Scaling-->
             <qa-scaling
               [validationModel]="validationModel"
               (hoverOverDataset)="onHoverOverReferenceDataset($event)"
             />
+         
           </div>
         </div>
 
         <!--      Map-->
         <div class="w-10 p-2">
-          <p-panel toggleable="true" [header]="'Map'" styleClass="map-panel" class="validation-row">
-            <qa-map class="map" #qwerty
-                    [spatialSubset]="validationModel.spatialSubsetModel"
-                    [center]="[10, 52.5]"
-                    [zoom]="2.5"
-                    (noIsmnPoints)="checkIsmnPoints($event)"/>
-          </p-panel>
-
+          <qa-map class="map" #qwerty
+              [spatialSubset]="validationModel.spatialSubsetModel"
+              [center]="[10, 52.5]"
+              [zoom]="2.5"
+              (noIsmnPoints)="checkIsmnPoints($event)"/>
         </div>
 
         <!--      Spatial subsetting-->
@@ -236,20 +235,8 @@
 
         <!--      Temporal subsetting-->
         <div class="w-10 p-2">
-          <p-panel header="Temporal Subsetting" [toggleable]="true" class="validation-row">
-            <ng-template pTemplate="icons">
-              <label class="p-panel-header-icon"
-                   pTooltip="Select validation period and temporal matching window."
-                   tooltipPosition="bottom">
-                <span class="pi pi-question-circle"></span>
-              </label>
-            </ng-template>
-            <!--      Validation period-->
-            <div>
-              <qa-validation-period
+          <qa-validation-period
                 [validationPeriodModel]="validationModel.validationPeriodModel"/>
-            </div>
-          </p-panel>
         </div>
 
         <!--      Metrics-->
@@ -257,15 +244,14 @@
           <qa-metrics [(validationModel)]="validationModel"/>
         </div>
 
-
         <!--      Anomalies-->
         <div class="w-10 p-2">
           <qa-anomalies [anomaliesModel]="validationModel.anomalies"/>
         </div>
 
         <!-- Name -->
-        <div class="w-10 p-2 flex flex-row md:flex-nowrap flex-wrap">
-          <div class="label md:w-3 w-12 md:px-1 px-2 text-center">
+        <div class="w-10 p-2 flex flex-row md:flex-nowrap flex-wrap align-items-center">
+          <div class="md:w-3 w-12 md:px-1 px-2 text-left md:text-right">
             <label for="name">Name your validation:</label>
           </div>
           <input 
@@ -277,14 +263,15 @@
                  [ngModel]="validationModel.nameTag$|async"
                  (ngModelChange)="validationModel.nameTag$.next($event)">
           <div class="w-1">
-           <span
+          <span
              pTooltip="Optional name for this validation (limit: 80 characters)."
-             class="pi pi-question-circle help-field ml-1">
+             class="pi pi-question-circle help-field pl-2">
             </span>
           </div>
         </div>
+
+        <!-- Button -->
         <div class="w-10 p-2">
-          <div>
             <div class="flex flex-row flex-wrap justify-content-center">
               <span
                 pTooltip="{{disableValidateButton(validationModel) ? (validationDisabledMessage|async) : ''}}">
@@ -296,9 +283,9 @@
                   (onClick)="startValidation(true)">
                 </p-button>
               </span>
-            </div>
-          </div>
+            </div> 
         </div>
+
       </div>
 
       <qa-maintenance-mode *ngIf="maintenanceMode" [action]="'start new validations'"></qa-maintenance-mode>

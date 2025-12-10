@@ -1,8 +1,8 @@
 <div class="grid">
   <!-- FROM -->
-  <div class="col-12 md:col-6 mt-5">
+  <div class="col-12 lg:col-6 mt-5">
     <div class="flex align-items-center justify-content-center gap-2">
-      <b>From:</b>
+      <strong>From:</strong>
       <p-floatLabel>
         <p-inputNumber
           id="yearFrom"
@@ -21,11 +21,10 @@
   </div>
 
   <!-- TO -->
-  <div class="col-12 md:col-6 mt-5">
+  <div class="col-12 lg:col-6 mt-5">
     <div class="flex align-items-center justify-content-center gap-2">
-      <b>To:</b>
+      <strong>To:</strong>
       <p-floatLabel>
-        <label for="yearTo">Choose year</label>
         <p-inputNumber
           id="yearTo"
           [useGrouping]="false"
@@ -36,6 +35,7 @@
           [min]="minYear"
           [max]="maxYear">
         </p-inputNumber>
+        <label for="yearTo">Choose year</label>
       </p-floatLabel>
     </div>
   </div>

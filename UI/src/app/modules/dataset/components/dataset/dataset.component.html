@@ -1,6 +1,6 @@
 <div class="grid align-content-center">
-  <div class="col">
-    <span class="p-float-label mb-4 mt-3">
+  <div class="col" style="max-width: 100%">
+    <p-floatLabel class="mb-4 mt-3">
       <p-select 
         [inputId]="datasetSelectorId" 
         (onChange)="updateSelectableVersionsAndVariableAndEmmit()" 
@@ -26,13 +26,13 @@
           </ng-template>
       </p-select>
       <label for="{{datasetSelectorId}}">Dataset name</label>
-    </span>
+    </p-floatLabel>
   </div>
 </div>
 
 <div class="grid  align-content-center">
-  <div class="col" style="width: 100%;">
-    <span class="p-float-label mb-4" *ngIf="(selectableDatasetVersions$|async) as selectedVersions">
+  <div class="col" style="max-width: 100%">
+    <p-floatLabel class="mb-4" *ngIf="(selectableDatasetVersions$|async) as selectedVersions">
       <p-select [inputId]="versionSelectorId"
                   [style]="{'width': '100%'}"
                   [options]="selectedVersions"
@@ -52,13 +52,13 @@
         </ng-template>
       </p-select>
       <label for="{{versionSelectorId}}">Dataset version <span *ngIf="newerVersionExists" class='warning-text'> (newer version available!) </span></label>
-    </span>
+    </p-floatLabel>
   </div>
 </div>
 
 <div class="grid  align-content-center">
-  <div class="col">
-    <span class="p-float-label">
+  <div class="col" style="max-width: 100%">
+    <p-floatLabel>
       <p-select [inputId]="variableSelectorId" optionLabel="short_name" [style]="{'width': '100%'}"
                   [options]="(selectableDatasetVariables$|async)"
                   [(ngModel)]="selectionModel.selectedVariable">
@@ -72,7 +72,7 @@
         </ng-template>
       </p-select>
       <label for="{{variableSelectorId}}">Variable [units]</label> 
-    </span>
+    </p-floatLabel>
   </div>
 </div>
 
