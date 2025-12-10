@@ -38,7 +38,7 @@
 
 /* Fluid logo size; the container controls width */
 .hero-brand {
-  inline-size: clamp(160px, 28vw, 340px); /* 160–340px based on viewport */
+  inline-size: clamp(240px, 28vw, 340px); /* 160–340px based on viewport */
   margin-inline: auto;
   margin-bottom: 0.75rem;
 }
@@ -52,7 +52,7 @@
 
 /* Heading is purely text; fluid and balanced */
 .hero-title {
-  font-size: clamp(28px, 3.5vw + 12px, 90px);
+  font-size: clamp(26px, 2.8vw + 10px, 60px);
   line-height: 1.15;
   font-weight: 400;
   margin: 0 0 1.25rem;
@@ -104,29 +104,29 @@
 
 
 /* --- HOME CONTAINER --- */
-.NewsContainer {
+.containerDark {
   background-color: #001C21;
   color: $font-color-white;
   width: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: flex-start;
   padding: clamp(1rem, 2vw, 4rem) 1rem;
   box-sizing: border-box;
   overflow-x: hidden;
 }
 
-/* about*/
-.about {
+.containerLight {
   width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   padding: clamp(1rem, 2vw, 4rem) 1rem;
 }
 
-.about__container {
+.container-text{
   max-width: 1100px;
-  margin: 0 auto;
-}
+  line-height: 1.5;}
 
 .text-highlighted {
   color: $highlight-color;

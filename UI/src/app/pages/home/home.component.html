@@ -14,14 +14,13 @@
           </h1>
 
           <div class="hero-actions">
-            <ng-container *ngIf="userLoggedIn$ | async; else loggedOut">
+            @if (userLoggedIn$ | async) {
               <a pButton label="See Results" routerLink="/published-validations" class="btn-action-home" role="button"></a>
-              <a pButton label="Try It"        routerLink="/validate"               class="btn-action-home" role="button"></a>
-            </ng-container>
-            <ng-template #loggedOut>
+              <a pButton label="Try It"      routerLink="/validate"              class="btn-action-home" role="button"></a>
+            } @else {
               <a pButton label="See Results" routerLink="/published-validations" class="btn-action-home" role="button"></a>
               <a pButton label="Sign Up"     routerLink="/signup"                class="btn-action-home" role="button"></a>
-            </ng-template>
+            }
           </div>
         </div>
 
@@ -38,19 +37,24 @@
     </div>
   </section>
 
-  <section class="NewsContainer">
-    <!-- News Section -->
-    <div *ngIf="settings$|async as settings"
-         id="qa4smNews"
-         [ngClass]="qa4smNewsClass.main">
-      <h1>What's new</h1>
-      <div [innerHTML]=settings[0].news></div>
+  <!-- News Section -->
+  <section class="containerDark">
+    <div class="container-text">
+    
+      @if (settings$ | async; as settings) {
+        <div class="container-text"
+          id="qa4smNews"
+          [ngClass]="qa4smNewsClass.main">
+          <h1 class="text-center">What's new</h1>
+          <div [innerHTML]="settings[0].news"></div>
+        </div>
+      }
     </div>
   </section>
 
   <!-- about-->
-  <section class="about" aria-labelledby="about-title">
-    <div class="about__container">
+  <section class="containerLight" aria-labelledby="about-title">
+    <div class="container-text">
     <!-- Intro -->
         <h1 class="text-center">Soil moisture validation service</h1>
         <h3>Validate satellite soil moisture data against in-situ observations and model references.</h3>
@@ -126,14 +130,16 @@
     </div>
   </section>
 
-  <section class="NewsContainer">
-    <!-- Application videos -->
-    <h1 class="text-center"> Step-by-step video tutorials</h1>
-    <p class="about__lead">
-      Explore a series of short <span class="text-highlighted">hands-on tutorials</span> that guide you through every part of the QA4SM platform — 
-      from setting up your first validation to interpreting results and publishing them.  
-      Learn how to <span class="text-highlighted">upload custom data, compare satellite data,</span> and make the most of QA4SM’s validation tools.
-    </p>
+  <section class="containerDark">
+    <div class="container-text">
+      <!-- Application videos -->
+      <h1 class="text-center"> Step-by-step video tutorials</h1>
+      <p class="about__lead">
+        Explore a series of short <span class="text-highlighted">hands-on tutorials</span> that guide you through every part of the QA4SM platform — 
+        from setting up your first validation to interpreting results and publishing them.  
+        Learn how to <span class="text-highlighted">upload custom data, compare satellite data,</span> and make the most of QA4SM’s validation tools.
+      </p>
+    </div>
     <div class="application-videos">
       <p-carousel
           [value]="videos"
@@ -163,12 +169,13 @@
     </div>
   </section>
 
-    <!-- Team -->
-  <section class="about" aria-labelledby="about-title">
-
-
-    <div [ngClass]="applicationTeamClass.main">
-        <h1 [ngClass]="applicationTeamClass.header"> Project Team and Partners </h1>
+  <!-- Team -->
+  <section class="containerLight">
+    <div class="container-text">
+      
+      <h1 class="text-center"> Project Team and Partners</h1>
+      <div class="flex flex-column flex-wrap">
+        
         <!--        FFG -->
         <div [ngClass]="applicationTeamClass.partner">
           <div [ngClass]="applicationTeamClass.partnerDesc">
@@ -202,8 +209,7 @@
             </a>
           </div>
         </div>
-
-        <div class="horizontal-line my-2"></div>
+        <div class="horizontal-line my-1"></div>
         <!--        TU -->
         <div [ngClass]="applicationTeamClass.team">
           <div [ngClass]="applicationTeamClass.teamLogo">
@@ -221,7 +227,6 @@
             <b>Tasks:</b> Scientific lead and research, dataset support
           </div>
         </div>
-
 
         <!--      AWST-->
         <div [ngClass]="applicationTeamClass.team">
@@ -250,17 +255,24 @@
             <a href="https://www.cesbio.cnrs.fr/homepage/" target="_blank">CESBIO</a>
           </div>
         </div>
-    </div>
+      </div>
 
-    <!-- Feedback -->
-    <div *ngIf="settings$|async as settings" id="qa4sm-opinion">
-      <h1 class="text-center">Share with us your opinion</h1>
-      <p>
-        If you think we could improve something or you see a missing functionality, please let us know using
-        this <b> <a target="_blank" [href]="settings[0].feed_link">feedback form</a> </b>.
-      </p>
     </div>
+  </section>
 
+  <!-- Feedback -->
+  <section class="containerLight">
+    <div class="container-text">
+      @if (settings$ | async; as settings) {
+        <div id="qa4sm-opinion">
+          <h1 class="text-center">Share with us your opinion</h1>
+          <p class="text-center">
+            If you think we could improve something or you see a missing functionality, please let us know using
+            this <a target="_blank" [href]="settings[0].feed_link">feedback form</a>.
+          </p>
+        </div>
+      }  
+    </div>
   </section>
 
   <p-scrollTop styleClass="scroll-button"></p-scrollTop>
