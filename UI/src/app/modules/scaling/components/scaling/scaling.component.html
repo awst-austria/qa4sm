@@ -6,13 +6,10 @@
       <span class="pi pi-question-circle"></span>
     </label>
   </ng-template>
-  <div class="grid pt-2">
+  <div class="grid pt-5">
     <div style="width: 100%">
-      <div class="col-12">
-        <label for="scalingMethod">Method: </label>
-      </div>
       <div class="col-12" id="scalingMethod">
-        <div class="p-float-label">
+        <p-floatLabel>
           <p-select inputId="scalingMethodSelector"
                       (onChange)="updateScalingMethod()"
                       [options]="scalingMethods"
@@ -20,15 +17,12 @@
                       (ngModelChange)="selectedScalingMethod$.next($event)"
                       optionLabel="description" [style]="{'width': '100%'}"></p-select>
           <label for="scalingMethodSelector">Select scaling method</label>
-        </div>
+        </p-floatLabel>
       </div>
     </div>
     <div style="width: 100%" *ngIf="(selectedScalingMethod$|async)?.method !== 'none'">
-      <div class="col-12">
-        <label for="scalingTo">Scale to: </label>
-      </div>
-      <div class="col-12 pt-3" id="scalingTo">
-        <div class="p-float-label">
+      <div class="col-12 pt-5" id="scalingTo">
+        <p-floatLabel>
           <p-select inputId="scalingReferenceSelector"
                       (onChange)="updateScaleTo(true)"
                       [options]="validationModel.datasetConfigurations"
@@ -52,7 +46,7 @@
             </ng-template>
           </p-select>
           <label for="scalingReferenceSelector">Select scaling reference</label>
-        </div>
+        </p-floatLabel>
       </div>
     </div>
   </div>
