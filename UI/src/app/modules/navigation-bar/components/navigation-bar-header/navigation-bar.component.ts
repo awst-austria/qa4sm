@@ -6,6 +6,7 @@ import {ToastService} from '../../../core/services/toast/toast.service';
 import {SettingsService} from '../../../core/services/global/settings.service';
 import {LoginComponent} from 'src/app/modules/user/login/login.component';
 
+
 @Component({
     selector: 'qa-navigation-bar-header',
     templateUrl: './navigation-bar.component.html',
@@ -13,6 +14,7 @@ import {LoginComponent} from 'src/app/modules/user/login/login.component';
     standalone: false
 })
 export class NavigationBarComponent implements OnInit {
+
   isMaintenancePossible = false;
   potentialMaintenanceDescription = '';
 
@@ -115,32 +117,21 @@ export class NavigationBarComponent implements OnInit {
   };
 
   isAuthenticated: boolean;
-  isHomePage = signal<boolean | undefined>(undefined)
-  isLogoDisplayed = signal<boolean>(true)
 
   Logo = {path:  '/static/images/logo/qa4sm_logo_long.webp', height: '45', shape: 'rectangle'}
-
-  minWindowWidthFullLogo = 1583;
-  maxWindowWidthForSquareLogo = 960;
-  noLogoWindowWidth = 660;
 
   showLoginModal = false;
   @ViewChild(LoginComponent) loginComponent: LoginComponent;
 
-
-  constructor(private authService: AuthService,
-              private router: Router,
-              private toastService: ToastService,
-              private settingsService: SettingsService) {
-
-    this.router.events.subscribe((event: Event) => {
-      if (event instanceof NavigationEnd) {
-        this.isHomePage.set(event.url.includes('/home'))
-      }
-    });
+   constructor(
+    private authService: AuthService,
+    public router: Router,
+    private toastService: ToastService,
+    private settingsService: SettingsService
+  ) {
 
     this.authService.showLoginModal$.subscribe(
-      (state: {show: boolean, message?: string}) => this.showLoginModal = state.show
+      (state: { show: boolean; message?: string }) => (this.showLoginModal = state.show)
     );
   }
 
@@ -207,10 +198,4 @@ export class NavigationBarComponent implements OnInit {
   }
 
   protected readonly window = window;
-}
-
-interface Logo {
-  path: string | undefined,
-  height: string | undefined,
-  shape: 'square' | 'rectangle' | undefined
 }

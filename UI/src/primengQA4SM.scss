@@ -5,16 +5,35 @@
 * { box-sizing: border-box;}
 
 
-
 // here we will overwrite default Aura thema with custom primengQA4SM
 @layer primengQA4SM {
+  .nav-menu.p-menubar {
+    background: transparent;
+    border: 0;
+    box-shadow: none;
+    width: 100%;
+  }
+
+  .nav-menu:not(.p-menubar-mobile) .p-menubar-root-list {
+    margin: 0 auto;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    gap: .25rem;
+  }
+
+  .nav-menu-home {
+    padding-top: 1.5rem;
+
+  }
+
   // general p-panel styling
   .p-panel-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: .75rem .75rem;
-    margin-bottom: .75rem;
+    padding: 10px 10px;
+    margin-bottom: 20px;
     border: 3px solid $base-color;
     border-top-left-radius: 4px;
     border-top-right-radius: 4px;
@@ -73,26 +92,5 @@
   .p-button.btn-action-large {
     color: #fff !important; 
   }
-
-
-
-
-  //p-select dropdown list styling
-  .p-float-label > label {
-    font-size: 0.875rem;     // 14px
-    color: $font-color-muted;
-    letter-spacing: 0.3px;
-  }
-  /* when the control is focused or has a value, PrimeNG adds these states */
-  .p-float-label .p-inputwrapper-focus ~ label,
-  .p-float-label .p-inputwrapper-filled ~ label,
-  .p-float-label .p-dropdown.p-focus ~ label,
-  .p-float-label .p-dropdown.p-inputwrapper-filled ~ label {
-    font-size: 0.75rem;      // 12px when floated
-    color: $font-color-muted;
-    opacity: 0.9;            
-  }
-
-
 
 }
