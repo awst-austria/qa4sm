@@ -1,26 +1,31 @@
-<header class="navbar" [class.header-dark]="isHomePage()">
+<header class="navbar"
+        [class.header-home]="router.url === '/home'">
   <!-- Row 1: logo only -->
-  <div class="nav-top" *ngIf="isLogoDisplayed()">
-    <a routerLink="/home" class="brand" aria-label="QA4SM Home">
-      <img
-        class="brand-logo"
-        [src]="Logo.path!"
-        alt="QA4SM logo" />
-    </a>
-    <span class="brand-title">Quality Assurance for Soil Moisture</span>
-  </div>
+  @if (!router.url.startsWith('/home'))  {
+    <div class="nav-top">
+      <a routerLink="/home" class="brand" aria-label="QA4SM Home">
+        <img
+          class="brand-logo"
+          [src]="Logo.path!"
+          alt="QA4SM logo" />
+      </a>
+      <span class="brand-title">Quality Assurance for Soil Moisture</span>
+    </div>
+  }
 
   <!-- Row 2: centered menu -->
   <p-menubar
     [model]="items"
     autoDisplay="false"
-    styleClass="nav-menu">
+    [ngClass]="['nav-menu', router.url.startsWith('/home') ? 'nav-menu-home' : '']">
   </p-menubar>
 </header>
 
+
 <qa-login (loggedIn)="onLoginSuccess()"></qa-login>
 
-<div *ngIf="isMaintenancePossible"
-     class="flex flex-column w-12 alert py-2 text-center align-content-center justify-content-center">
-  <h5 class="pt-2">{{ potentialMaintenanceDescription }}</h5>
-</div>
+@if (isMaintenancePossible) {
+  <div class="flex flex-column w-12 alert py-2 text-center align-content-center justify-content-center">
+    <h4 class="pt-2">{{ potentialMaintenanceDescription }}</h4>
+  </div>
+}

@@ -27,9 +27,26 @@ a:hover {
   color: $highlight-color;
 }
 
+
+.p-menubar.nav-menu.nav-menu-home,
+.p-menubar.nav-menu.nav-menu-home * {
+  color: $highlight-color !important;
+}
+
+/* And keep the token overrides too, to match Aura theme API */
+.p-menubar.nav-menu.nav-menu-home {
+  --p-menubar-item-color: $highlight-color !important;
+  --p-menubar-item-icon-color: $highlight-color !important;
+  --p-menubar-item-focus-color: $highlight-color !important;
+  --p-menubar-item-active-color: $highlight-color !important;
+  --p-menubar-item-icon-focus-color: $highlight-color !important;
+  --p-menubar-item-icon-active-color: $highlight-color !important;
+}
+
+
 h1, h2, h3, h4, h5, h6 {
-  margin-top: 1;
-  margin-bottom: 1rem;
+  margin-top: 0.5rem;
+  margin-bottom: 0.5rem;
 }
 
 h1, h2, h3, h4, h5, h6,
@@ -181,4 +198,26 @@ code {
   animation-iteration-count: infinite;
 }
 
+@media screen and (max-width: 960px) {
 
+  .nav-menu.p-menubar.p-menubar-mobile {
+    position: relative;
+  }
+  .nav-menu.p-menubar.p-menubar-mobile .p-menubar-button {
+    position: absolute;
+    right: 1rem;
+    top: -2.5rem;
+    z-index: 20;
+  }
+
+  .nav-menu-home.p-menubar.p-menubar-mobile .p-menubar-button {
+    position: absolute;
+    right: 1rem;
+    top: 1rem;
+    z-index: 20;
+  }
+
+  .nav-menu.p-menubar.p-menubar-mobile .p-menubar-root-list {
+    margin-top: 1rem;
+  }
+}
