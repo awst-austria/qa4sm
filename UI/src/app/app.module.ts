@@ -32,7 +32,6 @@ import {InputTextModule} from 'primeng/inputtext';
 import {FilterModule} from './modules/filter/filter.module';
 import {ToastModule} from 'primeng/toast';
 import {MessageService} from 'primeng/api';
-import {PublishedValidationsComponent} from './pages/published-validations/published-validations.component';
 import {ValidationResultModule} from './modules/validation-result/validation-result.module';
 import {SpatialSubsetModule} from './modules/spatial-subset/spatial-subset.module';
 import {CarouselModule} from 'primeng/carousel';
@@ -74,6 +73,7 @@ import {MaintenanceModeComponent} from "./modules/core/maintenance-mode/maintena
 import { SharedPrimeNgModule } from './shared.primeNg.module';
 import { providePrimeNG } from 'primeng/config';
 import Aura from '@primeuix/themes/aura';
+import { MyValidationsComponent } from './modules/validation-result/components/my-validations/my-validations.component';
 
 @NgModule({ declarations: [
         AppComponent,
@@ -83,7 +83,6 @@ import Aura from '@primeuix/themes/aura';
         ValidationsComponent,
         ValidationResultComponent,
         UserProfileComponent,
-        PublishedValidationsComponent,
         ComparisonComponent,
         SignupComponent,
         SignupCompleteComponent,
@@ -139,7 +138,8 @@ import Aura from '@primeuix/themes/aura';
         ContactModule,
         SelectButtonModule, 
         SharedPrimeNgModule,
-        MaintenanceModeComponent], 
+        MaintenanceModeComponent,
+        MyValidationsComponent], 
         
         providers: [
         {

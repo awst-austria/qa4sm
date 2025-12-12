@@ -1,0 +1,36 @@
+@use 'src/style.variables' as *;
+
+:host ::ng-deep .qa-validations-table table {
+  table-layout: fixed;
+  width: 100%;
+}
+
+.name-cell {
+  white-space: normal;        
+  word-break: break-word;     
+  overflow-wrap: anywhere;    
+  line-height: 1.3;
+  font-size: 0.85rem;
+  font-weight: 800;
+}
+
+.doi-cell {
+  white-space: normal;        
+  word-break: break-word;     
+  overflow-wrap: anywhere;    
+  line-height: 1.3;
+}
+
+.dataset-line {
+  line-height: 1.3;
+  font-size: 0.85rem;
+}
+
+.dataset-line + .dataset-line {
+  margin-top: 0.25rem;
+}
+
+.muted {
+  color: $font-color-muted;
+  font-size: 0.7rem;
+}

@@ -1,0 +1,129 @@
+<main class="flex flex-column mb-5 xl:w-11 w-11 align-content-center justify-content-center">
+  <div class="flex flex-column w-12 align-content-center justify-content-center">
+
+    <div class="text-center w-12">
+      <h1>My validations</h1>
+    </div>
+
+    <p>Loaded validations: {{ validations?.length || 0 }}</p>
+
+    <p *ngIf="!validations?.length" class="lead text-muted">
+      You have not started any validations yet. Visit the
+      <a routerLink="/validate">validation page</a>
+      to start your own validation run.
+    </p>
+
+    <div *ngIf="validations?.length">
+
+      <!-- панель действий -->
+      <div class="flex justify-content-between align-items-center mb-2">
+        <div>
+          <span class="text-lg font-semibold">My validations</span>
+          <span class="ml-3 text-sm text-muted">
+            Selected: {{ selectedValidations.length }}
+          </span>
+        </div>
+
+        <div>
+          <button
+            pButton
+            type="button"
+            label="Delete selected"
+            icon="pi pi-trash"
+            class="p-button-sm p-button-danger"
+            [disabled]="!selectedValidations.length"
+            (click)="deleteSelectedValidations()">
+          </button>
+        </div>
+      </div>
+
+      <p-table 
+        [value]="validations"
+        dataKey="id"
+        [(selection)]="selectedValidations"
+        selectionMode="multiple"
+        sortMode="single"  
+        [sortField]="'start_time'"  
+        [sortOrder]="-1" 
+        [paginator]="true"
+        [rows]="20" 
+        [styleClass]="'p-datatable-sm p-datatable-striped qa-validations-table'">
+
+        <ng-template pTemplate="header">
+          <tr>
+            <th style="width: 3rem">
+              <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
+            </th>
+            <th pSortableColumn="start_time">
+              Date
+              <p-sortIcon field="start_time"></p-sortIcon>
+            </th>
+            <th pSortableColumn="name_tag">
+              Name
+              <p-sortIcon field="name_tag"></p-sortIcon>
+            </th>
+            <th pSortableColumn="temporalReference">
+              Temporal ref
+              <p-sortIcon field="temporalReference"></p-sortIcon>
+            </th>
+            <th pSortableColumn="spatialReference">
+              Spatial ref
+              <p-sortIcon field="spatialReference"></p-sortIcon>
+            </th>
+            <th>
+              Status
+            </th>
+            <th>
+              Details
+            </th>
+          </tr>
+        </ng-template>
+
+        <ng-template pTemplate="body" let-rowData>
+          <tr [pSelectableRow]="rowData">
+            <td>
+              <p-tableCheckbox [value]="rowData"></p-tableCheckbox>
+            </td>
+            <td>
+              {{ rowData.start_time | date:'yyyy-MM-dd HH:mm':'UTC' }}
+            </td>
+            <td>
+              {{ rowData.name_tag || '(no name)' }}
+            </td>
+            <td>
+              <div class="ref-cell">
+                <div>{{ rowData.temporalReference }}</div>
+                <div *ngIf="rowData.temporalVersion" class="ref-version">
+                  {{ rowData.temporalVersion }}
+                </div>
+              </div>
+            </td>
+            <td>
+              <div class="ref-cell">
+                <div>{{ rowData.spatialReference }}</div>
+                <div *ngIf="rowData.spatialVersion" class="ref-version">
+                  v{{ rowData.spatialVersion }}
+                </div>
+              </div>
+            </td>
+            <td>
+              {{ getStatusFromProgress(rowData) }}
+            </td>
+            <td>
+              <a [routerLink]="['/validation-result', rowData.id]">
+                See details
+              </a>
+            </td>
+          </tr>
+        </ng-template>
+
+      </p-table>
+    </div>
+
+    <div *ngIf="isLoading" class="loading-vals-box">
+      <span class="pi pi-spinner pi-spin mr-2" style="font-size: 2rem"></span>
+      <em style="font-size: 1.5rem">Loading...</em>
+    </div>
+
+  </div>
+</main>

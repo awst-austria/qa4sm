@@ -77,7 +77,7 @@ def filter_validations(query_params, validations):
     filters = get_filters(query_params)
     if filters:
         print('given filters', filters)
-        return validations.filter(**filters)
+        return validations.filter(**filters).distinct()
     return validations
 
 
@@ -99,7 +99,7 @@ def published_results(request):
 
     # both limit and offset are send as string, so the simple if limit and offset condition can be used,
     # if they were sent as numbers there would be a problem because they both can be 0
-    if limit and offset:
+    if limit is not None and offset is not None:
         limit = int(limit)
         offset = int(offset)
         serializer = ValidationRunSerializer(val_runs[offset:(offset + limit)], many=True)

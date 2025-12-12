@@ -27,6 +27,7 @@ import {ContactUsComponent} from './pages/contact-us/contact-us.component';
 import { PublicApiComponent } from './pages/public-api/public-api.component';
 import { JsonConfigComponent } from './pages/public-api/json-config/json-config.component';
 import { CustomisePlotsComponent } from './pages/customise-plots/customise-plots.component';
+import { MyValidationsComponent } from './modules/validation-result/components/my-validations/my-validations.component';
 
 export const routes: Routes = [
   {path: '', redirectTo: '/home', pathMatch: 'full'},
