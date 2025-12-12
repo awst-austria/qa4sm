@@ -40,10 +40,6 @@ def get_data_point(request, validation_id, metric_name, layer_name):
                           x, y, z, projection)
 
 
-
-
-
-
 # API endpoints
 
 
@@ -55,8 +51,7 @@ def get_layer_bounds(request, validation_id):
     bounds_cache_key = f"bounds_{validation_id}"
     bounds_data = cache.get(bounds_cache_key)
     
-    #if not bounds_data:
-    if True:
+    if not bounds_data:
         try:
             zarr_path = get_cached_zarr_path(validation_id)
             
@@ -177,11 +172,26 @@ def get_layer_range(request, validation_id, metric_name, layer_name):
 @require_http_methods(["POST"])
 def get_validation_layer_metadata(request, validation_id):
     """Fetch metadata including layer mappings, gradients, and status legends (NO vmin/vmax)"""
+    import numpy as np
+
+    def convert_numpy(obj):
+        """Recursively convert numpy types to native Python types"""
+        if isinstance(obj, np.ndarray):
+            return obj.tolist()
+        elif isinstance(obj, np.integer):
+            return int(obj)
+        elif isinstance(obj, np.floating):
+            return float(obj)
+        elif isinstance(obj, dict):
+            return {key: convert_numpy(value) for key, value in obj.items()}
+        elif isinstance(obj, (list, tuple)):
+            return [convert_numpy(item) for item in obj]
+        return obj
+
     cache_key = f"layer_metadata_{validation_id}"
     metadata = cache.get(cache_key)
 
-    #if not metadata:
-    if True:
+    if not metadata:
         data = json.loads(request.body)
         possible_layers = data.get('possible_layers', {})
 
@@ -219,7 +229,12 @@ def get_validation_layer_metadata(request, validation_id):
 
         cache.set(cache_key, metadata, timeout=3600)
 
+    # Convert numpy arrays to native Python types
+    metadata = convert_numpy(metadata)
+
     return JsonResponse(metadata)
+
+
 
 
 

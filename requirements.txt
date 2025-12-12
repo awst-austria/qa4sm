@@ -81,10 +81,9 @@ pytest-django==4.10.0
 python-dateutil==2.9.0.post0
 pytz==2024.1
 pyyaml==6.0.2
-#git+https://github.com/daberer/qa4sm-reader.git@02541722f09a2a13791adac7a3512cd5f58a716f #qa4sm-reader change back to correct reader v. 0.6.4
-git+https://github.com/daberer/pygeogrids.git@1c2735bed77198b7d1155984bc94336230eaf171 #pygeogrids change back to correct pygeogrids and order alphabetically
 qa4sm-preprocessing==0.6.1
-qa4sm-reader==0.12.1
+#qa4sm-reader==0.12.1
+git+https://github.com/daberer/qa4sm-reader.git@interactive-maps-test #qa4sm-reader change back to correct reader
 redis==5.2.0
 requests==2.32.4
 scipy==1.15.1
@@ -108,7 +107,7 @@ urllib3==2.5.0
 wheel==0.45.1
 xarray==2025.1.2
 xyzservices==2025.1.0
-zarr==3.0.2
+zarr==3.0.7
 zict==3.0.0
 zipp==3.21.0
 zstandard==0.23.0

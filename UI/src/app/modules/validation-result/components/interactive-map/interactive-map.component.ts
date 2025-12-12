@@ -1,35 +1,33 @@
 // interactive-map.component.ts
-import { Component, input, OnInit, Input, inject, AfterViewInit, ChangeDetectorRef, OnDestroy, ViewChild, ElementRef } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { Component, input, Input, inject, AfterViewInit, ChangeDetectorRef, OnDestroy, ViewChild, ElementRef, HostListener } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { DropdownModule } from 'primeng/dropdown';
-import { ButtonModule } from 'primeng/button';
 import { MapModule } from '../../../map/map.module';
 import { Map, View, MapBrowserEvent } from 'ol';
 import TileLayer from 'ol/layer/Tile';
 import TileGrid from 'ol/tilegrid/TileGrid';
-import { XYZ, Cluster, TileWMS } from 'ol/source';
+import { XYZ, TileWMS } from 'ol/source';
 import VectorSource from 'ol/source/Vector';
 import { transformExtent } from 'ol/proj'
 import { FullScreen, Control } from 'ol/control';
-import { Extent } from 'ol/extent';
+import { SharedPrimeNgModule } from '../../../../shared.primeNg.module';
 import { WebsiteGraphicsService } from '../../../core/services/global/website-graphics.service';
 import { TiffLayer } from './interfaces/layer.interfaces';
 import { ValidationrunDto } from '../../../core/services/validation-run/validationrun.dto';
 import { MetricsPlotsDto } from '../../../core/services/validation-run/metrics-plots.dto';
 import { LegendControl } from './legend-control/legend-control';
 import { ValidationrunService } from '../../../core/services/validation-run/validationrun.service';
-import { OverlayPanel, OverlayPanelModule } from 'primeng/overlaypanel';
-import { DialogModule } from 'primeng/dialog';
-import { ProgressSpinnerModule } from 'primeng/progressspinner';
+import { Popover } from 'primeng/popover';
 
 
 @Component({
   selector: 'qa-interactive-map',
   standalone: true,
-  imports: [MapModule, CommonModule, FormsModule, DropdownModule, ButtonModule, OverlayPanelModule, DialogModule, ProgressSpinnerModule],
+  imports: [
+    MapModule,
+    SharedPrimeNgModule,
+    Popover
+  ],
   templateUrl: './interactive-map.component.html',
   styleUrls: ['./interactive-map.component.scss']
 })
@@ -40,7 +38,7 @@ export class InteractiveMapComponent implements AfterViewInit, OnDestroy {
   @ViewChild('snapshotButtonContainer') snapshotButtonContainer!: ElementRef;
   @ViewChild('projectionToggleContainer') projectionToggleContainer!: ElementRef;
   @ViewChild('mapContainer', { static: false }) mapContainer!: ElementRef;
-  @ViewChild('pointPopup') pointPopup!: OverlayPanel;
+
   Object = Object;
   private httpClient = inject(HttpClient);
   validationId = input('');
@@ -71,12 +69,12 @@ export class InteractiveMapComponent implements AfterViewInit, OnDestroy {
   isFullscreen: boolean = false;
   clickedPointData: any = null;
   isLoadingPointData = false;
+  pointPopupVisible = false;
   // Point query state
   selectedPointValue: string | null = null;
   selectedPointCoords: { lat: number; lon: number } | null = null;
-  showPointDialog: boolean = false;
   pointQueryLoading: boolean = false;
-  selectedVariable: string | null = null; // Add if not present
+  snapshotTitle: string = 'Snapshot';
 
 
 
@@ -88,7 +86,6 @@ export class InteractiveMapComponent implements AfterViewInit, OnDestroy {
     // now the template exists, safe to build OpenLayers Map
     this.initMap();
     this.loadInitialMetric();
-
     this.addAngularControlsToMap();
     document.addEventListener('fullscreenchange', () => {
       this.isFullscreen = document.fullscreenElement !== null;
@@ -349,8 +346,16 @@ export class InteractiveMapComponent implements AfterViewInit, OnDestroy {
         }
 
         this.snapshotImageSrc = mapCanvas.toDataURL('image/png');
-        this.showSnapshotModal = true;
 
+
+        if (this.currentLayerKey) {
+          this.snapshotTitle = this.currentLayerKey.replace(/:/g, '');
+        } else if (this.selectedMetric?.metric_pretty_name) {
+          this.snapshotTitle = this.selectedMetric.metric_pretty_name;
+        } else {
+          this.snapshotTitle = 'Snapshot';
+        }
+        this.showSnapshotModal = true;
         // Force Angular change detection
         this.cdr.detectChanges();
 
@@ -537,16 +542,9 @@ export class InteractiveMapComponent implements AfterViewInit, OnDestroy {
     if (!this.snapshotImageSrc) return;
 
     const link = document.createElement('a');
-    let filename = 'map-snapshot';
+    const filename = this.snapshotTitle.replace(/[^a-z0-9]/gi, '-').toLowerCase() || 'map-snapshot';
 
-    // Try to use current metric name in filename
-    if (this.selectedMetric?.metric_pretty_name) {
-      filename = this.selectedMetric.metric_pretty_name
-        .replace(/[^a-z0-9]/gi, '-')
-        .toLowerCase();
-    }
-
-    link.download = `${filename}-${new Date().toISOString().slice(0, 19).replace(/:/g, '-')}.png`;
+    link.download = `${filename}.png`;
     link.href = this.snapshotImageSrc;
     link.click();
   }
@@ -1038,6 +1036,8 @@ export class InteractiveMapComponent implements AfterViewInit, OnDestroy {
   onMapClick(event: MapBrowserEvent<any>) {
     if (!this.currentLayer) return;
 
+    // Hide existing popover first (if open)
+    this.pointPopupVisible = false;
     const coordinate = event.coordinate;
     const [x, y] = coordinate;
     const z = this.Map.getView().getZoom();
@@ -1048,7 +1048,6 @@ export class InteractiveMapComponent implements AfterViewInit, OnDestroy {
     if (!validationIdValue) return;
 
     // Reset all dialog state
-    this.showPointDialog = true;
     this.pointQueryLoading = true;
     this.selectedPointValue = null;
     this.selectedPointCoords = null;
@@ -1096,7 +1095,7 @@ export class InteractiveMapComponent implements AfterViewInit, OnDestroy {
           this.pointErrorMessage = 'No data returned from query';
           console.warn('No data returned from point query');
         }
-
+        this.pointPopupVisible = true;
         this.cdr.detectChanges();
       },
       error: (err) => {
@@ -1116,6 +1115,7 @@ export class InteractiveMapComponent implements AfterViewInit, OnDestroy {
         }
 
         console.error('Error fetching point value:', err);
+        this.pointPopupVisible = true;
         this.cdr.detectChanges();
       }
     });
@@ -1154,7 +1154,7 @@ export class InteractiveMapComponent implements AfterViewInit, OnDestroy {
     } else {
       this.varName = this.currentLayer?.name || null;
       this.pointLoc = candidate.gpi?.toString() || null;
-      
+
 
       console.log('Gridded point selected:', {
         gpi: candidate.gpi,
@@ -1189,7 +1189,7 @@ export class InteractiveMapComponent implements AfterViewInit, OnDestroy {
     } else {
       const lat = Number(candidate.lat).toFixed(3);
       const lon = Number(candidate.lon).toFixed(3);
-      return `Grid Point ${candidate.gpi} (${lat}°, ${lon}°)`;
+      return `Grid Point ${candidate.gpi}`;
     }
   }
 
@@ -1198,22 +1198,22 @@ export class InteractiveMapComponent implements AfterViewInit, OnDestroy {
   }
 
   getDialogHeader(): string {
-  if (this.pointQueryLoading) {
-    return 'Loading...';
+    if (this.pointQueryLoading) {
+      return 'Loading...';
+    }
+    if (this.showCandidateSelection) {
+      return `Select Point (${this.candidates.length} found)`;
+    }
+    // ISMN: Station name as header
+    if (this.isISMNData && this.selectedPointValue !== null) {
+      return this.stationName || 'Station Data';
+    }
+    // Gridded: Use layer name or generic "Grid Point"
+    if (this.selectedPointValue !== null) {
+      return this.varName || 'Grid Point';
+    }
+    return 'Point Query';
   }
-  if (this.showCandidateSelection) {
-    return `Select Point (${this.candidates.length} found)`;
-  }
-  // ISMN: Station name as header
-  if (this.isISMNData && this.selectedPointValue !== null) {
-    return this.stationName || 'Station Data';
-  }
-  // Gridded: Use layer name or generic "Grid Point"
-  if (this.selectedPointValue !== null) {
-    return this.varName || 'Grid Point';
-  }
-  return 'Point Query';
-}
 
   // New: Subtitle for ISMN showing network + sensor
   getDialogSubtitle(): string | null {
@@ -1237,34 +1237,34 @@ export class InteractiveMapComponent implements AfterViewInit, OnDestroy {
 
 
   getDialogSubheader(): string {
-  if (this.pointQueryLoading || this.showCandidateSelection) {
-    return '';
-  }
-
-  // ISMN: Network + sensor info
-  if (this.isISMNData && this.selectedPointValue !== null) {
-    let subtitle = this.networkName || '';
-
-    if (this.instrument) {
-      subtitle += ` · ${this.instrument}`;
-
-      if (this.instrumentDepthFrom !== null && this.instrumentDepthTo !== null) {
-        subtitle += ` (${this.instrumentDepthFrom.toFixed(1)}–${this.instrumentDepthTo.toFixed(1)} m)`;
-      } else if (this.instrumentDepthFrom !== null) {
-        subtitle += ` (${this.instrumentDepthFrom.toFixed(1)} m)`;
-      }
+    if (this.pointQueryLoading || this.showCandidateSelection) {
+      return '';
     }
 
-    return subtitle;
-  }
+    // ISMN: Network + sensor info
+    if (this.isISMNData && this.selectedPointValue !== null) {
+      let subtitle = this.networkName || '';
 
-  // Gridded: Show "Gridded Data" as subtitle
-  if (this.selectedPointValue !== null) {
-    return 'Gridded Data';
-  }
+      if (this.instrument) {
+        subtitle += ` · ${this.instrument}`;
 
-  return '';
-}
+        if (this.instrumentDepthFrom !== null && this.instrumentDepthTo !== null) {
+          subtitle += ` (${this.instrumentDepthFrom.toFixed(1)}–${this.instrumentDepthTo.toFixed(1)} m)`;
+        } else if (this.instrumentDepthFrom !== null) {
+          subtitle += ` (${this.instrumentDepthFrom.toFixed(1)} m)`;
+        }
+      }
+
+      return subtitle;
+    }
+
+    // Gridded: Show "Gridded Data" as subtitle
+    if (this.selectedPointValue !== null) {
+      return 'Gridded Data';
+    }
+
+    return '';
+  }
 
   private resetDataFields(): void {
     this.isISMNData = false;
@@ -1384,6 +1384,30 @@ export class InteractiveMapComponent implements AfterViewInit, OnDestroy {
         },
         error: (error) => console.error('Error loading metrics:', error)
       });
+  }
+  @HostListener('document:keydown.escape')
+  onEscapeKey() {
+    if (this.pointPopupVisible) {
+      this.pointPopupVisible = false;
+      this.cdr.detectChanges();
+    }
+  }
+
+  // Close dialog on click outside
+  @HostListener('document:mousedown', ['$event'])
+  onClickOutside(event: MouseEvent) {
+    if (!this.pointPopupVisible) return;
+
+    const target = event.target as HTMLElement;
+
+    // Don't close if clicking inside the dialog
+    const dialogElement = document.querySelector('.p-dialog');
+    if (dialogElement && dialogElement.contains(target)) {
+      return;
+    }
+
+    this.pointPopupVisible = false;
+    this.cdr.detectChanges();
   }
 }
 

@@ -23,7 +23,6 @@ import { UserProfileComponent } from './pages/user-profile/user-profile.componen
 import { DatasetModule } from './modules/dataset/dataset.module';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { DropdownModule } from 'primeng/dropdown';
 import { PanelModule } from 'primeng/panel';
 import { AccordionModule } from 'primeng/accordion';
 import { TooltipModule } from 'primeng/tooltip';
@@ -144,8 +143,8 @@ import {
         ImageModule,
         ScrollTopModule,
         ContactModule,
-        SelectButtonModule,
-        SharedPrimeNgModule, 
+        SelectButtonModule, 
+        SharedPrimeNgModule,
         MaintenanceModeComponent,
         InteractiveMapComponent], providers: [
         {

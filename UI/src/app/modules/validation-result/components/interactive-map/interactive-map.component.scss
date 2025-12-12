@@ -1,7 +1,10 @@
 /* POPUP MODAL */
 
-/* Custom Dialog Header */
+/* Fix z-index for dialog to appear above map */
 :host ::ng-deep .p-dialog {
+  z-index: 2000 !important;
+  /* Higher than OpenLayers controls */
+
   .p-dialog-header {
     padding: 1rem 1.25rem 0.75rem;
   }
@@ -9,6 +12,19 @@
   .p-dialog-content {
     padding: 0.75rem 1.25rem 1rem;
   }
+}
+
+/* Ensure dialog mask doesn't block interactions but dialog is clickable */
+:host ::ng-deep .p-dialog-mask {
+  z-index: 1999 !important;
+}
+
+/* Override for fullscreen mode - target the fullscreen container */
+:host ::ng-deep .ol-full-screen-true .p-dialog,
+:fullscreen .p-dialog,
+::backdrop+* .p-dialog {
+  z-index: 2147483647 !important;
+  /* Maximum z-index value */
 }
 
 .dialog-header-custom {
@@ -215,31 +231,30 @@
 
 
 
-
-
-
 /* ===== SHARED CONTROL STYLES ===== */
 %control-base {
   position: absolute;
   top: 10px;
   z-index: 1000;
-  background: rgba(255, 255, 255, 0.95);
+
+  background: var(--p-content-background);
   border-radius: 8px;
   padding: 6px 10px;
-  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 3px 12px var(--p-surface-shadow, rgba(0, 0, 0, 0.15));
   backdrop-filter: blur(8px);
-  border: 1px solid rgba(0, 0, 0, 0.1);
+  border: 1px solid var(--p-surface-border);
   transition: all 0.3s ease;
-  height: 36px;
+  height: 39px;
   display: flex;
   align-items: center;
 
   &:hover {
-    background: rgba(255, 255, 255, 0.98);
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+    background: var(--p-surface-hover);
+    box-shadow: 0 4px 16px var(--p-surface-shadow, rgba(0, 0, 0, 0.2));
     transform: translateY(-1px);
   }
 }
+
 
 %button-base {
   background: transparent;
@@ -253,7 +268,7 @@
   gap: 8px;
   font-size: 14px;
   font-weight: 500;
-  color: #2c3e50;
+  color: var(--p-text-color);
   transition: opacity 0.2s ease;
   white-space: nowrap;
   width: 100%;
@@ -274,22 +289,26 @@
   top: 10px;
   left: 10px;
   z-index: 1000;
-  min-width: 320px;
+  width: clamp(150px, 18%, 320px);
+  line-height: 1.4rem !important;
 }
 
 .ol-layer-dropdown-container {
   position: absolute;
   top: 10px;
-  left: 350px;
+  left: calc(clamp(150px, 18%, 320px) + 20px);
   z-index: 1000;
-  min-width: 300px;
+  width: clamp(140px, 17%, 300px);
+  line-height: 1.4rem !important;
 }
+
 
 .ol-snapshot-button-container {
   @extend %control-base;
   right: 200px;
   min-width: 80px;
 }
+
 
 .ol-projection-toggle-container {
   @extend %control-base;
@@ -318,6 +337,7 @@
 
 /* ===== FULLSCREEN SUPPORT ===== */
 :host ::ng-deep .ol-full-screen-true {
+
   .ol-metric-dropdown-container,
   .ol-layer-dropdown-container,
   .ol-snapshot-button-container,
@@ -327,7 +347,7 @@
   }
 
   .ol-snapshot-button-container {
-    right: 10px !important;
+    right: 150px !important;
     left: auto !important;
     top: 56px !important;
   }
@@ -341,17 +361,27 @@
 
 /* ===== RESPONSIVE ===== */
 @media (max-width: 992px) {
+
   .ol-metric-dropdown-container,
   .ol-layer-dropdown-container {
     min-width: 280px;
   }
 
-  .ol-layer-dropdown-container { left: 310px; }
-  .ol-snapshot-button-container { right: 200px; }
-  .ol-projection-toggle-container { right: 70px; }
+  .ol-layer-dropdown-container {
+    left: 310px;
+  }
+
+  .ol-snapshot-button-container {
+    right: 200px;
+  }
+
+  .ol-projection-toggle-container {
+    right: 70px;
+  }
 }
 
 @media (max-width: 768px) {
+
   .ol-metric-dropdown-container,
   .ol-layer-dropdown-container {
     min-width: calc(100vw - 60px);
@@ -359,30 +389,103 @@
     right: 10px;
   }
 
-  .ol-metric-dropdown-container { top: 10px; }
-  .ol-layer-dropdown-container { top: 66px; }
-  .ol-snapshot-button-container { right: 10px; top: 122px; }
-  .ol-projection-toggle-container { right: 10px; top: 168px; }
+  .ol-metric-dropdown-container {
+    top: 10px;
+  }
 
-  ::ng-deep .ol-full-screen { top: 214px; }
+  .ol-layer-dropdown-container {
+    top: 66px;
+  }
+
+  .ol-snapshot-button-container {
+    right: 10px;
+    top: 122px;
+  }
+
+  .ol-projection-toggle-container {
+    right: 10px;
+    top: 168px;
+  }
+
+  ::ng-deep .ol-full-screen {
+    top: 214px;
+  }
 
   .snapshot-container {
     padding: 16px;
-    h3 { font-size: 18px; }
+
+    h3 {
+      font-size: 18px;
+    }
+  }
+
+  .map-reset-btn {
+    width: 32px;
+    height: 32px;
+
+    i {
+      font-size: 12px;
+    }
+  }
+
+  .map-footer {
+    padding: 0.6rem 0.8rem;
+
+    small {
+      font-size: 0.75rem;
+    }
+  }
+
+  .colorbar-container {
+    bottom: 100px;
+    left: 50%;
+    right: unset;
+    transform: translateX(-50%);
+    min-width: 250px;
+    max-width: calc(100vw - 20px);
+    width: auto;
+    padding: 8px 12px;
+
+    &:hover {
+      transform: translateX(-50%) translateY(-2px);
+    }
+
+    .colorbar-gradient {
+      height: 16px;
+    }
+
+    .colorbar-labels {
+      font-size: 11px;
+    }
+
+    .colorbar-title {
+      font-size: 12px;
+    }
   }
 }
 
 @media (max-width: 576px) {
+
   .ol-metric-dropdown-container,
   .ol-layer-dropdown-container {
     min-width: calc(100vw - 40px);
   }
 
-  .ol-layer-dropdown-container { top: 66px; }
-  .ol-snapshot-button-container { top: 122px; }
-  .ol-projection-toggle-container { top: 168px; }
+  .ol-layer-dropdown-container {
+    top: 66px;
+  }
 
-  ::ng-deep .ol-full-screen { top: 214px; }
+  .ol-snapshot-button-container {
+    top: 122px;
+  }
+
+  .ol-projection-toggle-container {
+    top: 168px;
+  }
+
+  ::ng-deep .ol-full-screen {
+    top: 214px;
+  }
 
   .snapshot-actions {
     flex-direction: column;
@@ -395,10 +498,309 @@
   }
 }
 
+/* ===== MAP WRAPPER ===== */
+.map-wrapper {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+  transition: box-shadow 0.3s ease;
 
+  &:hover {
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+  }
+}
 
+/* ===== MAP CONTAINER ===== */
+.map-container,
+#imap.map-container {
+  position: relative;
+  border-radius: 12px 12px 0 0;
+  overflow: hidden;
+  background: #f8f9fa;
+}
 
+/* ===== LOADING STATE ===== */
+.map-loading {
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255, 255, 255, 0.8);
+    z-index: 999;
+    backdrop-filter: blur(2px);
+  }
+}
 
+.map-loading-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.95);
+  z-index: 1000;
+  backdrop-filter: blur(8px);
+  animation: fadeIn 0.3s ease-in;
+}
+
+.spinner-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+  padding: 2rem;
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+
+  .pi-spinner {
+    color: #007bff;
+    filter: drop-shadow(0 2px 4px rgba(0, 123, 255, 0.3));
+    font-size: 3rem;
+  }
+
+  @media (max-width: 768px) {
+    padding: 1.5rem;
+
+    .pi-spinner {
+      font-size: 2.5rem !important;
+    }
+  }
+}
+
+.loading-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.loading-text {
+  color: #2c3e50;
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+
+  @media (max-width: 768px) {
+    font-size: 0.9rem;
+  }
+}
+
+.loading-subtext {
+  color: #6c757d;
+  font-size: 0.85rem;
+  font-weight: 400;
+
+  @media (max-width: 768px) {
+    font-size: 0.8rem;
+  }
+}
+
+/* ===== MAP FOOTER ===== */
+.map-footer {
+  padding: 0.75rem 1rem;
+  background: #f8f9fa;
+  border-top: 1px solid rgba(0, 0, 0, 0.06);
+
+  small {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.8rem;
+    color: #6c757d;
+    margin: 0;
+
+    i {
+      color: #28a745;
+      font-size: 12px;
+    }
+  }
+}
+
+/* ===== LEGEND ===== */
+:host ::ng-deep .ol-legend {
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 8px;
+  padding: 12px 16px;
+  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.2);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+  font-size: 12px;
+  min-width: 160px;
+  max-width: 200px;
+  z-index: 1000;
+  border: 1px solid rgba(0, 0, 0, 0.15);
+}
+
+:host ::ng-deep .legend-content {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+:host ::ng-deep .legend-title {
+  font-weight: 600;
+  text-align: center;
+  font-size: 13px;
+  color: #2c3e50;
+  margin-bottom: 6px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid #e0e0e0;
+  text-transform: capitalize;
+}
+
+:host ::ng-deep .legend-items {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+:host ::ng-deep .legend-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 3px 0;
+}
+
+:host ::ng-deep .legend-symbol {
+  width: 16px;
+  height: 16px;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  border-radius: 3px;
+  flex-shrink: 0;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+:host ::ng-deep .legend-label {
+  color: #34495e;
+  font-size: 11px;
+  line-height: 1.3;
+  flex: 1;
+  word-wrap: break-word;
+}
+
+:host ::ng-deep .legend-empty {
+  color: #95a5a6;
+  font-style: italic;
+  text-align: center;
+  padding: 8px 0;
+}
+
+:host ::ng-deep .ol-full-screen .ol-legend {
+  position: fixed !important;
+  z-index: 2000 !important;
+}
+
+/* ===== COLORBAR ===== */
+.colorbar-container {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: rgba(255, 255, 255, 0.90);
+  padding: 16px 24px;
+  box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+  border-top: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.colorbar-wrapper {
+  max-width: 800px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.colorbar-gradient {
+  height: 20px;
+  border-radius: 4px;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.2) 50%, transparent 100%);
+    animation: shimmer 2s ease-in-out infinite;
+  }
+}
+
+.colorbar-labels {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+  font-size: 12px;
+  color: #34495e;
+}
+
+.colorbar-min,
+.colorbar-max {
+  font-weight: 500;
+  color: #2c3e50;
+  min-width: 60px;
+  font-family: 'Courier New', monospace;
+  background: rgba(108, 117, 125, 0.08);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 11px;
+}
+
+.colorbar-min {
+  text-align: left;
+}
+
+.colorbar-max {
+  text-align: right;
+}
+
+.colorbar-title {
+  font-weight: 600;
+  font-size: 13px;
+  color: #2c3e50;
+  text-transform: capitalize;
+  flex: 1;
+  text-align: center;
+  margin: 0 8px;
+}
+
+/* Fullscreen support for colorbar */
+:host ::ng-deep .ol-full-screen~.colorbar-container,
+:host ::ng-deep .ol-full-screen .colorbar-container,
+.ol-full-screen .colorbar-container,
+.ol-viewport.ol-full-screen .colorbar-container {
+  position: fixed !important;
+  z-index: 2000 !important;
+  bottom: 40px !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+}
+
+.ol-full-screen-true .colorbar-container {
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+}
 
 /* ===== SNAPSHOT MODAL ===== */
 .snapshot-modal {
@@ -492,129 +894,7 @@
   }
 }
 
-/* ===== FULLSCREEN SUPPORT ===== */
-:host ::ng-deep .ol-full-screen-true {
-  .ol-metric-dropdown-container,
-  .ol-layer-dropdown-container,
-  .ol-snapshot-button-container,
-  .ol-projection-toggle-container {
-    position: fixed !important;
-    z-index: 2000 !important;
-  }
-
-  .ol-snapshot-button-container {
-    right: 150px !important;
-    left: auto !important;
-  }
-
-  .ol-projection-toggle-container {
-    right: 10px !important;
-    left: auto !important;
-  }
-}
-
-
-
-
-
-
-
-
-
-/* Simple enhanced map wrapper */
-.map-wrapper {
-  background: white;
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  border: 1px solid rgba(0, 0, 0, 0.08);
-  overflow: hidden;
-  transition: box-shadow 0.3s ease;
-
-  &:hover {
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
-  }
-}
-
-/* Enhanced map container styling */
-.map-container {
-  position: relative;
-  border-radius: 12px 12px 0 0;
-  overflow: hidden;
-  background: #f8f9fa;
-}
-
-
-
-/* Enhanced loading state */
-.map-loading {
-  &::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(255, 255, 255, 0.8);
-    z-index: 999;
-    backdrop-filter: blur(2px);
-  }
-}
-
-
-/* Enhanced Loading Overlay */
-.map-loading-overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: rgba(255, 255, 255, 0.95);
-  z-index: 1000;
-  backdrop-filter: blur(8px);
-  animation: fadeIn 0.3s ease-in;
-}
-
-.spinner-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 1.5rem;
-  padding: 2rem;
-  background: white;
-  border-radius: 16px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
-  border: 1px solid rgba(0, 0, 0, 0.06);
-
-  .pi-spinner {
-    color: #007bff;
-    filter: drop-shadow(0 2px 4px rgba(0, 123, 255, 0.3));
-  }
-}
-
-.loading-content {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.loading-text {
-  color: #2c3e50;
-  font-size: 1rem;
-  font-weight: 600;
-  letter-spacing: 0.3px;
-}
-
-.loading-subtext {
-  color: #6c757d;
-  font-size: 0.85rem;
-  font-weight: 400;
-}
-
-/* Fade in animation */
+/* ===== ANIMATIONS ===== */
 @keyframes fadeIn {
   from {
     opacity: 0;
@@ -625,238 +905,6 @@
   }
 }
 
-/* Responsive adjustments */
-@media (max-width: 768px) {
-  .spinner-container {
-    padding: 1.5rem;
-
-    .pi-spinner {
-      font-size: 2.5rem !important;
-    }
-  }
-
-  .loading-text {
-    font-size: 0.9rem;
-  }
-
-  .loading-subtext {
-    font-size: 0.8rem;
-  }
-}
-
-/* Map footer with attribution */
-.map-footer {
-  padding: 0.75rem 1rem;
-  background: #f8f9fa;
-  border-top: 1px solid rgba(0, 0, 0, 0.06);
-
-  small {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    font-size: 0.8rem;
-    color: #6c757d;
-    margin: 0;
-
-    i {
-      color: #28a745;
-      font-size: 12px;
-    }
-  }
-}
-
-/* Spin animation */
-@keyframes spin {
-  0% {
-    transform: rotate(0deg);
-  }
-
-  100% {
-    transform: rotate(360deg);
-  }
-}
-
-/* Responsive design */
-@media (max-width: 768px) {
-  .map-container {
-    height: 320px !important;
-  }
-
-  .map-reset-btn {
-    width: 32px;
-    height: 32px;
-
-    i {
-      font-size: 12px;
-    }
-  }
-
-  .map-footer {
-    padding: 0.6rem 0.8rem;
-
-    small {
-      font-size: 0.75rem;
-    }
-  }
-}
-
-/* NEW COLORBAR STYLES */
-qa-interactive-map .map-wrapper .colorbar-container {
-  position: absolute;
-  bottom: 60px;
-  /* Above the map footer */
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 1000;
-  background: rgba(255, 255, 255, 0.95);
-  border-radius: 4px;
-  padding: 10px 16px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  backdrop-filter: blur(8px);
-  border: 1px solid rgba(0, 0, 0, 0.1);
-  min-width: 280px;
-  max-width: 400px;
-  width: auto;
-  transition: all 0.3s ease;
-
-  &:hover {
-    background: rgba(255, 255, 255, 0.98);
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
-    transform: translateX(-50%) translateY(-2px);
-  }
-}
-
-.colorbar-wrapper {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.colorbar-gradient {
-  height: 18px;
-  border-radius: 3px;
-  border: 1px solid rgba(0, 0, 0, 0.1);
-  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
-  position: relative;
-  overflow: hidden;
-
-  &::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.2) 50%, transparent 100%);
-    animation: shimmer 2s ease-in-out infinite;
-  }
-}
-
-.colorbar-labels {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-size: 0.75rem;
-  color: #495057;
-  font-weight: 500;
-}
-
-.colorbar-min,
-.colorbar-max {
-  font-family: 'Courier New', monospace;
-  background: rgba(108, 117, 125, 0.1);
-  padding: 2px 6px;
-  border-radius: 4px;
-  font-size: 0.7rem;
-  font-weight: 600;
-  color: #495057;
-}
-
-.colorbar-title {
-  font-weight: 600;
-  color: #212529;
-  font-size: 0.8rem;
-  text-align: center;
-  flex: 1;
-  margin: 0 8px;
-  text-transform: capitalize;
-}
-
-/* Alternative horizontal layout for larger screens */
-@media (min-width: 992px) {
-  qa-interactive-map .map-wrapper .colorbar-container {
-    min-width: 320px;
-    max-width: 500px;
-
-    .colorbar-gradient {
-      height: 20px;
-    }
-
-    .colorbar-labels {
-      font-size: 0.8rem;
-    }
-
-    .colorbar-min,
-    .colorbar-max {
-      font-size: 0.75rem;
-    }
-
-    .colorbar-title {
-      font-size: 0.85rem;
-    }
-  }
-}
-
-/* Vertical colorbar variant (optional) */
-.colorbar-container.vertical {
-  width: 60px;
-  min-width: unset;
-  right: 20px;
-  left: unset;
-
-  .colorbar-wrapper {
-    flex-direction: column;
-  }
-
-  .colorbar-gradient {
-    width: 20px;
-    height: 150px;
-    margin: 0 auto;
-    background: linear-gradient(to top, var(--gradient)) !important;
-  }
-
-  .colorbar-labels {
-    flex-direction: column-reverse;
-    gap: 4px;
-    text-align: center;
-
-    .colorbar-title {
-      writing-mode: vertical-rl;
-      text-orientation: mixed;
-      margin: 8px 0;
-    }
-  }
-}
-
-/* Target the OpenLayers fullscreen container */
-.ol-full-screen .colorbar-container,
-.ol-viewport.ol-full-screen .colorbar-container {
-  position: fixed !important;
-  z-index: 99999 !important;
-  bottom: 40px !important;
-  left: 50% !important;
-  transform: translateX(-50%) !important;
-}
-
-/* Ensure colorbar is visible in all fullscreen scenarios */
-.ol-full-screen-true .colorbar-container {
-  display: block !important;
-  visibility: visible !important;
-  opacity: 1 !important;
-}
-
-
-/* Shimmer animation */
 @keyframes shimmer {
 
   0%,
@@ -869,7 +917,6 @@ qa-interactive-map .map-wrapper .colorbar-container {
   }
 }
 
-/* Spin animation */
 @keyframes spin {
   0% {
     transform: rotate(0deg);
@@ -877,235 +924,5 @@ qa-interactive-map .map-wrapper .colorbar-container {
 
   100% {
     transform: rotate(360deg);
-  }
-}
-
-/* Responsive design */
-@media (max-width: 768px) {
-  #imap.map-container {
-    height: 320px !important;
-  }
-
-  .map-reset-btn {
-    width: 32px;
-    height: 32px;
-
-    i {
-      font-size: 12px;
-    }
-  }
-
-  .map-footer {
-    padding: 0.6rem 0.8rem;
-
-    small {
-      font-size: 0.75rem;
-    }
-  }
-
-  qa-interactive-map .map-wrapper .colorbar-container {
-    bottom: 100px;
-    /* Above map footer on mobile */
-    left: 50%;
-    right: unset;
-    transform: translateX(-50%);
-    min-width: 250px;
-    max-width: calc(100vw - 20px);
-    width: auto;
-    padding: 8px 12px;
-
-    &:hover {
-      transform: translateX(-50%) translateY(-2px);
-    }
-
-    .colorbar-gradient {
-      height: 16px;
-    }
-
-    .colorbar-labels {
-      font-size: 0.7rem;
-    }
-
-    .colorbar-min,
-    .colorbar-max {
-      font-size: 0.65rem;
-    }
-
-    .colorbar-title {
-      font-size: 0.75rem;
-    }
-  }
-}
-
-
-
-/* legend */
-
-
-/* Legend Control Styles - Bottom Right Position */
-:host ::ng-deep .ol-legend {
-  position: absolute;
-  bottom: 20px;  /* Changed from top */
-  right: 20px;   /* Changed from left */
-  background: rgba(255, 255, 255, 0.95);  /* Slightly more opaque */
-  border-radius: 8px;
-  padding: 12px 16px;  /* Slightly more compact */
-  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.2);
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
-  font-size: 12px;  /* Slightly smaller */
-  min-width: 160px;
-  max-width: 200px;
-  z-index: 1000;
-  border: 1px solid rgba(0, 0, 0, 0.15);
-}
-
-:host ::ng-deep .legend-content {
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
-}
-
-:host ::ng-deep .legend-title {
-  font-weight: 600;
-  text-align: center;
-  font-size: 13px;
-  color: #2c3e50;
-  margin-bottom: 6px;
-  padding-bottom: 6px;
-  border-bottom: 1px solid #e0e0e0;
-  text-transform: capitalize;
-}
-
-:host ::ng-deep .legend-items {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  max-height: 300px;  /* Add scrolling if too many items */
-  overflow-y: auto;
-}
-
-:host ::ng-deep .legend-item {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 3px 0;
-}
-
-:host ::ng-deep .legend-symbol {
-  width: 16px;
-  height: 16px;
-  border: 1px solid rgba(0, 0, 0, 0.2);
-  border-radius: 3px;
-  flex-shrink: 0;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
-}
-
-:host ::ng-deep .legend-label {
-  color: #34495e;
-  font-size: 11px;
-  line-height: 1.3;
-  flex: 1;
-  word-wrap: break-word;  /* Handle long labels */
-}
-
-:host ::ng-deep .legend-empty {
-  color: #95a5a6;
-  font-style: italic;
-  text-align: center;
-  padding: 8px 0;
-}
-
-
-/* Ensure legend works in fullscreen */
-:host ::ng-deep .ol-full-screen .ol-legend {
-  position: fixed !important;
-  z-index: 2000 !important;
-}
-
-
-/* Colorbar Container - Bottom Stretched */
-.colorbar-container {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  background: rgba(255, 255, 255, 0.90);
-  padding: 16px 24px;
-  box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.1);
-  z-index: 1000;
-  border-top: 1px solid rgba(0, 0, 0, 0.1);
-}
-
-.colorbar-wrapper {
-  max-width: 800px;
-  margin: 0 auto;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.colorbar-gradient {
-  height: 20px;
-  border-radius: 4px;
-  border: 1px solid rgba(0, 0, 0, 0.2);
-  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
-}
-
-.colorbar-labels {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
-  font-size: 12px;
-  color: #34495e;
-}
-
-.colorbar-min,
-.colorbar-max {
-  font-weight: 500;
-  color: #2c3e50;
-  min-width: 60px;
-}
-
-.colorbar-min {
-  text-align: left;
-}
-
-.colorbar-max {
-  text-align: right;
-}
-
-.colorbar-title {
-  font-weight: 600;
-  font-size: 13px;
-  color: #2c3e50;
-  text-transform: capitalize;
-  flex: 1;
-  text-align: center;
-}
-
-/* Fullscreen support for colorbar */
-:host ::ng-deep .ol-full-screen~.colorbar-container,
-:host ::ng-deep .ol-full-screen .colorbar-container {
-  position: fixed !important;
-  z-index: 2000 !important;
-}
-
-/* Responsive adjustments */
-@media (max-width: 768px) {
-  .colorbar-container {
-    padding: 12px 16px;
-  }
-
-  .colorbar-wrapper {
-    max-width: 100%;
-  }
-
-  .colorbar-labels {
-    font-size: 11px;
-  }
-
-  .colorbar-title {
-    font-size: 12px;
   }
 }

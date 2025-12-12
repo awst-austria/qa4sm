@@ -245,8 +245,8 @@ def get_layernames(zarr_path):
     cache_key = f"dataset_info_{zarr_path}"
     cached_info = cache.get(cache_key)
     
-    #if cached_info:
-    #    return cached_info
+    if cached_info:
+        return cached_info
     
     try:
         ds = xr.open_zarr(zarr_path, consolidated=True)
@@ -284,11 +284,17 @@ def get_actual_status_values(zarr_path, var_name):
 
 def build_status_legend_data(colormap_info, zarr_path=None, var_name=None):
     """Build legend entries from colormap info and status categories, filtered by actual values"""
+    import numpy as np
+
     if not colormap_info.get('is_categorical') or 'categories' not in colormap_info:
         return None
 
     categories = colormap_info['categories']
     colors = colormap_info['colormap_info'].get('colors', [])
+
+    # Convert colors to list if it's a numpy array
+    if isinstance(colors, np.ndarray):
+        colors = colors.tolist()
 
     # Get actual status values if zarr_path provided
     if zarr_path and var_name:
@@ -314,6 +320,10 @@ def build_status_legend_data(colormap_info, zarr_path=None, var_name=None):
         # Get color from colormap
         if color_index < len(colors):
             rgba = colors[color_index]
+            # Ensure rgba is also a list (in case colors wasn't converted above)
+            if isinstance(rgba, np.ndarray):
+                rgba = rgba.tolist()
+
             color = f"rgba({int(rgba[0]*255)}, {int(rgba[1]*255)}, {int(rgba[2]*255)}, {rgba[3] if len(rgba) > 3 else 1.0})"
         else:
             color = '#cccccc'
@@ -327,6 +337,7 @@ def build_status_legend_data(colormap_info, zarr_path=None, var_name=None):
     return {
         'entries': entries
     }
+
 
 
 

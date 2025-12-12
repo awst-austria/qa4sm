@@ -28,6 +28,7 @@ import { MultiSelectModule } from 'primeng/multiselect';
 import { PanelModule } from 'primeng/panel';
 import { PasswordModule } from 'primeng/password';
 import { ProgressBarModule } from 'primeng/progressbar';
+import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { RippleModule } from 'primeng/ripple';
 import { ScrollTopModule } from 'primeng/scrolltop';
 import { SelectButtonModule } from 'primeng/selectbutton';
@@ -81,6 +82,7 @@ import { SelectModule } from 'primeng/select';
     PanelModule,
     PasswordModule,
     ProgressBarModule,
+    ProgressSpinnerModule,
     RippleModule,
     ScrollPanelModule,
     ScrollTopModule,
@@ -127,6 +129,7 @@ import { SelectModule } from 'primeng/select';
     PanelModule,
     PasswordModule,
     ProgressBarModule,
+    ProgressSpinnerModule,
     RippleModule,
     ScrollPanelModule,
     ScrollTopModule,
