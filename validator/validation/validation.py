@@ -111,10 +111,10 @@ def set_outfile(validation_run, run_dir):
 
 def save_validation_config(validation_run):
     try:
-        with netCDF4.Dataset(os.path.join(OUTPUT_FOLDER,
+        with (netCDF4.Dataset(os.path.join(OUTPUT_FOLDER,
                                           validation_run.output_file.name),
                              "a",
-                             format="NETCDF4") as ds:
+                             format="NETCDF4") as ds):
 
             ds.qa4sm_version = settings.APP_VERSION
             ds.qa4sm_reader_version = qa4sm_reader.__version__
@@ -122,6 +122,12 @@ def save_validation_config(validation_run):
                 settings.APP_VERSION)
             ds.url = settings.SITE_URL + get_angular_url(
                 'result', validation_run.id)
+
+            # # Add validation run start time and duration to file
+            ds.process_start_time = str(pd.to_datetime(validation_run.start_time))
+            dt = int((pd.to_datetime(ds.date_created).tz_localize('UTC') -
+                      pd.to_datetime(ds.process_start_time)).seconds)
+            ds.process_duration_seconds = dt
 
             try:
                 if hasattr(validation_run, 'spatial_reference_configuration'):
@@ -252,8 +258,10 @@ def save_validation_config(validation_run):
                     validation_run.min_lat, validation_run.min_lon,
                     validation_run.max_lat, validation_run.max_lon)
 
+
     except Exception:
         __logger.exception('Validation configuration could not be stored.')
+
 
 
 def create_pytesmo_validation(validation_run):

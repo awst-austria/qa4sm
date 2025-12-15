@@ -246,6 +246,7 @@ class TestValidation(TestCase):
                 settings.APP_VERSION)
             assert str(run.id) in ds.url
             assert settings.SITE_URL in ds.url
+            assert ds.process_duration_seconds >= 0
 
             # check the metrics contained in the file
             for metric in self.metrics + tcol_metrics + stability_metrics:  # we dont test lon, lat, time etc.
