@@ -441,9 +441,6 @@
     left: 50%;
     right: unset;
     transform: translateX(-50%);
-    min-width: 250px;
-    max-width: calc(100vw - 20px);
-    width: auto;
     padding: 8px 12px;
 
     &:hover {
@@ -452,6 +449,7 @@
 
     .colorbar-gradient {
       height: 16px;
+      width: 96%, ;
     }
 
     .colorbar-labels {
@@ -718,7 +716,7 @@
 }
 
 .colorbar-wrapper {
-  max-width: 800px;
+  max-width: 96%;
   margin: 0 auto;
   display: flex;
   flex-direction: column;

@@ -484,33 +484,32 @@ export class InteractiveMapComponent implements AfterViewInit, OnDestroy {
 
 
 
-
-
-
-  // KEEP THIS METHOD AS IS
   private drawColorbarOnCanvas(ctx: CanvasRenderingContext2D, canvas: HTMLCanvasElement): void {
-    const padding = 20;
+    const padding = 40;
     const barHeight = 20;
-    const barWidth = Math.min(400, canvas.width - padding * 2);
+    const barWidth = Math.max(500, canvas.width - padding * 2);
     const x = (canvas.width - barWidth) / 2;
     const y = canvas.height - 60;
+    const borderRadius = 4; // Adjust this value for more/less rounding
 
     // Background
     ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
     ctx.fillRect(0, canvas.height - 70, canvas.width, 70);
 
-    // Draw gradient bar
+    // Draw gradient bar with rounded corners
     const gradient = ctx.createLinearGradient(x, y, x + barWidth, y);
     const colors = this.parseGradientColors(this.colorbarData.gradient);
     colors.forEach((color, index) => {
       gradient.addColorStop(index / (colors.length - 1), color);
     });
 
+    ctx.beginPath();
+    ctx.roundRect(x, y, barWidth, barHeight, borderRadius);
     ctx.fillStyle = gradient;
-    ctx.fillRect(x, y, barWidth, barHeight);
+    ctx.fill();
     ctx.strokeStyle = 'rgba(0, 0, 0, 0.2)';
     ctx.lineWidth = 1;
-    ctx.strokeRect(x, y, barWidth, barHeight);
+    ctx.stroke();
 
     // Draw text
     ctx.fillStyle = '#2c3e50';
@@ -518,7 +517,7 @@ export class InteractiveMapComponent implements AfterViewInit, OnDestroy {
 
     // Min value
     ctx.textAlign = 'left';
-    ctx.fillText(this.colorbarData.vmin.toFixed(1), x, y + barHeight + 15);
+    ctx.fillText(parseFloat(this.colorbarData.vmin.toFixed(3)).toString(), x, y + barHeight + 15);
 
     // Title
     ctx.textAlign = 'center';
@@ -528,8 +527,9 @@ export class InteractiveMapComponent implements AfterViewInit, OnDestroy {
     // Max value
     ctx.textAlign = 'right';
     ctx.font = '12px Arial, sans-serif';
-    ctx.fillText(this.colorbarData.vmax.toFixed(1), x + barWidth, y + barHeight + 15);
+    ctx.fillText(parseFloat(this.colorbarData.vmax.toFixed(3)).toString(), x + barWidth, y + barHeight + 15);
   }
+
 
   private parseGradientColors(gradientString: string): string[] {
     const colorRegex = /#[0-9a-f]{6}|rgb\([^)]+\)|rgba\([^)]+\)/gi;
