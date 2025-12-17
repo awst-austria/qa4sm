@@ -2,6 +2,7 @@
 set -e
 set -x
 export PIP_USE_PEP517=1
+export NUMBA_CACHE_DIR=/tmp/numba_cache
 WEB_VAL_GIT_DIR="/tmp/qa4sm-git"
 APP_DIR="/var/lib/qa4sm-web-val/valentina"
 mkdir -p "$APP_DIR"
