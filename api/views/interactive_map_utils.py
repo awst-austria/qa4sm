@@ -58,17 +58,16 @@ def compute_norm_params(validation_id, zarr_path, metric_name, layer_name):
         vmin_data = float(np.nanmin(var_data))
         vmax_data = float(np.nanmax(var_data))
 
+        vmax = max(abs(vmin_data), abs(vmax_data))
+        vmin = -abs(vmax)
+
         # Apply constraints from QR_VALUE_RANGES if they exist
         if metric_name and metric_name in QR_VALUE_RANGES:
             constraints = QR_VALUE_RANGES[metric_name]
-
             # Use constraint if it's not None, otherwise use computed value
-            vmin = constraints['vmin'] if constraints['vmin'] is not None else vmin_data
-            vmax = constraints['vmax'] if constraints['vmax'] is not None else vmax_data
-        else:
-            # No constraints - use computed values
-            vmin = vmin_data
-            vmax = vmax_data
+            vmin = constraints['vmin'] if constraints['vmin'] is not None else vmin
+            vmax = constraints['vmax'] if constraints['vmax'] is not None else vmax
+
 
         # Cache for 24 hours
         cache.set(cache_key, (vmin, vmax), 86400)
@@ -397,9 +396,6 @@ def get_cached_dataframe(validation_id, var_name, zarr_path):
     da = ds_zarr[var_name]
     df = da.to_dataframe(name='value').reset_index()
     df = df.dropna(subset=['value'])
-
-    print(f"Loaded DataFrame for {validation_id}/{var_name}: {len(df)} points, {df.memory_usage(deep=True).sum() / 1024**2:.2f} MB")
-
     return df
 
 

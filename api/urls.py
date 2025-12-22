@@ -18,7 +18,7 @@ from api.views.validation_config_view import (
 )
 from api.views.uptime_view import uptime_ping, get_uptime
 from api.views.interactive_map_view import get_tile, get_validation_layer_metadata, \
-    get_layer_range, get_layer_bounds, get_data_point
+    get_layer_range, get_layer_bounds, get_data_point, check_zarr_exists
 from api.views.comparison_view import get_comparison_table, get_comparison_plots_for_metric, \
     download_comparison_table, get_comparison_metrics, get_spatial_extent
 from api.views.user_view import signup_post, user_update, user_delete, password_update, verify_email, request_api_token, get_api_token
@@ -153,5 +153,6 @@ urlpatterns = [
     path('<uuid:validation_id>/metadata/', get_validation_layer_metadata, name='validation_metadata'),
     path('<uuid:validation_id>/range/<str:metric_name>/<str:layer_name>/', get_layer_range, name='layer_range'),
     path('<uuid:validation_id>/bounds/', get_layer_bounds, name='layer_bounds'),
+    path('<uuid:validation_id>/check-zarr/', check_zarr_exists, name='check-zarr'),
     
 ]

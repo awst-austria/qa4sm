@@ -924,3 +924,74 @@
     transform: rotate(360deg);
   }
 }
+
+/* ===== OPACITY SLIDER ===== */
+:host ::ng-deep .ol-opacity-slider {
+  @extend %control-base;
+
+  top: auto !important;
+  bottom: 100px !important;
+  right: 20px !important;
+  left: auto !important;
+
+  flex-direction: column;
+  gap: 6px;              // Tighter gap between label and slider
+  height: auto;
+  min-width: 80px;
+  padding: 8px 10px;     // Reduced padding
+
+  opacity: 0.5;
+  transition: all 0.3s ease;
+
+  &:hover,
+  &:focus-within {
+    opacity: 1;
+  }
+
+  label {
+    font-size: 10px;
+    font-weight: 500;
+    color: var(--p-text-color);
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    line-height: 1;       // Tighter line height
+    margin: 0;
+    opacity: 0.7;
+    transition: opacity 0.2s ease;
+  }
+
+  &:hover label,
+  &:focus-within label {
+    opacity: 1;
+  }
+
+  input[type="range"] {
+    width: 80px;          // Narrower slider
+    height: 4px;          // Thinner track
+    cursor: pointer;
+    accent-color: var(--primary-color);
+    margin: 0;
+    opacity: 0.6;
+    transition: opacity 0.2s ease;
+
+    &:hover,
+    &:focus,
+    &:active {
+      opacity: 1;
+    }
+  }
+}
+
+/* Fullscreen support */
+:host ::ng-deep .ol-full-screen-true .ol-opacity-slider {
+  position: fixed !important;
+  z-index: 2000 !important;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  :host ::ng-deep .ol-opacity-slider {
+    bottom: 110px !important;
+    right: 10px !important;
+  }
+}

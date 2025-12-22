@@ -1,27 +1,27 @@
-import {Component, Input, OnInit, signal, WritableSignal} from '@angular/core';
-import {EMPTY, Observable, of, tap} from 'rxjs';
-import {MetricsPlotsDto} from '../../../core/services/validation-run/metrics-plots.dto';
-import {ValidationrunService} from '../../../core/services/validation-run/validationrun.service';
-import {HttpParams} from '@angular/common/http';
-import {ValidationrunDto} from '../../../core/services/validation-run/validationrun.dto';
-import {WebsiteGraphicsService} from '../../../core/services/global/website-graphics.service';
-import {fas} from '@fortawesome/free-solid-svg-icons';
-import {catchError, map} from 'rxjs/operators';
-import {PlotDto} from '../../../core/services/global/plot.dto';
-import {SafeUrl} from '@angular/platform-browser';
-import {GlobalParamsService} from '../../../core/services/global/global-params.service';
-import {CustomHttpError} from '../../../core/services/global/http-error.service';
-import {ToastService} from '../../../core/services/toast/toast.service';
-
+import { Component, Input, OnInit, signal, WritableSignal } from '@angular/core';
+import { EMPTY, Observable, of, tap } from 'rxjs';
+import { MetricsPlotsDto } from '../../../core/services/validation-run/metrics-plots.dto';
+import { ValidationrunService } from '../../../core/services/validation-run/validationrun.service';
+import { HttpParams } from '@angular/common/http';
+import { ValidationrunDto } from '../../../core/services/validation-run/validationrun.dto';
+import { WebsiteGraphicsService } from '../../../core/services/global/website-graphics.service';
+import { fas } from '@fortawesome/free-solid-svg-icons';
+import { catchError, map } from 'rxjs/operators';
+import { PlotDto } from '../../../core/services/global/plot.dto';
+import { SafeUrl } from '@angular/platform-browser';
+import { GlobalParamsService } from '../../../core/services/global/global-params.service';
+import { CustomHttpError } from '../../../core/services/global/http-error.service';
+import { ToastService } from '../../../core/services/toast/toast.service';
+import { HttpClient, HttpResponse } from '@angular/common/http';
 @Component({
-    selector: 'qa-result-files',
-    templateUrl: './result-files.component.html',
-    styleUrls: ['./result-files.component.scss'],
-    standalone: false
+  selector: 'qa-result-files',
+  templateUrl: './result-files.component.html',
+  styleUrls: ['./result-files.component.scss'],
+  standalone: false
 })
 export class ResultFilesComponent implements OnInit {
   @Input() validation: ValidationrunDto;
-  faIcons = {faFileDownload: fas.faFileDownload};
+  faIcons = { faFileDownload: fas.faFileDownload };
 
   updatedMetrics$: Observable<MetricsPlotsDto[]>;
 
@@ -38,15 +38,18 @@ export class ResultFilesComponent implements OnInit {
 
   fileError = signal(false);
   dataFetchError = signal(false);
+  showInteractiveMap: boolean | null = null;
 
   constructor(private validationService: ValidationrunService,
-              public plotService: WebsiteGraphicsService,
-              public globals: GlobalParamsService,
-              private toastService: ToastService) {
+    public plotService: WebsiteGraphicsService,
+    public globals: GlobalParamsService,
+    private toastService: ToastService,
+    private http: HttpClient) {
   }
 
   ngOnInit(): void {
     this.updateMetricsWithPlots();
+    this.checkZarrFile();
   }
 
   private updateMetricsWithPlots(): void {
@@ -57,12 +60,12 @@ export class ResultFilesComponent implements OnInit {
         map((metrics) =>
           metrics.map(
             metric =>
-              ({
-                ...metric,
-                boxplotFiles: this.getPlots(metric.boxplot_dicts.map(boxplotFile => boxplotFile.file)),
-                overviewFiles: this.getPlots(metric.overview_files),
-                comparisonFile: metric.comparison_boxplot.length !== 0 ?  this.getPlots(metric.comparison_boxplot) : of(null)
-              })
+            ({
+              ...metric,
+              boxplotFiles: this.getPlots(metric.boxplot_dicts.map(boxplotFile => boxplotFile.file)),
+              overviewFiles: this.getPlots(metric.overview_files),
+              comparisonFile: metric.comparison_boxplot.length !== 0 ? this.getPlots(metric.comparison_boxplot) : of(null)
+            })
           )
         ),
         tap(data => {
@@ -80,6 +83,25 @@ export class ResultFilesComponent implements OnInit {
     this.selectedMetric.set(option.value);
     // resetting boxplot index
     this.boxplotIndx = 0;
+  }
+
+  private checkZarrFile(): void {
+    const validationId = this.validation?.id;
+    if (!validationId) {
+      this.showInteractiveMap = false;
+      return;
+    }
+
+    this.http
+      .get<{ exists: boolean }>(`/api/${validationId}/check-zarr/`)
+      .subscribe({
+        next: (response) => {
+          this.showInteractiveMap = response.exists;
+        },
+        error: () => {
+          this.showInteractiveMap = false;
+        }
+      });
   }
 
   onBoxPlotChange(event): void {

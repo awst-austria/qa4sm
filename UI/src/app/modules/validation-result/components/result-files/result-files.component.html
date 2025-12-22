@@ -151,14 +151,35 @@
       </div>
     </div>
   </p-panel>
-  <p-panel>
-    <ng-template pTemplate="header">
-      <div class="text-center" style="width: 95%">
-        <span class="my-0 py-0 font-weight-normal">Click & Explore</span>
-      </div>
-    </ng-template>
+  <!-- … other content … -->
 
-    <qa-interactive-map [validationId]="validation.id">
-    </qa-interactive-map>
-  </p-panel>
+  <p-panel>
+  <!-- Header ---------------------------------------------------->
+  <ng-template pTemplate="header">
+    <div class="text-center" style="width: 95%">
+      <span class="my-0 py-0 font-weight-normal">
+        {{ showInteractiveMap ? 'Click & Explore' : 'Interactive Map' }}
+      </span>
+    </div>
+  </ng-template>
+
+  <!-- Body ------------------------------------------------------>
+  <ng-container *ngIf="showInteractiveMap === null">
+    <!-- Loading state -->
+    <div class="text-center text-muted py-3">
+      <i class="pi pi-spin pi-spinner"></i> Checking for interactive map...
+    </div>
+  </ng-container>
+
+  <ng-container *ngIf="showInteractiveMap === true">
+    <qa-interactive-map [validationId]="validation.id"></qa-interactive-map>
+  </ng-container>
+
+  <ng-container *ngIf="showInteractiveMap === false">
+    <div class="text-center text-muted py-3">
+      No result file for interactive map detected – legacy run.
+    </div>
+  </ng-container>
+</p-panel>
+
 </div>

@@ -46,17 +46,15 @@
 </div>
 
 <!-- Layer dropdown - give it a unique class -->
-<div #layerDropdownContainer class="ol-layer-dropdown-container ol-select-container ol-unselectable ol-control"
-  style="display: none;">
-  <div class="flex flex-column">
+<div #layerDropdownContainer class="ol-layer-dropdown-container ol-select-container ol-unselectable ol-control" style="display: none;">
+  <div class="flex flex-column"  *ngIf="getAvailableLayersForCurrentMetric()?.length > 1">
     <span class="p-float-label">
       <p-select id="layer-select" [options]="getAvailableLayersForCurrentMetric()"
         [(ngModel)]="selectedLayerForMetric[selectedMetric?.metric_query_name]" optionLabel="name"
         [style]="{'width':'100%'}" (onChange)="onLayerSelectionChange(selectedMetric?.metric_query_name, $event.value)"
-        [disabled]="getAvailableLayersForCurrentMetric()?.length <= 1">
+        >
       </p-select>
     </span>
-
     <div *ngIf="!getAvailableLayersForCurrentMetric()?.length" class="p-field-description mt-2">
       No layers available for selection.
     </div>
@@ -66,7 +64,7 @@
 
 <!-- Simple Enhanced Map Container -->
 <div class="map-wrapper">
-  <div class="map-container" #mapContainer [class.map-loading]="isLoading" style="width: 100%; aspect-ratio: 4 / 3;"
+  <div class="map-container" #mapContainer [class.map-loading]="isLoading" style="width: 100%; aspect-ratio: 3 / 2;"
     id="imap">
 
     <!-- Enhanced Loading Overlay with PrimeNG Spinner -->
