@@ -340,24 +340,44 @@ def build_status_legend_data(colormap_info, zarr_path=None, var_name=None):
 
 
 
-def calculate_spread(zoom_level, plot_resolution=0.1, multiplier=450, exponent=3.6, divisor=1840): 
+def calculate_spread(zoom_level, plot_resolution):
     """
     Calculate spread pixels based on zoom level and plot resolution.
-    
-    Uses the formula: max(int((plot_resolution * multiplier + 10) * zoom_level ** exponent / divisor), 1)
-    
+
     Args:
-        zoom_level: Zoom level (1-14) - higher values increase spread exponentially
-        plot_resolution: Minimum distance/resolution from dataset (default: 0.1)
-        multiplier: Scaling factor for plot_resolution (default: 450)
-        exponent: Power applied to zoom_level (default: 3.6)
-        divisor: Final divisor to normalize the result (default: 1840)
+        zoom_level: zoom level (2-14)
+        plot_resolution: desired plot resolution in degrees (0.005-0.4)
 
     Returns:
-        int: Number of pixels to spread, minimum 1
+        int: number of pixels to spread
     """
-    spread =  max(int((plot_resolution * multiplier + 10) * zoom_level ** exponent / divisor), 1)
-    return spread
+    if not plot_resolution:
+        plot_resolution = 0.25
+
+    if plot_resolution <= 0.1:
+        # Fine resolution: exponential formula
+        multiplier = 450
+        exponent = 3.6
+        divisor = 1840
+        return max(int((plot_resolution * multiplier + 10) * zoom_level ** exponent / divisor), 1)
+
+    # Coarse resolution (plot_resolution > 0.1)
+    # Scale all values by plot_resolution/0.35 to handle different resolutions
+    scale = plot_resolution / 0.35
+
+    if zoom_level <= 4.5:
+        # Very low zoom: minimal spread to avoid artifacts
+        return max(int(zoom_level * scale), 2)
+
+    elif zoom_level <= 9:
+        # Mid-low zoom: gradual ramp toward transition
+        base_spread = int(7 * (zoom_level - 5) ** 1.6 + 6)
+        return int(base_spread * scale)
+
+    else:
+        # zoom >= 10: full rectangle mode with gradual quadratic ramp
+        base_spread = int(133 + 67 * (zoom_level - 10) + 33 * (zoom_level - 10) ** 2)
+        return int(base_spread * scale)
 
 
 
