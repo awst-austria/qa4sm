@@ -21,7 +21,7 @@ cytoolz==1.0.1
 dask==2025.1.0
 datedown==0.4
 distributed==2025.1.0
-django==5.1.6
+django==5.1.15
 django-countries==7.6.1
 django-rest-passwordreset==1.5.0
 django-widget-tweaks==1.5.0
@@ -59,7 +59,7 @@ packaging==24.2
 pandas==2.2.3
 partd==1.4.2
 pillow==11.1.0
-pip==25.0.1
+pip==25.3
 platformdirs==4.3.6
 pluggy==1.5.0
 psutil==6.1.1
