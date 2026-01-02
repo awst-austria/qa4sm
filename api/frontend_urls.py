@@ -51,9 +51,6 @@ def get_angular_url(url_name, parameter=None):
     else:
         searched_path = searched_element['path']
 
-    if settings.DEBUG:
-        return '/' + searched_path
-
     return '/ui/' + searched_path
 
 
