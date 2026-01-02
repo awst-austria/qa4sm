@@ -1,56 +1,84 @@
 @use 'src/style.variables' as *;
 
-div {
-  text-align: center;
-}
-.yml {
-  padding: 0.3rem;
-  text-align: left;
-  width: 15rem;
-  margin-bottom: 2rem;
-  border-width:3px;
-  border-style:solid;
+/* Navigation bar */
+.upload-nav {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  margin-bottom: 25px;
+  flex-wrap: wrap;
 }
 
-img {
-  padding-right: 2rem;
-  padding-left: 2rem;
-}
-
-table, th, td {
-  border:1px solid black;
-  border-collapse: collapse;
-  padding: 0.3rem;
-}
-
-a {
+.upload-nav button {
+  background-color: $base-color;
+  border: none;
+  color: #fff;
+  padding: 10px 20px;
+  font-size: 15px;
   font-weight: 600;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.3s ease;
 }
 
-#help-panel {
-  padding: 2rem;
-  background-color: rgba(210, 210, 210, 0.2);
-  box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.5);
+.upload-nav button:hover {
+  background-color: $base-color-hover;
+  color: #fff;
 }
-.code-example{
-  box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.5);
+
+.upload-nav button.active {
+  background-color: $base-color-active;
+  color: #fff;
+}
+
+/* Dataset links */
+.dataset-links li a {
+  color: $base-color;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.dataset-links li a:hover {
+  text-decoration: underline;
+  color: $base-color-hover;
+}
+
+/* Highlight text */
+.highlight {
+  color: $pronouced-button-color;
+  font-weight: bold;
+}
+
+/* Link buttons */
+.link-btn {
+  display: inline-block;
+  background-color: $base-color;
+  border: none;
   color: white;
-  background: rgba(0, 0, 0, 0.7);
-  word-wrap: break-word;
+  font-weight: 500;
+  padding: 4px 10px;
+  margin: 0 3px;
+  font-size: 0.85rem;
+  border-radius: 4px;
+  cursor: pointer;
+  text-decoration: none;
+  transition: background-color 0.3s ease, color 0.3s ease;
+  vertical-align: middle;
 }
 
-@media screen and (max-width: 500px) {
-  table {
-    scale: 0.8;
-  }
+.link-btn:hover {
+  background-color: $base-color-hover;
+  color: white;
 }
 
-@media screen and (max-width: 380px) {
-  table {
-    scale: 0.6;
-  }
+.link-btn:active {
+  background-color: $base-color-active;
+  color: white;
+}        
+
+.no-bullets {
+  list-style-type: none;
+  padding-left: 0;
+  margin-left: 0;
 }
-//.w3-round{
-//  align-content: center;
-//}
 
