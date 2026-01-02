@@ -4,7 +4,6 @@ import {ValidationSelectorComponent} from './components/validation-selector/vali
 import {PlotsComponent} from './components/plots/plots.component';
 import {DatasetModule} from '../dataset/dataset.module';
 import {SpatialExtentComponent} from './components/spatial-extent/spatial-extent.component';
-import {NgDompurifyModule} from '@tinkoff/ng-dompurify';
 import {TableComparisonComponent} from './components/table-comparison/table-comparison.component';
 import {ComparisonSummaryComponent} from './components/comparison-summary/comparison-summary.component';
 import {ValidationResultModule} from '../validation-result/validation-result.module';
@@ -23,7 +22,6 @@ import { SharedPrimeNgModule } from 'src/app/shared.primeNg.module';
     SharedPrimeNgModule,
     RouterModule,
     DatasetModule,
-    NgDompurifyModule,
     ValidationResultModule,
     CoreModule,
   ]
