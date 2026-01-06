@@ -1,6 +1,6 @@
 ascat==2.4.3
 asgiref==3.8.1
-bokeh==3.6.3
+bokeh==3.8.2
 brotli==1.1.0
 cartopy==0.24.0
 celery==5.4.0
