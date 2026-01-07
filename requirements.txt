@@ -83,7 +83,7 @@ pytz==2024.1
 pyyaml==6.0.2
 qa4sm-preprocessing==0.6.1
 #qa4sm-reader==0.12.1
-git+https://github.com/daberer/qa4sm-reader.git@7a9aad489d2bb01b49d1db2877f867b6eab3d4f5 #qa4sm-reader change back to correct reader
+git+https://github.com/daberer/qa4sm-reader.git@0ea1bb1e0b8d658728d363f035d38d4807453e99 #qa4sm-reader change back to correct reader
 redis==5.2.0
 requests==2.32.4
 scipy==1.15.1
