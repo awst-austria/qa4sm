@@ -90,7 +90,7 @@ setuptools==78.1.1
 shapely==2.0.7
 six==1.17.0
 smos==0.4
-smap-io==0.6
+smap-io==0.8
 sortedcontainers==2.4.0
 sqlparse==0.5.3
 tblib==3.0.0
