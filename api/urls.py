@@ -33,6 +33,9 @@ from api.views.support_request_view import *
 from api.views.custom_dataset_view import *
 from rest_framework.authtoken import views
 from api.views.autocleanup_view import run_auto_cleanup_script
+from api.views.validation_run_view import validation_run_status
+from api.views.validation_run_view import validation_run_timing
+
 
 # schema_view = get_schema_view(
 #     openapi.Info(
@@ -72,6 +75,8 @@ urlpatterns = [
     re_path(r'^dataset-variable-by-version/(?P<version_id>.+)$', dataset_variable_by_version,
             name='Dataset_variable_by_version'),
     path('published-results', published_results, name='Published results'),
+    path('validation-runs-status/<uuid:validation_id>', validation_run_status, name='Validation run status'),
+    path('validation-runs-timing/<uuid:validation_id>', validation_run_timing, name='Validation run timing'),
     re_path(r'^validation-runs/(?P<id>.+)$', validation_run_by_id, name='Validation run by id'),
     re_path(r'^is-validation-finished/(?P<id>.+)$', is_validation_finished, name='Is validation finished'),
     path('dataset-configuration', dataset_configuration, name='Configuration'),
