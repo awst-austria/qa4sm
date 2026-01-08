@@ -700,9 +700,13 @@ def run_validation(validation_id):
                 keep_pytesmo_ncfile=False)
             if transcriber.exists:
                 restructured_results = transcriber.get_transcribed_dataset()
-                transcriber.output_file_name = transcriber.build_outname(
+                transcriber.output_file_name, transcriber.output_zarr_name = transcriber.build_outname(
                     run_dir, results.keys())
                 transcriber.write_to_netcdf(transcriber.output_file_name)
+                transcriber.write_to_zarr_filtered(
+                    path=transcriber.output_zarr_name,
+                    tsw_value=DEFAULT_TSW
+                )
 
                 save_validation_config(validation_run)
 
