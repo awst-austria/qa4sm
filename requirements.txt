@@ -84,7 +84,7 @@ pyyaml==6.0.2
 #qa4sm-preprocessing==0.6.1
 git+https://github.com/daberer/qa4sm-preprocessing.git@v0.6.2-dev #qa4sm-preprocessing change back to correct version
 #qa4sm-reader==0.12.1
-git+https://github.com/daberer/qa4sm-reader.git@773b96318e4107cc62d1e7fb48f53d46c6bb50c4 #qa4sm-reader change back to correct version
+git+https://github.com/daberer/qa4sm-reader.git@e44d831ad8505e8083b34722b9c762f19046b830 #qa4sm-reader change back to correct version
 redis==5.2.0
 requests==2.32.4
 scipy==1.15.1
