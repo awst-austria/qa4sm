@@ -106,7 +106,7 @@ tzdata==2025.1
 unicodedata2==16.0.0
 urllib3==2.5.0
 wheel==0.45.1
-xarray==2025.7.1
+xarray==2025.1.2
 xyzservices==2025.1.0
 zarr==3.1.5
 zict==3.0.0
