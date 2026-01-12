@@ -5,7 +5,7 @@ brotli==1.1.0
 cartopy==0.24.0
 celery==5.4.0
 certifi==2025.1.31
-cf-xarray==0.8.4
+cf-xarray==0.10.10
 cffi==1.17.1
 cftime==1.6.4.post1
 charset-normalizer==3.4.0
@@ -81,7 +81,8 @@ pytest-django==4.10.0
 python-dateutil==2.9.0.post0
 pytz==2024.1
 pyyaml==6.0.2
-qa4sm-preprocessing==0.6.1
+#qa4sm-preprocessing==0.6.1
+git+https://github.com/daberer/qa4sm-preprocessing.git@v0.6.2-dev #qa4sm-preprocessing change back to correct version
 #qa4sm-reader==0.12.1
 git+https://github.com/daberer/qa4sm-reader.git@e44d831ad8505e8083b34722b9c762f19046b830 #qa4sm-reader change back to correct version
 redis==5.2.0
@@ -105,9 +106,9 @@ tzdata==2025.1
 unicodedata2==16.0.0
 urllib3==2.5.0
 wheel==0.45.1
-xarray==2025.1.2
+xarray==2025.7.1
 xyzservices==2025.1.0
-zarr==3.0.7
+zarr==3.1.5
 zict==3.0.0
 zipp==3.21.0
 zstandard==0.23.0
