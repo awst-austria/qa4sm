@@ -306,7 +306,7 @@ def get_tile(request, validation_id, metric_name, layer_name, projection, z, x, 
 
         # Aggregate and shade based on data type
         is_categorical = metric_name == 'status' or layer_name.startswith('status')
-        agg = cvs.points(df_tile, 'px', 'py', ds.first('value') if is_categorical else ds.mean('value'))
+        agg = cvs.points(df_tile, 'px', 'py', agg=ds.first('value') if is_categorical else ds.mean('value'))
 
         if is_categorical:
             status_codes = sorted(QR_STATUS_DICT.keys())
