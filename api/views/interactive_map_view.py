@@ -197,8 +197,7 @@ def get_validation_layer_metadata(request, validation_id):
         for metric, possible_layer_list in possible_layers.items():
             for possible_layer_name in possible_layer_list:
                 if possible_layer_name in available_layers_mapping.values():
-                    colormap_info = get_colormap_metadata(metric)
-
+                    colormap_info = get_colormap_metadata(metric, unit)
                     layers.append({
                         'name': possible_layer_name,
                         'metric': metric,
@@ -263,7 +262,9 @@ def get_tile(request, validation_id, metric_name, layer_name, projection, z, x, 
         is_scattered = resolution['is_scattered']
 
         if is_scattered:
-            spread_px, buffer_px, marker_shape = 8, 9, 'circle'
+            spread_px, buffer_px, marker_shape = 5, 6, 'circle'
+            if z < 5:
+                spread_px, buffer_px, marker_shape = 4, 5, 'circle'
         else:
             spread_px, buffer_px = get_spread_and_buffer(validation_id, z, resolution['plot_resolution'])
             marker_shape = 'square'

@@ -7,7 +7,6 @@ import { Map, View, MapBrowserEvent } from 'ol';
 import TileLayer from 'ol/layer/Tile';
 import TileGrid from 'ol/tilegrid/TileGrid';
 import { XYZ, TileWMS } from 'ol/source';
-import VectorSource from 'ol/source/Vector';
 import { transformExtent } from 'ol/proj';
 import { FullScreen, Control } from 'ol/control';
 import { SharedPrimeNgModule } from '../../../../shared.primeNg.module';
@@ -19,10 +18,19 @@ import { LegendControl } from './control/legend-control';
 import { OpacitySliderControl } from './control/opacity-slider.control';
 import { ValidationrunService } from '../../../core/services/validation-run/validationrun.service';
 import { Popover } from 'primeng/popover';
+import VectorLayer from 'ol/layer/Vector';
+import VectorSource from 'ol/source/Vector';
+import Feature from 'ol/Feature';
+import Point from 'ol/geom/Point';
+import { Geometry } from 'ol/geom';
+import { Circle as CircleStyle, Fill, Stroke, Style } from 'ol/style';
+import { fromLonLat } from 'ol/proj';
+import { Attribution } from 'ol/control';
+
+
 
 // Constants
 const EPSG_4326 = 'EPSG:4326';
-const EPSG_3857 = 'EPSG:3857';
 const DEFAULT_OPACITY = 0.7;
 const DEFAULT_ZOOM = 2;
 const MIN_ZOOM = 0;
@@ -33,7 +41,7 @@ const BASE_URL_OSM = 'https://tile.openstreetmap.org/{z}/{x}/{y}.png';
 const DEFAULT_SNAPSHOT_TITLE = 'Snapshot';
 const DEFAULT_COLORBAR_GRADIENT = 'linear-gradient(to right, blue, cyan, yellow, red)';
 const CANVAS_PADDING = 40;
-const COLORBAR_HEIGHT = 20;
+const COLORBAR_HEIGHT = 16;
 const COLORBAR_BORDER_RADIUS = 4;
 const LEGEND_PADDING = 20;
 const LEGEND_ITEM_HEIGHT = 24;
@@ -114,6 +122,11 @@ export class InteractiveMapComponent implements AfterViewInit, OnDestroy {
   instrument: string | null = null;
   instrumentDepthFrom: number | null = null;
   instrumentDepthTo: number | null = null;
+
+  // Vector marker
+  private markerSource = new VectorSource<Feature<Geometry>>();
+  private markerLayer!: VectorLayer<Feature<Geometry>>;
+
 
   private fullscreenHandler = () => {
     this.isFullscreen = document.fullscreenElement !== null;
@@ -227,7 +240,7 @@ export class InteractiveMapComponent implements AfterViewInit, OnDestroy {
         url: BASE_URL_EOX,
         params: { LAYERS: 'terrain-light', TILED: true, CRS: EPSG_4326 },
         serverType: 'geoserver',
-        attributions: 'Data © OpenStreetMap contributors and others, Rendering © EOX',
+        attributions: '© <a href="https://eox.at" target="_blank">EOX</a> & contributors',
         crossOrigin: 'anonymous'
       }),
       visible: true
@@ -236,7 +249,7 @@ export class InteractiveMapComponent implements AfterViewInit, OnDestroy {
     this.baseLayer3857 = new TileLayer({
       source: new XYZ({
         url: BASE_URL_OSM,
-        attributions: '© OpenStreetMap contributors',
+        attributions: '© <a href="https://openstreetmap.org" target="_blank">OSM</a>',
         crossOrigin: 'anonymous'
       }),
       visible: false
@@ -256,8 +269,36 @@ export class InteractiveMapComponent implements AfterViewInit, OnDestroy {
         minZoom: MIN_ZOOM,
         maxZoom: MAX_ZOOM
       }),
-      controls: [new FullScreen(), this.opacityControl]
+      controls: [
+        new FullScreen(),
+        this.opacityControl,
+        new Attribution({ collapsible: true, collapsed: false, target: document.getElementById('custom-attribution') })
+      ]
     });
+
+
+    // Yellow marker layer
+    this.markerLayer = new VectorLayer({
+      source: this.markerSource,
+      style: new Style({
+        image: new CircleStyle({
+          radius: 8,
+          fill: new Fill({ color: '#FFD700' }), // Yellow
+          stroke: new Stroke({ color: '#000', width: 2 })
+        })
+      }),
+      zIndex: 999
+    });
+    // Force reposition after map is ready
+    setTimeout(() => {
+      const attribution = document.querySelector('.ol-attribution') as HTMLElement;
+      if (attribution) {
+        attribution.style.left = '0.5rem';
+        attribution.style.right = 'auto';
+        attribution.style.bottom = '4.8rem';
+      }
+    }, 100);
+    this.Map.addLayer(this.markerLayer);
 
     this.legendControl = new LegendControl({ colorbarData: null, metricName: '' });
     this.Map.addControl(this.legendControl);
@@ -398,11 +439,11 @@ export class InteractiveMapComponent implements AfterViewInit, OnDestroy {
   private drawColorbarOnCanvas(ctx: CanvasRenderingContext2D, canvas: HTMLCanvasElement): void {
     const barWidth = Math.max(500, canvas.width - CANVAS_PADDING * 2);
     const x = (canvas.width - barWidth) / 2;
-    const y = canvas.height - 60;
+    const y = canvas.height - 50;
 
     // Background
     ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
-    ctx.fillRect(0, canvas.height - 70, canvas.width, 70);
+    ctx.fillRect(0, canvas.height - 55, canvas.width, 55);
 
     // Gradient bar
     const gradient = ctx.createLinearGradient(x, y, x + barWidth, y);
@@ -424,7 +465,11 @@ export class InteractiveMapComponent implements AfterViewInit, OnDestroy {
     console.log(' should be vmin !!! : ' + this.completeColormap.vmin.toFixed(3).toString())
     ctx.textAlign = 'center';
     ctx.font = 'bold 13px Arial, sans-serif';
-    ctx.fillText(this.colorbarData.metric_name, canvas.width / 2, y + COLORBAR_HEIGHT + 15);
+    const capitalizedMetricName = this.colorbarData.metric_name.charAt(0).toUpperCase() +
+      this.colorbarData.metric_name.slice(1);
+    const metricText = capitalizedMetricName +
+      (this.colorbarData.metrics_description ?? '');
+    ctx.fillText(metricText, canvas.width / 2, y + COLORBAR_HEIGHT + 15);
 
     ctx.textAlign = 'right';
     ctx.font = '12px Arial, sans-serif';
@@ -783,7 +828,13 @@ export class InteractiveMapComponent implements AfterViewInit, OnDestroy {
     this.candidates = [];
     this.multipleFound = false;
     this.showCandidateSelection = false;
+    this.markerSource?.clear();
     this.resetDataFields();
+  }
+
+  onPopupClose(): void {
+    this.markerSource.clear();
+    this.resetPointQueryState();
   }
 
   selectCandidate(candidate: any): void {
@@ -806,6 +857,13 @@ export class InteractiveMapComponent implements AfterViewInit, OnDestroy {
       this.varName = this.currentLayer?.name || null;
       this.pointLoc = candidate.gpi?.toString() || null;
     }
+
+    // Clear previous and add new marker
+    this.markerSource.clear();
+    const coords = this.currentProjection === 'EPSG:4326'
+      ? [candidate.lon, candidate.lat]
+      : fromLonLat([candidate.lon, candidate.lat]);
+    this.markerSource.addFeature(new Feature(new Point(coords)));
 
     this.cdr.detectChanges();
   }
@@ -831,28 +889,31 @@ export class InteractiveMapComponent implements AfterViewInit, OnDestroy {
   getDialogHeader(): string {
     if (this.pointQueryLoading) return 'Loading...';
     if (this.showCandidateSelection) return `Select Point (${this.candidates.length} found)`;
-    if (this.isISMNData && this.selectedPointValue !== null) return this.stationName || 'Station Data';
+    if (this.isISMNData && this.selectedPointValue !== null) return `Station: ${this.stationName || 'Station Data'}`;
     if (this.selectedPointValue !== null) return this.varName || 'Grid Point';
     return 'Point Query';
   }
 
   getDialogSubheader(): string {
-    if (this.pointQueryLoading || this.showCandidateSelection) return '';
-
-    if (this.isISMNData && this.selectedPointValue !== null) {
-      let subtitle = this.networkName || '';
-      if (this.instrument) {
-        subtitle += ` · ${this.instrument}`;
-        if (this.instrumentDepthFrom !== null && this.instrumentDepthTo !== null) {
-          subtitle += ` (${this.instrumentDepthFrom.toFixed(1)}–${this.instrumentDepthTo.toFixed(1)} m)`;
-        } else if (this.instrumentDepthFrom !== null) {
-          subtitle += ` (${this.instrumentDepthFrom.toFixed(1)} m)`;
-        }
-      }
-      return subtitle;
+    if (this.pointQueryLoading || this.showCandidateSelection) {
+      return '';
     }
 
-    return this.selectedPointValue !== null ? 'Gridded Data' : '';
+    if (this.isISMNData && this.selectedPointValue !== null) {
+      const parts: string[] = [];
+      parts.push(`Network: ${this.networkName || ''}`);
+      if (this.instrument) {
+        let instrumentInfo = `Instrument: ${this.instrument}`;
+        if (this.instrumentDepthFrom !== null && this.instrumentDepthTo !== null) {
+          instrumentInfo += ` (${this.instrumentDepthFrom.toFixed(1)}–${this.instrumentDepthTo.toFixed(1)} m)`;
+        } else if (this.instrumentDepthFrom !== null) {
+          instrumentInfo += ` (${this.instrumentDepthFrom.toFixed(1)} m)`;
+        }
+        parts.push(instrumentInfo);
+      }
+      return parts.join('<br>');
+    }
+    return this.selectedPointValue !== null ? 'Data Point' : '';
   }
 
   private resetDataFields(): void {

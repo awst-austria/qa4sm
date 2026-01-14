@@ -46,13 +46,13 @@
 </div>
 
 <!-- Layer dropdown - give it a unique class -->
-<div #layerDropdownContainer class="ol-layer-dropdown-container ol-select-container ol-unselectable ol-control" style="display: none;">
-  <div class="flex flex-column"  *ngIf="getAvailableLayersForCurrentMetric()?.length > 1">
+<div #layerDropdownContainer class="ol-layer-dropdown-container ol-select-container ol-unselectable ol-control"
+  style="display: none;">
+  <div class="flex flex-column" *ngIf="getAvailableLayersForCurrentMetric()?.length > 1">
     <span class="p-float-label">
       <p-select id="layer-select" [options]="getAvailableLayersForCurrentMetric()"
         [(ngModel)]="selectedLayerForMetric[selectedMetric?.metric_query_name]" optionLabel="name"
-        [style]="{'width':'100%'}" (onChange)="onLayerSelectionChange(selectedMetric?.metric_query_name, $event.value)"
-        >
+        [style]="{'width':'100%'}" (onChange)="onLayerSelectionChange(selectedMetric?.metric_query_name, $event.value)">
       </p-select>
     </span>
     <div *ngIf="!getAvailableLayersForCurrentMetric()?.length" class="p-field-description mt-2">
@@ -83,20 +83,23 @@
         <div class="colorbar-gradient" [style.background]="colorbarData.gradient"></div>
         <div class="colorbar-labels">
           <span class="colorbar-min">{{ colorbarData.vmin | number:'1.0-3' }}</span>
-          <span class="colorbar-title">{{ colorbarData.metric_name }}</span>
+          <span class="colorbar-title">
+            {{ colorbarData.metric_name.charAt(0).toUpperCase() + colorbarData.metric_name.slice(1) }}{{
+            colorbarData.metrics_description ?? '' }}
+          </span>
           <span class="colorbar-max">{{ colorbarData.vmax | number:'1.0-3' }}</span>
         </div>
       </div>
     </div>
     <!-- Point Value Dialog -->
-    <p-dialog [(visible)]="pointPopupVisible" [modal]="false" [draggable]="true" [resizable]="false" [closable]="true"
-      [closeOnEscape]="true" [style]="{width: '350px'}" [appendTo]='mapContainer'>
+    <p-dialog [(visible)]="pointPopupVisible" (onHide)="onPopupClose()" [modal]="false" [draggable]="true"
+      [resizable]="false" [closable]="true" [closeOnEscape]="true" [style]="{width: '350px'}" [appendTo]='mapContainer'>
 
       <!-- Custom Header with subtitle support -->
       <ng-template pTemplate="header">
         <div class="dialog-header-custom">
           <span class="dialog-title">{{ getDialogHeader() }}</span>
-          <span *ngIf="getDialogSubheader()" class="dialog-subtitle">{{ getDialogSubheader() }}</span>
+          <span *ngIf="getDialogSubheader()" class="dialog-subtitle" [innerHTML]="getDialogSubheader()"></span>
         </div>
       </ng-template>
 
@@ -235,13 +238,5 @@
         <p class="error-text">{{ pointErrorMessage || 'No data available at this location' }}</p>
       </div>
     </p-dialog>
-  </div>
-
-  <!-- Map Footer with Attribution -->
-  <div class="map-footer">
-    <small>
-      <i class="pi pi-map"></i>
-      © OpenStreetMap contributors
-    </small>
   </div>
 </div>

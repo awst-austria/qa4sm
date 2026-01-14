@@ -82,9 +82,9 @@ python-dateutil==2.9.0.post0
 pytz==2024.1
 pyyaml==6.0.2
 #qa4sm-preprocessing==0.6.1
-git+https://github.com/daberer/qa4sm-preprocessing.git@v0.6.2-dev #qa4sm-preprocessing change back to correct version
+git+https://github.com/daberer/qa4sm-preprocessing.git@v0.6.2-dev #qa4sm-preprocessing change back to correct version (zarr upgrade) 
 #qa4sm-reader==0.12.1
-git+https://github.com/daberer/qa4sm-reader.git@e44d831ad8505e8083b34722b9c762f19046b830 #qa4sm-reader change back to correct version
+git+https://github.com/daberer/qa4sm-reader.git@a850b16eb8b392c16faf4fa543a5fdba752b132f #qa4sm-reader change back to correct version
 redis==5.2.0
 requests==2.32.4
 scipy==1.15.1

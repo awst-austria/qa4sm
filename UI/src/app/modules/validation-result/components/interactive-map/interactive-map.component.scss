@@ -440,11 +440,10 @@
     bottom: 100px;
     left: 50%;
     right: unset;
-    transform: translateX(-50%);
-    padding: 8px 12px;
+    transform: translateX(-80%);
 
     &:hover {
-      transform: translateX(-50%) translateY(-2px);
+      transform: translateX(-90%) translateY(-2px);
     }
 
     .colorbar-gradient {
@@ -708,8 +707,8 @@
   bottom: 0;
   left: 0;
   right: 0;
-  background: rgba(255, 255, 255, 0.90);
-  padding: 16px 24px;
+  background: rgba(255, 255, 255, 0.45);
+  padding: 7px 24px;
   box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.1);
   z-index: 1000;
   border-top: 1px solid rgba(0, 0, 0, 0.1);
@@ -776,7 +775,6 @@
   font-weight: 600;
   font-size: 13px;
   color: #2c3e50;
-  text-transform: capitalize;
   flex: 1;
   text-align: center;
   margin: 0 8px;

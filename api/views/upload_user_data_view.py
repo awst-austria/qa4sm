@@ -219,7 +219,7 @@ class UploadedFileError(BaseException):
 def upload_user_data(request, filename):
     user = request.user.username
     user_data_dir = getattr(settings, 'USER_DATA_DIR', '/tmp/user_data_dir/')
-    user_path = Path(user_data_dir) / user / 'log'
+    user_path = Path(user_data_dir) / user
     user_path.mkdir(parents=True, exist_ok=True)
 
     file = request.FILES['file']

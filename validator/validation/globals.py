@@ -255,3 +255,4 @@ QR_VALUE_RANGES = {
 
 QR_CCI_LANDCOVER = qr_globals.lc_classes
 QR_KG_CLIMATE = qr_globals.climate_classes
+QR_METRICS_DESCRIPTION = qr_globals._metric_description

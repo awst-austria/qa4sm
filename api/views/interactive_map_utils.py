@@ -4,6 +4,7 @@ from django.http import JsonResponse, HttpResponse
 from PIL import Image
 from django.core.cache import cache
 import io
+import re
 import matplotlib.cm as cm
 import xarray as xr
 import numpy as np
@@ -11,7 +12,7 @@ from ..services.interactive_map_service import get_plot_resolution
 from functools import lru_cache
 from django.core.cache import cache
 from pyproj import Transformer
-from validator.validation.globals import QR_COLORMAPS, QR_STATUS_DICT, QR_VALUE_RANGES, QR_CCI_LANDCOVER, QR_KG_CLIMATE
+from validator.validation.globals import QR_COLORMAPS, QR_STATUS_DICT, QR_VALUE_RANGES, QR_CCI_LANDCOVER, QR_KG_CLIMATE, QR_METRICS_DESCRIPTION
 
 
 # Define transformer at module level
@@ -205,15 +206,42 @@ def generate_css_gradient(mpl_colormap, metric_name=None, num_colors=10):
     except Exception as e:
         print(f"Error generating CSS gradient: {e}")
         return "linear-gradient(to right, blue, cyan, yellow, red)"  # fallback
-    
 
-def get_colormap_metadata(metric_name):
-    """Get static colormap metadata (gradient, type, categories) - NO file I/O"""
+def get_colormap_metadata(metric_name, unit=None):                    
+    """Get static colormap metadata (gradient, type, categories) - NO file I/O
+    Args:
+
+    metric_name: str
+        name of metric for colorbar (e.g. n_obs, status, BIAS)
+    unit: dict, None
+        dict with keys explaining a common_unit and from_scaling_ref, if applicable
+    """
     cache_key = f"colormap_metadata_{metric_name}"
     cached = cache.get(cache_key)
 
     if cached:
         return cached
+    
+    def clip_trailing_int(name: str) -> str:
+        """triple collocation metrics include a dataset as identifier 
+        This gets clipped away using regex (e.g. err_std_0-ISMN -> err_std)
+        """
+        return re.sub(r'_\d+(?:-.*)?$', '', name)
+    
+    
+    if unit.get('common_unit'):
+        candidates = (metric_name, clip_trailing_int(metric_name))
+
+    template = None
+    for key in candidates:
+        template = QR_METRICS_DESCRIPTION.get(key)
+        if template is not None:
+            break
+
+    if template is None:
+        print(f"Unknown metric_name: {metric_name!r} (also tried {candidates[1]!r})")
+    else:
+        metrics_description = template.format(unit['common_unit'])
 
     # Get the colormap for this metric
     colormap = get_colormap(metric_name)
@@ -225,7 +253,8 @@ def get_colormap_metadata(metric_name):
     result = {
         'gradient': gradient_colors,
         'is_categorical': metric_name == 'status',  # Adjust based on your logic
-        'colormap_info': colormap_info
+        'colormap_info': colormap_info,
+        'metrics_description': metrics_description
     }
 
     # Add category definitions for status
@@ -471,14 +500,6 @@ def get_point_value(request, validation_id, layer_name, zarr_path, x, y, z, proj
     """
     Get value at point using direct xarray operations.
     Returns all candidates within threshold, with disambiguation info.
-
-    Args:
-        x, y: Query coordinates in the given projection
-        z: current zoom lvl
-        projection: Coordinate system (3857 or 4326)
-
-    Returns:
-        JsonResponse with candidates array and metadata
     """
     # Transform coordinates to EPSG:4326 if needed
     if projection == 3857:
@@ -486,45 +507,34 @@ def get_point_value(request, validation_id, layer_name, zarr_path, x, y, z, proj
     elif projection == 4326:
         query_lon, query_lat = x, y
     else:
-        return JsonResponse({
-            'error': f'Unsupported projection: {projection}'
-        }, status=400)
+        return JsonResponse({'error': f'Unsupported projection: {projection}'}, status=400)
 
     # Get resolution/distance threshold
     resolution = get_plot_resolution(validation_id)
 
-    if not resolution['is_scattered']:  
-        max_distance_deg = resolution['plot_resolution']  * (2 / z) ** 0.25 # should also depend on zoom lvl
+    if not resolution['is_scattered']:
+        max_distance_deg = resolution['plot_resolution'] * (2 / z) ** 0.25
     else:
-        max_distance_deg = 4 / (z ** 1.75) # click area should be smaller the higher the zoom lvl
-        print(f'max distance in deg = {max_distance_deg}')
+        max_distance_deg = 4 / (z ** 1.75)
 
     try:
         ds = get_cached_zarr_dataset(zarr_path)
 
         if layer_name not in ds.data_vars:
-            return JsonResponse({
-                'error': f'Variable {layer_name} not found in dataset'
-            }, status=404)
+            return JsonResponse({'error': f'Variable {layer_name} not found'}, status=404)
 
-        # Get coordinates (already in lat/lon from your zarr)
         lons = ds['lon'].values
         lats = ds['lat'].values
 
         # Simple distance calculation in degrees
         distances = np.sqrt((lons - query_lon)**2 + (lats - query_lat)**2)
-        print(f'distance min {np.array(distances).min()}, z {z}')
+
         # Find ALL points within threshold
         within_threshold_mask = distances <= max_distance_deg
         candidate_indices = np.where(within_threshold_mask)[0]
 
-        # If nothing within threshold, return 404
         if len(candidate_indices) == 0:
-            min_dist = float(np.min(distances))
-            return JsonResponse({
-                'error': f'No data within {max_distance_deg}° of query point',
-                'nearest_distance': min_dist
-            }, status=404)
+            return JsonResponse({'error': 'No data found at this location'}, status=404)
 
         # Sort candidates by distance (nearest first)
         candidate_distances = distances[candidate_indices]
@@ -538,10 +548,12 @@ def get_point_value(request, validation_id, layer_name, zarr_path, x, y, z, proj
         for idx in candidate_indices:
             idx = int(idx)
 
-            # Extract value
+            # Extract value and skip NaN
             raw_value = float(ds[layer_name].isel(loc=idx).values)
-            response_value = round(raw_value, 3)
+            if np.isnan(raw_value):
+                continue
 
+            response_value = round(raw_value, 3)
             if layer_name.startswith('status'):
                 response_value = QR_STATUS_DICT[int(raw_value)]
 
@@ -554,48 +566,51 @@ def get_point_value(request, validation_id, layer_name, zarr_path, x, y, z, proj
             }
 
             if is_ismn:
-                metadata_vars = ['station', 'network', 'lc_2010', 
-                                'climate_KG', 'frm_class', 'instrument', 
-                                'instrument_depthfrom', 'instrument_depthto']
-
-                for meta_var in metadata_vars:
-                    if meta_var in ds.data_vars or meta_var in ds.coords:
-                        val = ds[meta_var].isel(loc=idx).values
-                        if hasattr(val, 'item'):
-                            val = val.item()
-                        elif isinstance(val, (bytes, np.bytes_)):
-                            val = val.decode('utf-8')
-                        else:
-                            val = str(val)
-
-                        # Handle landcover classification
-                        if meta_var == 'lc_2010':
-                            lc_code = int(val)
-                            lc_value = QR_CCI_LANDCOVER.get(lc_code, "Unknown")
-                            candidate[meta_var] = f"{lc_value} ({lc_code})"
-
-                        # Handle climate classification
-                        elif meta_var == 'climate_KG':
-                            kg_value = QR_KG_CLIMATE.get(val, "Unknown")
-                            candidate[meta_var] = f"{kg_value} ({val})"
-
-                        else:
-                            candidate[meta_var] = val
-
+                _add_ismn_metadata(ds, idx, candidate)
 
             candidates.append(candidate)
 
-        # Build response
-        response = {
+        # No valid candidates after NaN filtering
+        if len(candidates) == 0:
+            return JsonResponse({'error': 'No valid data at this location'}, status=404)
+
+        return JsonResponse({
             'candidates': candidates,
             'multiple_found': len(candidates) > 1,
             'source': 'ismn' if is_ismn else 'gridded',
             'is_ismn': is_ismn
-        }
-
-        return JsonResponse(response)
+        })
 
     except Exception as e:
-        return JsonResponse({
-            'error': f'Error retrieving data: {str(e)}'
-        }, status=500)
+        return JsonResponse({'error': str(e)}, status=500)
+
+
+def _add_ismn_metadata(ds, idx, candidate):
+    """Helper to add ISMN metadata to a candidate."""
+    metadata_vars = [
+        'station', 'network', 'lc_2010', 'climate_KG',
+        'frm_class', 'instrument', 'instrument_depthfrom', 'instrument_depthto'
+    ]
+
+    for meta_var in metadata_vars:
+        if meta_var not in ds.data_vars and meta_var not in ds.coords:
+            continue
+
+        val = ds[meta_var].isel(loc=idx).values
+        if hasattr(val, 'item'):
+            val = val.item()
+        elif isinstance(val, (bytes, np.bytes_)):
+            val = val.decode('utf-8')
+        else:
+            val = str(val)
+
+        if meta_var == 'lc_2010':
+            lc_code = int(val)
+            lc_value = QR_CCI_LANDCOVER.get(lc_code, "Unknown")
+            candidate[meta_var] = f"{lc_value} ({lc_code})"
+        elif meta_var == 'climate_KG':
+            kg_value = QR_KG_CLIMATE.get(val, "Unknown")
+            candidate[meta_var] = f"{kg_value} ({val})"
+        else:
+            candidate[meta_var] = val
+
