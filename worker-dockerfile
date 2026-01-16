@@ -1,4 +1,4 @@
-FROM awst/qa4sm-base:3.4.0
+FROM awst/qa4sm-base:3.4.1
 RUN apt-get update && apt-get -y install apt-utils
 RUN apt-get -y install curl gfortran libgeos-dev build-essential qtbase5-dev qt5-qmake rsync libproj-dev wget git
 ADD ./ /tmp/qa4sm-git

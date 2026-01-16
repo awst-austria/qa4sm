@@ -10,7 +10,6 @@ import {ButtonsComponent} from './components/buttons/buttons.component';
 import {TrackedValidationsComponent} from './components/tracked-validations/tracked-validations.component';
 import {SummaryStatisticsComponent} from './components/summary-statistics/summary-statistics.component';
 import {ResultFilesComponent} from './components/result-files/result-files.component';
-import {NgDompurifyModule} from '@tinkoff/ng-dompurify';
 import {PublishingComponent} from './components/publishing/publishing.component';
 import {ExistingValidationComponent} from './components/existing-validation/existing-validation.component';
 import {
@@ -47,7 +46,6 @@ import { SharedPrimeNgModule } from 'src/app/shared.primeNg.module';
   imports: [
     SharedPrimeNgModule,
     RouterModule,
-    NgDompurifyModule,
     CoreModule,
   ]
 })

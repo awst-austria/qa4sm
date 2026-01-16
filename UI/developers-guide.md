@@ -3,7 +3,7 @@ QA4SM Angular UI
 
 ## Development environment - build tools
 Necessary software packages to run and build the UI
-- Node.js -> at least v18
+- Node.js -> at least v22 (might need to `nvm install 22` first)
 - npm
 - angular-cli
 For the current angular version please check package.json, this will imply which node.js version is needed. 

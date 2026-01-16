@@ -1,7 +1,7 @@
 ascat==2.4.3
 asgiref==3.8.1
-bokeh==3.6.3
-brotli==1.1.0
+bokeh==3.8.2
+brotli==1.2.0
 cartopy==0.24.0
 celery==5.4.0
 certifi==2025.1.31
@@ -21,7 +21,7 @@ cytoolz==1.0.1
 dask==2025.1.0
 datedown==0.4
 distributed==2025.1.0
-django==5.1.6
+django==5.1.15
 django-countries==7.6.1
 django-rest-passwordreset==1.5.0
 django-widget-tweaks==1.5.0
@@ -31,11 +31,11 @@ drf-yasg==1.21.8
 exceptiongroup==1.2.2
 ecmwf-models==0.10.2
 esa_cci_sm==0.5.0
-fonttools==4.56.0
+fonttools==4.61.0
 fsspec==2025.2.0
 GitPython==3.1.44
 gldas==0.7.0
-h2==4.2.0
+h2==4.3.0
 h5netcdf==1.4.1
 h5py==3.12.1
 hpack==4.1.0
@@ -59,7 +59,7 @@ packaging==24.2
 pandas==2.2.3
 partd==1.4.2
 pillow==11.1.0
-pip==25.0.1
+pip==25.3
 platformdirs==4.3.6
 pluggy==1.5.0
 psutil==6.1.1
@@ -102,7 +102,7 @@ trollsift==0.2.1
 typing-extensions==4.12.2
 tzdata==2025.1
 unicodedata2==16.0.0
-urllib3==2.5.0
+urllib3==2.6.3
 wheel==0.45.1
 xarray==2025.1.2
 xyzservices==2025.1.0

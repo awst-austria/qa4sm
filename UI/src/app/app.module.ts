@@ -62,7 +62,6 @@ import {InputNumberModule} from 'primeng/inputnumber';
 import {MyDatasetsComponent} from './pages/my-datasets/my-datasets.component';
 import {UserDatasetsModule} from './modules/user-datasets/user-datasets.module';
 import {ValidationReferenceModule} from './modules/validation-reference/validation-reference.module';
-import {UserDataGuidelinesComponent} from './pages/user-data-guidelines/user-data-guidelines.component';
 import {DialogModule} from 'primeng/dialog';
 import {ProgressBarModule} from 'primeng/progressbar';
 import {ImageModule} from 'primeng/image';
@@ -94,7 +93,6 @@ import Aura from '@primeuix/themes/aura';
         PasswordResetValidateTokenComponent,
         TemporalMatchingComponent,
         MyDatasetsComponent,
-        UserDataGuidelinesComponent,
         ContactUsComponent,
     ],
     bootstrap: [AppComponent],

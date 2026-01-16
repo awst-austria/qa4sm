@@ -1,3 +1,11 @@
+QA4SM v3.4.1 - Release notes 2026-01-15
+======================================================
+
+# Fixes
+1. Fixed broken URLs in automated email and within NetCDF file.
+2. Update requirements.txt and AngularCore.
+3. Removed outdated FileUpload guidance.
+
 QA4SM v3.4.0 - Release notes 2025-12-05
 ======================================================
 # Updates

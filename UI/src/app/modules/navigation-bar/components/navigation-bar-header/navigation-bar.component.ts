@@ -59,15 +59,9 @@ export class NavigationBarComponent implements OnInit {
   };
 
   uploadDataHelpMenuItem: MenuItem = {
-    label: 'Data Preparation',
-    icon: 'pi pi-fw pi-question',
-    routerLink: ['user-data-guidelines']
-  };
-
-  uploadDataHelpMenuItem2: MenuItem = {
     label: 'Upload help',
     icon: 'pi pi-fw pi-question',
-    routerLink: ['user-data-guidelines2']
+    routerLink: ['user-data-guidelines']
   };
 
   datasetUploadMenuItem: MenuItem = {
@@ -75,8 +69,7 @@ export class NavigationBarComponent implements OnInit {
     icon: 'pi pi-fw pi-upload',
     items: [
       this.uploadDataMenuItem,
-      this.uploadDataHelpMenuItem,
-      this.uploadDataHelpMenuItem2
+      this.uploadDataHelpMenuItem
     ]
   };
 
