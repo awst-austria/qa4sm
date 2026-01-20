@@ -14,10 +14,13 @@ from django.core.cache import cache
 from pyproj import Transformer
 from validator.validation.globals import QR_COLORMAPS, QR_STATUS_DICT, QR_VALUE_RANGES, QR_CCI_LANDCOVER, QR_KG_CLIMATE, QR_METRICS_DESCRIPTION
 
-
 # Define transformer at module level
-TRANSFORMER_TO_4326 = Transformer.from_crs("EPSG:3857", "EPSG:4326", always_xy=True)
-TRANSFORMER_TO_3857 = Transformer.from_crs("EPSG:4326", "EPSG:3857", always_xy=True)
+TRANSFORMER_TO_4326 = Transformer.from_crs("EPSG:3857",
+                                           "EPSG:4326",
+                                           always_xy=True)
+TRANSFORMER_TO_3857 = Transformer.from_crs("EPSG:4326",
+                                           "EPSG:3857",
+                                           always_xy=True)
 
 
 @lru_cache(maxsize=10)
@@ -27,9 +30,11 @@ def get_cached_zarr_dataset(zarr_path):
     """
     return xr.open_zarr(zarr_path)
 
+
 def get_cache_key(validation_id, var_name):
     """Generate consistent cache keys"""
     return f"validation_{validation_id}_{var_name}"
+
 
 def compute_norm_params(validation_id, zarr_path, metric_name, layer_name):
     """Compute normalization parameters for a specific variable, respecting constraints"""
@@ -41,7 +46,8 @@ def compute_norm_params(validation_id, zarr_path, metric_name, layer_name):
 
     try:
         # Special handling for status (categorical)
-        if metric_name and (metric_name == 'status' or layer_name.startswith('status')):
+        if metric_name and (metric_name == 'status'
+                            or layer_name.startswith('status')):
             # Status uses fixed range based on status codes
             vmin = min(QR_STATUS_DICT.keys())
             vmax = max(QR_STATUS_DICT.keys())
@@ -49,7 +55,7 @@ def compute_norm_params(validation_id, zarr_path, metric_name, layer_name):
             return vmin, vmax
 
         # For continuous data, compute from actual data
-        ds = xr.open_zarr(zarr_path, consolidated=True)
+        ds = get_cached_zarr_dataset(zarr_path)
 
         # Select tsw='bulk' if needed
         if 'tsw' in ds.dims:
@@ -66,9 +72,10 @@ def compute_norm_params(validation_id, zarr_path, metric_name, layer_name):
         if metric_name and metric_name in QR_VALUE_RANGES:
             constraints = QR_VALUE_RANGES[metric_name]
             # Use constraint if it's not None, otherwise use computed value
-            vmin = constraints['vmin'] if constraints['vmin'] is not None else vmin
-            vmax = constraints['vmax'] if constraints['vmax'] is not None else vmax
-
+            vmin = constraints['vmin'] if constraints[
+                'vmin'] is not None else vmin
+            vmax = constraints['vmax'] if constraints[
+                'vmax'] is not None else vmax
 
         # Cache for 24 hours
         cache.set(cache_key, (vmin, vmax), 86400)
@@ -79,48 +86,47 @@ def compute_norm_params(validation_id, zarr_path, metric_name, layer_name):
         return 0.0, 1.0
 
 
-
 def get_transparent_tile():
     """Get cached transparent tile bytes"""
     cache_key = 'transparent_tile_png'
     tile_bytes = cache.get(cache_key)
-    
+
     if not tile_bytes:
         img = Image.new('RGBA', (256, 256), (0, 0, 0, 0))
         img_buffer = io.BytesIO()
         img.save(img_buffer, format='PNG')
         tile_bytes = img_buffer.getvalue()
         cache.set(cache_key, tile_bytes, timeout=None)  # Cache forever
-    
-    return HttpResponse(tile_bytes, content_type='image/png')
 
+    return HttpResponse(tile_bytes, content_type='image/png')
 
 
 def get_colormap(metric_name):
     """Get cached colormap for a specific metric"""
     cache_key = f"colormap_{metric_name}"
     cached_colormap = cache.get(cache_key)
-    
+
     if cached_colormap:
         return cached_colormap
-    
+
     try:
         # Get the matplotlib colormap from QR_COLORMAPS
         if metric_name in QR_COLORMAPS:
             mpl_colormap = QR_COLORMAPS[metric_name]
         else:
             # Fallback to a default colormap if metric not found
-            mpl_colormap = cm.get_cmap('viridis')  # or whatever default you prefer
-        
+            mpl_colormap = cm.get_cmap(
+                'viridis')
+
         # Cache for 24 hours (colormaps don't change)
         cache.set(cache_key, mpl_colormap, 86400)
         return mpl_colormap
-    
+
     except Exception as e:
         print(f"Error getting colormap for metric {metric_name}: {e}")
         # Return a safe default colormap
         return cm.get_cmap('viridis')
-    
+
 
 def get_colormap_type(mpl_colormap):
     """Get information about the colormap type and properties"""
@@ -142,51 +148,51 @@ def generate_css_gradient(mpl_colormap, metric_name=None, num_colors=10):
     try:
         # Get colormap information
         colormap_info = get_colormap_type(mpl_colormap)
-        
+
         if colormap_info['type'] == 'ListedColormap':
             # For ListedColormap, use the actual discrete colors
             colors = []
             actual_colors = colormap_info['colors']
-            
+
             for rgba in actual_colors:
                 # Convert to CSS rgba format
                 css_color = f"rgba({int(rgba[0]*255)}, {int(rgba[1]*255)}, {int(rgba[2]*255)}, {rgba[3] if len(rgba) > 3 else 1.0})"
                 colors.append(css_color)
-            
+
             # For categorical data like 'status', create equal segments
             if metric_name == 'status' and len(colors) > 1:
                 # Create discrete segments with equal width for categorical data
                 segment_width = 100 / len(colors)
                 gradient_parts = []
-                
+
                 for i, color in enumerate(colors):
                     start_pos = i * segment_width
                     end_pos = (i + 1) * segment_width
-                    
+
                     # Create sharp transitions between categories
                     gradient_parts.append(f"{color} {start_pos}%")
                     gradient_parts.append(f"{color} {end_pos}%")
-                
+
                 gradient = f"linear-gradient(to right, {', '.join(gradient_parts)})"
             elif len(colors) > 1:
                 # For other discrete colormaps, still create segments but maybe smoother
                 segment_width = 100 / len(colors)
                 gradient_parts = []
-                
+
                 for i, color in enumerate(colors):
                     start_pos = i * segment_width
                     end_pos = (i + 1) * segment_width
-                    
+
                     if i == 0:
                         gradient_parts.append(f"{color} {start_pos}%")
-                    
+
                     gradient_parts.append(f"{color} {end_pos}%")
-                
+
                 gradient = f"linear-gradient(to right, {', '.join(gradient_parts)})"
             else:
                 # Single color case
                 gradient = f"linear-gradient(to right, {colors[0]}, {colors[0]})"
-                
+
         else:
             # For LinearSegmentedColormap, sample colors continuously
             colors = []
@@ -197,17 +203,18 @@ def generate_css_gradient(mpl_colormap, metric_name=None, num_colors=10):
                 # Convert to CSS rgba format
                 css_color = f"rgba({int(rgba[0]*255)}, {int(rgba[1]*255)}, {int(rgba[2]*255)}, {rgba[3] if len(rgba) > 3 else 1.0})"
                 colors.append(css_color)
-            
+
             # Create smooth CSS linear gradient
             gradient = f"linear-gradient(to right, {', '.join(colors)})"
-        
+
         return gradient
-    
+
     except Exception as e:
         print(f"Error generating CSS gradient: {e}")
         return "linear-gradient(to right, blue, cyan, yellow, red)"  # fallback
 
-def get_colormap_metadata(metric_name, unit=None):                    
+
+def get_colormap_metadata(metric_name, unit=None):
     """Get static colormap metadata (gradient, type, categories) - NO file I/O
     Args:
 
@@ -221,14 +228,13 @@ def get_colormap_metadata(metric_name, unit=None):
 
     if cached:
         return cached
-    
+
     def clip_trailing_int(name: str) -> str:
         """triple collocation metrics include a dataset as identifier 
         This gets clipped away using regex (e.g. err_std_0-ISMN -> err_std)
         """
         return re.sub(r'_\d+(?:-.*)?$', '', name)
-    
-    
+
     if unit.get('common_unit'):
         candidates = (metric_name, clip_trailing_int(metric_name))
 
@@ -239,7 +245,9 @@ def get_colormap_metadata(metric_name, unit=None):
             break
 
     if template is None:
-        print(f"Unknown metric_name: {metric_name!r} (also tried {candidates[1]!r})")
+        print(
+            f"Unknown metric_name: {metric_name!r} (also tried {candidates[1]!r})"
+        )
     else:
         metrics_description = template.format(unit['common_unit'])
 
@@ -252,7 +260,8 @@ def get_colormap_metadata(metric_name, unit=None):
 
     result = {
         'gradient': gradient_colors,
-        'is_categorical': metric_name == 'status',  # Adjust based on your logic
+        'is_categorical':
+        metric_name == 'status',  # Adjust based on your logic
         'colormap_info': colormap_info,
         'metrics_description': metrics_description
     }
@@ -267,29 +276,29 @@ def get_colormap_metadata(metric_name, unit=None):
     return result
 
 
-
 def get_layernames(zarr_path):
     """Get information about all variables in the Zarr dataset"""
     cache_key = f"dataset_info_{zarr_path}"
     cached_info = cache.get(cache_key)
-    
+
     if cached_info:
         return cached_info
-    
+
     try:
-        ds = xr.open_zarr(zarr_path, consolidated=True)
-        
+        ds = get_cached_zarr_dataset(zarr_path)
+
         excluded = {'tsw', 'lon', 'lat', 'idx', 'gpi'}
         descriptions = {}
-        
+
         for var_name in ds.data_vars:
             if var_name not in excluded:
-                descriptions[var_name] = ds[var_name].attrs.get('long_name', var_name)
-        
+                descriptions[var_name] = ds[var_name].attrs.get(
+                    'long_name', var_name)
+
         # Cache for 1 hour
         cache.set(cache_key, descriptions, 3600)
         return descriptions
-    
+
     except Exception as e:
         print(f"Error reading zarr dataset info: {e}")
         return {}
@@ -298,7 +307,7 @@ def get_layernames(zarr_path):
 def get_actual_status_values(zarr_path, var_name):
     """Get unique status values that actually occur in the data"""
     try:
-        ds = xr.open_zarr(zarr_path, consolidated=True)
+        ds = get_cached_zarr_dataset(zarr_path)
         if var_name in ds.data_vars:
             data = ds[var_name].values
             # Get unique values, excluding NaN
@@ -314,7 +323,8 @@ def build_status_legend_data(colormap_info, zarr_path=None, var_name=None):
     """Build legend entries from colormap info and status categories, filtered by actual values"""
     import numpy as np
 
-    if not colormap_info.get('is_categorical') or 'categories' not in colormap_info:
+    if not colormap_info.get(
+            'is_categorical') or 'categories' not in colormap_info:
         return None
 
     categories = colormap_info['categories']
@@ -362,11 +372,7 @@ def build_status_legend_data(colormap_info, zarr_path=None, var_name=None):
             'color': color
         })
 
-    return {
-        'entries': entries
-    }
-
-
+    return {'entries': entries}
 
 
 def calculate_spread(zoom_level, plot_resolution):
@@ -388,7 +394,9 @@ def calculate_spread(zoom_level, plot_resolution):
         multiplier = 450
         exponent = 3.6
         divisor = 1840
-        return max(int((plot_resolution * multiplier + 10) * zoom_level ** exponent / divisor), 1)
+        return max(
+            int((plot_resolution * multiplier + 10) * zoom_level**exponent /
+                divisor), 1)
 
     # Coarse resolution (plot_resolution > 0.1)
     # Scale all values by plot_resolution/0.35 to handle different resolutions
@@ -400,14 +408,14 @@ def calculate_spread(zoom_level, plot_resolution):
 
     elif zoom_level <= 9:
         # Mid-low zoom: gradual ramp toward transition
-        base_spread = int(7 * (zoom_level - 5) ** 1.6 + 6)
+        base_spread = int(7 * (zoom_level - 5)**1.6 + 6)
         return int(base_spread * scale)
 
     else:
         # zoom >= 10: full rectangle mode with gradual quadratic ramp
-        base_spread = int(133 + 67 * (zoom_level - 10) + 33 * (zoom_level - 10) ** 2)
+        base_spread = int(133 + 67 * (zoom_level - 10) + 33 *
+                          (zoom_level - 10)**2)
         return int(base_spread * scale)
-
 
 
 def get_spread_and_buffer(validation_id, zoom_level, plot_resolution):
@@ -428,16 +436,15 @@ def get_spread_and_buffer(validation_id, zoom_level, plot_resolution):
     return result
 
 
-
-
 # 1. In-memory LRU cache for DataFrames (most recent validations)
-@lru_cache(maxsize=10)  # Keep last 10 validation_id + var_name combos in memory
+@lru_cache(
+    maxsize=10)  # Keep last 10 validation_id + var_name combos in memory
 def get_cached_dataframe(validation_id, var_name, zarr_path):
     """
     Load and cache DataFrame in memory.
     Cache key is based on validation_id and var_name.
     """
-    ds_zarr = xr.open_zarr(zarr_path)
+    ds_zarr = get_cached_zarr_dataset(zarr_path)
 
     if var_name not in ds_zarr.data_vars:
         return None
@@ -464,11 +471,15 @@ def create_spatial_index(df, coord_cols=('lon', 'lat')):
 
 
 @lru_cache(maxsize=10)
-def get_cached_dataframe_with_index(validation_id, layer_name, zarr_path, projection, is_scattered=False):
+def get_cached_dataframe_with_index(validation_id,
+                                    layer_name,
+                                    zarr_path,
+                                    projection,
+                                    is_scattered=False):
     """
     Load DataFrame and create spatial index.
     """
-    ds_zarr = xr.open_zarr(zarr_path)
+    ds_zarr = get_cached_zarr_dataset(zarr_path)
 
     if layer_name not in ds_zarr.data_vars:
         return None, None, None
@@ -481,9 +492,7 @@ def get_cached_dataframe_with_index(validation_id, layer_name, zarr_path, projec
     if projection == 3857:
         df = df.copy()
         df['x'], df['y'] = TRANSFORMER_TO_3857.transform(
-            df['lon'].values, 
-            df['lat'].values
-        )
+            df['lon'].values, df['lat'].values)
         coord_cols = ('x', 'y')
     else:
         coord_cols = ('lon', 'lat')
@@ -491,12 +500,15 @@ def get_cached_dataframe_with_index(validation_id, layer_name, zarr_path, projec
     # Create spatial index
     tree, coords = create_spatial_index(df, coord_cols)
 
-    print(f"Loaded DataFrame with spatial index for {validation_id}/{layer_name}: {len(df)} points")
+    print(
+        f"Loaded DataFrame with spatial index for {validation_id}/{layer_name}: {len(df)} points"
+    )
 
     return df, tree, coord_cols
 
 
-def get_point_value(request, validation_id, layer_name, zarr_path, x, y, z, projection):
+def get_point_value(request, validation_id, layer_name, zarr_path, x, y, z,
+                    projection):
     """
     Get value at point using direct xarray operations.
     Returns all candidates within threshold, with disambiguation info.
@@ -507,21 +519,23 @@ def get_point_value(request, validation_id, layer_name, zarr_path, x, y, z, proj
     elif projection == 4326:
         query_lon, query_lat = x, y
     else:
-        return JsonResponse({'error': f'Unsupported projection: {projection}'}, status=400)
+        return JsonResponse({'error': f'Unsupported projection: {projection}'},
+                            status=400)
 
     # Get resolution/distance threshold
     resolution = get_plot_resolution(validation_id)
 
     if not resolution['is_scattered']:
-        max_distance_deg = resolution['plot_resolution'] * (2 / z) ** 0.25
+        max_distance_deg = resolution['plot_resolution'] * (2 / z)**0.25
     else:
-        max_distance_deg = 4 / (z ** 1.75)
+        max_distance_deg = 4 / (z**1.75)
 
     try:
         ds = get_cached_zarr_dataset(zarr_path)
 
         if layer_name not in ds.data_vars:
-            return JsonResponse({'error': f'Variable {layer_name} not found'}, status=404)
+            return JsonResponse({'error': f'Variable {layer_name} not found'},
+                                status=404)
 
         lons = ds['lon'].values
         lats = ds['lat'].values
@@ -534,7 +548,8 @@ def get_point_value(request, validation_id, layer_name, zarr_path, x, y, z, proj
         candidate_indices = np.where(within_threshold_mask)[0]
 
         if len(candidate_indices) == 0:
-            return JsonResponse({'error': 'No data found at this location'}, status=404)
+            return JsonResponse({'error': 'No data found at this location'},
+                                status=404)
 
         # Sort candidates by distance (nearest first)
         candidate_distances = distances[candidate_indices]
@@ -572,7 +587,8 @@ def get_point_value(request, validation_id, layer_name, zarr_path, x, y, z, proj
 
         # No valid candidates after NaN filtering
         if len(candidates) == 0:
-            return JsonResponse({'error': 'No valid data at this location'}, status=404)
+            return JsonResponse({'error': 'No valid data at this location'},
+                                status=404)
 
         return JsonResponse({
             'candidates': candidates,
@@ -588,8 +604,8 @@ def get_point_value(request, validation_id, layer_name, zarr_path, x, y, z, proj
 def _add_ismn_metadata(ds, idx, candidate):
     """Helper to add ISMN metadata to a candidate."""
     metadata_vars = [
-        'station', 'network', 'lc_2010', 'climate_KG',
-        'frm_class', 'instrument', 'instrument_depthfrom', 'instrument_depthto'
+        'station', 'network', 'lc_2010', 'climate_KG', 'frm_class',
+        'instrument', 'instrument_depthfrom', 'instrument_depthto'
     ]
 
     for meta_var in metadata_vars:
@@ -613,4 +629,3 @@ def _add_ismn_metadata(ds, idx, candidate):
             candidate[meta_var] = f"{kg_value} ({val})"
         else:
             candidate[meta_var] = val
-

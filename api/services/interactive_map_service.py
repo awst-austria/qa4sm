@@ -1,4 +1,3 @@
-
 from django.core.cache import cache
 from django.conf import settings
 from django.shortcuts import get_object_or_404
@@ -19,15 +18,17 @@ def get_cached_zarr_path(validation_id):
 
     return zarr_path
 
+
 def check_zarr_file_exists(validation_id):
     """Check if zarr.json exists in the validation's zarr path"""
     zarr_path = get_cached_zarr_path(validation_id)
-    
+
     if not zarr_path:
         return False
-    
+
     zarr_json = os.path.join(zarr_path, 'zarr.json')
     return os.path.isfile(zarr_json)
+
 
 def get_plot_resolution(validation_id):
     """
@@ -39,25 +40,25 @@ def get_plot_resolution(validation_id):
     """
     cache_key = f'plot_resolution_{validation_id}'
     result = cache.get(cache_key)
-    
+
     if not result:
         validation_run = get_object_or_404(ValidationRun, id=validation_id)
         dataset_id = validation_run.spatial_reference_configuration.dataset_id
         dataset = get_object_or_404(Dataset, id=dataset_id)
-        
+
         plot_resolution = dataset.plot_resolution
         # Handle NaN - convert to None
         if plot_resolution is not None and math.isnan(plot_resolution):
             plot_resolution = None
-        
+
         result = {
             'plot_resolution': plot_resolution,
             'is_scattered': dataset.is_scattered_data,
             'is_ismn': dataset.short_name == 'ISMN'
         }
-        
-        cache.set(cache_key, result, timeout=3600) 
-    
+
+        cache.set(cache_key, result, timeout=3600)
+
     return result
 
 
@@ -99,4 +100,3 @@ def get_common_unit(validation_id):
 
     except Exception:
         return {'common_unit': None, 'from_scaling_ref': False}
-

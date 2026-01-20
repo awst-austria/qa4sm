@@ -62,7 +62,6 @@ pillow==11.1.0
 pip==25.0.1
 platformdirs==4.3.6
 pluggy==1.5.0
-psutil==6.1.1
 psycopg2-binary==2.9.10
 pyarrow==19.0.0
 pycparser==2.22
@@ -84,7 +83,7 @@ pyyaml==6.0.2
 #qa4sm-preprocessing==0.6.1
 git+https://github.com/daberer/qa4sm-preprocessing.git@v0.6.2-dev #qa4sm-preprocessing change back to correct version (zarr upgrade) 
 #qa4sm-reader==0.12.1
-git+https://github.com/daberer/qa4sm-reader.git@a850b16eb8b392c16faf4fa543a5fdba752b132f #qa4sm-reader change back to correct version
+git+https://github.com/daberer/qa4sm-reader.git@f421637b376aa98715a06499b5bc89f6ee027948 #qa4sm-reader change back to correct version
 redis==5.2.0
 requests==2.32.4
 scipy==1.15.1

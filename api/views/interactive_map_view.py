@@ -16,14 +16,15 @@ import zarr
 from ..services.interactive_map_service import get_plot_resolution, get_cached_zarr_path, get_common_unit, check_zarr_file_exists
 from validator.validation.globals import QR_STATUS_DICT, QR_VALUE_RANGES
 
-
-# Cache TMS and transformer objects 
+# Cache TMS and transformer objects
 TMS_4326 = morecantile.tms.get("WorldCRS84Quad")  # EPSG:4326
 TMS_3857 = morecantile.tms.get("WebMercatorQuad")  # EPSG:3857
-TRANSFORMER_TO_3857 = Transformer.from_crs("EPSG:4326", "EPSG:3857", always_xy=True)
+TRANSFORMER_TO_3857 = Transformer.from_crs("EPSG:4326",
+                                           "EPSG:3857",
+                                           always_xy=True)
 
 
-
+# API endpoints
 @require_http_methods(["GET"])
 def check_zarr_exists(request, validation_id):
     """API endpoint to check if zarr file exists"""
@@ -37,89 +38,77 @@ def get_data_point(request, validation_id, metric_name, layer_name):
         x = float(request.GET.get('x'))
         y = float(request.GET.get('y'))
         z = float(request.GET.get('z'))
+        print(x, y, z, layer_name)
         projection = int(request.GET.get('projection', 4326))
     except (TypeError, ValueError):
         return JsonResponse({'error': 'Invalid coordinates'}, status=400)
 
     zarr_path = get_cached_zarr_path(validation_id)
 
-    return get_point_value(request, validation_id, layer_name, zarr_path, 
-                          x, y, z, projection)
-
-
-# API endpoints
+    return get_point_value(request, validation_id, layer_name, zarr_path, x, y,
+                           z, projection)
 
 
 @require_http_methods(["GET"])
 def get_layer_bounds(request, validation_id):
     """Get geographic bounds from Zarr lat/lon arrays (same for all metrics)"""
-    
+
     # Cache key only uses validation_id since bounds are the same for all metrics
     bounds_cache_key = f"bounds_{validation_id}"
     bounds_data = cache.get(bounds_cache_key)
-    
+
     if not bounds_data:
         try:
             zarr_path = get_cached_zarr_path(validation_id)
-            
+
             # Open the Zarr store
             store = zarr.open(zarr_path, mode='r')
-            
+
             # Read lat/lon arrays
             if 'lat' not in store or 'lon' not in store:
                 return JsonResponse(
-                    {"error": "lat/lon arrays not found in Zarr store"}, 
-                    status=404
-                )
-            
+                    {"error": "lat/lon arrays not found in Zarr store"},
+                    status=404)
+
             lat = store['lat'][:]
             lon = store['lon'][:]
-            
+
             # Filter out fill values (NaN) if present
             lat_valid = lat[~np.isnan(lat)]
             lon_valid = lon[~np.isnan(lon)]
-            
+
             if len(lat_valid) == 0 or len(lon_valid) == 0:
-                return JsonResponse(
-                    {"error": "No valid coordinates found"}, 
-                    status=404
-                )
-            
+                return JsonResponse({"error": "No valid coordinates found"},
+                                    status=404)
+
             # Calculate bounds
             min_lon = float(np.min(lon_valid))
             max_lon = float(np.max(lon_valid))
             min_lat = float(np.min(lat_valid))
             max_lat = float(np.max(lat_valid))
-            
+
             # Add a small buffer (1% of the range) to ensure all points are visible
             lon_buffer = (max_lon - min_lon) * 0.01 or 0.1
             lat_buffer = (max_lat - min_lat) * 0.01 or 0.1
-            
+
             bounds_data = {
                 'extent': [
-                    min_lon - lon_buffer,
-                    min_lat - lat_buffer,
-                    max_lon + lon_buffer,
-                    max_lat + lat_buffer
+                    min_lon - lon_buffer, min_lat - lat_buffer,
+                    max_lon + lon_buffer, max_lat + lat_buffer
                 ],
-                'center': [
-                    (min_lon + max_lon) / 2,
-                    (min_lat + max_lat) / 2
-                ],
-                'num_points': len(lat_valid)
+                'center': [(min_lon + max_lon) / 2, (min_lat + max_lat) / 2],
+                'num_points':
+                len(lat_valid)
             }
-            
+
             # Cache for longer (24 hours) since this never changes for a validation
             cache.set(bounds_cache_key, bounds_data, timeout=86400)
-            
+
         except Exception as e:
             return JsonResponse(
-                {"error": f"Error reading Zarr bounds: {str(e)}"}, 
-                status=500
-            )
-    
-    return JsonResponse(bounds_data)
+                {"error": f"Error reading Zarr bounds: {str(e)}"}, status=500)
 
+    return JsonResponse(bounds_data)
 
 
 @require_http_methods(["GET"])
@@ -143,9 +132,9 @@ def get_layer_range(request, validation_id, metric_name, layer_name):
             # Continuous data - compute from actual data
             zarr_path = get_cached_zarr_path(validation_id)
             vmin, vmax = compute_norm_params(
-                validation_id, 
+                validation_id,
                 zarr_path,
-                metric_name, 
+                metric_name,
                 layer_name,
             )
 
@@ -162,11 +151,10 @@ def get_layer_range(request, validation_id, metric_name, layer_name):
     return JsonResponse(range_data)
 
 
-
-
 @require_http_methods(["POST"])
 def get_validation_layer_metadata(request, validation_id):
     """Fetch metadata including layer mappings, gradients, and status legends (NO vmin/vmax)"""
+
     def convert_numpy(obj):
         """Recursively convert numpy types to native Python types"""
         if isinstance(obj, np.ndarray):
@@ -207,17 +195,14 @@ def get_validation_layer_metadata(request, validation_id):
                     # Handle status legends with actual values
                     if metric == 'status':
                         status_legend = build_status_legend_data(
-                            colormap_info,
-                            zarr_path,
-                            possible_layer_name
-                        )
+                            colormap_info, zarr_path, possible_layer_name)
                         status_metadata[possible_layer_name] = status_legend
 
         metadata = {
-            'validation_id': validation_id, 
+            'validation_id': validation_id,
             'layers': layers,
             'status_metadata': status_metadata,
-            'unit' : unit,
+            'unit': unit,
         }
 
         cache.set(cache_key, metadata, timeout=3600)
@@ -228,17 +213,13 @@ def get_validation_layer_metadata(request, validation_id):
     return JsonResponse(metadata)
 
 
-
-
-
-
-    
 @require_http_methods(["GET"])
-def get_tile(request, validation_id, metric_name, layer_name, projection, z, x, y):
+def get_tile(request, validation_id, metric_name, layer_name, projection, z, x,
+             y):
     """Serve a datashader tile with efficient DataFrame caching."""
-
     if projection not in (4326, 3857):
-        return HttpResponse("Invalid projection. Use '4326' or '3857'", status=400)
+        return HttpResponse("Invalid projection. Use '4326' or '3857'",
+                            status=400)
 
     zarr_path = get_cached_zarr_path(validation_id)
 
@@ -247,8 +228,7 @@ def get_tile(request, validation_id, metric_name, layer_name, projection, z, x, 
 
     try:
         df, tree, coord_cols = get_cached_dataframe_with_index(
-            validation_id, layer_name, zarr_path, projection
-        )
+            validation_id, layer_name, zarr_path, projection)
 
         if df is None or len(df) == 0:
             return get_transparent_tile()
@@ -266,7 +246,8 @@ def get_tile(request, validation_id, metric_name, layer_name, projection, z, x, 
             if z < 5:
                 spread_px, buffer_px, marker_shape = 4, 5, 'circle'
         else:
-            spread_px, buffer_px = get_spread_and_buffer(validation_id, z, resolution['plot_resolution'])
+            spread_px, buffer_px = get_spread_and_buffer(
+                validation_id, z, resolution['plot_resolution'])
             marker_shape = 'square'
 
         # Calculate ranges and buffers
@@ -290,43 +271,57 @@ def get_tile(request, validation_id, metric_name, layer_name, projection, z, x, 
 
         # Map to buffered pixel space
         buffered_size = 256 + 2 * buffer_px
-        df_tile['px'] = (df_tile[col_x] - x_min) / (x_range + 2 * x_buffer) * buffered_size
-        df_tile['py'] = (df_tile[col_y] - y_min) / (y_range + 2 * y_buffer) * buffered_size
+        df_tile['px'] = (df_tile[col_x] -
+                         x_min) / (x_range + 2 * x_buffer) * buffered_size
+        df_tile['py'] = (df_tile[col_y] -
+                         y_min) / (y_range + 2 * y_buffer) * buffered_size
 
         # Create buffered canvas
-        cvs = ds.Canvas(
-            plot_width=buffered_size,
-            plot_height=buffered_size,
-            x_range=(0, buffered_size),
-            y_range=(0, buffered_size)
-        )
+        cvs = ds.Canvas(plot_width=buffered_size,
+                        plot_height=buffered_size,
+                        x_range=(0, buffered_size),
+                        y_range=(0, buffered_size))
 
         # Get normalization parameters and colormap
-        vmin, vmax = compute_norm_params(validation_id, zarr_path, metric_name, layer_name)
+        vmin, vmax = compute_norm_params(validation_id, zarr_path, metric_name,
+                                         layer_name)
         mpl_cmap = get_colormap(metric_name)
 
         # Aggregate and shade based on data type
-        is_categorical = metric_name == 'status' or layer_name.startswith('status')
-        agg = cvs.points(df_tile, 'px', 'py', agg=ds.first('value') if is_categorical else ds.mean('value'))
+        is_categorical = metric_name == 'status' or layer_name.startswith(
+            'status')
+        agg = cvs.points(
+            df_tile,
+            'px',
+            'py',
+            agg=ds.first('value') if is_categorical else ds.mean('value'))
 
         if is_categorical:
             status_codes = sorted(QR_STATUS_DICT.keys())
             colors_hex = [
-                '#%02x%02x%02x' % (int(r*255), int(g*255), int(b*255))
-                for r, g, b, a in (mpl_cmap(i) for i in range(len(status_codes)))
+                '#%02x%02x%02x' % (int(r * 255), int(g * 255), int(b * 255))
+                for r, g, b, a in (mpl_cmap(i)
+                                   for i in range(len(status_codes)))
             ]
-            color_key = {int(code): colors_hex[i] for i, code in enumerate(status_codes)}
+            color_key = {
+                int(code): colors_hex[i]
+                for i, code in enumerate(status_codes)
+            }
             img = tf.shade(agg, color_key=color_key, how='linear')
         else:
             img = tf.shade(agg, cmap=mpl_cmap, how='linear', span=(vmin, vmax))
 
         # Create black halo layer and colored marker layer, then stack
-        img_halo = tf.spread(tf.shade(agg, cmap=['black'], how='linear'), px=spread_px + 1, shape=marker_shape)
-        img = tf.stack(img_halo, tf.spread(img, px=spread_px, shape=marker_shape))
+        img_halo = tf.spread(tf.shade(agg, cmap=['black'], how='linear'),
+                             px=spread_px + 1,
+                             shape=marker_shape)
+        img = tf.stack(img_halo,
+                       tf.spread(img, px=spread_px, shape=marker_shape))
 
         # Crop to tile bounds and output
         pil_img = img.to_pil().convert('RGBA')
-        pil_img = pil_img.crop((buffer_px, buffer_px, 256 + buffer_px, 256 + buffer_px))
+        pil_img = pil_img.crop(
+            (buffer_px, buffer_px, 256 + buffer_px, 256 + buffer_px))
 
         img_buffer = io.BytesIO()
         pil_img.save(img_buffer, format='PNG')
@@ -339,4 +334,3 @@ def get_tile(request, validation_id, metric_name, layer_name, projection, z, x, 
         import traceback
         traceback.print_exc()
         return get_transparent_tile()
-
