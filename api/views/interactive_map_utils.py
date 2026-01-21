@@ -213,67 +213,64 @@ def generate_css_gradient(mpl_colormap, metric_name=None, num_colors=10):
         print(f"Error generating CSS gradient: {e}")
         return "linear-gradient(to right, blue, cyan, yellow, red)"  # fallback
 
+def clip_trailing_int(name: str) -> str:
+    """Remove trailing dataset identifier from triple collocation metrics.
 
-def get_colormap_metadata(metric_name, unit=None):
-    """Get static colormap metadata (gradient, type, categories) - NO file I/O
+    Example: 'err_std_0-ISMN' -> 'err_std'
+    """
+    return re.sub(r'_\d+(?:-.*)?$', '', name)
+
+
+def get_metrics_description(metric_name: str, unit: dict | None) -> str | None:
+    """Look up metric description and format with unit if available."""
+    if not unit:
+        return None
+
+    common_unit = unit.get('common_unit')
+    if not common_unit:
+        return None
+
+    candidates = (metric_name, clip_trailing_int(metric_name))
+
+    for key in candidates:
+        if key and (template := QR_METRICS_DESCRIPTION.get(key)):
+            return template.format(common_unit)
+
+    print(f"Unknown metric_name: {metric_name!r} (also tried {candidates[1]!r})")
+    return None
+
+
+def get_colormap_metadata(metric_name: str, unit: dict | None = None) -> dict:
+    """Get static colormap metadata (gradient, type, categories) - NO file I/O.
+
     Args:
+        metric_name: Name of metric for colorbar (e.g. 'n_obs', 'status', 'BIAS')
+        unit: Dict with 'common_unit' and optionally 'from_scaling_ref', or None
 
-    metric_name: str
-        name of metric for colorbar (e.g. n_obs, status, BIAS)
-    unit: dict, None
-        dict with keys explaining a common_unit and from_scaling_ref, if applicable
+    Returns:
+        Dict with keys: gradient, is_categorical, colormap_info, metrics_description,
+        and optionally 'categories' for status metrics.
     """
     cache_key = f"colormap_metadata_{metric_name}"
-    cached = cache.get(cache_key)
 
-    if cached:
-        return cached
+    # if cached := cache.get(cache_key):
+    #     return cached
 
-    def clip_trailing_int(name: str) -> str:
-        """triple collocation metrics include a dataset as identifier 
-        This gets clipped away using regex (e.g. err_std_0-ISMN -> err_std)
-        """
-        return re.sub(r'_\d+(?:-.*)?$', '', name)
-
-    if unit.get('common_unit'):
-        candidates = (metric_name, clip_trailing_int(metric_name))
-
-    template = None
-    for key in candidates:
-        template = QR_METRICS_DESCRIPTION.get(key)
-        if template is not None:
-            break
-
-    if template is None:
-        print(
-            f"Unknown metric_name: {metric_name!r} (also tried {candidates[1]!r})"
-        )
-    else:
-        metrics_description = template.format(unit['common_unit'])
-
-    # Get the colormap for this metric
     colormap = get_colormap(metric_name)
-    colormap_info = get_colormap_type(colormap)
-
-    # Generate CSS gradient colors from the matplotlib colormap
-    gradient_colors = generate_css_gradient(colormap, metric_name)
 
     result = {
-        'gradient': gradient_colors,
-        'is_categorical':
-        metric_name == 'status',  # Adjust based on your logic
-        'colormap_info': colormap_info,
-        'metrics_description': metrics_description
+        'gradient': generate_css_gradient(colormap, metric_name),
+        'is_categorical': metric_name == 'status',
+        'colormap_info': get_colormap_type(colormap),
+        'metrics_description': get_metrics_description(metric_name, unit),
     }
 
-    # Add category definitions for status
     if metric_name == 'status':
         result['categories'] = QR_STATUS_DICT
 
-    # Cache indefinitely - this never changes
     cache.set(cache_key, result, None)
-
     return result
+
 
 
 def get_layernames(zarr_path):
