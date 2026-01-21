@@ -9,6 +9,8 @@ class DataVariable(models.Model):
 
     min_value = models.FloatField(null=True)
     max_value = models.FloatField(null=True)
+    display_name = models.CharField(max_length=100)
+
     
     # many-to-one relationships coming from other models:
     # dataset_configuration from DatasetConfiguration

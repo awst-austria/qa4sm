@@ -1,3 +1,5 @@
+import os
+
 from django.shortcuts import get_object_or_404
 from qa4sm_preprocessing.utils import preprocess_user_data, validate_file_upload
 
