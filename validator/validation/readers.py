@@ -114,27 +114,6 @@ class SMOSL2Reader(GriddedNcIndexedRaggedTs):
         return ts
 
 
-# class SMAPL3_V9Reader(GriddedNcIndexedRaggedTs):
-#     def __init__(self, *args, **kwargs):
-#         super().__init__(*args, **kwargs)
-#
-#     def read(self, *args, **kwargs) -> pd.DataFrame:
-#         ts = super().read(*args, **kwargs)
-#         if (ts is not None) and not ts.empty:
-#             ts = ts[ts.index.notnull()]
-#             for col in ['soil_moisture_error', "retrieval_qual_flag",
-#             "freeze_thaw_fraction", "surface_flag",
-#                         "surface_temperature", "vegetation_opacity",
-#                         "vegetation_water_content", "landcover_class",
-#                         'static_water_body_fraction']:
-#                 if col in ts.columns:
-#                     ts[col] = ts[col].fillna(0)
-#             if 'soil_moisture' in ts.columns:
-#                 ts = ts.dropna(subset='soil_moisture')
-#         assert ts is not None, "No data read"
-#         return ts
-
-
 def create_reader(dataset, version) -> GriddedNcTs:
     """
     Create basic readers (without any adapters / filters) for a dataset version
@@ -185,6 +164,7 @@ def create_reader(dataset, version) -> GriddedNcTs:
             dataset.short_name == globals.CCIP or
             dataset.short_name == globals.CCI_RZSM or
             dataset.short_name == globals.CCIGF or
+            dataset.short_name == globals.CCIMF or
             dataset.short_name == globals.CCICMR):
         reader = CCITs(folder_name, ioclass_kws={'read_bulk': True})
 
