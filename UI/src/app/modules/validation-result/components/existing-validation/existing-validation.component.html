@@ -1,7 +1,6 @@
-<ng-container *ngIf="display$ | async as display">
-  <p-dialog
+<p-dialog
     header="There exists a validation"
-    [visible]="display === 'open'"
+    [(visible)]="visible"
     [modal]="true"
     [dismissableMask]="true"
     [closable]="true"
@@ -48,6 +47,6 @@
       </div>
 
     </ng-container>
-  </p-dialog>
-</ng-container>
+</p-dialog>
+
 

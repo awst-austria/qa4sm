@@ -293,7 +293,8 @@
     </div>
     <qa-existing-validation *ngIf="isExistingValidationWindowOpen"
                             [isThereValidation]="isThereValidation"
-                            (startValidation)="startValidation(false)"/>
+                            (startValidation)="startValidation(false)"
+                            (closed)="isExistingValidationWindowOpen = false"/>
   </div>
 </main>
 <p-scrollTop styleClass="scroll-button"></p-scrollTop>
