@@ -81,7 +81,7 @@ pytest-django==4.10.0
 python-dateutil==2.9.0.post0
 pytz==2024.1
 pyyaml==6.0.2
-qa4sm-preprocessing==0.6.1
+qa4sm-preprocessing==0.6.2
 qa4sm-reader==0.12.1
 redis==5.2.0
 requests==2.32.4
