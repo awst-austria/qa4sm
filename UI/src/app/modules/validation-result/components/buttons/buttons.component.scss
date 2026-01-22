@@ -3,6 +3,25 @@
 .btn-bar {
   display: flex;
   align-items: center;
+}
+
+/* IMPORTANT: normalize ALL direct children (a, button, span, dropdown wrapper) */
+.btn-bar > * {
+  display: inline-flex;
+  align-items: center;
+  vertical-align: middle;
+}
+
+/* IMPORTANT: normalize the actual PrimeNG button element for both <a pButton> and <button pButton> */
+.btn-bar .p-button {
+  display: inline-flex;
+  align-items: center;
+  line-height: 1;     /* removes tiny baseline differences */
+}
+
+.btn-bar span {
+  display: inline-flex;
+  align-items: center;
   gap: 0.5rem;
 }
 
