@@ -82,7 +82,7 @@ export class ValidateComponent implements OnInit, AfterViewInit {
 
   validationStart: Date = new Date('1978-01-01');
   validationEnd: Date = new Date();
-  isThereValidation: ExistingValidationDto;
+  isThereValidation: ExistingValidationDto | null = null;
   public isExistingValidationWindowOpen: boolean;
   maintenanceMode = false;
   noIsmnPoints = signal(false);
@@ -131,9 +131,10 @@ export class ValidateComponent implements OnInit, AfterViewInit {
     this.settingsService.getAllSettings().subscribe(setting => {
       this.maintenanceMode = setting[0].maintenance_mode;
     });
-    this.modalWindowService.watch().subscribe(state => {
-      this.isExistingValidationWindowOpen = state === 'open';
-    });
+
+    this.isExistingValidationWindowOpen = false;
+    this.isThereValidation = null; // make it ExistingValidationDto | null
+    
 
     this.route.queryParams.subscribe(params => {
       if (params.validation_id) {
@@ -908,7 +909,7 @@ export class ValidateComponent implements OnInit, AfterViewInit {
           'Your validation has been started'));
     } else if (data.is_there_validation) {
       this.isThereValidation = data;
-      this.modalWindowService.open();
+      this.isExistingValidationWindowOpen = true;
     }
   }
 

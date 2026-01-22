@@ -18,7 +18,7 @@ export class ExistingValidationComponent implements OnInit {
    /* Visibility of p-dialog */
   visible = true;
 
-  @Input() isThereValidation: ExistingValidationDto;
+  @Input() isThereValidation: ExistingValidationDto | null = null;
   @Output() startValidation = new EventEmitter<boolean>();
   @Output() closed = new EventEmitter<void>();
 
@@ -38,7 +38,7 @@ export class ExistingValidationComponent implements OnInit {
       .pipe(
         catchError(() => {
           this.visible = false;
-          this.startValidation.emit(true);
+          this.startValidation.emit(false);
           return EMPTY;
         })
       );
@@ -55,7 +55,7 @@ export class ExistingValidationComponent implements OnInit {
 
   runOwnValidation(): void{
     this.close(); // I need to add it, otherwise a publishing window will open, it uses the same modal window functions
-    this.startValidation.emit(true);
+    this.startValidation.emit(false);
   }
 
 }

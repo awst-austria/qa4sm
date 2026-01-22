@@ -291,9 +291,9 @@
       <qa-maintenance-mode *ngIf="maintenanceMode" [action]="'start new validations'"></qa-maintenance-mode>
 
     </div>
-    <qa-existing-validation *ngIf="isExistingValidationWindowOpen"
+    <qa-existing-validation *ngIf="isExistingValidationWindowOpen && isThereValidation"
                             [isThereValidation]="isThereValidation"
-                            (startValidation)="startValidation(false)"
+                            (startValidation)="startValidation($event)"
                             (closed)="isExistingValidationWindowOpen = false"/>
   </div>
 </main>
