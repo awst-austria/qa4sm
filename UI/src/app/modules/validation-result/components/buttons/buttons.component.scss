@@ -1,5 +1,11 @@
 @use 'src/style.variables' as *;
 
+.btn-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
 
 .dropdown {
   position: relative;

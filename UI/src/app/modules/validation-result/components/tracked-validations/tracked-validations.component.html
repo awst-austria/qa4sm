@@ -3,7 +3,7 @@
   <div *ngIf="myCopiedRuns.length !== 0" class="w-12 flex flex-column">
     <h1 class="text-center">Pinned validations</h1>
     <div class="mb-3 flex flex-column w-12">
-      <div *ngFor="let valrun of myCopiedRuns" class="mx-0 my-2 flex flex-row flex-wrap w-12 justify-content-start align-items-center"
+      <div *ngFor="let valrun of myCopiedRuns" class="mx-0 my-2 flex flex-row lg:flex-nowrap flex-wrap w-12 justify-content-start align-items-center"
            id="attached_result_row_{{ valrun.id }}">
         <h4 class="my-0 w-6 text-justify"><span class="font-weight-normal"><b>Validation:</b></span> {{ valrun.name_tag }}</h4>
 
