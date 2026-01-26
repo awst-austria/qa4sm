@@ -1,4 +1,4 @@
-<p-panel header="Spatial Subsetting" [toggleable]="true" styleClass="validation-row">
+<p-panel header="Spatial Subsetting" [toggleable]="true">
   <ng-template pTemplate="icons">
     <label class="p-panel-header-icon"
            pTooltip="Restrict the input and reference data to a lat/lon bounding box (specified with lower left and upper right corner coordinates). You can also select the bounding box on the map above."
@@ -6,16 +6,17 @@
       <span class="pi pi-question-circle"></span>
     </label>
   </ng-template>
-  <div class="p-fluid grid pt-2">
+
+  <div class="grid pt-5 align-items-center">
 
     <!-- Left -->
     <div class="col-12 lg:col-5">
       <div class="grid align-items-center">
-        <div class="col-4 label-cell text-center">
-          <div pTooltip="Lower left bounding box corner" style="margin-top:-1.5rem;"><b>Lower left:</b> </div>
+        <div class="col-4 text-right">
+          <strong>Lower left:</strong>
         </div>
         <div class="col-4">
-          <span class="p-float-label">
+          <p-floatLabel>
             <p-inputNumber 
                 class="w-full"
                 inputStyleClass="w-full"
@@ -27,10 +28,10 @@
                 (ngModelChange)="subsetModel.minLat$.next($event)">
             </p-inputNumber>
             <label for="minLatInputId">Min. Lat</label>
-          </span>
+          </p-floatLabel>
         </div>
         <div class="col-4">
-          <span class="p-float-label">
+          <p-floatLabel>
             <p-inputNumber 
                 class="w-full"
                 inputStyleClass="w-full"
@@ -43,13 +44,13 @@
                 (ngModelChange)="subsetModel.minLon$.next($event)">
               </p-inputNumber>
               <label for="minLonInputId">Min. Lon</label>
-            </span>
+            </p-floatLabel>
         </div>
       </div>
     </div>
 
     <!-- Middle buttons -->
-    <div class="col-12 lg:col-2 flex align-items-center justify-content-center" style="margin-top:-1.5rem;">
+    <div class="col-12 lg:col-2 flex align-items-center justify-content-center">
         <button pButton
                 title="clear-coordinates-button"
                 type="button"
@@ -63,12 +64,12 @@
     <!--    Right  -->
     <div class="col-12 lg:col-5">
       <div class="grid align-items-center">
-        <div class="col-4 label-cell text-center"> 
-          <div pTooltip="Upper right bounding box corner" style="margin-top:-1.5rem;"><b>Upper right:</b></div> 
+        <div class="col-4 text-right"> 
+          <strong>Upper right:</strong>
         </div>
 
         <div class="col-4">
-          <span class="p-float-label ">
+          <p-floatLabel>
             <p-inputNumber 
                   class="w-full"
                   inputStyleClass="w-full"
@@ -80,11 +81,11 @@
                   (ngModelChange)="subsetModel.maxLat$.next($event)">
             </p-inputNumber>
             <label for="maxLatInputId">Max. Lat</label>
-          </span>
+          </p-floatLabel>
         </div>
 
         <div class="col-4">
-            <span class="p-float-label ">
+            <p-floatLabel>
               <p-inputNumber 
                   class="w-full"
                   inputStyleClass="w-full"
@@ -96,7 +97,7 @@
                   (ngModelChange)="subsetModel.maxLon$.next($event)">
               </p-inputNumber>
               <label for="maxLonInputId">Max. Lon</label>
-            </span>  
+            </p-floatLabel>  
         </div>
 
       </div>

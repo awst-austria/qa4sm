@@ -1,3 +1,12 @@
+QA4SM v3.5.0 - Release notes 2026-01-26
+======================================================
+
+# Fixes
+1. Update Home and Validate Page Frontend.
+2. BugFix Pinned Validations.
+3. BugFix Statistics in Tables.
+4. Add ESA CCI MODELFREE dataset.
+
 QA4SM v3.4.1 - Release notes 2026-01-15
 ======================================================
 

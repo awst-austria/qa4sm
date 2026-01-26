@@ -7,7 +7,9 @@
                 (onChange)="includeFilters($event); excludeFilters($event); checkIfUpdateMap(filterModel.filterDto.name)"
                 [ngClass]="{'readonly-filter-checkbox': filterModel.filterDto.readonly}"
     ></p-checkbox>
-    <label class="pl-2" for="{{filterModel.filterDto.id}}"> {{filterModel.filterDto.description}}</label>
+    <label class="pl-2" [for]="filterModel.filterDto.id"> 
+      {{filterModel.filterDto.description}}
+    </label>
   </div>
   <div [ngClass]="{'col-1': true, 'adjust-margin': isIncluded}">
     <span class="pi pi-question-circle" [pTooltip]="filterModel.filterDto.help_text"></span>

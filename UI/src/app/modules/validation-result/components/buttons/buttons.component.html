@@ -1,5 +1,5 @@
 <!--Buttons shown on the validation list page (both custom and published)-->
-<div *ngIf="validationList" class="btn-bar" style="max-width: 25rem">
+<div *ngIf="validationList" class="btn-bar flex align-items-center" style="max-width: 25rem">
   <!--  this one will be shown on custom validation page only due to given conditions-->
   <button *ngIf="validationRun.progress > -1 && validationRun.progress < 100 && validationRun.end_time === null"
           pButton
@@ -13,15 +13,16 @@
     <span><fa-icon [icon]="faIcons.faStop"></fa-icon></span>
   </button>
   <!--  both pages -->
-  <a class="btn-action"
-     title="see-results"
-     pButton
-     type="button"
-     icon="pi pi-folder-open"
-     routerLink="/validation-result/{{validationRun.id}}"
-     pTooltip="View results"
-     [life]="globals.tooltipLifetime">
-  </a>
+<button
+        pButton
+        type="button"
+        class="btn-action"
+        title="see-results"
+        icon="pi pi-folder-open"
+        pTooltip="View results"
+        [life]="globals.tooltipLifetime"
+        (click)="router.navigate(['/validation-result', validationRun.id])">
+        </button>
 
   <!--custom validations only-->
   <span *ngIf="validationRun.end_time && validationRun.is_unpublished && isOwner"
