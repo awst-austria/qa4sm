@@ -6,6 +6,8 @@ class UserDatasetFileAdmin(ModelAdmin):
     list_filter = ('owner', 'dataset', 'version', 'upload_date')
     ordering = ('owner', 'upload_date','dataset', 'version')
 
+    sortable_by = ('id', 'file_name', 'owner', 'dataset', 'version', 'upload_date')
+
     def user_groups_list(self, obj):
         if obj.dataset is None:
             return "N/A (Dataset deleted)"

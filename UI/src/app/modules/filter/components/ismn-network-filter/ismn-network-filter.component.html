@@ -3,20 +3,25 @@
     <p-checkbox label="{{filterModel.filterDto.description}}: "
                 [binary]="true" [ngModel]="true" [readonly]=filterModel.filterDto.readonly class="readonly-filter-checkbox">
     </p-checkbox>
-    <a (click)="showNetworkSelector()"><span style="padding-left: 5px;cursor: pointer;">Select area</span></a>
+    <a (click)="showNetworkSelector()"><span style="padding-left: 5px;cursor: pointer;">Select Network(s)</span></a>
   </div>
   <div [ngClass]="{'col-1': true}">
     <span class="pi pi-question-circle" [pTooltip]="filterModel.filterDto.help_text"></span>
   </div>
 </div>
-<p-dialog styleClass="networkDialog" header="Select network(s)" position="top" [(visible)]="networkSelectorVisible">
-  <div class="pb-3" style="max-width: 350px">
+<p-dialog 
+    styleClass="networkDialog" 
+    [style]="{ width: '400px' }"
+    header="Select network(s)" 
+    position="top" 
+    [(visible)]="networkSelectorVisible">
+  <div class="pb-3">
     Click on a continent to unfold its list of networks.<br/>
     You can find more information about the ISMN networks on the <a href="https://ismn.earth/en/networks/"
                                                                     target="_blank">ISMN networks list</a>. <br>
-      <div style="color: gray" *ngIf="networkFetchError()">
-        {{errorMessage}}
-      </div>
+    <div style="color: gray" *ngIf="networkFetchError()">
+      {{errorMessage}}
+    </div>
   </div>
   <p-tree [value]="networkTree" selectionMode="checkbox"
           (onNodeSelect)="onNetworkSelect($event)"

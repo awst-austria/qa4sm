@@ -333,6 +333,12 @@ class ValidationConfigurationSerializer(serializers.Serializer):
             raise serializers.ValidationError('Scaling reference set, but the scaling method not.')
         elif scaling_ref_configs_num > 1 and attrs['scaling_method'] != 'none':
             raise serializers.ValidationError('More than one scaling reference provided.')
+        
+        # Only climatology may have dates
+        anomalies_method = attrs.get('anomalies_method')
+        if anomalies_method != ValidationRun.CLIMATOLOGY:
+            attrs['anomalies_from'] = None
+            attrs['anomalies_to'] = None
 
         return attrs
 

@@ -1,7 +1,10 @@
-<div id="tooltip" class="ol-tooltip">
-  <div id="tooltip-content"></div>
-</div>
-<div class="map-container" style="width: 100%;height: 400px" id="map"></div>
+<p-panel toggleable="true" [header]="'Map'" class="validation-small-row">
+  <div id="tooltip">
+    <div id="tooltip-content"></div>
+  </div>
+  <div class="map-container" style="width: 100%;height: 400px" id="map"></div>
 
-<qa-map-legend [legendItems]="legendItems"/>
+  <qa-map-legend [legendItems]="legendItems"/>
+
+</p-panel>
 

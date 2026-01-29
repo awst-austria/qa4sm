@@ -8,7 +8,7 @@
     <label class="pl-2" for="intraAnnualMetricsSelector">Include Intra-Annual metrics</label>
   </div>
   <div class="w-1">
-    <label class="p-panel-header-icon"
+    <label 
            pTooltip="To assess the intra-annual variation in product performance (e.g., summer versus winter), metrics are calculated separately for each month or season (including data from the respective month/season of all years) instead of for the entire time series (bulk case)"
            tooltipPosition="bottom">
       <span class="pi pi-question-circle ml-2"></span>
@@ -16,41 +16,33 @@
   </div>
 </div>
 
-<div *ngIf="selectedMetric().intra_annual_metrics">
-  <div class="p-fluid grid pt-3">
+@if (selectedMetric().intra_annual_metrics) {
+  
+  <div class="grid">
 
-  <div class="col-12 lg:col-6">
-    <div class="grid align-items-center">
-      <div class="col-5 label-cell text-center">
-        <div style="margin-top:-1.5rem;"><b>Frequency:</b></div>
-      </div>
-      <div class="col-5">
-        <span class="p-float-label">
+    <div class="col-12 md:col-6 mt-5">
+      <div class="flex align-items-center justify-content-center gap-2">
+        <strong>From:</strong>
+        <p-floatLabel>
           <p-select id="intraAnnualMetricTypeSelector"
-                    [options]="intraAnnualMetricTypes"
-                    [ngModel]="selectedMetric().intra_annual_type"
-                    (ngModelChange)="updateType($event)">
+                  [options]="intraAnnualMetricTypes"
+                  [ngModel]="selectedMetric().intra_annual_type"
+                  (ngModelChange)="updateType($event)">
           </p-select>
           <label for="intraAnnualMetricTypeSelector">Select</label>
-        </span>
-      </div>
-      <div class="col-2">
-        <label class="p-panel-header-icon"
+        </p-floatLabel>
+        <label 
                pTooltip="The set of temporal sub-windows over which all metrics are calculated:&#10;&#10;&#8226; 'Seasonal': the four meteorological seasons.&#10;&#10;&#8226; 'Monthly': the twelve months.&#10;&#10;Note: Per default, the bulk case (metrics calculated over the entire time series) is always included.&#10;Refer to the manual for the exact definitions."
                tooltipPosition="bottom">
           <span class="pi pi-question-circle ml-2"></span>
         </label>
       </div>
     </div>
-  </div>
 
-  <div class="col-12 lg:col-6">
-    <div class="grid align-items-center">
-      <div class="col-5 label-cell text-center">
-        <div style="margin-top:-1.5rem;"><b>Overlap:</b></div>
-      </div>
-      <div class="col-5">
-        <span class="p-float-label">
+    <div class="col-12 md:col-6 mt-5">
+      <div class="flex align-items-center justify-content-center gap-2">
+        <strong>Overlap:</strong>
+        <p-floatLabel>
           <p-inputNumber
               class="w-full"
               inputStyleClass="w-full"
@@ -65,17 +57,13 @@
               [max]="maxIntraAnnualOverlap()">
           </p-inputNumber>
           <label for="overlapSelector">Select overlap</label>
-        </span>
-      </div>
-      <div class="col-2">
-        <label class="p-panel-header-icon"
-               pTooltip="Extends each temporal sub-window on either side by the specified number of days, i.e. the overlap is symmetric. May be used to increase the sample size, but may introduce correlations between adjacent windows as they will overlap."
+        </p-floatLabel>
+        <label pTooltip="Extends each temporal sub-window on either side by the specified number of days, i.e. the overlap is symmetric. May be used to increase the sample size, but may introduce correlations between adjacent windows as they will overlap."
                tooltipPosition="bottom">
           <span class="pi pi-question-circle ml-2"></span>
         </label>
       </div>
     </div>
-  </div>
   
-</div>
-</div>
+  </div>
+}

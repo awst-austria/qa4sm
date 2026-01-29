@@ -1,49 +1,52 @@
-<ng-container *ngIf="display$ | async as display">
-  <div class="form-background" [class.open]="display === 'open'" (click)="close()">
-    <p-panel class="existing-validation-window" (click)="$event.stopPropagation()">
-      <ng-template pTemplate="header">
-        <h4 class="my-0 font-weight-normal" id="publishDialogTitle">There exists a validation</h4>
-      </ng-template>
-      <ng-template pTemplate="icons">
-        <button class="close"
-                type="button"
-                (click)="close()"><b>X</b>
-        </button>
-      </ng-template>
-      <div *ngIf="foundValidation$|async as validation">
-        <div *ngIf="isThereValidation.is_published">
-          There exists a published validation with exactly the same settings, run on {{validation.start_time|date: dateFormat :timeZone}}. <br>
-          You can run your own validation and wait for the results or you can use the existing one.<br>
-          You can also close this window and change some settings.<br>
-          What would you like to do?
-        </div>
-        <div *ngIf="isThereValidation.belongs_to_user && !isThereValidation.is_published">
-          You have already run a validation with exactly the same settings on {{validation.start_time|date: dateFormat :timeZone}}. <br>
-          You can run it again or use the existing one. <br>
-        </div>
-        <div *ngIf="!isThereValidation.belongs_to_user && !isThereValidation.is_published">
-          There exists a validation with exactly the same settings, run on {{validation.start_time|date: dateFormat :timeZone}}. <br>
-          You can run your own validation and wait for the results or you can use the existing one.<br>
-        </div>
-        <div class="m-3 buttons">
-          <button pButton
-                  type="button"
-                  class="btn-action-large"
-                  label="See the existing validation"
-                  (click)="useAnExistingValidation(validation)">
-          </button>
-          <button pButton
-                  type="button"
-                  class="btn-action-large"
-                  label="Run your own validation"
-                  (click)="runOwnValidation()">
-          </button>
+<p-dialog
+    header="There exists a validation"
+    [(visible)]="visible"
+    [modal]="true"
+    [dismissableMask]="true"
+    [closable]="true"
+    [draggable]="false"
+    [resizable]="false"
+    [style]="{ width: '40rem', maxWidth: '95vw' }"
+    (onHide)="close()"
+  >
+    <ng-container *ngIf="foundValidation$ | async as validation">
 
-        </div>
-
+      <div *ngIf="isThereValidation.is_published">
+        There exists a published validation with exactly the same settings, run on {{validation.start_time|date: dateFormat :timeZone}}. <br>
+        You can run your own validation and wait for the results or you can use the existing one.<br>
+        You can also close this window and change some settings.<br>
+        What would you like to do?
       </div>
 
-    </p-panel>
-  </div>
-</ng-container>
+      <div *ngIf="isThereValidation.belongs_to_user && !isThereValidation.is_published">
+        You have already run a validation with exactly the same settings on {{validation.start_time|date: dateFormat :timeZone}}. <br>
+        You can run it again or use the existing one. <br>
+      </div>
+        
+      <div *ngIf="!isThereValidation.belongs_to_user && !isThereValidation.is_published">
+        There exists a validation with exactly the same settings, run on {{validation.start_time|date: dateFormat :timeZone}}. <br>
+        You can run your own validation and wait for the results or you can use the existing one.<br>
+      </div>
+
+      <div class="buttons mt-4 flex gap-3 justify-content-end flex-wrap">
+        <button
+          pButton
+          type="button"
+          class="btn-action-large"
+          label="See the existing validation"
+          (click)="useAnExistingValidation(validation)"
+        ></button>
+
+        <button
+          pButton
+          type="button"
+          class="btn-action-large"
+          label="Run your own validation"
+          (click)="runOwnValidation()"
+        ></button>
+      </div>
+
+    </ng-container>
+</p-dialog>
+
 

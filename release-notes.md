@@ -1,3 +1,33 @@
+QA4SM v3.5.0 - Release notes 2026-01-26
+======================================================
+
+# Fixes
+1. Update Home and Validate Page Frontend.
+2. BugFix Pinned Validations.
+3. BugFix Statistics in Tables.
+4. Add ESA CCI MODELFREE dataset.
+
+QA4SM v3.4.1 - Release notes 2026-01-15
+======================================================
+
+# Fixes
+1. Fixed broken URLs in automated email and within NetCDF file.
+2. Update requirements.txt and AngularCore.
+3. Removed outdated FileUpload guidance.
+
+QA4SM v3.4.0 - Release notes 2025-12-05
+======================================================
+# Updates
+1. Added Dataset ESA CCI SM combined medium resolution.
+2. Improved test performance by adding conftest.py to reduce execution time.
+
+# Fixes
+1. Fixed anomaly calculation bug.
+2. Updated map to include all ISMN stations.
+3. Fixed ISMN legend display issue on the map in dark mode.
+4. Fixed threshold-filter label visualization issue.
+
+
 QA4SM v3.3.0 - Release notes 2025-11-17
 ======================================================
 # Updates

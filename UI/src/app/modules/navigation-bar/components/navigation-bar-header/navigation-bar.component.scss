@@ -7,13 +7,19 @@
 
 .navbar{
   border-bottom: 2px solid $base-color; 
+  position: relative;
+  z-index: 10;
 }
 
-/* Dark variant when on hero (if you keep that behavior) */
-.navbar.header-dark {
-  background: #001C21;
+.navbar.header-home {
+  background: transparent;
   border-bottom-color: transparent;
-  color: #fff;
+  position: absolute;  
+  top: 0;
+  left: 0;
+  width: 100%;
+  background: transparent;  
+  box-shadow: none;
 }
 
 /* Row 1: logo centered */
@@ -21,7 +27,9 @@
   display: flex; 
   align-items: center;
   justify-content:flex-start;
-  padding: .5rem 1rem;
+  padding-left: 10px;
+  padding-top: 20px;
+  padding-bottom: 5px;
 }
 
 .brand {
@@ -33,7 +41,7 @@
 
 /* Long logo: responsive height, width auto */
 .brand-logo {
-  height: clamp(32px, 4vw, 56px); /* scales on larger screens, capped */
+  height: clamp(40px, 4vw, 56px); /* scales on larger screens, capped */
   width: auto;
   display: block;
 }
@@ -47,33 +55,9 @@
   white-space: nowrap;
 }
 
-/* Row 2: Menubar centered + colors */
-.nav-menu.p-menubar {
-  background: transparent;
-  border: 0;
-  box-shadow: none;
-  width: 100%;
-}
 
-/* center the root list */
-.nav-menu .p-menubar-root-list {
-  margin: 0 auto;
-  width: 100%;
-  display: flex;
-  justify-content: center;
-  gap: .25rem;
-}
-
-/* link colors (light) */
-.nav-menu .p-menuitem-link {
-  color: #0f172a;
-  font-weight: 500;
-}
-
-
-/* Mobile tweaks */
 @media (max-width: 560px) {
   .nav-top { padding: .4rem .75rem; }
-  .brand-logo { height: 25px; }
-  .brand-title {font-size: 12px; margin-bottom: 0.5rem;margin-left: 0.5rem;}
+  .brand-logo { height: 40px; }
+  .brand-title {display: none;}
 }

@@ -3,60 +3,56 @@
     <p-checkbox label="{{filterModel.filterDto.description}}: "
                 [binary]="true" [ngModel]="true" [readonly]=filterModel.filterDto.readonly class="readonly-filter-checkbox">
     </p-checkbox>
-    <a (click)="dialogVisible=true"><span style="padding-left: 5px;cursor: pointer;">Select depth</span></a>
+    <a (click)="dialogVisible=true"><span style="padding-left: 5px;cursor: pointer;">Select Measurement depth</span></a>
   </div>
   <div  [ngClass]="{'col-1': true}">
     <span class="pi pi-question-circle" [pTooltip]="filterModel.filterDto.help_text"></span>
   </div>
 </div>
 
-<p-dialog id="ismn-depth-selector" header="Select measurements depth range" position="top" [(visible)]="dialogVisible">
-  <div class="pb-3 pl-0"> Choose a range to include measurements done only at a<br> particular depth range.<br>
-    The filter will be applied to all stations in all chosen networks.</div>
-  <div class="grid" style="display: flex">
-    <div class="col-12 pl-3">
-      <div class="grid"  id="depthFromInput">
-        <div class="col-2 px-0">
-          <div class="p-fluid">
-            <div>Depth from: </div>
-          </div>
-        </div>
-        <div class="col-3 mx-0 px-0 p-fluid">
-          <p-inputNumber
-            [minFractionDigits]="1"
-            [maxFractionDigits]="2" suffix=" m"
-            [(ngModel)]="editFrom"
-            [showButtons]="true"
-            [step]="0.01"
-            [min]="0"
-            decrementButtonClass="changeValueButton">
-          </p-inputNumber>
-        </div>
-      </div>
-    </div>
-
-    <div class="col-12 pl-3">
-      <div class="grid"  id="depthToInput">
-        <div class="col-2 px-0">
-          <div class="p-fluid">
-            <div>Depth to: </div>
-          </div>
-        </div>
-        <div class="col-3 mx-0 px-0 p-fluid">
-          <p-inputNumber
-            [minFractionDigits]="1"
-            [maxFractionDigits]="2" suffix=" m"
-            [(ngModel)]="editTo"
-            [showButtons]="true"
-            [step]="0.01"
-            [min]="0">
-          </p-inputNumber>
-        </div>
-      </div>
-    </div>
-
-    <div class="col-12">
-      <p-button label="OK" (onClick)="saveNewValues()"></p-button>
-    </div>
+<p-dialog 
+    id="ismn-depth-selector" 
+    [style]="{ width: '400px' }"
+    header="Select measurements depth range" 
+    position="top" 
+    [(visible)]="dialogVisible">
+  <div class="pb-3"> Choose a range to include measurements done only at a <b>particular depth range</b>.
+    The filter will be applied to all stations in all chosen networks.
   </div>
+
+  <div class="depth-container">
+
+  <div class="depth-row">
+    <label>Depth from:</label>
+    <p-inputNumber
+      [(ngModel)]="editFrom"
+      [minFractionDigits]="1"
+      [maxFractionDigits]="2"
+      suffix=" m"
+      [showButtons]="true"
+      [step]="0.01"
+      [min]="0"
+      decrementButtonClass="changeValueButton">
+    </p-inputNumber>
+  </div>
+
+  <div class="depth-row">
+    <label>Depth to:</label>
+    <p-inputNumber
+      [(ngModel)]="editTo"
+      [minFractionDigits]="1"
+      [maxFractionDigits]="2"
+      suffix=" m"
+      [showButtons]="true"
+      [step]="0.01"
+      [min]="0">
+    </p-inputNumber>
+  </div>
+
+  <div class="depth-actions">
+    <p-button label="OK" (onClick)="saveNewValues()"></p-button>
+  </div>
+
+</div>
+
 </p-dialog>

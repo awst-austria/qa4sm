@@ -1,6 +1,7 @@
 from django.db.models import Q, ExpressionWrapper, F, BooleanField
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
+from django.utils import timezone
 
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes, authentication_classes
@@ -10,6 +11,8 @@ from rest_framework.authentication import TokenAuthentication
 
 from api.views.auxiliary_functions import get_fields_as_list
 from validator.models import ValidationRun, CopiedValidations
+from validator.validation.util import determine_status
+
 from dateutil.parser import parse
 
 
@@ -151,6 +154,64 @@ def validation_run_by_id(request, **kwargs):
 
     serializer = ValidationRunSerializer(val_run)
     return JsonResponse(serializer.data, status=status.HTTP_200_OK, safe=False)
+
+
+@api_view(["GET"])
+@permission_classes([AllowAny])
+def validation_run_status(request, validation_id):
+    run = get_object_or_404(ValidationRun, id=validation_id)
+
+    status_value = determine_status(run.progress, run.end_time, run.status)
+
+    return JsonResponse(
+        {
+            "id": str(run.id),
+            "status": status_value,
+            "progress": run.progress,
+        },
+        status=status.HTTP_200_OK
+    )
+
+@api_view(["GET"])
+@permission_classes([AllowAny])
+def validation_run_timing(request, validation_id):
+    run = get_object_or_404(ValidationRun, id=validation_id)
+
+    start_time = run.start_time
+    end_time = run.end_time
+
+    # duration in seconds:
+    # - if finished: end - start
+    # - if running: now - start
+    # - if no start_time: None
+    if start_time is None:
+        duration_seconds = None
+    else:
+        end_or_now = end_time if end_time is not None else timezone.now()
+        duration_seconds = int((end_or_now - start_time).total_seconds())
+        if duration_seconds < 0:
+            # just in case of clock/timezone issues
+            duration_seconds = 0
+
+    # optional readable duration HH:MM:SS
+    if duration_seconds is None:
+        duration_format = None
+    else:
+        hours = duration_seconds // 3600
+        minutes = (duration_seconds % 3600) // 60
+        seconds = duration_seconds % 60
+        duration_format = f"{hours:02d}:{minutes:02d}:{seconds:02d}"
+
+    return JsonResponse(
+        {
+            "id": str(run.id),
+            "start_time": start_time,
+            "end_time": end_time,
+            "duration_seconds": duration_seconds,
+            "duration_format": duration_format,
+        },
+        status=status.HTTP_200_OK
+    )
 
 
 @api_view(['GET'])
