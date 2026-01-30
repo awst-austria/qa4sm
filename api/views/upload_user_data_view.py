@@ -27,6 +27,7 @@ __logger = logging.getLogger(__name__)
 
 def create_variable_entry(variable_name,
                           variable_pretty_name,
+                          variable_display_name,
                           dataset_name,
                           user,
                           variable_unit=None,
@@ -35,6 +36,7 @@ def create_variable_entry(variable_name,
     current_max_id = DataVariable.objects.all().last(
     ).id if DataVariable.objects.all().last() else 0
     new_variable_data = {
+        'display_name': variable_display_name,
         'short_name': variable_name,
         'pretty_name': variable_pretty_name,
         'help_text':
@@ -245,7 +247,7 @@ def upload_user_data(request, filename):
 
     # creating version entry
 
-    new_variable = create_variable_entry('none', 'none', dataset_pretty_name,
+    new_variable = create_variable_entry('none', 'none', 'none', dataset_pretty_name,
                                          request.user, 'n.a.')
     new_version = create_version_entry(version_name, version_pretty_name,
                                        dataset_pretty_name, request.user,

@@ -1,14 +1,14 @@
 <div class="grid align-content-center">
   <div class="col" style="max-width: 100%">
     <p-floatLabel class="mb-4 mt-3">
-      <p-select 
-        [inputId]="datasetSelectorId" 
-        (onChange)="updateSelectableVersionsAndVariableAndEmmit()" 
+      <p-select
+        [inputId]="datasetSelectorId"
+        (onChange)="updateSelectableVersionsAndVariableAndEmmit()"
         [options]="(datasets$|async)"
         [(ngModel)]="selectionModel.selectedDataset"
         optionLabel="pretty_name" [style]="{'width': '100%'}">
           <ng-template let-item pTemplate="item">
-            <span>{{ item.pretty_name }} 
+            <span>{{ item.pretty_name }}
               <em *ngIf="authService.authenticated.value">
                 {{item.user === authService.currentUser.id ? "  (user data)" :
                   (item.user !== authService.currentUser.id && item.is_shared ? ' (shared data)' : "")}}
@@ -17,7 +17,7 @@
           </ng-template>
 
           <ng-template let-item pTemplate="selectedItem">
-            <span>{{ item.pretty_name }} 
+            <span>{{ item.pretty_name }}
               <em *ngIf="authService.authenticated.value">
                 {{item.user === authService.currentUser.id ? "  (user data)" :
                (item.user !== authService.currentUser.id && item.is_shared ? " (shared data)" : "")}}
@@ -64,14 +64,14 @@
                   [(ngModel)]="selectionModel.selectedVariable">
         <ng-template let-item pTemplate="item">
           <span>
-            <span>{{ item.short_name }} [{{ item.unit ? item.unit : 'n.a.' }}]</span>
+            <span>{{ item.display_name }} [{{ item.unit ? item.unit : 'n.a.' }}]</span>
           </span>
         </ng-template>
         <ng-template let-item pTemplate="selectedItem">
-          <span>{{ item.short_name }} [{{ item.unit ? item.unit : 'n.a.' }}]</span>
+          <span>{{ item.display_name }} [{{ item.unit ? item.unit : 'n.a.' }}]</span>
         </ng-template>
       </p-select>
-      <label for="{{variableSelectorId}}">Variable [units]</label> 
+      <label for="{{variableSelectorId}}">Variable [units]</label>
     </p-floatLabel>
   </div>
 </div>
