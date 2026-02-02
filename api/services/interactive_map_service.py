@@ -13,6 +13,10 @@ def get_cached_zarr_path(validation_id):
 
     if not zarr_path:
         validation_run = get_object_or_404(ValidationRun, id=validation_id)
+        
+        if not validation_run.zarr_path:
+            return None
+        
         zarr_path = os.path.join(settings.MEDIA_ROOT, validation_run.zarr_path)
         cache.set(cache_key, zarr_path, timeout=3600)
 
