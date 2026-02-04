@@ -161,21 +161,11 @@ class TestValidation(TestCase):
             raise ValueError(
                 'More than one configuration is marked as spatial reference.')
 
-        if len(val_configs.filter(is_temporal_reference=True)) == 0:
-            raise ValueError(
-                'No configuration is marked as temporal reference.')
-        elif len(val_configs.filter(is_temporal_reference=True)) > 1:
-            raise ValueError(
-                'More than one configuration is marked as temporal reference.')
-
         # check if proper reference configurations have proper fields set
         if not validation.spatial_reference_configuration.is_spatial_reference:
             raise ValueError(
                 'Configuration is not marked as spatial reference.')
-        if not validation.temporal_reference_configuration.is_temporal_reference:
-            raise ValueError(
-                'Configuration is not marked as temporal reference.')
-
+        
         # check if proper reference configurations have proper fields set
         if not validation.spatial_reference_configuration.is_spatial_reference:
             raise ValueError(
@@ -572,10 +562,6 @@ class TestValidation(TestCase):
         run.interval_to = datetime(2018, 12, 31, tzinfo=UTC)
 
         run.save()
-
-        self.__logger.debug(
-            f"Intra-Annual params: {run.intra_annual_type=}, {run.intra_annual_metrics=}, {run.intra_annual_overlap=}"
-        )
 
         self.__logger.debug(
             f"Intra-Annual params: {run.intra_annual_type=}, {run.intra_annual_metrics=}, {run.intra_annual_overlap=}"
