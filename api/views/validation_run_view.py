@@ -95,7 +95,7 @@ def published_results(request):
     val_runs = ValidationRun.objects.exclude(doi='')
 
     if check_for_filters(request.query_params):
-        val_runs = filter_validations(request.query_params, val_runs)
+        val_runs = filter_validations(request.query_params, val_runs).distinct()
 
     if order:
         val_runs = val_runs.order_by(order)
@@ -110,7 +110,7 @@ def published_results(request):
         serializer = ValidationRunSerializer(val_runs, many=True)
 
     response = {'validations': serializer.data,
-                'length': len(val_runs)}
+                'length': val_runs.count()}
 
     return JsonResponse(response, status=status.HTTP_200_OK, safe=False)
 
