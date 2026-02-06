@@ -26,6 +26,7 @@ def upload_directory(instance, filename):
 class UserDatasetFile(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     file = models.FileField(null=True, blank=True, storage=key_store, upload_to=upload_directory)
+    original_file_size = models.IntegerField(blank=True, null=True)
     file_name = models.CharField(max_length=100, blank=True, null=True)
     owner = models.ForeignKey(User, related_name='user_datasets', on_delete=models.CASCADE, null=True)
     dataset = models.ForeignKey(Dataset, related_name='user_dataset', on_delete=models.SET_NULL, null=True)
@@ -61,11 +62,29 @@ class UserDatasetFile(models.Model):
         return len(self.get_user_data_configs().exclude(validation__user=self.owner))
 
     @property
+    # def file_size(self):
+    #     if self.file_name is not None and self.original_file_size is None:
+    #         return self.file.size
+    #     elif self.file_name is not None and self.original_file_size is not None:
+    #         return self.original_file_size
+    #     else:
+    #         return
     def file_size(self):
         if self.file_name is not None:
-            return self.file.size
-        else:
-            return
+            if os.path.isdir(self.get_raw_file_path):
+                    if self.original_file_size is not None:
+                        return self.original_file_size
+                    else:
+                        return self.file.size
+            elif not os.path.isdir(self.get_raw_file_path):
+                return self.file.size
+            else:
+                return
+    # def file_size(self):
+    #     if self.file_name is not None:
+    #         return self.file.size
+    #     else:
+    #         return
 
     @property
     def user_groups(self):
