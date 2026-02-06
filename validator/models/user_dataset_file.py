@@ -62,13 +62,29 @@ class UserDatasetFile(models.Model):
         return len(self.get_user_data_configs().exclude(validation__user=self.owner))
 
     @property
+    # def file_size(self):
+    #     if self.file_name is not None and self.original_file_size is None:
+    #         return self.file.size
+    #     elif self.file_name is not None and self.original_file_size is not None:
+    #         return self.original_file_size
+    #     else:
+    #         return
     def file_size(self):
-        if self.file_name is not None and self.original_file_size is None:
-            return self.file.size
-        elif self.file_name is not None and self.original_file_size is not None:
-            return self.original_file_size
-        else:
-            return
+        if self.file_name is not None:
+            if os.path.isdir(self.get_raw_file_path):
+                    if self.original_file_size is not None:
+                        return self.original_file_size
+                    else:
+                        return self.file.size
+            elif not os.path.isdir(self.get_raw_file_path):
+                return self.file.size
+            else:
+                return
+    # def file_size(self):
+    #     if self.file_name is not None:
+    #         return self.file.size
+    #     else:
+    #         return
 
     @property
     def user_groups(self):
