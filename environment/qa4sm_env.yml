@@ -159,6 +159,7 @@ dependencies:
   - re2=2024.07.02
   - readline=8.2
   - s2n=1.5.11
+  - setuptools<81
   - snappy=1.2.1
   - sqlite=3.48.0
   - tk=8.6.13
