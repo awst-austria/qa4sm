@@ -1,7 +1,7 @@
 <main class="flex justify-content-center">
   <div class="content">
 
-    <div class="text-center w-12 my-2">
+    <div class="text-center w-12 my-5">
       <h1>Published validations</h1>
       <p>
         The QA4SM validations below have been published by their owners to
@@ -9,9 +9,11 @@
         and can be referenced with a
         <a class="font-semibold" target="_blank" href="https://www.doi.org/" rel="noreferrer">DOI</a>.
       </p>
-      <div>
-        {{ (rows$ | async)?.length || 0 }} published validations are shown.
-      </div>
+      @if (totalRecords$ | async; as total) {
+        <div>{{ total }} published validations are shown.</div>
+      } @else {
+        <div>0 published validations are shown.</div>
+      }
     </div>
 
     <!-- Filters -->
@@ -48,9 +50,9 @@
     <p-table
       [value]="rows$ | async"
       [paginator]="true"
-      [rows]="PAGE_SIZE"
+      [rows]="20"
       [lazy]="true"
-      [loading]="loading"
+      [loading]="loading$ | async"
       [totalRecords]="(totalRecords$ | async) || 0"
       (onPage)="onPageChange($event)"
       (onSort)="onSortChange($event)" 
@@ -59,37 +61,43 @@
       [sortOrder]="-1"
       [styleClass]="'p-datatable-sm p-datatable-striped qa-validations-table'">
 
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td colspan="7" class="text-center p-5">
+            <div class="flex flex-column align-items-center gap-2">
+              <i class="pi pi-search-plus" style="font-size: 2rem; color: var(--text-color-secondary)"></i>
+              <span class="font-semibold text-xl">No validations found</span>
+              <p class="muted">Try adjusting your filters.</p>
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+
       <ng-template pTemplate="header">
         <tr>
-          <th pSortableColumn="start_time">
-            Date
-            <p-sortIcon field="start_time"></p-sortIcon>
-          </th>
-          <th pSortableColumn="name_tag">
-            Name
-            <p-sortIcon field="name_tag"></p-sortIcon>
-          </th>
-          <th>
-            Datasets
-          </th>
-          <th pSortableColumn="spatial_reference_dataset">
-            Spatial reference
-            <p-sortIcon field="spatial_reference_dataset"></p-sortIcon>
-          </th>
-          <th>
-            DOI
-          </th>
-          <th>
-            Results
-          </th>
-          <th>
-            Pin
-          </th>
+          <th pSortableColumn="start_time">Date<p-sortIcon field="start_time"></p-sortIcon></th>
+
+          <th pSortableColumn="name_tag">Name<p-sortIcon field="name_tag"></p-sortIcon></th>
+          
+          <th>Datasets</th>
+
+          <th pSortableColumn="spatial_reference_dataset">Spatial reference<p-sortIcon field="spatial_reference_dataset"></p-sortIcon></th>
+          
+          <th>DOI</th>
+
+          <th>Pin</th>
+
         </tr>
       </ng-template>
 
       <ng-template pTemplate="body" let-rowData>
-        <tr>
+        <tr
+          class="clickable-row"
+          (click)="ViewResults(rowData)"
+          tabindex="0"
+          (keydown.enter)="ViewResults(rowData)"
+          [pTooltip]="'View results'"
+          tooltipPosition="top">
           <td>
             {{ rowData.start_time | date:'yyyy-MM-dd' }}
           </td>
@@ -129,51 +137,27 @@
             </a>
             <span *ngIf="!rowData.doi">—</span>
           </td>
-          <td>
-            <a [routerLink]="['/validation-result', rowData.id]">
-              View Results
-            </a>
-          </td>
+          
           <td class="pin-cell">
             <ng-container *ngIf="isLogged$ | async; else pinDisabled">
-              
               <button
-                *ngIf="isTrackedByTheUser(rowData); else pinButton"
                 pButton
                 type="button"
-                class="p-button-text p-button-sm p-button-danger"
-                icon="pi pi-times"
-                pTooltip="Unpin (remove from your list)"
-                (click)="onUnpin(rowData, $event)">
+                [icon]="isPinned(rowData) ? 'pi pi-times' : 'pi pi-plus'"
+                class="p-button-text"
+                [pTooltip]="isPinned(rowData) ? 'Unpin validation' : 'Pin validation'"
+                tooltipPosition="left"
+                [ngClass]="{'p-button-danger': isPinned(rowData)}"
+                (click)="onTogglePin(rowData, $event)">
               </button>
-
-              <ng-template #pinButton>
-                <button
-                  pButton
-                  type="button"
-                  class="p-button-text p-button-sm "
-                  icon="pi pi-plus"
-                  pTooltip="Pin this validation"
-                  (click)="onPin(rowData, $event)">
-                </button>
-              </ng-template>
             </ng-container>
-
             <ng-template #pinDisabled>
               <span class="muted">—</span>
             </ng-template>
-          </td>
-          
+          </td>    
         </tr>
       </ng-template>
     </p-table>
-
-    <!-- @if (isLoading) {
-      <div class="loading-vals-box">
-        <span class="pi pi-spinner pi-spin mr-2" style="font-size: 2rem"></span>
-        <em style="font-size: 1.5rem">Loading...</em>
-      </div>
-    } -->
 
     @if (dataFetchError) {
       <div class="text-center w-12 my-2">

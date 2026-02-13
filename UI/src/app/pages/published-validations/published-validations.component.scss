@@ -10,13 +10,33 @@
   padding: 0 1rem;
 }
 
-.qa-validations-table th:nth-child(1){ width: 8%; } /* Date */
-.qa-validations-table th:nth-child(2){ width: 20%; } /* Name */
+:host ::ng-deep .qa-validations-table .p-datatable-thead > tr > th {
+  border-bottom: 1px solid $base-color;
+}
+:host ::ng-deep .qa-validations-table .p-datatable-thead {
+  box-shadow: inset 0 -1px 0 $base-color;
+}
+:host ::ng-deep .qa-validations-table .p-datatable-tbody > tr {
+  cursor: pointer;
+}
+:host ::ng-deep .qa-validations-table .p-datatable-tbody > tr:hover > td {
+  background: #ECFDF5;
+}
+
+.qa-validations-table th:nth-child(1){ width: 9%; } /* Date */
+.qa-validations-table th:nth-child(2){ width: 22%; } /* Name */
 .qa-validations-table th:nth-child(3){ width: 22%; } /* Datasets */
 .qa-validations-table th:nth-child(4){ width: 22%; } /* Spatial */
-.qa-validations-table th:nth-child(5){ width: 15%; } /* DOI */
-.qa-validations-table th:nth-child(6){ width: 9%; }  /* Results */
-.qa-validations-table th:nth-child(7){ width: 4%; }  /* Pin */
+.qa-validations-table th:nth-child(5){ width: 20%; } /* DOI */
+.qa-validations-table th:nth-child(6){ width: 5%; }  /* Pin */
+
+.qa-validations-table th:nth-child(6){
+  text-align: center;
+  justify-content: center; 
+}
+.qa-validations-table td:nth-child(6){
+  text-align: center;
+}
 
 .name-cell {
   white-space: normal;        
@@ -35,7 +55,7 @@
 }
 
 .muted {
-  color: $font-color-muted;
+  /*color: $font-color-muted;*/
   font-size: 0.7rem;
 }
 
@@ -52,19 +72,13 @@
   vertical-align: top;
 }
 
-/* optional: clamp text inside datasets */
 .qa-validations-table td:nth-child(3) .muted,
 .qa-validations-table td:nth-child(4) .muted{
   display: -webkit-box;
-  -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
   overflow: hidden;
-}
-
-.qa-validations-table .p-datatable-thead > tr > th{
-  position: sticky;
-  top: 0;
-  z-index: 2;
 }
 
 @media (min-width: 1600px){
@@ -73,3 +87,10 @@
     padding: .85rem .9rem;
   }
 }
+
+@media (prefers-color-scheme: dark) {
+  :host ::ng-deep .qa-validations-table .p-datatable-tbody > tr:hover > td {
+    background: rgba(34, 197, 94, 0.25);
+  }
+}
+
