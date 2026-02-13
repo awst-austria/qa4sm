@@ -1,7 +1,245 @@
-<main class="flex flex-column justify-content-center align-content-center">
-  <div class="flex flex-column w-12">
-    <qa-tracked-validations/>
-    <qa-validation-page-paginated [published]="false"/>
-    <p-scrollTop styleClass="scroll-button"></p-scrollTop>
+<main class="flex justify-content-center">
+  <div class="content">
+
+    <qa-pinned-validations/>
+
+    <div class="text-center w-12 my-5">
+      <h1>My validations</h1>
+      
+      @if (totalRecords$ | async; as total) {
+        <div>{{ total }} validation-runs are shown.</div>
+      } @else {
+        <div>0 validation-runs are shown.</div>
+      }
+    </div>
+
+    <form [formGroup]="filterForm" class="flex flex-row flex-wrap gap-3 my-5">
+      <div class="flex flex-column">
+        <p-floatLabel>
+          <p-date-picker id="dateFilter" selectionMode="range" dateFormat="yy-mm-dd" formControlName="dateRange" [showIcon]="true"></p-date-picker>
+          <label for="dateFilter">Choose date range</label>
+        </p-floatLabel>
+      </div>
+      <div class="flex flex-column">
+        <p-floatLabel>
+          <input id="nameFilter" type="text" pInputText formControlName="name" />
+          <label for="nameFilter">Search by name</label>
+        </p-floatLabel>
+      </div>
+      <div class="flex flex-column">
+        <p-floatLabel>
+          <input id="datasetFilter" type="text" pInputText formControlName="dataset" />
+          <label for="datasetFilter">Search by dataset</label>
+        </p-floatLabel>
+      </div>
+    </form>
+
+    <p-table
+      [value]="rows$ | async"
+      [paginator]="true"
+      [rows]="PAGE_SIZE"
+      [lazy]="true"
+      [loading]="loading$ | async"
+      [totalRecords]="(totalRecords$ | async) || 0"
+      (onPage)="onPageChange($event)"
+      (onSort)="onSortChange($event)" 
+      sortMode="single"
+      [sortField]="'start_time'"
+      [sortOrder]="-1"
+      [styleClass]="'p-datatable-sm p-datatable-striped qa-validations-table'">
+
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td colspan="7" class="text-center p-5">
+            <div class="flex flex-column align-items-center gap-2">
+              <i class="pi pi-search-plus" style="font-size: 2rem; color: var(--text-color-secondary)"></i>
+              <span class="font-semibold text-xl">No validations found</span>
+              <p class="muted">Try adjusting your filters or start a new validation.</p>
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="header">
+        <tr>
+          <th pSortableColumn="start_time">Date <p-sortIcon field="start_time"></p-sortIcon></th>
+          <th pSortableColumn="name_tag">Name <p-sortIcon field="name_tag"></p-sortIcon></th>
+          <th>Datasets</th>
+          <th pSortableColumn="spatial_reference_dataset">Spatial reference <p-sortIcon field="spatial_reference_dataset"></p-sortIcon></th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="body" let-rowData>
+        <tr
+          class="clickable-row"
+          (click)="ViewResults(rowData, $event)"
+          tabindex="0"
+          (keydown.enter)="ViewResults(rowData, $event)"
+          [pTooltip]="'View results'"
+          tooltipPosition="top">
+
+          <td class="date-cell">{{ rowData.start_time | date:'yyyy-MM-dd' }}</td>   
+          
+          <td class="name-cell">
+            <div class="flex align-items-center justify-content-start w-full min-h-2rem">
+              
+              @if (editingRowId === rowData.id) {
+                <div class="flex align-items-center gap-1 w-full edit-container">
+                  <input 
+                    #editInput
+                    pInputText 
+                    [(ngModel)]="tempName" 
+                    class="p-inputtext-sm flex-grow-1"
+                    (click)="$event.stopPropagation()"
+                    (keydown)="$event.stopPropagation()"
+                    (keyup.enter)="saveEdit(rowData)"
+                    (keyup.escape)="cancelEdit()"
+                    (blur)="onBlur(rowData)"
+                    autoFocus
+                  />
+                  
+                  <button 
+                    pButton 
+                    icon="pi pi-check" 
+                    class="p-button-text p-button-sm p-button-success p-0 action-btn"
+                    (mousedown)="$event.stopPropagation(); saveEdit(rowData)"> </button>
+                  <button 
+                    pButton 
+                    icon="pi pi-times" 
+                    class="p-button-text p-button-sm p-button-danger p-0 action-btn"
+                    (mousedown)="$event.stopPropagation(); cancelEdit()">
+                  </button>
+                </div>
+              } @else {
+                <div class="name-wrapper">
+                  <span class="name-text">{{ rowData.name_tag || '(no name)' }}</span>
+                  
+                  @if (!rowData.doi && !rowData.is_published) {
+                    <button 
+                      pButton 
+                      icon="pi pi-pencil" 
+                      class="p-button-text p-button-sm p-0 edit-icon"
+                      pTooltip="Rename"
+                      (click)="$event.stopPropagation(); startEdit(rowData)">
+                    </button>
+                  }
+                </div>
+              }
+            </div>
+          </td>
+        
+          <td class="datasets-reference-cell">
+            <ng-container *ngIf="rowData.datasetsDisplay?.length; else noData">
+              <div *ngFor="let d of rowData.datasetsDisplay" class="dataset-line">
+                <strong>{{ d.dataset }}</strong>
+                <span class="muted"> — {{ d.version }}, {{ d.variable }} <span *ngIf="d.unit">[{{ d.unit }}]</span></span>
+              </div>
+            </ng-container>
+            <ng-template #noData>—</ng-template>
+          </td>
+
+          <td class="spatial-reference-cell">
+            <ng-container *ngIf="rowData.spatialReferenceDisplay; else noSpatial">
+              <div class="dataset-line">
+                <strong>{{ rowData.spatialReferenceDisplay.dataset }}</strong>
+                <span class="muted"> — {{ rowData.spatialReferenceDisplay.version }}</span>
+              </div>
+            </ng-container>
+            <ng-template #noSpatial>—</ng-template>
+          </td>
+
+
+          <td class="status-cell">
+            @let status = getStatusDisplay(rowData);
+              <p-tag [severity]="status.severity" [value]="status.label" [style]="{ 'background': 'transparent' }">
+                  @if (status.severity === 'warning') {
+                      <i class="pi pi-spin pi-spinner mr-1" style="font-size: 0.7rem"></i>
+                  }
+              </p-tag>
+          </td>
+
+          <td class="delete-cell">
+            @if (isLive(rowData)) {
+                <button
+                    pButton
+                    type="button"
+                    class="p-button-text p-button-sm p-button-danger"
+                    icon="pi pi-stop-circle"
+                    pTooltip="Stop validation"
+                    tooltipPosition="left"
+                    (click)="onStop(rowData, $event)">
+                </button>
+            } @else {
+
+              @if (rowData.doi || rowData.is_published) {
+                <p-tag severity="secondary" value="Published"></p-tag>
+              } 
+              @else if (rowData.is_archived) {
+                <p-tag severity="secondary" value="Archived"></p-tag>
+              } 
+              @else {
+                  <button
+                    pButton
+                    type="button"
+                    class="p-button-text p-button-danger"
+                    icon="pi pi-trash"
+                    pTooltip="Permanently delete"
+                    tooltipPosition="left"
+                    (click)="openDeleteDialog(rowData, $event)">
+                  </button>
+              }
+            }
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+
+    @if (dataFetchError) {
+      <div class="text-center w-12 my-2">
+        <qa-error></qa-error>
+      </div>
+    }
+
   </div>
+
+  <p-dialog
+    header="Delete validation result"
+    [(visible)]="confirmDeleteVisible"
+    [modal]="true"
+    [closable]="true"
+    [dismissableMask]="true"
+    [style]="{ width: '32rem' }"
+    (onHide)="closeDeleteDialog()"
+  >
+    <div class="flex flex-column gap-2">
+      <span>
+        Do you really want to permanently delete
+        <b>{{ deleteTarget?.name_tag || deleteTarget?.id }}</b>?
+      </span>
+    </div>
+
+    <ng-template pTemplate="footer">
+      <button
+        pButton
+        type="button"
+        class="p-button-text"
+        label="Cancel"
+        (click)="closeDeleteDialog()"
+        [disabled]="deleting"
+      ></button>
+
+      <button
+        pButton
+        type="button"
+        class="p-button-text p-button-danger"
+        label="Delete"
+        icon="pi pi-trash"
+        (click)="confirmDelete()"
+        [loading]="deleting"
+      ></button>
+    </ng-template>
+  </p-dialog>
+
 </main>
