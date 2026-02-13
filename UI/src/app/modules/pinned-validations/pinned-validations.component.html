@@ -1,0 +1,67 @@
+<main class="flex justify-content-center">
+    @if (pinnedValidations$ | async; as pinnedValidations) {
+        @if (pinnedValidations.length !== 0) {
+
+        <div *ngIf="pinnedValidations.length !== 0">
+
+            <h1 class="text-center">Pinned validations</h1>
+
+            <div class="mb-3 flex flex-column">
+                @for (valrun of pinnedValidations; track valrun.id) {
+
+                    <div class="my-2 flex flex-row align-items-center w-12"
+                    id="attached_result_row_{{ valrun.id }}"
+                    >
+                        <div class="w-8 flex">
+                            <p class="my-0"><b>Validation:</b> {{ valrun.name_tag }} </p>
+                        </div>
+
+                        <div class="w-4 flex justify-content-end gap-1">
+                    
+                            <!-- View results -->
+                            <button
+                                pButton
+                                type="button"
+                                class="p-button-text p-button-sm"
+                                [routerLink]="['/validation-result', valrun.id]"
+                                pTooltip="View results">
+                                <i class="pi pi-folder-open"></i>
+                            </button>
+
+                            <!-- Download graphs --> 
+                            <button
+                                pButton
+                                type="button"
+                                class="p-button-text p-button-sm"
+                                (click)="downloadResultFile(valrun.id, 'graphics', valrun.id + '_graphs.zip')"
+                                pTooltip="Download graphs as a .zip file">
+                                <i class="pi pi-download"></i>
+                            </button>
+
+                            <!-- Download NetCDF -->
+                            <button
+                                pButton
+                                type="button"
+                                class="p-button-text p-button-sm"
+                                (click)="downloadResultFile(valrun.id, 'netCDF', valrun.output_file_name)"
+                                pTooltip="Download validation run results as a .nc file">
+                                .nc
+                            </button>
+
+                            <!-- Unpin -->
+                            <button
+                                pButton
+                                type="button"
+                                class="p-button-text p-button-sm p-button-danger"
+                                pTooltip="Remove this validation from your list"
+                                (click)="unpinValidation(valrun.id)">
+                                <i class="pi pi-times"></i>
+                            </button>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    }
+  }
+</main>
