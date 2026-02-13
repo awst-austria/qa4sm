@@ -129,6 +129,9 @@ def my_results(request):
 
     if check_for_filters(request.query_params):
         user_validations = filter_validations(request.query_params, user_validations)
+        user_validations = user_validations.distinct()
+
+    number_of_filtered_validations = user_validations.count()
 
     if order:
         user_validations = user_validations.order_by(order)
@@ -140,7 +143,7 @@ def my_results(request):
     else:
         serializer = ValidationRunSerializer(user_validations, many=True)
 
-    response = {'validations': serializer.data, 'length': number_of_all_validations}
+    response = {'validations': serializer.data, 'length': number_of_filtered_validations}
     return JsonResponse(response, status=status.HTTP_200_OK, safe=False)
 
 

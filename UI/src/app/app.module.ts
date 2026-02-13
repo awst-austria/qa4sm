@@ -12,7 +12,6 @@ import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 
 import {ErrorPageComponent} from './pages/error/error-page.component';
 
-import {ValidationsComponent} from './pages/validations/validations.component';
 import {ValidationResultComponent} from './pages/validation-result/validation-result.component';
 import {HTTP_INTERCEPTORS, provideHttpClient, withInterceptorsFromDi} from '@angular/common/http';
 import {HttpTokenInterceptor} from './modules/core/interceptors/http-token.interceptor';
@@ -78,7 +77,6 @@ import Aura from '@primeuix/themes/aura';
         HomeComponent,
         ValidateComponent,
         ErrorPageComponent,
-        ValidationsComponent,
         ValidationResultComponent,
         UserProfileComponent,
         ComparisonComponent,

@@ -8,7 +8,7 @@ import {saveAs} from 'file-saver-es';
 import {MetricsPlotsDto} from './metrics-plots.dto';
 import {PublishingFormDto} from './publishing-form.dto';
 import {HttpErrorService} from '../global/http-error.service';
-import {catchError} from 'rxjs/operators';
+import {catchError, tap} from 'rxjs/operators';
 
 const urlPrefix = environment.API_URL + 'api';
 const zeroId = '00000000-0000-0000-0000-000000000000'
@@ -151,6 +151,7 @@ export class ValidationrunService {
     const data = {add_validation: true};
     return this.httpClient.post(addUrl + '/', data, {headers, observe: 'body', responseType: 'text'})
       .pipe(
+        tap(() => this.refreshComponent('page')),
         catchError(err =>
           this.httpError.handleError(err, 'We could not add the validation to the followed validations list.'))
       );
@@ -161,6 +162,7 @@ export class ValidationrunService {
     const data = {remove_validation: true};
     return this.httpClient.post(addUrl + '/', data, {headers, observe: 'body', responseType: 'text'})
       .pipe(
+        tap(() => this.refreshComponent('page')),
         catchError(err => this.httpError.handleError(err, 'We could not remove the validation from your list.'))
       );
   }
