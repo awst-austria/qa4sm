@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpParams } from '@angular/common/http';
-import { BehaviorSubject, combineLatest, forkJoin, of, Observable } from 'rxjs';
-import { map, switchMap, catchError, shareReplay, finalize, tap } from 'rxjs/operators';
+import { BehaviorSubject, combineLatest, forkJoin, of, Observable, from, merge } from 'rxjs';
+import { map, switchMap, catchError, shareReplay, finalize, tap, mergeMap, scan } from 'rxjs/operators';
 
 import { ValidationrunService } from './validationrun.service';
 import { DatasetService } from '../dataset/dataset.service';
@@ -45,8 +45,17 @@ export class ValidationRunFacade {
       versions: new Map<number, any>(res.versions.map((v: any) => [v.id, v])),
       variables: new Map<number, any>(res.variables.map((v: any) => [v.id, v]))
     })),
-    shareReplay(1) 
+    shareReplay({ bufferSize: 1, refCount: true }) 
   );
+
+  private getConfigsCached$(validationId: string): Observable<any[]> {
+    if (this.configCache.has(validationId)) {
+      return of(this.configCache.get(validationId)!);
+    }
+    return this.datasetConfigService.getConfigByValidationrun(validationId).pipe(
+      tap(cfgs => this.configCache.set(validationId, cfgs))
+    );
+  }
 
   /**
    * Fetches validation runs and enriches them with full dataset/version/variable names.
@@ -54,58 +63,85 @@ export class ValidationRunFacade {
    * * @param mode - Source of validations: 'published' or 'user' (My Validations)
    * * @param params - HttpParams containing filters, sorting, and pagination
    */
-  getValidations(mode: 'published' | 'user', params: HttpParams): Observable<{rows: any[], total: number}> {
-    this.loadingSubject.next(true);
+  getValidations(
+    mode: 'published' | 'user',
+    params: HttpParams
+  ): Observable<{ rows: any[]; total: number }> {
 
-    const apiCall$ = mode === 'published' 
+    this.loadingSubject.next(true);
+    
+    const apiCall$ = mode === 'published'
       ? this.validationService.getPublishedValidationruns(params)
       : this.validationService.getMyValidationruns(params);
 
     return combineLatest([this.dictionaries$, apiCall$]).pipe(
       switchMap(([dicts, response]) => {
+        const total = response.length ?? 0;
+
         if (!response.validations?.length) {
-          return of({ rows: [], total: 0 });
+          this.loadingSubject.next(false);
+          return of({ rows: [], total });
         }
 
-        /** * For each validation, we create a sub-stream to fetch its configurations.
-         * If the data is already in cache, we skip the network request.
-         */
-        const enrichmentRequests = response.validations.map(v => {
-          if (this.configCache.has(v.id)) {
-            const cachedConfigs = this.configCache.get(v.id)!;
-            return of(this.enrichValidationData(v, cachedConfigs, dicts));
-          }
+        // Display validations-runs rows
+        const baseRows = response.validations.map(v => ({
+          ...v,
+          datasetsDisplay: [],
+          spatialReferenceDisplay: null
+        }));
 
-          return this.datasetConfigService.getConfigByValidationrun(v.id).pipe(
-            tap(configs => this.configCache.set(v.id, configs)),
-            map(configs => this.enrichValidationData(v, configs, dicts)),
-            catchError(() => of({ ...v, datasetsDisplay: [] })) // Если один запрос упал, не рушим всё
-          );
-        });
+        this.loadingSubject.next(false);
 
-        return forkJoin(enrichmentRequests).pipe(
-          map(enrichedRows => ({
-            rows: enrichedRows,
-            total: response.length
-          }))
+        // provide each row with dataset information
+        const patches$ = from(baseRows).pipe(
+          mergeMap((v: any) =>
+            this.getConfigsCached$(v.id).pipe(
+              map(cfgs => {
+                const patch = this.buildDisplaysPatch(v, cfgs, dicts);
+                return { id: v.id, patch };
+              }),
+              catchError(() =>
+                of({
+                  id: v.id,
+                  patch: { datasetsDisplay: [], spatialReferenceDisplay: null }
+                })
+              )
+            ),
+            6 //6 at the same time
+          )
+        );
+
+        //    - first baseRows
+        //    - update row with patches
+        return merge(
+          of({ rows: baseRows, total }),
+          patches$.pipe(
+            scan((state, { id, patch }) => {
+              const idx = state.rows.findIndex((r: any) => r.id === id);
+              if (idx === -1) return state;
+
+              const updatedRow = { ...state.rows[idx], ...patch };
+              const newRows = state.rows.slice();
+              newRows[idx] = updatedRow;
+
+              return { rows: newRows, total: state.total };
+            }, { rows: baseRows, total })
+          )
         );
       }),
       catchError(err => {
         console.error('Facade Error:', err);
+        this.loadingSubject.next(false);
         return of({ rows: [], total: 0 });
       }),
       finalize(() => this.loadingSubject.next(false))
     );
   }
 
-  /**
-   * Transforms raw IDs into human-readable display objects.
-   * Attaches 'datasetsDisplay' property to the validation object.
-   * * @param validation - The raw validation run object from API
-   * * @param configs - Dataset configurations linked to this run
-   * * @param dicts - Metadata dictionaries for ID-to-Name resolution
-   */
-  private enrichValidationData(validation: any, configs: any[], dicts: Dictionaries) {
+  private buildDisplaysPatch(validation: any, configs: any[], dicts: Dictionaries): {
+    datasetsDisplay: any[];
+    spatialReferenceDisplay: any | null;
+  } {
     const resolveName = (cfg: any) => {
       const ds = dicts.datasets.get(cfg.dataset);
       const ver = dicts.versions.get(cfg.version);
@@ -119,13 +155,11 @@ export class ValidationRunFacade {
       };
     };
 
-    // Pre-calculated fields for direct binding in HTML templates
-    validation.datasetsDisplay = (configs || []).map(c => resolveName(c));
-    
+    const datasetsDisplay = (configs || []).map(c => resolveName(c));
     const spatialCfg = (configs || []).find(c => c.is_spatial_reference);
-    validation.spatialReferenceDisplay = spatialCfg ? resolveName(spatialCfg) : null;
+    const spatialReferenceDisplay = spatialCfg ? resolveName(spatialCfg) : null;
 
-    return validation;
+    return { datasetsDisplay, spatialReferenceDisplay };
   }
 
   /**
@@ -151,6 +185,7 @@ export class ValidationRunFacade {
       const to = f.dateRange[1].toISOString().split('T')[0];
       params = params.set('filter:start_time', `${from},${to}`);
     }
+
     return params;
   }
 

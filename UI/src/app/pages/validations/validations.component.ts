@@ -50,6 +50,7 @@ export class ValidationsComponent implements OnInit, OnDestroy {
 
   // From Facade
   loading$ = this.facade.loading$;
+  
   rows$!: Observable<any[]>;
   totalRecords$!: Observable<number>;
   dataFetchError = false;
@@ -72,22 +73,32 @@ export class ValidationsComponent implements OnInit, OnDestroy {
   deleteTarget: any | null = null;
   deleting = false;
 
+  // For stop dialog window
+  confirmStopVisible = false;
+  stopTarget: any | null = null;
+  stopping = false;
+
   ngOnInit(): void {
-    
+
+    // Create Filters Reactive Form with fields: dateRange, Validation-run name, Dataset name
     this.filterForm = this.fb.group({
       dateRange: [null],
       name: [''],
       dataset: ['']
     });
 
+    // Create Observable from Reactive Form
     const filters$ = this.filterForm.valueChanges.pipe(
       startWith(this.filterForm.value),
       debounceTime(300),
       distinctUntilChanged((a, b) => JSON.stringify(a) === JSON.stringify(b)),
+      // send to 0 page if user changed the filters
       tap(() => this.page$.next({ ...this.page$.value, page: 0 }))
     );
 
+    // Listen to filters, page and sort and send request to backend
     const dataState$ = combineLatest([filters$, this.page$, this.sort$]).pipe(
+      tap(() => this.dataFetchError = false),
       switchMap(([f, p, s]) => {
         // Filter from Facade
         const params = this.facade.ValidationRunFilters(f, p, s);
@@ -99,7 +110,7 @@ export class ValidationsComponent implements OnInit, OnDestroy {
           })
         );
       }),
-      shareReplay(1)
+      shareReplay({ bufferSize: 1, refCount: true })
     );
 
     this.rows$ = dataState$.pipe(map(res => res.rows));
@@ -194,17 +205,35 @@ export class ValidationsComponent implements OnInit, OnDestroy {
   }
 
   // Stop Validation
-  onStop(row: any, event: Event): void {
+  openStopDialog(row: any, event: Event): void {
     event.stopPropagation();
-    if (confirm(`Are you sure you want to stop validation "${row.name_tag || row.id}"?`)) {
-      this.validationrunService.stopValidation(row.id).subscribe({
-        next: () => {
-          this.toastService.showSuccessWithHeader('Success', 'Validation stop requested.');
-          this.page$.next({ ...this.page$.value }); // Обновляем данные
-        },
-        error: () => this.toastService.showErrorWithHeader('Error', 'Could not stop validation.')
-      });
-    }
+    this.stopTarget = row;
+    this.confirmStopVisible = true;
+  }
+
+  closeStopDialog(): void {
+    this.confirmStopVisible = false;
+    this.stopTarget = null;
+  }
+
+  confirmStop(): void {
+    if (!this.stopTarget || this.stopping) return;
+
+    this.stopping = true;
+    const row = this.stopTarget;
+
+    this.validationrunService.stopValidation(row.id).pipe(take(1)).subscribe({
+      next: () => {
+        this.toastService.showSuccessWithHeader('Success', 'Validation stop requested.');
+        this.closeStopDialog();
+        this.page$.next({ ...this.page$.value }); // refresh table
+        this.stopping = false;
+      },
+      error: () => {
+        this.toastService.showErrorWithHeader('Error', 'Could not stop validation.');
+        this.stopping = false;
+      }
+    });
   }
 
   isLive(valrun: any): boolean {

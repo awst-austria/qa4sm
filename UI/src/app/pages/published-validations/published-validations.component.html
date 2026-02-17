@@ -10,9 +10,9 @@
         <a class="font-semibold" target="_blank" href="https://www.doi.org/" rel="noreferrer">DOI</a>.
       </p>
       @if (totalRecords$ | async; as total) {
-        <div>{{ total }} published validations are shown.</div>
+        <div>{{ total }} published validations found.</div>
       } @else {
-        <div>0 published validations are shown.</div>
+        <div>0 published validations found.</div>
       }
     </div>
 

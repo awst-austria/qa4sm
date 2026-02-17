@@ -5,11 +5,12 @@
 
     <div class="text-center w-12 my-5">
       <h1>My validations</h1>
+      <p>Here you can view, filter, and manage all your validation runs.</p>
       
       @if (totalRecords$ | async; as total) {
-        <div>{{ total }} validation-runs are shown.</div>
+        <div>{{ total }} validation runs found.</div>
       } @else {
-        <div>0 validation-runs are shown.</div>
+        <div>0 validation runs found.</div>
       }
     </div>
 
@@ -169,7 +170,7 @@
                     icon="pi pi-stop-circle"
                     pTooltip="Stop validation"
                     tooltipPosition="left"
-                    (click)="onStop(rowData, $event)">
+                    (click)="openStopDialog(rowData, $event)">
                 </button>
             } @else {
 
@@ -204,6 +205,7 @@
 
   </div>
 
+  <!-- p-dialog to delete validation-->
   <p-dialog
     header="Delete validation result"
     [(visible)]="confirmDeleteVisible"
@@ -238,6 +240,45 @@
         icon="pi pi-trash"
         (click)="confirmDelete()"
         [loading]="deleting"
+      ></button>
+    </ng-template>
+  </p-dialog>
+
+  <!-- p-dialog to stop validation-->
+  <p-dialog
+    header="Stop validation"
+    [(visible)]="confirmStopVisible"
+    [modal]="true"
+    [dismissableMask]="true"
+    [style]="{ width: '32rem' }"
+    (onHide)="closeStopDialog()"
+  >
+    <div class="flex flex-column gap-2">
+      <span>
+        Do you really want to stop
+        <b>{{ stopTarget?.name_tag || stopTarget?.id }}</b>?
+      </span>
+      <span class="muted">The validation run will be cancelled and no further processing will occur.</span>
+    </div>
+
+    <ng-template pTemplate="footer">
+      <button
+        pButton
+        type="button"
+        class="p-button-text"
+        label="Cancel"
+        (click)="closeStopDialog()"
+        [disabled]="stopping"
+      ></button>
+
+      <button
+        pButton
+        type="button"
+        class="p-button-text p-button-danger"
+        label="Stop"
+        icon="pi pi-stop-circle"
+        (click)="confirmStop()"
+        [loading]="stopping"
       ></button>
     </ng-template>
   </p-dialog>

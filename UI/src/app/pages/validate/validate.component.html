@@ -250,25 +250,26 @@
         </div>
 
         <!-- Name -->
-        <div class="w-10 p-2 flex flex-row md:flex-nowrap flex-wrap align-items-center">
-          <div class="md:w-3 w-12 md:px-1 px-2 text-left md:text-right">
-            <label for="name">Name your validation:</label>
+        <div class="w-10 p-4 flex align-items-center gap-2">
+          <div class="flex-grow-1">
+            <p-floatLabel>
+              <input 
+                maxlength="80"
+                class="form-field w-full"
+                id="name"
+                type="text"
+                pInputText
+                [ngModel]="validationModel.nameTag$ | async"
+                (ngModelChange)="validationModel.nameTag$.next($event)" />
+              <label for="name">Validation name</label>
+            </p-floatLabel>
           </div>
-          <input 
-                 maxlength="80"
-                 class="form-field md:w-8 w-11"
-                 id="name"
-                 type="text"
-                 pInputText
-                 [ngModel]="validationModel.nameTag$|async"
-                 (ngModelChange)="validationModel.nameTag$.next($event)">
-          <div class="w-1">
           <span
-             pTooltip="Optional name for this validation (limit: 80 characters)."
-             class="pi pi-question-circle help-field pl-2">
-            </span>
-          </div>
+            pTooltip="Optional name for this validation (max 80 characters)."
+            class="pi pi-question-circle help-field">
+          </span>
         </div>
+     
 
         <!-- Button -->
         <div class="w-10 p-2">
