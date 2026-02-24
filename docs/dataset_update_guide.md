@@ -132,7 +132,8 @@ for your dataset in the service. Otherwise skip this step.
 9) The ``user`` is usually "null" except if a dataset should be private and only accessible to a certain user group.
    In that case (e.g. for the SMOS L2 experimental data) you can add "1" for now, and later - after deployment - assign
    the real user(s) in the admin panel, that should have exclusive access.
-
+### Networks fixture (only for ISMN updates)
+- Add the pk value of the new ISMN version to the versions field of its respective ISMN-stations in the networks.json fixture file. Create new entries in case the new ISMN data contains new ISMN-stations.
 ## Add reader
 If you add a new dataset, you have to define the reader. Theoretically, each version can can have a different reader, 
 although in practice, usually different versions of the same dataset also use the same reader (so you probably can skip this
