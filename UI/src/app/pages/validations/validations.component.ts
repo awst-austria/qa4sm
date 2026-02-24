@@ -21,6 +21,7 @@ import { ToastService } from 'src/app/modules/core/services/toast/toast.service'
 import { ValidationrunService } from 'src/app/modules/core/services/validation-run/validationrun.service';
 import { AuthService } from 'src/app/modules/core/services/auth/auth.service';
 import { DialogModule } from 'primeng/dialog';
+import { HttpParams } from '@angular/common/http';
 
 interface SortState {
   field: string;
@@ -204,7 +205,7 @@ export class ValidationsComponent implements OnInit, OnDestroy {
     }
   }
 
-  // Stop Validation
+  // Stop Validation (if we have running validation)
   openStopDialog(row: any, event: Event): void {
     event.stopPropagation();
     this.stopTarget = row;
@@ -253,6 +254,23 @@ export class ValidationsComponent implements OnInit, OnDestroy {
     const target = event?.target as HTMLElement | undefined;
     if (target?.closest('button, a, input, textarea, .p-inputtext')) return;
     this.router.navigate(['/validation-result', row.id]);
+  }
+  loadSettings(row: any, event: Event): void {
+    event.stopPropagation();
+
+    const params = new HttpParams().set('validation_id', row.id);
+
+    this.validationrunService.copyValidation(params)
+      .pipe(take(1))
+      .subscribe({
+        next: (data: any) => {
+          const newId = data.run_id; // same as ButtonsComponent
+          this.router.navigate(['/validate'], { queryParams: { validation_id: newId } });
+        },
+        error: () => {
+          this.toastService.showErrorWithHeader('Error', 'Could not load settings.');
+        }
+      });
   }
 
   ngOnDestroy(): void {

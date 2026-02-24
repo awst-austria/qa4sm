@@ -67,6 +67,7 @@
           <th pSortableColumn="name_tag">Name <p-sortIcon field="name_tag"></p-sortIcon></th>
           <th>Datasets</th>
           <th pSortableColumn="spatial_reference_dataset">Spatial reference <p-sortIcon field="spatial_reference_dataset"></p-sortIcon></th>
+          <th>Load settings</th>
           <th>Status</th>
           <th>Actions</th>
         </tr>
@@ -84,13 +85,14 @@
           <td class="date-cell">{{ rowData.start_time | date:'yyyy-MM-dd' }}</td>   
           
           <td class="name-cell">
-            <div class="flex align-items-center justify-content-start w-full min-h-2rem">
+            <div class="flex align-items-center justify-content-start w-full">
               
               @if (editingRowId === rowData.id) {
                 <div class="flex align-items-center gap-1 w-full edit-container">
                   <input 
                     #editInput
                     pInputText 
+                    maxlength="80"
                     [(ngModel)]="tempName" 
                     class="p-inputtext-sm flex-grow-1"
                     (click)="$event.stopPropagation()"
@@ -151,6 +153,16 @@
             <ng-template #noSpatial>—</ng-template>
           </td>
 
+          <td class="settings-cell">
+            <button
+              pButton
+              type="button"
+              class="p-button-text p-button-secondary"
+              icon="pi pi-replay"
+              pTooltip="Load settings (redirects to validate page)" 
+              (click)="loadSettings(rowData, $event)">
+            </button>
+          </td>
 
           <td class="status-cell">
             @let status = getStatusDisplay(rowData);

@@ -88,9 +88,24 @@
   }
 }
 
+@media (min-width: 2200px) {
+  .name-cell { font-size: 1rem; }
+  .muted { font-size: 0.85rem; }
+}
+
 @media (prefers-color-scheme: dark) {
   :host ::ng-deep .qa-validations-table .p-datatable-tbody > tr:hover > td {
     background: rgba(34, 197, 94, 0.25);
   }
 }
 
+@media (max-width: 900px) {
+  .qa-validations-table th:nth-child(2),
+  .qa-validations-table td:nth-child(2),
+  .qa-validations-table th:nth-child(4),
+  .qa-validations-table td:nth-child(4),
+  .qa-validations-table th:nth-child(6),
+  .qa-validations-table td:nth-child(6) {
+    display: none; /* hide for mobile */
+  }
+}
