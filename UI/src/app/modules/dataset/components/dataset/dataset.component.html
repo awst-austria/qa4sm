@@ -59,16 +59,25 @@
 <div class="grid  align-content-center">
   <div class="col" style="max-width: 100%">
     <p-floatLabel>
-      <p-select [inputId]="variableSelectorId" optionLabel="short_name" [style]="{'width': '100%'}"
-                  [options]="(selectableDatasetVariables$|async)"
-                  [(ngModel)]="selectionModel.selectedVariable">
+      <p-select 
+        [inputId]="variableSelectorId" 
+        optionLabel="short_name" 
+        [style]="{'width': '100%'}"     
+        [options]="(selectableDatasetVariables$|async)"          
+        [(ngModel)]="selectionModel.selectedVariable"
+      >
         <ng-template let-item pTemplate="item">
           <span>
-            <span>{{ item.display_name }} [{{ item.unit ? item.unit : 'n.a.' }}]</span>
+            {{ item.display_name === 'none' ? item.pretty_name : item.display_name }}
+            [{{ item.unit ? item.unit : 'n.a.' }}]
           </span>
         </ng-template>
+        
         <ng-template let-item pTemplate="selectedItem">
-          <span>{{ item.display_name }} [{{ item.unit ? item.unit : 'n.a.' }}]</span>
+          <span>
+            {{ item.display_name === 'none' ? item.pretty_name : item.display_name }}
+            [{{ item.unit ? item.unit : 'n.a.' }}]
+          </span>
         </ng-template>
       </p-select>
       <label for="{{variableSelectorId}}">Variable [units]</label>
