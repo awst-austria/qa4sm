@@ -13,6 +13,6 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name="datavariable",
             name="display_name",
-            field=models.CharField(max_length=100),
+            field=models.CharField(max_length=100, default='n.a.', blank=True),
         ),
     ]
