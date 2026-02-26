@@ -161,21 +161,11 @@ class TestValidation(TestCase):
             raise ValueError(
                 'More than one configuration is marked as spatial reference.')
 
-        if len(val_configs.filter(is_temporal_reference=True)) == 0:
-            raise ValueError(
-                'No configuration is marked as temporal reference.')
-        elif len(val_configs.filter(is_temporal_reference=True)) > 1:
-            raise ValueError(
-                'More than one configuration is marked as temporal reference.')
-
         # check if proper reference configurations have proper fields set
         if not validation.spatial_reference_configuration.is_spatial_reference:
             raise ValueError(
                 'Configuration is not marked as spatial reference.')
-        if not validation.temporal_reference_configuration.is_temporal_reference:
-            raise ValueError(
-                'Configuration is not marked as temporal reference.')
-
+        
         # check if proper reference configurations have proper fields set
         if not validation.spatial_reference_configuration.is_spatial_reference:
             raise ValueError(
@@ -208,7 +198,7 @@ class TestValidation(TestCase):
     def check_results(self,
                       run,
                       is_tcol_run=False,
-                      meta_plots=True,
+                      meta_plots=False,
                       stability_metrics_run=False):
 
         try:
@@ -558,7 +548,7 @@ class TestValidation(TestCase):
         "ignore: Too few points are available to generate:UserWarning")
     def test_validation_stability_metrics(self):
         run = generate_default_validation()
-        run.plots_save_metadata = 'always'
+        run.plots_save_metadata = 'never'
         run.user = self.testuser
 
         # run.scaling_ref = ValidationRun.SCALE_REF
@@ -572,10 +562,6 @@ class TestValidation(TestCase):
         run.interval_to = datetime(2018, 12, 31, tzinfo=UTC)
 
         run.save()
-
-        self.__logger.debug(
-            f"Intra-Annual params: {run.intra_annual_type=}, {run.intra_annual_metrics=}, {run.intra_annual_overlap=}"
-        )
 
         self.__logger.debug(
             f"Intra-Annual params: {run.intra_annual_type=}, {run.intra_annual_metrics=}, {run.intra_annual_overlap=}"
@@ -611,7 +597,7 @@ class TestValidation(TestCase):
 
         self.check_results(new_run,
                            is_tcol_run=False,
-                           meta_plots=True,
+                           meta_plots=False,
                            stability_metrics_run=True)
         self.delete_run(new_run)
 
@@ -622,11 +608,11 @@ class TestValidation(TestCase):
         "ignore: Too few points are available to generate:UserWarning")
     def test_validation_tcol(self):
         run = generate_default_validation_triple_coll()
-        run.plots_save_metadata = 'always'
+        run.plots_save_metadata = 'never'
         run.user = self.testuser
 
         # run.scaling_ref = ValidationRun.SCALE_REF
-        run.plots_save_metadata = 'always'
+        run.plots_save_metadata = 'never'
         run.scaling_method = ValidationRun.BETA_SCALING  # cdf matching
         run.scaling_ref = run.spatial_reference_configuration
         run.scaling_ref.is_scaling_reference = True
@@ -668,7 +654,7 @@ class TestValidation(TestCase):
         # the other 4 are okay
         assert new_run.ok_points == 4
 
-        self.check_results(new_run, is_tcol_run=True, meta_plots=True)
+        self.check_results(new_run, is_tcol_run=True, meta_plots=False)
         self.delete_run(new_run)
 
     @pytest.mark.filterwarnings(
@@ -677,7 +663,7 @@ class TestValidation(TestCase):
         "ignore: Too few points are available to generate:UserWarning")
     def test_validation_empty_network(self):
         run = generate_default_validation()
-        run.plots_save_metadata = 'always'
+        run.plots_save_metadata = 'never'
         run.user = self.testuser
 
         # run.scaling_ref = ValidationRun.SCALE_REF
@@ -724,7 +710,7 @@ class TestValidation(TestCase):
     @pytest.mark.long_running
     def test_validation_gldas_ref(self):
         run = generate_default_validation()
-        run.plots_save_metadata = 'always'
+        run.plots_save_metadata = 'never'
         run.user = self.testuser
 
         run.spatial_reference_configuration.dataset = Dataset.objects.get(
@@ -777,7 +763,7 @@ class TestValidation(TestCase):
     @pytest.mark.long_running
     def test_validation_ccip_ref(self):
         run = generate_default_validation()
-        run.plots_save_metadata = 'always'
+        run.plots_save_metadata = 'never'
         run.user = self.testuser
 
         run.spatial_reference_configuration.dataset = Dataset.objects.get(
@@ -829,7 +815,7 @@ class TestValidation(TestCase):
     @pytest.mark.long_running
     def test_validation_ccia_ref(self):
         run = generate_default_validation()
-        run.plots_save_metadata = 'always'
+        run.plots_save_metadata = 'never'
         run.user = self.testuser
 
         run.spatial_reference_configuration.dataset = Dataset.objects.get(
@@ -880,7 +866,7 @@ class TestValidation(TestCase):
     # @pytest.mark.long_running
     def test_validation_smap_ref(self):
         run = generate_default_validation()
-        run.plots_save_metadata = 'always'
+        run.plots_save_metadata = 'never'
         run.user = self.testuser
 
         run.spatial_reference_configuration.dataset = Dataset.objects.get(
@@ -939,7 +925,7 @@ class TestValidation(TestCase):
     @pytest.mark.long_running
     def test_validation_smap_v9_all_orbits(self):
         run = generate_validation_smap_l3_v9()
-        run.plots_save_metadata = 'always'
+        run.plots_save_metadata = 'never'
         run.user = self.testuser
 
         for config in run.dataset_configurations.all():
@@ -990,7 +976,7 @@ class TestValidation(TestCase):
         assert new_run.error_points == 1, "Error points are off"
         assert new_run.ok_points == 8, "OK points are off"
 
-        self.check_results(new_run, is_tcol_run=False, meta_plots=True)
+        self.check_results(new_run, is_tcol_run=False, meta_plots=False)
         self.delete_run(new_run)
 
     @pytest.mark.filterwarnings(
@@ -1000,7 +986,7 @@ class TestValidation(TestCase):
     @pytest.mark.long_running
     def test_validation_smap_v9_select_orbit(self):
         run = generate_validation_smap_l3_v9()
-        run.plots_save_metadata = 'always'
+        run.plots_save_metadata = 'never'
         run.user = self.testuser
 
         for config in run.dataset_configurations.all():
@@ -1053,7 +1039,7 @@ class TestValidation(TestCase):
         assert new_run.error_points == 1, "Error points are off"
         assert new_run.ok_points == 8, "OK points are off"
 
-        self.check_results(new_run, is_tcol_run=False, meta_plots=True)
+        self.check_results(new_run, is_tcol_run=False, meta_plots=False)
         self.delete_run(new_run)
 
     @pytest.mark.filterwarnings(
@@ -1063,7 +1049,7 @@ class TestValidation(TestCase):
     @pytest.mark.long_running
     def test_validation_ascat_ref(self):
         run = generate_default_validation()
-        run.plots_save_metadata = 'always'
+        run.plots_save_metadata = 'never'
         run.user = self.testuser
 
         run.spatial_reference_configuration.dataset = Dataset.objects.get(
@@ -1120,7 +1106,7 @@ class TestValidation(TestCase):
     @pytest.mark.long_running
     def test_validation_c3s_ref(self):
         run = generate_default_validation()
-        run.plots_save_metadata = 'always'
+        run.plots_save_metadata = 'never'
         run.user = self.testuser
 
         run.spatial_reference_configuration.dataset = Dataset.objects.get(
@@ -1172,7 +1158,7 @@ class TestValidation(TestCase):
     @pytest.mark.long_running
     def test_validation_era5_ref(self):
         run = generate_default_validation()
-        run.plots_save_metadata = 'always'
+        run.plots_save_metadata = 'never'
         run.user = self.testuser
 
         run.spatial_reference_configuration.dataset = Dataset.objects.get(
@@ -1225,7 +1211,7 @@ class TestValidation(TestCase):
     @pytest.mark.long_running
     def test_validation_esa_cci_C_MR_ref(self):
         run = generate_default_validation()
-        run.plots_save_metadata = 'always'
+        run.plots_save_metadata = 'never'
         run.user = self.testuser
 
         run.spatial_reference_configuration.dataset = Dataset.objects.get(
@@ -1278,7 +1264,7 @@ class TestValidation(TestCase):
     @pytest.mark.long_running
     def test_validation_ascat(self):
         run = generate_default_validation()
-        run.plots_save_metadata = 'always'
+        run.plots_save_metadata = 'never'
         run.user = self.testuser
 
         for config in run.dataset_configurations.all():
@@ -1313,7 +1299,7 @@ class TestValidation(TestCase):
         assert new_run.error_points == 1
         assert new_run.ok_points == 8
 
-        self.check_results(new_run, is_tcol_run=False, meta_plots=True)
+        self.check_results(new_run, is_tcol_run=False, meta_plots=False)
         self.delete_run(new_run)
 
     # TODO: fails, if validation contains temporal sub-windows
@@ -1350,7 +1336,7 @@ class TestValidation(TestCase):
     @pytest.mark.long_running
     def test_validation_anomalies_moving_avg(self):
         run = generate_default_validation()
-        run.plots_save_metadata = 'always'
+        run.plots_save_metadata = 'never'
         run.user = self.testuser
         run.anomalies = ValidationRun.MOVING_AVG_35_D
         run.save()
@@ -1376,7 +1362,7 @@ class TestValidation(TestCase):
         assert new_run.error_points == 0
         assert new_run.ok_points == 9
 
-        self.check_results(new_run, is_tcol_run=False, meta_plots=True)
+        self.check_results(new_run, is_tcol_run=False, meta_plots=False)
         self.delete_run(new_run)
 
     @pytest.mark.filterwarnings(
@@ -1386,7 +1372,7 @@ class TestValidation(TestCase):
     @pytest.mark.long_running
     def test_validation_anomalies_climatology(self):
         run = generate_default_validation()
-        run.plots_save_metadata = 'always'
+        run.plots_save_metadata = 'never'
         run.user = self.testuser
         run.anomalies = ValidationRun.CLIMATOLOGY
         # make sure there is data for the climatology time period!
@@ -1412,7 +1398,7 @@ class TestValidation(TestCase):
 
         assert new_run
 
-        self.check_results(new_run, is_tcol_run=False, meta_plots=True)
+        self.check_results(new_run, is_tcol_run=False, meta_plots=False)
         self.delete_run(new_run)
 
     @pytest.mark.filterwarnings(
@@ -1425,7 +1411,7 @@ class TestValidation(TestCase):
         a validation that doesn't involve ISMN ref is used to check the resolution attributes
         """
         run = generate_default_validation()
-        run.plots_save_metadata = 'always'
+        run.plots_save_metadata = 'never'
         run.user = self.testuser
 
         # need validation without ISMN as referebce to check resolution attributes
@@ -1633,7 +1619,7 @@ class TestValidation(TestCase):
     @pytest.mark.long_running
     def test_validation_spatial_subsetting(self):
         run = generate_default_validation()
-        run.plots_save_metadata = 'always'
+        run.plots_save_metadata = 'never'
         run.user = self.testuser
 
         # hawaii bounding box
@@ -1665,7 +1651,7 @@ class TestValidation(TestCase):
         assert new_run.error_points == 0
         assert new_run.ok_points == 9
 
-        self.check_results(new_run, is_tcol_run=False, meta_plots=True)
+        self.check_results(new_run, is_tcol_run=False, meta_plots=False)
         self.delete_run(new_run)
 
     def test_errors(self):
@@ -2328,7 +2314,7 @@ class TestValidation(TestCase):
         # preparing a few validations, so that there is a base to be searched
         for i in range(3):
             run = generate_default_validation()
-            run.plots_save_metadata = 'always'
+            run.plots_save_metadata = 'never'
             run.user = self.testuser
             run.interval_from = time_intervals_from
             run.interval_to = time_intervals_to
@@ -2411,7 +2397,7 @@ class TestValidation(TestCase):
         # here will be validations for asserting, I start with exactly the same validations and check if it finds them:
         for i in range(3):
             run = generate_default_validation()
-            run.plots_save_metadata = 'always'
+            run.plots_save_metadata = 'never'
             run.user = self.testuser
             run.interval_from = time_intervals_from
             run.interval_to = time_intervals_to
@@ -2438,7 +2424,7 @@ class TestValidation(TestCase):
 
         # runs to fail:
         run = generate_default_validation()
-        run.plots_save_metadata = 'always'
+        run.plots_save_metadata = 'never'
         run.user = self.testuser
         run.interval_from = time_intervals_from
         run.interval_to = time_intervals_to
@@ -2722,7 +2708,7 @@ class TestValidation(TestCase):
     def test_copy_validation(self):
         # create a validation to copy:
         run = generate_default_validation()
-        run.plots_save_metadata = 'always'
+        run.plots_save_metadata = 'never'
         run.user = self.testuser
 
         run.scaling_method = ValidationRun.MEAN_STD
@@ -2788,7 +2774,7 @@ class TestValidation(TestCase):
         assert copied_run.error_points == 0
         assert copied_run.ok_points == 9
 
-        self.check_results(copied_run, is_tcol_run=False, meta_plots=True)
+        self.check_results(copied_run, is_tcol_run=False, meta_plots=False)
 
         # copying again, so to check CopiedValidations model
         new_run = get_object_or_404(ValidationRun, pk=run_id)

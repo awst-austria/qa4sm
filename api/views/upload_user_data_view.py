@@ -255,8 +255,10 @@ def upload_user_data(request, filename):
     new_dataset = create_dataset_entry(dataset_name, dataset_pretty_name,
                                        new_version, request.user, is_scattered_data=is_scattered)
 
+    original_file_size = file.size
     file_data = {
         'file': file,
+        'original_file_size': original_file_size,
         'file_name': filename,
         'owner': request.user.pk,
         'dataset': new_dataset.pk,

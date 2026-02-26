@@ -165,8 +165,8 @@ def default_parameterized_validation_to_be_run(user, tcol=False):
 
 def create_default_validation_without_running(user, tcol=False):
     run = default_parameterized_validation_to_be_run(user, tcol)
-    run.start_time = datetime.utcnow().replace(tzinfo=utc) - timedelta(hours=1)
-    run.end_time = datetime.utcnow().replace(tzinfo=utc)
+    run.start_time = datetime.now(UTC) - timedelta(hours=1)
+    run.end_time = datetime.now(UTC)
     run.total_points = 30
     run.error_points = 5
     run.anomalies = 'climatology'

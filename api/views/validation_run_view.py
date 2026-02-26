@@ -95,7 +95,7 @@ def published_results(request):
     val_runs = ValidationRun.objects.exclude(doi='')
 
     if check_for_filters(request.query_params):
-        val_runs = filter_validations(request.query_params, val_runs)
+        val_runs = filter_validations(request.query_params, val_runs).distinct()
 
     if order:
         val_runs = val_runs.order_by(order)
@@ -110,7 +110,7 @@ def published_results(request):
         serializer = ValidationRunSerializer(val_runs, many=True)
 
     response = {'validations': serializer.data,
-                'length': len(val_runs)}
+                'length': val_runs.count()}
 
     return JsonResponse(response, status=status.HTTP_200_OK, safe=False)
 
@@ -129,6 +129,9 @@ def my_results(request):
 
     if check_for_filters(request.query_params):
         user_validations = filter_validations(request.query_params, user_validations)
+        user_validations = user_validations.distinct()
+
+    number_of_filtered_validations = user_validations.count()
 
     if order:
         user_validations = user_validations.order_by(order)
@@ -140,7 +143,7 @@ def my_results(request):
     else:
         serializer = ValidationRunSerializer(user_validations, many=True)
 
-    response = {'validations': serializer.data, 'length': number_of_all_validations}
+    response = {'validations': serializer.data, 'length': number_of_filtered_validations}
     return JsonResponse(response, status=status.HTTP_200_OK, safe=False)
 
 

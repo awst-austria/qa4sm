@@ -1,0 +1,111 @@
+@use 'src/style.variables' as *;
+
+:host ::ng-deep .qa-validations-table table {
+  table-layout: fixed;
+  width: 100%;
+}
+
+.content{
+  width: min(1600px, 100%);   /* max width for large screens */
+  padding: 0 1rem;
+}
+
+:host ::ng-deep .qa-validations-table .p-datatable-thead > tr > th {
+  border-bottom: 1px solid $base-color;
+}
+:host ::ng-deep .qa-validations-table .p-datatable-thead {
+  box-shadow: inset 0 -1px 0 $base-color;
+}
+:host ::ng-deep .qa-validations-table .p-datatable-tbody > tr {
+  cursor: pointer;
+}
+:host ::ng-deep .qa-validations-table .p-datatable-tbody > tr:hover > td {
+  background: #ECFDF5;
+}
+
+.qa-validations-table th:nth-child(1){ width: 9%; } /* Date */
+.qa-validations-table th:nth-child(2){ width: 22%; } /* Name */
+.qa-validations-table th:nth-child(3){ width: 22%; } /* Datasets */
+.qa-validations-table th:nth-child(4){ width: 22%; } /* Spatial */
+.qa-validations-table th:nth-child(5){ width: 20%; } /* DOI */
+.qa-validations-table th:nth-child(6){ width: 5%; }  /* Pin */
+
+.qa-validations-table th:nth-child(6){
+  text-align: center;
+  justify-content: center; 
+}
+.qa-validations-table td:nth-child(6){
+  text-align: center;
+}
+
+.name-cell {
+  white-space: normal;        
+  word-break: break-word;     
+  overflow-wrap: anywhere;    
+  line-height: 1.3;
+  font-size: 0.85rem;
+  font-weight: 800;
+}
+
+.doi-cell {
+  white-space: normal;        
+  word-break: break-word;     
+  overflow-wrap: anywhere;    
+  line-height: 1.3;
+}
+
+.muted {
+  /*color: $font-color-muted;*/
+  font-size: 0.7rem;
+}
+
+.dataset-line{
+  line-height: 1.25rem;
+  margin-bottom: .25rem;
+}
+
+.dataset-line .muted{
+  opacity: .75;
+}
+
+.qa-validations-table td{
+  vertical-align: top;
+}
+
+.qa-validations-table td:nth-child(3) .muted,
+.qa-validations-table td:nth-child(4) .muted{
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  overflow: hidden;
+}
+
+@media (min-width: 1600px){
+  .qa-validations-table .p-datatable-tbody > tr > td,
+  .qa-validations-table .p-datatable-thead > tr > th{
+    padding: .85rem .9rem;
+  }
+}
+
+@media (min-width: 2200px) {
+  .name-cell { font-size: 1rem; }
+  .muted { font-size: 0.85rem; }
+}
+
+@media (prefers-color-scheme: dark) {
+  :host ::ng-deep .qa-validations-table .p-datatable-tbody > tr:hover > td {
+    background: rgba(34, 197, 94, 0.25);
+  }
+}
+
+@media (max-width: 900px) {
+  .qa-validations-table th:nth-child(2),
+  .qa-validations-table td:nth-child(2),
+  .qa-validations-table th:nth-child(4),
+  .qa-validations-table td:nth-child(4),
+  .qa-validations-table th:nth-child(6),
+  .qa-validations-table td:nth-child(6) {
+    display: none; /* hide for mobile */
+  }
+}
