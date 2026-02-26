@@ -9,7 +9,7 @@ class DataVariable(models.Model):
 
     min_value = models.FloatField(null=True)
     max_value = models.FloatField(null=True)
-    display_name = models.CharField(max_length=100)
+    display_name = models.CharField(max_length=100, default='n.a.', blank=True)
 
     
     # many-to-one relationships coming from other models:
