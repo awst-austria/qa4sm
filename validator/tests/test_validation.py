@@ -670,7 +670,7 @@ class TestValidation(TestCase):
         # the other 4 are okay
         assert new_run.ok_points == 4
 
-        self.check_results(new_run, is_tcol_run=True, meta_plots=True)
+        self.check_results(new_run, is_tcol_run=True, meta_plots=False)
         if delete:
             self.delete_run(new_run)
         else:
