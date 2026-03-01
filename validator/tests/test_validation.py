@@ -459,7 +459,8 @@ class TestValidation(TestCase):
             self.__logger.debug(f"{boxplot_pngs=}")
             self.__logger.debug(
                 f"{metric}: Plots are {len(boxplot_pngs)}, "
-                f"should: {n_metadata_plots} + {n_metric_plots}")
+                f"should: {n_metadata_plots} + {n_metric_plots}"
+                f"{out_metadata_plots}")
 
             assert len(boxplot_pngs) == n_metadata_plots + n_metric_plots
 
@@ -490,7 +491,14 @@ class TestValidation(TestCase):
         "ignore:No results for gpi:UserWarning",
         "ignore:read_ts is deprecated, please use read instead:DeprecationWarning",
         "ignore: Too few points are available to generate:UserWarning")
-    def test_validation(self):
+    def test_validation(self, delete=True, val_type='temporal'):
+        """Tests a normal validation run between ISMN (spatial reference) and C3S_combined around Hawaii.
+
+        Parameters
+        ----------
+        delete: bool, default = True
+                Determines wheter the run is deleted after testing. Used for debugging.
+        """
         run = generate_default_validation()
         run.plots_save_metadata = 'always'
         run.user = self.testuser
@@ -531,7 +539,7 @@ class TestValidation(TestCase):
         run_id = run.id
 
         ## run the validation
-        val.run_validation(run_id)
+        val.run_validation(run_id, val_type=val_type)
         new_run = ValidationRun.objects.get(pk=run_id)
 
         assert new_run.total_points == 9  # 9 ismn stations in hawaii testdata
@@ -539,7 +547,15 @@ class TestValidation(TestCase):
         assert new_run.ok_points == 9
 
         self.check_results(new_run, is_tcol_run=False, meta_plots=True)
-        self.delete_run(new_run)
+        if delete:
+            self.delete_run(new_run)
+        else:
+            return new_run
+
+    @pytest.mark.long_running   
+    def test_spatial_validation(self):
+        """Tests a spatial validation run between ISMN (spatial reference) and C3S_combined around Hawaii."""
+        self.test_validation(val_type="both")
 
     # TODO: fails, if validation contains temporal sub-windows
     @pytest.mark.filterwarnings(
@@ -606,7 +622,7 @@ class TestValidation(TestCase):
         "ignore:No results for gpi:UserWarning",
         "ignore:read_ts is deprecated, please use read instead:DeprecationWarning",
         "ignore: Too few points are available to generate:UserWarning")
-    def test_validation_tcol(self):
+    def test_validation_tcol(self, delete=True, val_type='temporal'):
         run = generate_default_validation_triple_coll()
         run.plots_save_metadata = 'never'
         run.user = self.testuser
@@ -645,7 +661,7 @@ class TestValidation(TestCase):
         run_id = run.id
 
         # run the validation
-        val.run_validation(run_id)
+        val.run_validation(run_id, val_type=val_type)
         new_run = ValidationRun.objects.get(pk=run_id)
 
         assert new_run.total_points == 9  # 9 ismn stations in hawaii testdata
@@ -654,8 +670,14 @@ class TestValidation(TestCase):
         # the other 4 are okay
         assert new_run.ok_points == 4
 
-        self.check_results(new_run, is_tcol_run=True, meta_plots=False)
-        self.delete_run(new_run)
+        self.check_results(new_run, is_tcol_run=True, meta_plots=True)
+        if delete:
+            self.delete_run(new_run)
+        else:
+            return new_run
+    @pytest.mark.long_running
+    def test_spatial_validation_tcol(self):
+        self.test_validation_tcol(val_type='both')
 
     @pytest.mark.filterwarnings(
         "ignore:No results for gpi:UserWarning",
@@ -2134,7 +2156,8 @@ class TestValidation(TestCase):
         val.generate_all_graphs(validation_run=v,
                                 temporal_sub_windows=[DEFAULT_TSW],
                                 outfolder=run_dir,
-                                save_metadata='never')
+                                save_metadata='never',
+                                out_type=["png", "svg"])
 
         boxplot_pngs = [
             x for x in os.listdir(os.path.join(run_dir, DEFAULT_TSW))
