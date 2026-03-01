@@ -64,7 +64,8 @@ def generate_all_graphs(validation_run, temporal_sub_windows: List[str], outfold
             out_dir=outfolder,
             out_type=out_type,
             save_metadata=save_metadata,
-            dpi=dpi
+            dpi=dpi,
+            val_type=val_type,
         )
 
         plot_all_output_dict = sort_filenames_to_filetypes((fnb, fnm, fcsv, fncb))

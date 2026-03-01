@@ -1461,7 +1461,8 @@ def run_validation(validation_id, val_type="temporal"):
                         validation_run=validation_run,
                         outfolder=run_dir,
                         temporal_sub_windows=temporal_sub_windows_names,
-                        save_metadata=validation_run.plots_save_metadata)
+                        save_metadata=validation_run.plots_save_metadata,
+                        val_type=val_type)
 
     except Exception as e:
         __logger.exception('Unexpected exception during validation {}:'.format(
