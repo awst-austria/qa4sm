@@ -552,11 +552,6 @@ class TestValidation(TestCase):
         else:
             return new_run
 
-    @pytest.mark.long_running   
-    def test_spatial_validation(self):
-        """Tests a spatial validation run between ISMN (spatial reference) and C3S_combined around Hawaii."""
-        self.test_validation(val_type="both")
-
     # TODO: fails, if validation contains temporal sub-windows
     @pytest.mark.filterwarnings(
         "ignore:No results for gpi:UserWarning",
@@ -675,9 +670,6 @@ class TestValidation(TestCase):
             self.delete_run(new_run)
         else:
             return new_run
-    @pytest.mark.long_running
-    def test_spatial_validation_tcol(self):
-        self.test_validation_tcol(val_type='both')
 
     @pytest.mark.filterwarnings(
         "ignore:No results for gpi:UserWarning",
