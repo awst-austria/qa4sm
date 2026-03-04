@@ -61,12 +61,6 @@ jobs:
         run: python manage.py migrate
       - name: Fill database
         run: python manage.py loaddata versions variables filters datasets networks users
-      - name: Monitor Memory
-        run: |
-          while true; do
-            free -m
-            sleep 5
-          done &
       - name: Tests with token
         if: ${{ env.DOI_ACCESS_TOKEN_ENV }}
         run: |
@@ -77,7 +71,17 @@ jobs:
           pytest -m "not needs_advanced_setup and long_running and not graphs"
       - name: Graphs tests
         run: |
-          pytest -m "graphs"
+          # Start the monitor in a subshell, sending output directly to stderr
+          # This bypasses the standard output buffer that pytest might be hogging
+          (while true; do 
+            echo "--- RAM [$(date +%H:%M:%S)] ---" >&2
+            free -m | grep "Mem:" >&2
+            sleep 2
+          done) & 
+          # Capture the background process PID so we can kill it gracefully at the end
+          MONITOR_PID=$!
+          pytest -s -m "graphs"
+          kill $MONITOR_PID
       - name: Test with no token
         if: ${{ !env.DOI_ACCESS_TOKEN_ENV }}
         run: |
