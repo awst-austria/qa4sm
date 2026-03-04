@@ -61,6 +61,12 @@ jobs:
         run: python manage.py migrate
       - name: Fill database
         run: python manage.py loaddata versions variables filters datasets networks users
+      - name: Monitor Memory
+        run: |
+          while true; do
+            free -m
+            sleep 5
+          done &
       - name: Tests with token
         if: ${{ env.DOI_ACCESS_TOKEN_ENV }}
         run: |
