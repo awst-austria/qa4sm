@@ -48,7 +48,7 @@ def run_upload_format_check(file, filename, file_uuid, user_path):
             file_entry.log_info += f"\n{msg}"
         
         file_entry.log_info += f"\nFormat validation {'succeeded' if success else 'failed'}"
-        file_entry.status = 'success' if success else 'failed'
+        file_entry.status = 'preprocessing' if success else 'failed'
         file_entry.error_message = f"{msg}"
         file_entry.metadata_submitted = True
         file_entry.save()

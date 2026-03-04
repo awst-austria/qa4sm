@@ -36,8 +36,19 @@
         <div *ngIf="userDatasetList.length !== 0" class="w-11 xl:w-11 mb-5 mt-2 mx-auto" [ngStyle]="pageStyle">
           <div>
             <div *ngFor="let userDataset of userDatasetList" class="mb-3">
-              <qa-user-data-row [userDataset]="userDataset"
-                                [dataManagementGroups]="dataManagementGroups"/>
+              <!-- Preprocessing overlay -->
+              <div *ngIf="userDataset.status === 'preprocessing'" 
+                  class="flex align-items-center gap-2 p-3 border-round surface-200 mb-1">
+                <i class="pi pi-spinner pi-spin text-primary"></i>
+                <span class="text-primary font-semibold">
+                  This dataset is being preprocessed. Reload to refresh page. May take some minutes depending on the upload file size.
+                </span>
+              </div>
+              
+              <div [ngClass]="{'opacity-60': userDataset.status === 'preprocessing'}">
+                <qa-user-data-row [userDataset]="userDataset"
+                                  [dataManagementGroups]="dataManagementGroups"/>
+              </div>
             </div>
           </div>
           <hr class="featurette-divider">
