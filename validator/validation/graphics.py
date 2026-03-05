@@ -30,7 +30,7 @@ from parse import parse
 
 __logger = logging.getLogger(__name__)
 
-def generate_all_graphs(validation_run, temporal_sub_windows: List[str], outfolder: str, save_metadata='threshold'):
+def generate_all_graphs(validation_run, temporal_sub_windows: List[str], outfolder: str, save_metadata='threshold', out_type = ["png"], dpi=100, val_type="temporal"):
     """
     Create all default graphs for validation run. This is done
     using the qa4sm-reader plotting library.
@@ -47,43 +47,77 @@ def generate_all_graphs(validation_run, temporal_sub_windows: List[str], outfold
         'threshold' will only create box plots if there are enough observations
         'all' will create all plots, even if there are not enough observations
         'never' will never create box plots
+    val_type: str, optional (default: 'temporal')
+        'temporal' creates graphs for temporal validation
+        'spatial' creates graphs for spatial validation
     """
     if not validation_run.output_file:
         return None
 
-    zipfilename = path.join(outfolder, 'graphs.zip')
-    __logger.debug('Trying to create zipfile {}'.format(zipfilename))
 
-    fnb, fnm, fcsv, fncb = plot_all(
-        validation_run.output_file.path,
-        temporal_sub_windows=temporal_sub_windows,
-        out_dir=outfolder,
-        out_type=['png', 'svg'],
-        save_metadata=save_metadata
-    )
+    if val_type=="temporal":
+        zipfilename = path.join(outfolder, 'graphs.zip')
+        __logger.debug('Trying to create zipfile {}'.format(zipfilename))
+        fnb, fnm, fcsv, fncb = plot_all(
+            validation_run.output_file.path,
+            temporal_sub_windows=temporal_sub_windows,
+            out_dir=outfolder,
+            out_type=out_type,
+            save_metadata=save_metadata,
+            dpi=dpi,
+            val_type=val_type,
+        )
 
-    plot_all_output_dict = sort_filenames_to_filetypes((fnb, fnm, fcsv, fncb))
-    flattened_list = [item for inner_dict in plot_all_output_dict.values() for lst in inner_dict.values() for item in lst]
-    root_dir = os.path.dirname(os.path.commonprefix(flattened_list))
+        plot_all_output_dict = sort_filenames_to_filetypes((fnb, fnm, fcsv, fncb))
+        flattened_list = [item for inner_dict in plot_all_output_dict.values() for lst in inner_dict.values() for item in lst]
+        root_dir = os.path.dirname(os.path.commonprefix(flattened_list))
 
-    with ZipFile(zipfilename, 'w', ZIP_DEFLATED) as myzip:
-        pngfiles = files_to_zip(plot_all_output_dict, 'png')
-        svgfiles = files_to_zip(plot_all_output_dict, 'svg')
+        with ZipFile(zipfilename, 'w', ZIP_DEFLATED) as myzip:
+            for type in out_type:
+                files = files_to_zip(plot_all_output_dict, type)
 
-        for pngfile in pngfiles:
-            arcname = os.path.relpath(pngfile, root_dir)
-            myzip.write(pngfile, arcname=arcname)
+                for file in files:
+                    arcname = os.path.relpath(file, root_dir)
+                    myzip.write(file, arcname=arcname)
+                    if type in ['svg']:
+                        remove(file)
 
-        for svgfile in svgfiles:
-            arcname = os.path.relpath(svgfile, root_dir)
-            myzip.write(svgfile, arcname=arcname)
-            remove(svgfile)
+        collect_statitics_files(dir=outfolder, val_type=val_type)
 
-    collect_statitics_files(dir=outfolder)
+        clean_output_folder(dir=outfolder,
+                            to_be_deleted=[x for x in temporal_sub_windows if x != DEFAULT_TSW])
+    elif val_type=="spatial":
+        zipfilename = path.join(outfolder, 'spatial_graphs.zip')
+        __logger.debug('Trying to create zipfile {}'.format(zipfilename))
+        fnb, fnm, fcsv, fncb = plot_all(
+                    validation_run.output_file_spatial.path,
+                    temporal_sub_windows=temporal_sub_windows,
+                    out_dir=outfolder,
+                    out_type=out_type,
+                    save_metadata=save_metadata,
+                    dpi=dpi,
+                    val_type=val_type
 
-    clean_output_folder(dir=outfolder,
-                        to_be_deleted=[x for x in temporal_sub_windows if x != DEFAULT_TSW])
+                )
+        
+        plot_all_output_dict = sort_filenames_to_filetypes((fnb, fnm, fcsv, fncb))
+        flattened_list = [item for inner_dict in plot_all_output_dict.values() for lst in inner_dict.values() for item in lst]
+        root_dir = os.path.dirname(os.path.commonprefix(flattened_list))
 
+        with ZipFile(zipfilename, 'w', ZIP_DEFLATED) as myzip:
+            for type in out_type:
+                files = files_to_zip(plot_all_output_dict, type)
+
+                for file in files:
+                    arcname = os.path.relpath(file, root_dir)
+                    myzip.write(file, arcname=arcname)
+                    if type in ['svg']:
+                        remove(file)
+
+        collect_statitics_files(dir=outfolder, val_type=val_type)
+
+        clean_output_folder(dir=outfolder,
+                            to_be_deleted=[x for x in temporal_sub_windows if x != DEFAULT_TSW])
 
 def get_dataset_combis_and_metrics_from_files(validation_run):
     """
@@ -415,7 +449,7 @@ def get_extent_image(
         return "error encountered"
 
 
-def collect_statitics_files(dir: str) -> None:
+def collect_statitics_files(dir: str, val_type='temporal') -> None:
     """
     Collect all statistics files in a directory and store them in a zip file.
 
@@ -428,7 +462,7 @@ def collect_statitics_files(dir: str) -> None:
     -------
     None
     """
-    zipfilename = path.join(dir, 'statistics.zip')
+    zipfilename = path.join(dir, f'{val_type}_statistics.zip' if val_type in ['spatial'] else 'statistics.zip')
     __logger.debug('Trying to create zipfile {}'.format(zipfilename))
 
     with ZipFile(zipfilename, 'w', ZIP_DEFLATED) as myzip:
@@ -518,8 +552,10 @@ def files_to_zip(plot_dict: Dict[str, Dict[str, List[PosixPath]]], filetype: str
     _files : Set[PosixPath]
         A set of the filepaths of the given filetype.
     """
-    _files = plot_dict['fnb'][filetype] + plot_dict['fnm'][filetype]
-
+    try:
+        _files = plot_dict['fnb'][filetype] + plot_dict['fnm'][filetype]
+    except KeyError as e:  # if there are no comparison boxplots the 'fncb' key will not be present
+        warnings.warn(f"KeyError: {e}. No plots found. Skipping...")
     try:
         _files += plot_dict['fncb'][filetype]
     except KeyError as e:  # if there are no comparison boxplots the 'fncb' key will not be present

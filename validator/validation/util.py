@@ -13,10 +13,14 @@ def mkdir_if_not_exists(the_dir):
             raise
 
 
-def first_file_in(the_dir, extension):
+def first_file_in(the_dir, extension, val_type="temporal"):
     for file in listdir(the_dir):
-        if file.endswith(extension):
-            return path.join(the_dir, file)
+        if val_type=="temporal":
+            if (file.endswith(extension)) and ("SPATIAL" not in file):
+                return path.join(the_dir, file)
+        elif val_type=="spatial":
+            if (file.endswith(extension)) and ("SPATIAL" in file):
+                return path.join(the_dir, file)
     return None
 
 
