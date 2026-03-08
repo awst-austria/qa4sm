@@ -103,7 +103,7 @@ typing-extensions==4.12.2
 tzdata==2025.1
 unicodedata2==16.0.0
 urllib3==2.6.3
-wheel==0.45.1
+wheel==0.46.2
 xarray==2025.1.2
 xyzservices==2025.1.0
 zarr==3.0.2
