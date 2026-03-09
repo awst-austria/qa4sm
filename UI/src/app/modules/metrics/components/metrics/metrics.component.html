@@ -8,6 +8,20 @@
   </ng-template>
 
   <div class="grid pt-3">
+
+    <div class="col-12" *ngIf="!ISMN_isTrue()">
+      <p-floatLabel>
+        <p-select id="valTypeSelector"
+                  [options]="valTypeOptions"
+                  [(ngModel)]="validationModel().valType"
+                  optionLabel="label"
+                  optionValue="value"
+                  [style]="{'width': '100%'}">
+        </p-select>
+        <label for="valTypeSelector">Validation type</label>
+      </p-floatLabel>
+    </div>
+
     <div *ngFor="let metric of validationModel().metrics" class="col-12">
       <qa-metric [metricModel]="metric" [disabled]="checkIfDisabled(metric)"/>
     </div>

@@ -76,6 +76,20 @@ class ValidationRun(models.Model):
         ('CANCELLED', 'Cancelled'),
         ('ERROR', 'Error'),
     ]
+
+    # spatial validation:
+
+    VAL_TYPE_TEMPORAL = 'temporal'
+    VAL_TYPE_SPATIAL  = 'spatial'
+    VAL_TYPE_BOTH     = 'both'
+
+    VAL_TYPE_CHOICES = (
+        (VAL_TYPE_TEMPORAL, 'Temporal only'),
+        (VAL_TYPE_SPATIAL,  'Spatial only'),
+        (VAL_TYPE_BOTH,     'Both'),
+    )
+
+
     # fields
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name_tag = models.CharField(max_length=80, blank=True)
@@ -109,6 +123,7 @@ class ValidationRun(models.Model):
     temporal_stability = models.BooleanField(default=False)
 
     output_file = models.FileField(null=True, max_length=250, blank=True)
+    output_file_spatial = models.FileField(null=True, max_length=250, blank=True)
 
     is_archived = models.BooleanField(default=False)
     last_extended = models.DateTimeField(null=True, blank=True)
@@ -141,6 +156,12 @@ class ValidationRun(models.Model):
 
     stability_metrics = models.BooleanField(default=False)
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='SCHEDULED')
+
+    val_type = models.CharField(
+        max_length=10,
+        choices=VAL_TYPE_CHOICES,
+        default=VAL_TYPE_TEMPORAL   # old validation runs before spatial validation implementation
+    )
 
     # many-to-one relationships coming from other models:
     # dataset_configurations from DatasetConfiguration
@@ -246,6 +267,12 @@ class ValidationRun(models.Model):
             return None
         name = self.output_file.name.split('/')[1]
         return name
+    
+    @property
+    def output_file_spatial_name(self):
+        if not bool(self.output_file_spatial):
+            return None
+        return self.output_file_spatial.name.split('/')[-1]
 
     @property
     def is_a_copy(self):
@@ -321,16 +348,12 @@ def auto_delete_file_on_delete(sender, instance, **kwargs):
         for dataset in datasets_to_delete:
             dataset.user_dataset.first().delete()
 
-    if instance.output_file:
-        rundir = path.dirname(instance.output_file.path)
-        if path.isdir(rundir):
-            rmtree(rundir)
-    else:
-        # this part has to be added, otherwise, when a validation is canceled an empty directory remains
-        outdir = os.path.join(OUTPUT_FOLDER, str(instance.id))
-        if os.path.isdir(outdir):
-            rmtree(outdir)
-
+    # Always delete the entire run directory — it contains both
+    # output_file (temporal) and output_file_spatial, plus graphs
+    rundir = os.path.join(OUTPUT_FOLDER, str(instance.id))
+    if os.path.isdir(rundir):
+        rmtree(rundir)
+        
 
 def create_deleted_validation_run(instance):
     val_datasets = [f'{config.dataset.pretty_name}/{config.version.pretty_name}/{config.variable.pretty_name}' for config in instance.dataset_configurations.all()]
@@ -376,5 +399,6 @@ def create_deleted_validation_run(instance):
         intra_annual_type=instance.intra_annual_type,
         intra_annual_overlap=instance.intra_annual_overlap,
         stability_metrics=instance.stability_metrics,
-        status=instance.status
+        status=instance.status,
+        val_type=instance.val_type
     )

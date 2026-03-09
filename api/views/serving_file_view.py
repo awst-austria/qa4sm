@@ -291,3 +291,49 @@ def get_ismn_list_file(request):
             return response
     else:
         return HttpResponse("File not found", status=404)
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_results_spatial(request):
+    validation_id = request.query_params.get('validationId', None)
+    file_type = request.query_params.get('fileType', None)
+    validation = get_object_or_404(ValidationRun, pk=validation_id)
+
+    run_dir = os.path.join(settings.MEDIA_ROOT, str(validation.id)) + '/'
+
+    if file_type == 'netCDF':
+        filename = run_dir + validation.output_file_spatial_name
+        download_name = f"{validation.id}_spatial.nc"
+    elif file_type == 'graphics':
+        filename = run_dir + 'spatial_graphs.zip'
+        download_name = f"{validation.id}_spatial_graphs.zip"
+    elif file_type == 'statistics':
+        filename = run_dir + 'spatial_statistics.zip'
+        download_name = f"{validation.id}_spatial_statistics.zip"
+    else:
+        return HttpResponse('No file type given', status=404)
+
+    try:
+        file_wrapper = FileWrapper(open(filename, 'rb'))
+    except FileNotFoundError as e:
+        return HttpResponse(e, status=404)
+
+    file_mimetype = mimetypes.guess_type(filename)
+    response = HttpResponse(file_wrapper, content_type=file_mimetype)
+    response['Content-Disposition'] = f'attachment; filename="{download_name}"'
+    return response
+
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_metric_names_and_associated_files_spatial(request):
+    validation_id = request.query_params.get('validationId', None)
+    validation = get_object_or_404(ValidationRun, pk=validation_id)
+
+    return JsonResponse({
+        'validation_id': str(validation.id),
+        'val_type': validation.val_type,
+        'has_spatial_file': bool(validation.output_file_spatial),
+        'spatial_file_name': validation.output_file_spatial_name,
+        'message': 'Spatial metrics endpoint is working'
+    }, status=200)

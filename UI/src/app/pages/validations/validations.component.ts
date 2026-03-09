@@ -194,10 +194,14 @@ export class ValidationsComponent implements OnInit, OnDestroy {
   getStatusDisplay(valrun: any): { label: string, severity: string, progress?: number } {
     if (valrun.progress === 0 && valrun.end_time === null) {
       return { label: 'Scheduled', severity: 'info' };
-    } else if (valrun.progress === 100 && valrun.end_time) {
-      return { label: 'Done', severity: 'secondary' };
     } else if (valrun.progress === -1 || valrun.progress === -100) {
       return { label: 'Cancelled', severity: 'secondary' };
+    } else if (valrun.val_type !== 'temporal' && valrun.end_time) {
+      return { label: 'Done', severity: 'secondary' };
+    } else if (valrun.progress === 100 && valrun.end_time) {
+      return { label: 'Done', severity: 'secondary' };
+    } else if (valrun.val_type !== 'temporal'  && (valrun.end_time != null || valrun.total_points == 0)) {
+      return { label: 'Error', severity: 'danger' };
     } else if (valrun.end_time != null || valrun.total_points == 0) {
       return { label: 'Error', severity: 'danger' };
     } else {

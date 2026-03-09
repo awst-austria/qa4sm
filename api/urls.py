@@ -150,5 +150,7 @@ urlpatterns = [
     path('update-fixture-in-git', update_fixture_in_github, name='Update-Fixture'),
     path('verify-email/<int:user_id>/<str:token>/', verify_email, name='verify_email'),
     path('download-result-file-with-token/<uuid:validation_id>/<str:file_type>', download_result_file_with_token, name='Download result file with token'),
-    path('my-validation-runs-with-token', list_my_validation_runs_with_token, name='My validation runs with token')
+    path('my-validation-runs-with-token', list_my_validation_runs_with_token, name='My validation runs with token'),
+    path('download-result-spatial', get_results_spatial, name='Download spatial results'),
+    path('get-metric-and-plots-names-spatial', get_metric_names_and_associated_files_spatial, name='Get spatial metric and plots names')
 ]

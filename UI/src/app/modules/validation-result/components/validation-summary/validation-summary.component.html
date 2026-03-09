@@ -207,11 +207,17 @@
           restart it using 'Load settings' button.
         </li>
         <li *ngIf="!forComparison && validationRun.total_points !== 0 && validationRun.progress !== -1
-        && validationRun.progress !== -100" [ngClass]="{'alert-danger': errorRate > 0}">
+        && validationRun.progress !== -100 && validationRun.val_type !== 'spatial'" 
+        [ngClass]="{'alert-danger': errorRate > 0}">
           for {{ errorRate * 100 | number: '.0' }}% ({{ validationRun.error_points }}
           of {{ validationRun.total_points }}) of the processed locations (grid points) the validation metrics could
           not be calculated. For an overview of potential causes select '# status' (available from version 2.2) in the
           'Result files' section.
+        </li>
+
+        <li *ngIf="!forComparison && validationRun.val_type === 'spatial' && validationRun.progress !== -1
+        && validationRun.progress !== -100">
+         <b>Spatial validation metrics were computed across time steps.</b> 
         </li>
         <li *ngIf="!forComparison && validationRun.total_points === 0
         && validationRun.progress !== -1 && validationRun.progress !== -100" [ngClass]="'alert-danger'">

@@ -17,4 +17,7 @@ export interface MetricsPlotsDto {
   boxplotFiles?: Observable<PlotDto[]>,
   overviewFiles?: Observable<PlotDto[]>
   comparisonFile?: Observable<PlotDto[] | null>
+
+  tsplot_file: string;
+  tsplotFile?: Observable<PlotDto[]>; // for spatial
 }

@@ -71,6 +71,7 @@ import {MaintenanceModeComponent} from "./modules/core/maintenance-mode/maintena
 import { SharedPrimeNgModule } from './shared.primeNg.module';
 import { providePrimeNG } from 'primeng/config';
 import Aura from '@primeuix/themes/aura';
+import { ResultFilesSpatialComponent } from './modules/validation-result/components/result-files-spatial/result-files-spatial.component';
 
 @NgModule({ declarations: [
         AppComponent,
@@ -90,6 +91,7 @@ import Aura from '@primeuix/themes/aura';
         TemporalMatchingComponent,
         MyDatasetsComponent,
         ContactUsComponent,
+
     ],
     bootstrap: [AppComponent],
     imports: [LoggerModule.forRoot({level: NgxLoggerLevel.DEBUG, serverLogLevel: NgxLoggerLevel.ERROR}),
@@ -133,7 +135,8 @@ import Aura from '@primeuix/themes/aura';
         ContactModule,
         SelectButtonModule, 
         SharedPrimeNgModule,
-        MaintenanceModeComponent], 
+        MaintenanceModeComponent,
+        ResultFilesSpatialComponent], 
         
         providers: [
         {

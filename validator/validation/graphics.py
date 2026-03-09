@@ -51,9 +51,17 @@ def generate_all_graphs(validation_run, temporal_sub_windows: List[str], outfold
         'temporal' creates graphs for temporal validation
         'spatial' creates graphs for spatial validation
     """
-    if not validation_run.output_file:
-        return None
 
+    # Ensure the relevant output file exists before attempting to generate graphs.
+    # For spatial check output_file_spatial
+    # For temporal check output_file
+
+    if val_type == "spatial":
+        if not validation_run.output_file_spatial:
+            return None
+    else:
+        if not validation_run.output_file:
+            return None
 
     if val_type=="temporal":
         zipfilename = path.join(outfolder, 'graphs.zip')

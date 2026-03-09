@@ -108,12 +108,11 @@ def _get_spatial_reference_reader(val_run) -> Tuple['Reader', str, dict]:
 
 def set_outfile(validation_run, run_dir, val_type="temporal"):
     outfile = first_file_in(run_dir, '.nc', val_type=val_type)
-    validation_run.output_file_spatial = validation_run.output_file
     if val_type == "temporal":
         if outfile is not None:
             outfile = regex_sub('/?' + OUTPUT_FOLDER + '/?', '', outfile)
             validation_run.output_file.name = outfile
-    if val_type == "spatial":
+    elif val_type == "spatial":
         if outfile is not None:
             outfile = regex_sub('/?' + OUTPUT_FOLDER + '/?', '', outfile)
             validation_run.output_file_spatial.name = outfile
@@ -665,11 +664,13 @@ def build_xarray(job, val, keep_meta=True, handle_errors="ignore"):
     Raises
     ------
     eh.NoGpiDataError
-        If data retrieval fails for a GPI and `handle_errors` is set to "raise".
+        If data retrieval fails for a GPI and `handle_errors` is set to "raise",
+        or if no valid GPI data is found at all.
     """
     gpis_meta = {}
     data_vars = list(val.data_manager.datasets.keys())
     gpis_data = {}
+    time_key = "date_time"
 
     for gpi_info in zip(*job):
         try:
@@ -677,19 +678,44 @@ def build_xarray(job, val, keep_meta=True, handle_errors="ignore"):
         except Exception as e:
             if handle_errors == "raise":
                 raise eh.NoGpiDataError(
-                            f"Data retrieval failed for gpi"
-                            f" {gpi_info} with error {e}!"
-                        )
+                    f"Data retrieval failed for gpi {gpi_info} with error {e}!"
+                )
             else:
                 warnings.warn(f"Data retrieval failed for gpi {gpi_info} with error {e}!")
-                continue #just skipping gpi in dictionaries
+                continue
+        
+
+        # reset index so date_time becomes a regular column
+        data.index.name = time_key  # ensure index is named 'date_time'
+        data_reset = data.reset_index()
+
+        # skip if empty or date_time column missing
+        if data_reset.empty or time_key not in data_reset.columns:
+            warnings.warn(
+                f"No '{time_key}' column for gpi {gpi_info[3].get('gpi', '?')}, skipping"
+            )
+            continue
+
         gpis_meta[gpi_info[3]["gpi"]] = gpi_info[3]
-        gpis_data[gpi_info[3]["gpi"]] = {c:data.reset_index()[c] for c in data.reset_index().columns}
+        gpis_data[gpi_info[3]["gpi"]] = {c: data_reset[c] for c in data_reset.columns}
+
+    # -- GUARD: nothing to build --
+    if not gpis_data:
+        raise eh.NoGpiDataError(
+            "No valid GPI data found for this job — all GPIs were skipped."
+        )
 
     # -- BUILDING XARRAY -- #
-    # Build union time index
-    time_key = "date_time"
-    full_time = pd.DatetimeIndex(sorted(set().union(*[d[time_key] for d in gpis_data.values()])), name=time_key)
+    # Build union time index across all GPIs
+    full_time = pd.DatetimeIndex(
+        sorted(set().union(*[d[time_key] for d in gpis_data.values()])),
+        name=time_key
+    )
+
+    if len(full_time) == 0:
+        raise eh.NoGpiDataError(
+            "No valid timestamps found across all GPIs."
+        )
 
     # Preallocate arrays
     n_stations = len(gpis_meta)
@@ -705,7 +731,9 @@ def build_xarray(job, val, keep_meta=True, handle_errors="ignore"):
         for var in data_vars:
             if var in dat.keys():
                 values = dat[var].values.astype("float64")
-                data_arrays[var][aligned_idx, j] = values
+                # only fill positions where alignment succeeded (aligned_idx >= 0)
+                valid_mask = aligned_idx >= 0
+                data_arrays[var][aligned_idx[valid_mask], j] = values[valid_mask]
 
     # Build final dataset 
     df_meta = pd.DataFrame.from_dict(gpis_meta, orient='index')
@@ -1020,7 +1048,7 @@ def temporal_validation_xr(val, ds_use, only_with_reference=True, handle_errors=
     return c_results
 
 @shared_task(bind=True, max_retries=3)
-def run_xArray_validation(self, validation_id, gpi_tuple, val_type="both", min_obs=10, include_secondary_meta=False, only_with_reference=False):
+def run_xArray_validation(self, validation_id, gpi_tuple, val_type="both", min_obs=1, include_secondary_meta=False, only_with_reference=False):
     """
     Executes a pytesmo-based validation using xArray datasets.
 
@@ -1397,15 +1425,40 @@ def run_validation(validation_id, val_type="temporal"):
                                                 keep_pytesmo_ncfile=False)
                 if sp_transcriber.exists:
                     restructured_results = sp_transcriber.get_transcribed_dataset()
-                    sp_transcriber.output_file_name = sp_transcriber.build_outname(
-                        run_dir, sr.keys(), val_type="spatial")
-                    sp_transcriber.write_to_netcdf(sp_transcriber.output_file_name)
 
-                    save_validation_config(validation_run)
 
-                    sp_transcriber.compress(path=sp_transcriber.output_file_name,
-                                        compression='zlib',
-                                        complevel=9)
+                    base = os.path.basename(validation_run.output_file_spatial.name).replace('.SPATIAL.nc', '_spatial_result.nc')
+                    spatial_outname = os.path.join(run_dir, base)
+                    
+                    restructured_results.to_netcdf(spatial_outname)
+                    
+                    # Update DB reference
+                    validation_run.output_file_spatial.name = regex_sub(
+                        '/?' + OUTPUT_FOLDER + '/?', '', spatial_outname)
+                    validation_run.save()
+
+                    # Copy attributes from temporal file to spatial file
+                    # Add required attributes directly
+                    with netCDF4.Dataset(spatial_outname, 'a') as ds:
+                        ds.val_ref = 'val_dc_dataset0'
+                        j = 1
+                        for dataset_config in validation_run.dataset_configurations.all():
+                            if (validation_run.spatial_reference_configuration and
+                                    dataset_config.id == validation_run.spatial_reference_configuration.id):
+                                i = 0
+                            else:
+                                i = j
+                                j += 1
+                            ds.setncattr('val_dc_dataset' + str(i), dataset_config.dataset.short_name)
+                            ds.setncattr('val_dc_version' + str(i), dataset_config.version.short_name)
+                            ds.setncattr('val_dc_variable' + str(i), dataset_config.variable.pretty_name)
+                            ds.setncattr('val_dc_dataset_pretty_name' + str(i), dataset_config.dataset.pretty_name)
+                            ds.setncattr('val_dc_version_pretty_name' + str(i), dataset_config.version.pretty_name)
+                            ds.setncattr('val_dc_variable_pretty_name' + str(i), dataset_config.variable.short_name)
+                        ds.val_scaling_method = validation_run.scaling_method
+                        ds.val_anomalies = validation_run.anomalies
+                   
+                    sp_transcriber.compress(path=spatial_outname, compression='zlib', complevel=9)
 
                     if temp_sub_wdws is None:
                         temporal_sub_windows_names = [DEFAULT_TSW]
@@ -1462,7 +1515,7 @@ def run_validation(validation_id, val_type="temporal"):
                         outfolder=run_dir,
                         temporal_sub_windows=temporal_sub_windows_names,
                         save_metadata=validation_run.plots_save_metadata,
-                        val_type=val_type)
+                        val_type="temporal")
 
     except Exception as e:
         __logger.exception('Unexpected exception during validation {}:'.format(

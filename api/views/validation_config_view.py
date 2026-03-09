@@ -64,7 +64,10 @@ def _start_validation_run(request):
             return response
 
     connections.close_all()
-    p = Process(target=run_validation, kwargs={"validation_id": new_val_run.id})
+    p = Process(target=run_validation, kwargs={
+        "validation_id": new_val_run.id,
+        "val_type": new_val_run.val_type
+    })
     p.start()
     serializer = ValidationRunSerializer(new_val_run)
     return JsonResponse(serializer.data, status=status.HTTP_200_OK, safe=False)
@@ -363,6 +366,7 @@ class ValidationConfigurationSerializer(serializers.Serializer):
             new_val_run.name_tag = validated_data.get('name_tag', None)
             new_val_run.temporal_matching = validated_data.get('temporal_matching', None)
             new_val_run.intra_annual_metrics = validated_data.get('intra_annual_metrics', None)
+            new_val_run.val_type = validated_data.get('val_type', ValidationRun.VAL_TYPE_TEMPORAL)
 
             for key, value in validated_data.get('intra_annual_metrics', None).items():
                 setattr(new_val_run, key, value)
@@ -438,7 +442,10 @@ class ValidationConfigurationSerializer(serializers.Serializer):
     name_tag = serializers.CharField(required=False, allow_null=True, max_length=80, allow_blank=True)
     temporal_matching = serializers.IntegerField(allow_null=False, default=globals.TEMP_MATCH_WINDOW)
     intra_annual_metrics = IntraAnnualMetricsSerializer(many=False, required=False)
-
+    val_type = serializers.ChoiceField(
+        choices=ValidationRun.VAL_TYPE_CHOICES,
+        default=ValidationRun.VAL_TYPE_TEMPORAL,
+        required=False)
 
 class ValidationConfigurationModelSerializer(ModelSerializer):
     class Meta:

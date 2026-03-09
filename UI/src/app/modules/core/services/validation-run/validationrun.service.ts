@@ -237,5 +237,16 @@ export class ValidationrunService {
         catchError(err => this.httpError.handleError(err))
       );
   }
+  getMetricsAndPlotsNamesSpatial(params: HttpParams): Observable<MetricsPlotsDto[]> {
+    return this.httpClient.get<MetricsPlotsDto[]>(`${urlPrefix}/get-metric-and-plots-names-spatial`, {params})
+      .pipe(
+        catchError(err => this.httpError.handleError(err))
+      );
+  }
+
+  downloadSpatialResultFile(validationId: string, fileType: string, fileName: string): void {
+    const fileUrl = `${urlPrefix}/download-result-spatial?validationId=${validationId}&fileType=${fileType}`;
+    saveAs(fileUrl, fileName);
+  }
 
 }

@@ -27,6 +27,12 @@ export class MetricsComponent implements OnInit {
   stabilityMetrics: MetricModel;
   // ad a metric instance
 
+   valTypeOptions = [
+    { label: 'Temporal only', value: 'temporal' },
+    { label: 'Spatial only', value: 'spatial' },
+    { label: 'Both', value: 'both' }
+  ];
+
 
   constructor() {
   }
@@ -86,6 +92,16 @@ export class MetricsComponent implements OnInit {
 
   intraAnnulMetricDisabled(): boolean{
     return this.stabilityMetrics.value;
+  }
+
+   // Activate spatial validation only if ISMN is selected
+
+  ISMN_isTrue(): boolean {
+    const datasets = this.validationModel().datasetConfigurations;
+
+    const hasDatasetISMN = datasets.some(d => d.datasetModel.selectedDataset?.id === 4);
+
+    return !hasDatasetISMN;
   }
 
   // If something else should happen, when the metric is checked, add a proper function here

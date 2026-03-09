@@ -53,6 +53,11 @@ class DeletedValidationRun(models.Model):
 
     stability_metrics = models.BooleanField(default=False)
     status = models.CharField(max_length=10, default='DONE')
+    val_type = models.CharField(
+        max_length=10,
+        default='temporal',   # default for old deleted records
+        blank=True
+    )
 
 
     def __str__(self):
