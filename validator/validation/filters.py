@@ -16,6 +16,28 @@ Bitmask filter for SMOS, you can only exclude data on set bits (not on unset
 bits)
 '''
 
+class TimeOfDayFilterAdapter:
+    """
+    Filters DataFrame rows based on the UTC hour of the DatetimeIndex.
+    Used for datasets (e.g. CCI subdaily) where overpass time is encoded
+    in the index, not as a data column.
+    """
+
+    def __init__(self, cls, hour):
+        self.cls = cls
+        self.hour = hour
+
+    def read(self, *args, **kwargs):
+        data = self.cls.read(*args, **kwargs)
+        if data is not None and not data.empty:
+            if isinstance(data.index, pd.DatetimeIndex):
+                data = data[data.index.hour == self.hour]
+        return data
+
+    def __getattr__(self, attr):
+        return getattr(self.cls, attr)
+
+
 
 def smos_exclude_bitmask(data, bitmask):
     """
@@ -123,6 +145,11 @@ def get_used_variables(filters, dataset, variable):
                 variables.append('mode')
                 continue
 
+            if fil.name in ("FIL_CCI_TIME_DAY", "FIL_CCI_TIME_NIGHT"):
+                # No extra variable needed — time is the DatetimeIndex, not a column
+                continue
+
+            
             if fil.name == "FIL_GLDAS_UNFROZEN":
                 temp_variable = variable.short_name.replace("Moi", "TMP")
                 variables.append(temp_variable)
@@ -395,6 +422,16 @@ def setup_filtering(reader, filters, param_filters, dataset,
 
         if fil.name == "FIL_C3S_MODE_DESC":
             masking_filters.append(('mode', '==', 2))
+            continue
+
+        if fil.name == "FIL_CCI_TIME_DAY":
+            filtered_reader = TimeOfDayFilterAdapter(filtered_reader, hour=12)
+            print("Applied FIL_CCI_TIME_DAY: keeping hour==12 (UTC)")
+            continue
+
+        if fil.name == "FIL_CCI_TIME_NIGHT":
+            filtered_reader = TimeOfDayFilterAdapter(filtered_reader, hour=0)
+            print("Applied FIL_CCI_TIME_NIGHT: keeping hour==0 (UTC)")
             continue
 
         if fil.name == "FIL_GLDAS_UNFROZEN":
