@@ -26,7 +26,7 @@ def upload_directory(instance, filename):
 class UserDatasetFile(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     file = models.FileField(null=True, blank=True, storage=key_store, upload_to=upload_directory)
-    original_file_size = models.IntegerField(blank=True, null=True)
+    original_file_size = models.BigIntegerField(blank=True, null=True)
     file_name = models.CharField(max_length=100, blank=True, null=True)
     owner = models.ForeignKey(User, related_name='user_datasets', on_delete=models.CASCADE, null=True)
     dataset = models.ForeignKey(Dataset, related_name='user_dataset', on_delete=models.SET_NULL, null=True)

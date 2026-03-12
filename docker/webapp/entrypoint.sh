@@ -26,6 +26,11 @@ if [[ "$QA4SM_INSTANCE" == "TEST" ]]; then
     git switch test-branch || git checkout -b test-branch origin/test-branch
 fi
 
+if [[ "$QA4SM_INSTANCE" == "TEST2" ]]; then
+    git fetch origin
+    git switch subdaily || git checkout -b subdaily origin/subdaily
+fi
+
 if [[ "$QA4SM_INSTANCE" == "PROD" ]]; then
     git fetch origin
     git switch main
