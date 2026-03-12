@@ -1,4 +1,4 @@
-QA4SM v3.6.1 - Release notes 2026-03-10
+QA4SM v3.6.1 - Release notes 2026-03-12
 ======================================================
 # Updates
 1. Add ESA CCI SUBDAILY dataset.
