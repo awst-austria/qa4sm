@@ -17,6 +17,8 @@ METRIC_TEMPLATE = [
     "overview_{id_ref}-{ds_ref}_and_{id_sat}-{ds_sat}_", "{metric}"
 ]
 
+ONLY_WITH_REFERENCE = True
+
 TEMPORAL_SUB_WINDOW_SEPARATOR = qr_globals.TEMPORAL_SUB_WINDOW_SEPARATOR
 
 INTRA_ANNUAL_METRIC_TEMPLATE = qr_globals.INTRA_ANNUAL_METRIC_TEMPLATE
