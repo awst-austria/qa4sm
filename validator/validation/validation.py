@@ -44,7 +44,7 @@ from validator.models import ValidationRun, DatasetVersion
 from validator.validation.batches import create_jobs, create_upscaling_lut
 from validator.validation.filters import setup_filtering
 from validator.validation.globals import OUTPUT_FOLDER, IRREGULAR_GRIDS, VR_FIELDS, DS_FIELDS, ISMN, DEFAULT_TSW, \
-    TEMPORAL_SUB_WINDOW_SEPARATOR, METRICS, TEMPORAL_SUB_WINDOWS
+    TEMPORAL_SUB_WINDOW_SEPARATOR, METRICS, TEMPORAL_SUB_WINDOWS, ONLY_WITH_REFERENCE
 from validator.validation.graphics import generate_all_graphs
 from validator.validation.readers import create_reader, adapt_timestamp
 from validator.validation.util import mkdir_if_not_exists, first_file_in
@@ -525,7 +525,7 @@ def execute_job(self, validation_id, job):
 
         result = val.calc(*job,
                           rename_cols=False,
-                          only_with_reference=True,
+                          only_with_reference=ONLY_WITH_REFERENCE,
                           handle_errors="ignore")
         end_time = datetime.now(tzlocal())
         duration = end_time - start_time
@@ -1015,6 +1015,8 @@ def temporal_validation_xr(val, ds_use, only_with_reference=True, handle_errors=
                     metrics["status"][0] = eh.NO_TEMP_MATCHED_DATA
                 else:
                     try:
+                        metrics_calculator.__self__.metadata_template = METADATA_TEMPLATE['ismn_ref']
+                        metrics_calculator.__self__.result_template.update(metrics_calculator.__self__.metadata_template)
                         metrics = metrics_calculator(data=df_comb, gpi_info=gpi_info)
                     except Exception:
                         if handle_errors == "raise":
@@ -1048,7 +1050,7 @@ def temporal_validation_xr(val, ds_use, only_with_reference=True, handle_errors=
     return c_results
 
 @shared_task(bind=True, max_retries=3)
-def run_xArray_validation(self, validation_id, gpi_tuple, val_type="both", min_obs=1, include_secondary_meta=False, only_with_reference=False):
+def run_xArray_validation(self, validation_id, gpi_tuple, val_type="both", min_obs=1, include_secondary_meta=False, only_with_reference=ONLY_WITH_REFERENCE):
     """
     Executes a pytesmo-based validation using xArray datasets.
 
@@ -1065,6 +1067,7 @@ def run_xArray_validation(self, validation_id, gpi_tuple, val_type="both", min_o
         A tuple defining the Grid Point Indices (GPIs) to be processed.
     val_type : str, optional
         Type of validation to perform. Default is 'both'.
+        'spatial' creates graphs for spatial validation.
         'spatial' creates graphs for spatial validation.
         'temporal' creates graphs for temporal validation.
         'both' performs both spatial and temporal validation.
@@ -1116,11 +1119,11 @@ def run_xArray_validation(self, validation_id, gpi_tuple, val_type="both", min_o
 
         # Run validations depending on chosen type
         if val_type == "both":
-            temporal_result = temporal_validation_xr(val, ds_all, only_with_reference)
             ds_use = ds_all.where(ds_all.n_gpi>=min_obs, drop=True) # if you want to filter beforehand: should be filtered to min_obs in pytesmo, probably 10
             if any(np.array([len(ds_use[coord]) for coord in ds_use.dims]) < 1):
                 raise ValueError(f"No Timestamp with enough gpi observations")
             spatial_result = spatial_validation_xr(val, ds_use, only_with_reference)
+            temporal_result = temporal_validation_xr(val, ds_all, only_with_reference)
         elif val_type == "spatial":
             ds_use = ds_all.where(ds_all.n_gpi>=min_obs, drop=True) # if you want to filter beforehand: should be filtered to min_obs in pytesmo, probably 10
             if any(np.array([len(ds_use[coord]) for coord in ds_use.dims]) < 1):
