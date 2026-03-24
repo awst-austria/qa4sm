@@ -1,33 +1,163 @@
-<p-panel header="Spatial Validation Results" [toggleable]="true">
-  <div class="flex flex-column gap-3 p-3">
-    <p class="text-muted m-0">
-      Download the spatial validation results. The NetCDF file contains the computed metrics,
-      the graphs contain all generated plots, and the statistics contains
-      summary CSV files.
-    </p>
-    
-    <div class="flex flex-row gap-2 flex-wrap">
-      <button pButton
-              type="button"
-              label="Download NetCDF"
-              icon="pi pi-download"
-              (click)="downloadSpatialNetCDF()">
-      </button>
-      <button pButton
-              type="button"
-              label="Download Graphs"
-              icon="pi pi-download"
-              class="p-button-secondary"
-              (click)="downloadSpatialGraphics()">
-      </button>
-      <button pButton
-              type="button"
-              label="Download Statistics"
-              icon="pi pi-download"
-              class="p-button-secondary"
-              (click)="downloadSpatialStatistics()">
-      </button>
+<div class="flex flex-column w-12 mx-0 sm:text-base text-sm">
+  <p-panel>
+    <ng-template pTemplate="header">
+      <div class="text-center" style="width: 95%">
+        <span class="my-0 py-0 font-weight-normal">Spatial Validation Result files</span>
+      </div>
+    </ng-template>
+
+    <div *ngIf="!fileError() && !dataFetchError() && updatedMetrics$ | async as metrics"
+         style="min-height: 400px"
+         class="flex flex-column align-content-center justify-content-center">
+
+      <div *ngIf="selectedMetric() && selectedMetric().boxplotFiles | async as boxplots"
+           class="flex flex-column w-12 flex-wrap gap-2">
+
+        <!-- Download buttons and metric selection -->
+        <div class="flex flex-row w-12 align-content-center justify-content-center my-2 py-3 lg:flex-nowrap flex-wrap gap-2">
+          <div class="flex flex-column lg:w-6 w-10 flex-wrap justify-content-center align-content-center gap-4">
+            <!-- Select metric -->
+            <div class="flex flex-column w-10">
+                <p-floatLabel>
+                  <p-select id="spatialMetricSelector"
+                            (onChange)="onMetricChange($event)"
+                            [options]="metrics"
+                            [ngModel]="selectedMetric()"
+                            optionLabel="metric_pretty_name"
+                            [style]="{'width': '100%'}">
+                  </p-select>
+                  <label for="spatialMetricSelector">Select metric</label>
+                </p-floatLabel>
+            </div>
+          </div>
+
+          <!-- Download buttons -->
+          <div class="flex flex-row lg:w-6 w-10 lg:flex-nowrap flex-wrap justify-content-center align-content-center gap-2">
+            <div class="flex flex-column lg:w-5 w-10 justify-content-center">
+              <button pButton
+                      type="button"
+                      icon="pi pi-download"
+                      class="btn-action-large"
+                      label="Download graphs"
+                      pTooltip="Download spatial graphs .zip"
+                      [life]="globals.tooltipLifetime"
+                      (click)="downloadSpatialGraphics()">
+              </button>
+            </div>
+            <div class="flex flex-column lg:w-5 w-10 justify-content-center">
+              <button pButton
+                      type="button"
+                      icon="pi pi-download"
+                      class="btn-action-large"
+                      label="Download NetCDF"
+                      pTooltip="Download spatial results in NetCDF format"
+                      [life]="globals.tooltipLifetime"
+                      (click)="downloadSpatialNetCDF()">
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <hr class="flex w-11 pt-0 mt-0 featurette-divider">
+
+        <!-- Section Spatial Plots -->
+        <div class="flex flex-row w-12 justify-content-center align-content-center md:text-4xl text-2xl text-muted">
+          Spatial Plots
+          <span class="pi pi-question-circle mx-2 text-2xl"
+                pTooltip="Boxplot shows metric distribution across all stations. Time series shows how the metric changes over time."
+                tooltipPosition="bottom">
+          </span>
+        </div>
+
+        <!-- graphics -->
+        <div *ngIf="selectedMetric().overviewFiles | async as overviewPlots"
+             class="flex flex-column w-12 gap-3 py-3">
+
+          <!-- Boxplot + overview -->
+        <div class="flex flex-row lg:flex-nowrap flex-wrap w-12 align-content-center justify-content-center gap-3">
+
+          <!-- boxplot -->
+          <div *ngIf="boxplots.length > 0"
+              [ngClass]="{
+                'flex flex-column align-items-center justify-content-center plot-spot': true,
+                'w-10': overviewPlots.length === 0,
+                'lg:w-5 w-10': overviewPlots.length > 0
+              }">
+            <p-galleria [value]="boxplots"
+                        [(visible)]="displayBoxplotGallery"
+                        [(activeIndex)]="activeBoxplotIndex"
+                        [circular]="true" [fullScreen]="true"
+                        [showItemNavigators]="false"
+                        [showThumbnails]="false" [baseZIndex]="100000">
+              <ng-template pTemplate="item" let-item>
+                <img [src]="sanitizePlotUrl(item.plot)"
+                    style="width: 100%; display: block;"
+                    alt="Boxplot for {{selectedMetric().metric_pretty_name}}"/>
+              </ng-template>
+            </p-galleria>
+            <img width="85%" style="object-fit: contain;"
+                [src]="sanitizePlotUrl(boxplots[0].plot)"
+                (click)="showGallery(0, 'boxplot')"
+                [ngClass]="{'result-plot': true}"
+                alt="Boxplot for {{selectedMetric().metric_pretty_name}}">
+          </div>
+
+          <!-- overview map (n_gpi_was_used) -->
+          <div *ngIf="overviewPlots.length > 0"
+              class="flex flex-column lg:w-5 w-10 align-items-center justify-content-center plot-spot">
+            <p-galleria [value]="overviewPlots"
+                        [(visible)]="displayOverviewGallery"
+                        [(activeIndex)]="activeOverviewIndex"
+                        [circular]="true" [fullScreen]="true"
+                        [showItemNavigators]="false"
+                        [showThumbnails]="false" [baseZIndex]="100000">
+              <ng-template pTemplate="item" let-item>
+                <img [src]="sanitizePlotUrl(item.plot)"
+                    style="width: 100%; display: block;"
+                    alt="Overview map"/>
+              </ng-template>
+            </p-galleria>
+            <span class="image-label mb-1">{{ selectedMetric().datasets[0] }}</span>
+            <img width="95%" style="object-fit: contain;"
+                [src]="sanitizePlotUrl(overviewPlots[0].plot)"
+                (click)="showGallery(0, 'overview')"
+                [ngClass]="{'result-plot': true, 'pcol': true}"
+                alt="Overview map for {{selectedMetric().metric_pretty_name}}">
+          </div>
+        </div>
+
+        <!-- tsplot -->
+        <div *ngIf="selectedMetric().tsplotFiles | async as tsplots">
+          <div *ngIf="tsplots.length > 0"
+              class="flex flex-column w-12 align-items-center justify-content-center plot-spot mt-3">
+            <p-galleria [value]="tsplots"
+                        [(visible)]="displayTsplotGallery"
+                        [(activeIndex)]="activeTsplotIndex"
+                        [circular]="true" [fullScreen]="true"
+                        [showItemNavigators]="false"
+                        [showThumbnails]="false" [baseZIndex]="100000">
+              <ng-template pTemplate="item" let-item>
+                <img [src]="sanitizePlotUrl(item.plot)"
+                    style="width: 100%; display: block;"
+                    alt="Time series for {{selectedMetric().metric_pretty_name}}"/>
+              </ng-template>
+            </p-galleria>
+            <span class="text-muted mb-2" style="font-size: 1.0rem">Time series</span>
+            <img width="95%" style="object-fit: contain;"
+                [src]="sanitizePlotUrl(tsplots[0].plot)"
+                (click)="showGallery(0, 'tsplot')"
+                [ngClass]="{'result-plot': true, 'pcol': true}"
+                alt="Time series for {{selectedMetric().metric_pretty_name}}">
+          </div>
+          </div>
+        </div>
+      </div>
     </div>
 
-  </div>
-</p-panel>
+    <!-- errors -->
+    <div *ngIf="dataFetchError() || fileError()" class="p-3">
+      <p class="lead text-muted">Spatial result plots are temporarily unavailable.</p>
+    </div>
+
+  </p-panel>
+</div>

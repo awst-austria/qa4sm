@@ -293,6 +293,25 @@ def get_inspection_table(validation_run):
         # rendered anyways.
         return None
 
+def get_inspection_table_spatial(validation_run):
+    outfile = validation_run.output_file_spatial
+    spatial_dir = path.join(OUTPUT_FOLDER, str(validation_run.id), 'bulk', 'spatial')
+    stats_file = path.join(spatial_dir, 'bulk_statistics_table.csv')
+
+    if bool(outfile) and path.exists(outfile.path):
+        if path.exists(stats_file):
+            stats = pd.read_csv(stats_file, index_col="Metric", dtype=str)
+            stats = stats.drop(columns="Group", errors="ignore")
+            return stats
+        else:
+            # fallback — читаем из netCDF если CSV нет
+            file_size = os.path.getsize(outfile.path)
+            if file_size > 100 * 2 ** 20:
+                return "No output"
+            return get_img_stats(outfile.path)
+    else:
+        return None
+
 
 def generate_comparison(
         validation_runs: list,

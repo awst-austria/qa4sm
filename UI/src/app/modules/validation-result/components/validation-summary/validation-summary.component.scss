@@ -15,3 +15,10 @@ li{
   padding: 0;
 }
 
+.no_edit_name {
+  max-width: 400px;
+  word-break: break-word;  
+  white-space: normal;
+  display: inline-block;
+  vertical-align: middle;
+}

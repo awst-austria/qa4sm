@@ -14,7 +14,7 @@ from validator.models import ValidationRun, DatasetConfiguration, Dataset
 
 import mimetypes
 from wsgiref.util import FileWrapper
-from validator.validation import get_inspection_table, get_dataset_combis_and_metrics_from_files
+from validator.validation import get_inspection_table, get_inspection_table_spatial, get_dataset_combis_and_metrics_from_files
 from validator.validation.globals import ISMN, METADATA_PLOT_NAMES, ISMN_LIST_FILE_NAME
 
 
@@ -254,6 +254,30 @@ def get_summary_statistics(request):
             index=False
         ))
 
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_summary_statistics_spatial(request):
+    validation_id = request.query_params.get('id', None)
+    validation = get_object_or_404(ValidationRun, id=validation_id)
+
+    try:
+        inspection_table = get_inspection_table_spatial(validation)
+    except FileNotFoundError as e:
+        return HttpResponse('File not found', 404)
+
+    if inspection_table is None:
+        return HttpResponse('File not found', 404)
+
+    if isinstance(inspection_table, str):
+        return HttpResponse('error file size')
+
+    return HttpResponse(
+        inspection_table.reset_index().to_html(
+            table_id=None,
+            classes=['table', 'table-bordered', 'table-striped'],
+            index=False
+        ))
+
 
 @api_view(['GET'])
 @permission_classes([AllowAny])
@@ -330,10 +354,69 @@ def get_metric_names_and_associated_files_spatial(request):
     validation_id = request.query_params.get('validationId', None)
     validation = get_object_or_404(ValidationRun, pk=validation_id)
 
-    return JsonResponse({
-        'validation_id': str(validation.id),
-        'val_type': validation.val_type,
-        'has_spatial_file': bool(validation.output_file_spatial),
-        'spatial_file_name': validation.output_file_spatial_name,
-        'message': 'Spatial metrics endpoint is working'
-    }, status=200)
+    try:
+        file_path = os.path.join(settings.MEDIA_ROOT, str(validation.id)) + '/'
+        plot_dir = os.path.join(file_path, 'bulk', 'spatial') + '/'
+
+        try:
+            files = os.listdir(plot_dir)
+            if not any(f.endswith('.png') for f in files):
+                return JsonResponse({'message': 'No spatial plot files found'}, status=404)
+        except FileNotFoundError as e:
+            return JsonResponse({'message': str(e)}, status=404)
+
+        pairs, triples, metrics, ref0_config = get_dataset_combis_and_metrics_from_files(validation)
+        combis = OrderedDict(sorted({**pairs, **triples}.items()))
+        metrics = OrderedDict(sorted([(val, key) for key, val in metrics.items()]))
+
+        # ищем n_gpi_was_used напрямую в списке файлов
+        gpi_overview_files = []
+        gpi_datasets = []
+        for f in files:
+            if f.startswith('overview_') and f.endswith('_n_gpi_was_used.png'):
+                gpi_overview_files.append(plot_dir + f)
+                dataset_part = f.replace('overview_', '').replace('_n_gpi_was_used.png', '')
+                gpi_datasets.append(' '.join(dataset_part.split('_')))
+
+        response = []
+        boxplot_prefix = 'bulk_boxplot_spatial_'
+        tsplot_prefix = 'bulk_tsplot_'
+        barplot_prefix = 'barplot_'
+
+        for metric_ind, key in enumerate(metrics):
+            boxplot_file = ''
+            tsplot_file = ''
+
+            if metrics[key] == 'status':
+                barplot_files = [f for f in files if f.startswith(barplot_prefix + 'status')]
+                boxplot_file_name = barplot_files[0] if barplot_files else ''
+            else:
+                boxplot_file_name = boxplot_prefix + metrics[key] + '.png'
+
+            tsplot_file_name = tsplot_prefix + metrics[key] + '.png'
+
+            if boxplot_file_name and boxplot_file_name in files:
+                boxplot_file = plot_dir + boxplot_file_name
+
+            if tsplot_file_name in files:
+                tsplot_file = plot_dir + tsplot_file_name
+
+            metric_dict = {
+                'ind': metric_ind,
+                'metric_query_name': metrics[key],
+                'metric_pretty_name': key,
+                'boxplot_dicts': [{'ind': 0, 'name': 'Boxplot', 'file': boxplot_file}],
+                'overview_files': gpi_overview_files,
+                'metadata_files': [],
+                'comparison_boxplot': [],
+                'datasets': gpi_datasets,
+                'tsplot_file': [tsplot_file] if tsplot_file else [],
+            }
+            response.append(metric_dict)
+
+        return JsonResponse(response, status=200, safe=False)
+
+    except Exception as e:
+        import traceback
+        print(traceback.format_exc())
+        return JsonResponse({'message': str(e)}, status=500)

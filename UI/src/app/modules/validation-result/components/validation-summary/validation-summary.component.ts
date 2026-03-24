@@ -33,7 +33,7 @@ export class ValidationSummaryComponent implements OnInit, OnDestroy {
   configurations$: Observable<any>;
   dateFormat = 'medium';
   timeZone = 'UTC';
-  hideElement = true;
+  hideElement = signal(true);
   originalDate = signal<Date | undefined>(undefined)
   runTime: number;
   errorRate: number;
@@ -46,6 +46,7 @@ export class ValidationSummaryComponent implements OnInit, OnDestroy {
   isNearExpiry = signal<boolean | undefined>(undefined);
   noFilters = signal(false);
   noParamFilters = signal(false);
+  nameLength = 0;
 
   faIcons = {faArchive: fas.faArchive, faPencil: fas.faPen};
   public isPublishingWindowOpen: boolean;
@@ -164,24 +165,44 @@ export class ValidationSummaryComponent implements OnInit, OnDestroy {
   }
 
   toggleEditing(): void {
-    this.hideElement = !this.hideElement;
+    this.hideElement.set(!this.hideElement());
   }
 
   saveNameObserver = (newName: string) => {
     return {
-      next: () => this.onNameSave(newName),
-      error: (error: CustomHttpError) => this.toastService.showErrorWithHeader(error.errorMessage.header, error.errorMessage.message),
-      complete: () => this.toastService.showSuccess('Name updated')
+      next: () => {
+        this.valName.set(newName);  
+      },
+      error: (error: CustomHttpError) => 
+        this.toastService.showErrorWithHeader(
+          error.errorMessage.header, 
+          error.errorMessage.message
+        ),
+      complete: () => {
+        this.hideElement.set(true);  
+        this.toastService.showSuccess('Name updated');
+      }
     }
   }
 
   onNameSave(newName: string): void {
     this.valName.set(newName);
-    this.toggleEditing();
   }
 
   saveName(validationId: string, newName: string): void {
+    if (newName.length > 80) {
+      this.toastService.showErrorWithHeader(
+        'Name too long', 
+        `Name must be 80 characters or less (currently ${newName.length})`
+      );
+      return;
+    }
     this.validationService.saveResultsName(validationId, newName).subscribe(this.saveNameObserver(newName));
+  }
+
+
+  onNameInput(value: string): void {
+    this.nameLength = value.length;
   }
 
   update(doUpdate: any): void {

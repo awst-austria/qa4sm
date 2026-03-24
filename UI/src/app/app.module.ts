@@ -72,6 +72,8 @@ import { SharedPrimeNgModule } from './shared.primeNg.module';
 import { providePrimeNG } from 'primeng/config';
 import Aura from '@primeuix/themes/aura';
 import { ResultFilesSpatialComponent } from './modules/validation-result/components/result-files-spatial/result-files-spatial.component';
+import { SummaryStatisticsSpatialComponent } from './modules/validation-result/components/summary-statistics-spatial/summary-statistics-spatial.component';
+
 
 @NgModule({ declarations: [
         AppComponent,
@@ -136,7 +138,8 @@ import { ResultFilesSpatialComponent } from './modules/validation-result/compone
         SelectButtonModule, 
         SharedPrimeNgModule,
         MaintenanceModeComponent,
-        ResultFilesSpatialComponent], 
+        ResultFilesSpatialComponent,
+        SummaryStatisticsSpatialComponent], 
         
         providers: [
         {

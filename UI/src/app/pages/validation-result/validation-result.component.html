@@ -33,6 +33,11 @@
             <qa-result-files-spatial [validation]="validationRun"/>
           </div>
 
+          <div *ngIf="validationRun.end_time && validationRun.output_file_spatial"
+            class="flex flex-column w-12 align-content-center justify-content-center">
+            <qa-summary-statistics-spatial [validationRun]="validationRun"/>
+          </div>
+
         </div>
 
       </div>
