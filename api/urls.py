@@ -107,7 +107,7 @@ urlpatterns = [
     path('custom-tracked-run', custom_tracked_validation_runs, name='Tracked custom run'),
     path('download-result', get_results, name='Download results'),
     path('summary-statistics', get_summary_statistics, name='Summary statistics'),
-    path('summary-statistics-spatial', get_summary_statistics_spatial, name='Summary statistics'),
+    path('summary-statistics-spatial', get_summary_statistics_spatial, name='Summary statistics spatial'),
     path('download-statistics-csv', get_csv_with_statistics, name='Download statistics csv'),
     path('uptime-ping', uptime_ping),
     path('uptime-report', get_uptime),
