@@ -23,6 +23,19 @@ TRANSFORMER_TO_3857 = Transformer.from_crs("EPSG:4326",
                                            "EPSG:3857",
                                            always_xy=True)
 
+# Precompute categorical color key once at module load time
+def _build_status_color_key(cmap, status_codes):
+    """Build the color key dict for categorical status rendering."""
+    colors_hex = [
+        '#%02x%02x%02x' % (int(r * 255), int(g * 255), int(b * 255))
+        for r, g, b, a in (cmap(i) for i in range(len(status_codes)))
+    ]
+    return {int(code): colors_hex[i] for i, code in enumerate(status_codes)}
+
+_STATUS_COLOR_KEY = _build_status_color_key(
+    get_colormap('status'),
+    sorted(QR_STATUS_DICT.keys())
+)
 
 # API endpoints
 @require_http_methods(["GET"])
@@ -214,12 +227,10 @@ def get_validation_layer_metadata(request, validation_id):
 
 
 @require_http_methods(["GET"])
-def get_tile(request, validation_id, metric_name, layer_name, projection, z, x,
-             y):
+def get_tile(request, validation_id, metric_name, layer_name, projection, z, x, y):
     """Serve a datashader tile with efficient DataFrame caching."""
     if projection not in (4326, 3857):
-        return HttpResponse("Invalid projection. Use '4326' or '3857'",
-                            status=400)
+        return HttpResponse("Invalid projection. Use '4326' or '3857'", status=400)
 
     zarr_path = get_cached_zarr_path(validation_id)
 
@@ -260,68 +271,97 @@ def get_tile(request, validation_id, metric_name, layer_name, projection, z, x,
         x_min, x_max = bbox.left - x_buffer, bbox.right + x_buffer
         y_min, y_max = bbox.bottom - y_buffer, bbox.top + y_buffer
 
-        # Filter data with buffered bounds
         col_x, col_y = coord_cols
-        mask = ((df[col_x] >= x_min) & (df[col_x] <= x_max) &
-                (df[col_y] >= y_min) & (df[col_y] <= y_max))
-        df_tile = df[mask].copy()
 
-        if len(df_tile) == 0:
+        # --- Use KD-tree for spatial pre-filtering ---
+        # The tree gives us candidate indices in O(log n + k) instead of O(n).
+        # We use a bounding-box half-diagonal as the query radius, then apply
+        # the exact mask on the smaller candidate set.
+        center_x = (x_min + x_max) / 2
+        center_y = (y_min + y_max) / 2
+        radius = ((x_max - x_min) ** 2 + (y_max - y_min) ** 2) ** 0.5 / 2
+
+        candidate_indices = tree.query_ball_point([center_x, center_y], r=radius)
+
+        if not candidate_indices:
             return get_transparent_tile()
 
-        # Map to buffered pixel space
+        df_candidates = df.iloc[candidate_indices]
+
+        # Exact bounding-box mask on the reduced candidate set
+        mask = (
+            (df_candidates[col_x] >= x_min) & (df_candidates[col_x] <= x_max) &
+            (df_candidates[col_y] >= y_min) & (df_candidates[col_y] <= y_max)
+        )
+        df_filtered = df_candidates[mask]
+
+        if len(df_filtered) == 0:
+            return get_transparent_tile()
+
+        # --- Use .assign() instead of .copy() + column mutation ---
+        # .assign() computes only the new columns and returns a new DataFrame,
+        # avoiding a full deep copy of all existing data.
         buffered_size = 256 + 2 * buffer_px
-        df_tile['px'] = (df_tile[col_x] -
-                         x_min) / (x_range + 2 * x_buffer) * buffered_size
-        df_tile['py'] = (df_tile[col_y] -
-                         y_min) / (y_range + 2 * y_buffer) * buffered_size
+        df_tile = df_filtered.assign(
+            px=(df_filtered[col_x] - x_min) / (x_range + 2 * x_buffer) * buffered_size,
+            py=(df_filtered[col_y] - y_min) / (y_range + 2 * y_buffer) * buffered_size
+        )
 
         # Create buffered canvas
-        cvs = ds.Canvas(plot_width=buffered_size,
-                        plot_height=buffered_size,
-                        x_range=(0, buffered_size),
-                        y_range=(0, buffered_size))
+        cvs = ds.Canvas(
+            plot_width=buffered_size,
+            plot_height=buffered_size,
+            x_range=(0, buffered_size),
+            y_range=(0, buffered_size)
+        )
 
         # Get normalization parameters and colormap
-        vmin, vmax = compute_norm_params(validation_id, zarr_path, metric_name,
-                                         layer_name)
+        vmin, vmax = compute_norm_params(validation_id, zarr_path, metric_name, layer_name)
+
+        # Override with user-supplied range when the frontend sends ?vmin=...&vmax=...
+        # request.GET.get() returns None if the key is absent, keeping backward compatibility.
+        try:
+            custom_vmin = request.GET.get('vmin')
+            custom_vmax = request.GET.get('vmax')
+            if custom_vmin is not None:
+                vmin = float(custom_vmin)
+            if custom_vmax is not None:
+                vmax = float(custom_vmax)
+        except (ValueError, TypeError):
+            # Bad float string - silently fall back to computed values
+            pass
+
         mpl_cmap = get_colormap(metric_name)
 
         # Aggregate and shade based on data type
-        is_categorical = metric_name == 'status' or layer_name.startswith(
-            'status')
+        is_categorical = metric_name == 'status' or layer_name.startswith('status')
         agg = cvs.points(
             df_tile,
             'px',
             'py',
-            agg=ds.first('value') if is_categorical else ds.mean('value'))
+            agg=ds.first('value') if is_categorical else ds.mean('value')
+        )
 
         if is_categorical:
-            status_codes = sorted(QR_STATUS_DICT.keys())
-            colors_hex = [
-                '#%02x%02x%02x' % (int(r * 255), int(g * 255), int(b * 255))
-                for r, g, b, a in (mpl_cmap(i)
-                                   for i in range(len(status_codes)))
-            ]
-            color_key = {
-                int(code): colors_hex[i]
-                for i, code in enumerate(status_codes)
-            }
-            img = tf.shade(agg, color_key=color_key, how='linear')
+            # --- Use precomputed module-level color key ---
+            # _STATUS_COLOR_KEY is built once at import time, not per request.
+            img = tf.shade(agg, color_key=_STATUS_COLOR_KEY, how='linear')
         else:
-            img = tf.shade(agg, cmap=mpl_cmap, how='linear', span=(vmin, vmax))
+            img = tf.shade(agg, cmap=mpl_cmap, how='linear', span=[vmin, vmax])
 
         # Create black halo layer and colored marker layer, then stack
-        img_halo = tf.spread(tf.shade(agg, cmap=['black'], how='linear'),
-                             px=spread_px + 1,
-                             shape=marker_shape)
-        img = tf.stack(img_halo,
-                       tf.spread(img, px=spread_px, shape=marker_shape))
+        img_halo = tf.spread(
+            tf.shade(agg, cmap=['black'], how='linear'),
+            px=spread_px + 1,
+            shape=marker_shape
+        )
+        img = tf.stack(img_halo, tf.spread(img, px=spread_px, shape=marker_shape))
 
         # Crop to tile bounds and output
         pil_img = img.to_pil().convert('RGBA')
         pil_img = pil_img.crop(
-            (buffer_px, buffer_px, 256 + buffer_px, 256 + buffer_px))
+            (buffer_px, buffer_px, 256 + buffer_px, 256 + buffer_px)
+        )
 
         img_buffer = io.BytesIO()
         pil_img.save(img_buffer, format='PNG')
@@ -334,3 +374,4 @@ def get_tile(request, validation_id, metric_name, layer_name, projection, z, x,
         import traceback
         traceback.print_exc()
         return get_transparent_tile()
+

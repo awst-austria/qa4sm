@@ -8,11 +8,9 @@
 <div #projectionToggleContainer class="ol-projection-toggle-container" style="display: none;">
   <button class="projection-toggle-btn" (click)="toggleProjection()">
     <i class="pi pi-globe"></i>
-    {{ currentProjection }}
+    {{ currentProjection === 'EPSG:4326' ? 'Terrain' : 'Base Map' }}
   </button>
 </div>
-
-
 
 
 <!-- Snapshot Modal -->
@@ -33,7 +31,7 @@
   </div>
 </div>
 
-<!-- Metric dropdown - give it a unique class -->
+<!-- Metric dropdown -->
 <div #metricDropdownContainer class="ol-metric-dropdown-container ol-select-container ol-unselectable ol-control"
   style="display: none;">
   <div class="flex flex-column">
@@ -45,7 +43,7 @@
   </div>
 </div>
 
-<!-- Layer dropdown - give it a unique class -->
+<!-- Layer dropdown -->
 <div #layerDropdownContainer class="ol-layer-dropdown-container ol-select-container ol-unselectable ol-control"
   style="display: none;">
   <div class="flex flex-column" *ngIf="getAvailableLayersForCurrentMetric()?.length > 1">
@@ -62,12 +60,12 @@
 </div>
 
 
-<!-- Simple Enhanced Map Container -->
+<!-- Map Container -->
 <div class="map-wrapper">
   <div class="map-container" #mapContainer [class.map-loading]="isLoading" style="width: 100%; aspect-ratio: 3 / 2;"
     id="imap">
 
-    <!-- Enhanced Loading Overlay with PrimeNG Spinner -->
+    <!-- Loading Overlay -->
     <div *ngIf="isLoading" class="map-loading-overlay">
       <div class="spinner-container">
         <i class="pi pi-spin pi-spinner" style="font-size: 3rem"></i>
@@ -78,24 +76,64 @@
       </div>
     </div>
 
-    <div *ngIf="colorbarData && colorbarData.is_categorical === false" class="colorbar-container">
+    <!-- Editable colorbar -->
+    <div *ngIf="colorbarState && !colorbarState.is_categorical" class="colorbar-container">
       <div class="colorbar-wrapper">
-        <div class="colorbar-gradient" [style.background]="colorbarData.gradient"></div>
+        <div class="colorbar-gradient" [style.background]="colorbarState.gradient"></div>
         <div class="colorbar-labels">
-          <span class="colorbar-min">{{ colorbarData.vmin | number:'1.0-3' }}</span>
-          <span class="colorbar-title">
-            {{ colorbarData.metric_name.charAt(0).toUpperCase() + colorbarData.metric_name.slice(1) }}{{
-            colorbarData.metrics_description ?? '' }}
+
+          <!-- Editable Min -->
+          <span *ngIf="!editingMin"
+                class="colorbar-min clickable"
+                (click)="startEditMin()"
+                title="Click to edit minimum value">
+            {{ colorbarState.vmin | number:'1.0-3' }}
           </span>
-          <span class="colorbar-max">{{ colorbarData.vmax | number:'1.0-3' }}</span>
+          <input *ngIf="editingMin"
+                 class="colorbar-min-input"
+                 type="number"
+                 [value]="colorbarState.vmin"
+                 (keydown.enter)="confirmMin($any($event.target).value)"
+                 (keydown.escape)="cancelEditMin()"
+                 (blur)="confirmMin($any($event.target).value)"
+                 step="0.01" />
+
+          <!-- Metric Name -->
+          <span class="colorbar-title">
+            {{ colorbarState.metric_name | titlecase }}{{ colorbarState.metrics_description ?? '' }}
+          </span>
+
+          <!-- Editable Max -->
+          <span *ngIf="!editingMax"
+                class="colorbar-max clickable"
+                (click)="startEditMax()"
+                title="Click to edit maximum value">
+            {{ colorbarState.vmax | number:'1.0-3' }}
+          </span>
+          <input *ngIf="editingMax"
+                 class="colorbar-max-input"
+                 type="number"
+                 [value]="colorbarState.vmax"
+                 (keydown.enter)="confirmMax($any($event.target).value)"
+                 (keydown.escape)="cancelEditMax()"
+                 (blur)="confirmMax($any($event.target).value)"
+                 step="0.01" />
         </div>
       </div>
+
+      <!-- Reset button: only visible when user has overridden the range -->
+      <button *ngIf="colorbarState.isCustomRange"
+              class="colorbar-reset-btn"
+              (click)="resetColorbarRange()"
+              title="Reset to original range">
+        &#x21BA;
+      </button>
     </div>
+
     <!-- Point Value Dialog -->
     <p-dialog [(visible)]="pointPopupVisible" (onHide)="onPopupClose()" [modal]="false" [draggable]="true"
       [resizable]="false" [closable]="true" [closeOnEscape]="true" [style]="{width: '350px'}" [appendTo]='mapContainer'>
 
-      <!-- Custom Header with subtitle support -->
       <ng-template pTemplate="header">
         <div class="dialog-header-custom">
           <span class="dialog-title">{{ getDialogHeader() }}</span>
@@ -144,7 +182,6 @@
       <div *ngIf="!pointQueryLoading && !showCandidateSelection && selectedPointValue !== null && isISMNData"
         class="dialog-content">
 
-        <!-- Back button at TOP -->
         <div *ngIf="multipleFound" class="info-section back-section">
           <button (click)="showCandidateSelection = true; cdr.detectChanges()"
             class="p-button p-button-text p-button-sm back-button" type="button">
@@ -153,7 +190,6 @@
           </button>
         </div>
 
-        <!-- Measurement Value - PRIMARY -->
         <div class="info-section">
           <div class="label-value highlight">
             <span class="label">{{ varName || 'Value' }}</span>
@@ -161,7 +197,6 @@
           </div>
         </div>
 
-        <!-- Location + Point ID grouped -->
         <div class="info-section compact">
           <div class="label-value">
             <span class="label">Latitude</span>
@@ -171,13 +206,8 @@
             <span class="label">Longitude</span>
             <span class="value">{{ selectedPointCoords?.lon | number:'1.0-2' }}°</span>
           </div>
-          <!-- <div class="label-value" *ngIf="pointLoc">
-            <span class="label">Point ID</span>
-            <span class="value">{{ pointLoc }}</span>
-          </div> -->
         </div>
 
-        <!-- Additional Metadata -->
         <div class="info-section metadata" *ngIf="landcoverType || climateKG || frmClass">
           <div class="label-value" *ngIf="landcoverType">
             <span class="label">Land Cover</span>
@@ -198,7 +228,6 @@
       <div *ngIf="!pointQueryLoading && !showCandidateSelection && selectedPointValue !== null && !isISMNData"
         class="dialog-content">
 
-        <!-- Back button at TOP -->
         <div *ngIf="multipleFound" class="info-section back-section">
           <button (click)="showCandidateSelection = true; cdr.detectChanges()"
             class="p-button p-button-text p-button-sm back-button" type="button">
@@ -207,7 +236,6 @@
           </button>
         </div>
 
-        <!-- Measurement Value - PRIMARY -->
         <div class="info-section">
           <div class="label-value highlight">
             <span class="label">{{ selectedMetric?.metric_query_name || 'Value' }}</span>
@@ -215,7 +243,6 @@
           </div>
         </div>
 
-        <!-- Location + Point ID grouped -->
         <div class="info-section compact">
           <div class="label-value">
             <span class="label">Latitude</span>
@@ -225,10 +252,6 @@
             <span class="label">Longitude</span>
             <span class="value">{{ selectedPointCoords?.lon | number:'1.0-4' }}°</span>
           </div>
-          <!-- <div class="label-value" *ngIf="pointLoc">
-            <span class="label">Point ID</span>
-            <span class="value">{{ pointLoc }}</span>
-          </div> -->
         </div>
       </div>
 

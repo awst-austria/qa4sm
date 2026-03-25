@@ -26,6 +26,7 @@ import { Geometry } from 'ol/geom';
 import { Circle as CircleStyle, Fill, Stroke, Style } from 'ol/style';
 import { fromLonLat } from 'ol/proj';
 import { Attribution } from 'ol/control';
+import { ColorbarState } from './interfaces/colorbar-state.interface';
 
 
 
@@ -86,7 +87,12 @@ export class InteractiveMapComponent implements AfterViewInit, OnDestroy {
   private currentLayerKey = '';
   cachedMetadata: any = null;
   selectedLayerForMetric: { [metric: string]: LayerDetail } = {};
-  colorbarData: any = null;
+
+  colorbarState: ColorbarState | null = null;
+  editingMin = false;
+  editingMax = false;
+  private originalVmin: number | null = null;
+  private originalVmax: number | null = null;
   private legendControl: LegendControl | null = null;
   statusMetadata: any = null;
   selectedMetric: MetricsPlotsDto = {} as MetricsPlotsDto;
@@ -95,7 +101,7 @@ export class InteractiveMapComponent implements AfterViewInit, OnDestroy {
   private baseLayer4326!: TileLayer<TileWMS>;
   private baseLayer3857!: TileLayer<XYZ>;
   private shouldFitToBounds = true;
-  private completeColormap: any = null;
+
   showSnapshotModal = false;
   snapshotImageSrc: string | null = null;
   isFullscreen = false;
@@ -127,7 +133,6 @@ export class InteractiveMapComponent implements AfterViewInit, OnDestroy {
   private markerSource = new VectorSource<Feature<Geometry>>();
   private markerLayer!: VectorLayer<Feature<Geometry>>;
 
-
   private fullscreenHandler = () => {
     this.isFullscreen = document.fullscreenElement !== null;
     this.cdr.detectChanges();
@@ -150,7 +155,6 @@ export class InteractiveMapComponent implements AfterViewInit, OnDestroy {
     document.removeEventListener('fullscreenchange', this.fullscreenHandler);
   }
 
-  // Helper to update loading state and trigger change detection
   private setLoading(loading: boolean): void {
     this.isLoading = loading;
     this.cdr.detectChanges();
@@ -276,20 +280,18 @@ export class InteractiveMapComponent implements AfterViewInit, OnDestroy {
       ]
     });
 
-
-    // Yellow marker layer
     this.markerLayer = new VectorLayer({
       source: this.markerSource,
       style: new Style({
         image: new CircleStyle({
           radius: 8,
-          fill: new Fill({ color: '#FFD700' }), // Yellow
+          fill: new Fill({ color: '#FFD700' }),
           stroke: new Stroke({ color: '#000', width: 2 })
         })
       }),
       zIndex: 999
     });
-    // Force reposition after map is ready
+
     setTimeout(() => {
       const attribution = document.querySelector('.ol-attribution') as HTMLElement;
       if (attribution) {
@@ -298,8 +300,8 @@ export class InteractiveMapComponent implements AfterViewInit, OnDestroy {
         attribution.style.bottom = '4.8rem';
       }
     }, 100);
-    this.Map.addLayer(this.markerLayer);
 
+    this.Map.addLayer(this.markerLayer);
     this.legendControl = new LegendControl({ colorbarData: null, metricName: '' });
     this.Map.addControl(this.legendControl);
     this.setupMapClickHandler();
@@ -358,8 +360,8 @@ export class InteractiveMapComponent implements AfterViewInit, OnDestroy {
         mapContext.globalAlpha = 1;
         mapContext.setTransform(1, 0, 0, 1, 0, 0);
 
-        if (this.colorbarData) {
-          if (this.colorbarData.is_categorical) {
+        if (this.colorbarState) {
+          if (this.colorbarState.is_categorical) {
             this.drawLegendOnCanvas(mapContext, mapCanvas);
           } else {
             this.drawColorbarOnCanvas(mapContext, mapCanvas);
@@ -387,7 +389,7 @@ export class InteractiveMapComponent implements AfterViewInit, OnDestroy {
   }
 
   private drawLegendOnCanvas(ctx: CanvasRenderingContext2D, canvas: HTMLCanvasElement): void {
-    const entries = this.colorbarData?.legend_data?.entries;
+    const entries = this.colorbarState?.legend_data?.entries;
     if (!entries) return;
 
     const padding = LEGEND_PADDING;
@@ -397,20 +399,17 @@ export class InteractiveMapComponent implements AfterViewInit, OnDestroy {
     const x = canvas.width - legendWidth - LEGEND_PADDING;
     const y = canvas.height - legendHeight - LEGEND_PADDING;
 
-    // Background
     ctx.fillStyle = 'rgba(255, 255, 255, 0.95)';
     ctx.fillRect(x, y, legendWidth, legendHeight);
     ctx.strokeStyle = 'rgba(0, 0, 0, 0.15)';
     ctx.lineWidth = 1;
     ctx.strokeRect(x, y, legendWidth, legendHeight);
 
-    // Title
     ctx.fillStyle = '#2c3e50';
     ctx.font = 'bold 13px Arial, sans-serif';
     ctx.textAlign = 'center';
-    ctx.fillText(this.colorbarData.metric_name || 'Status', x + legendWidth / 2, y + padding + 10);
+    ctx.fillText(this.colorbarState.metric_name || 'Status', x + legendWidth / 2, y + padding + 10);
 
-    // Separator
     const separatorY = y + padding + 18;
     ctx.strokeStyle = '#e0e0e0';
     ctx.beginPath();
@@ -418,7 +417,6 @@ export class InteractiveMapComponent implements AfterViewInit, OnDestroy {
     ctx.lineTo(x + legendWidth - padding, separatorY);
     ctx.stroke();
 
-    // Legend items
     ctx.font = '11px Arial, sans-serif';
     ctx.textAlign = 'left';
 
@@ -437,17 +435,17 @@ export class InteractiveMapComponent implements AfterViewInit, OnDestroy {
   }
 
   private drawColorbarOnCanvas(ctx: CanvasRenderingContext2D, canvas: HTMLCanvasElement): void {
+    if (!this.colorbarState) return;
+
     const barWidth = Math.max(500, canvas.width - CANVAS_PADDING * 2);
     const x = (canvas.width - barWidth) / 2;
     const y = canvas.height - 50;
 
-    // Background
     ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
     ctx.fillRect(0, canvas.height - 55, canvas.width, 55);
 
-    // Gradient bar
     const gradient = ctx.createLinearGradient(x, y, x + barWidth, y);
-    const colors = this.parseGradientColors(this.colorbarData.gradient);
+    const colors = this.parseGradientColors(this.colorbarState.gradient);
     colors.forEach((color, index) => gradient.addColorStop(index / (colors.length - 1), color));
 
     ctx.beginPath();
@@ -457,24 +455,21 @@ export class InteractiveMapComponent implements AfterViewInit, OnDestroy {
     ctx.strokeStyle = 'rgba(0, 0, 0, 0.2)';
     ctx.stroke();
 
-    // Labels
     ctx.fillStyle = '#2c3e50';
     ctx.font = '12px Arial, sans-serif';
     ctx.textAlign = 'left';
-    ctx.fillText(parseFloat(this.completeColormap.vmin.toFixed(3)).toString(), x, y + COLORBAR_HEIGHT + 15);
-    console.log(' should be vmin !!! : ' + this.completeColormap.vmin.toFixed(3).toString())
+    ctx.fillText(parseFloat(this.colorbarState.vmin.toFixed(3)).toString(), x, y + COLORBAR_HEIGHT + 15);
+
     ctx.textAlign = 'center';
     ctx.font = 'bold 13px Arial, sans-serif';
-    const capitalizedMetricName = this.colorbarData.metric_name.charAt(0).toUpperCase() +
-      this.colorbarData.metric_name.slice(1);
-    const metricText = capitalizedMetricName +
-      (this.colorbarData.metrics_description ?? '');
+    const capitalizedMetricName = this.colorbarState.metric_name.charAt(0).toUpperCase() +
+      this.colorbarState.metric_name.slice(1);
+    const metricText = capitalizedMetricName + (this.colorbarState.metrics_description ?? '');
     ctx.fillText(metricText, canvas.width / 2, y + COLORBAR_HEIGHT + 15);
 
     ctx.textAlign = 'right';
     ctx.font = '12px Arial, sans-serif';
-    ctx.fillText(parseFloat(this.completeColormap.vmax.toFixed(3)).toString(), x + barWidth, y + COLORBAR_HEIGHT + 15);
-    console.log(' should be vmax !!! : ' + this.completeColormap.vmax.toFixed(3).toString())
+    ctx.fillText(parseFloat(this.colorbarState.vmax.toFixed(3)).toString(), x + barWidth, y + COLORBAR_HEIGHT + 15);
   }
 
   private parseGradientColors(gradientString: string): string[] {
@@ -532,7 +527,7 @@ export class InteractiveMapComponent implements AfterViewInit, OnDestroy {
   }
 
   getStatusLegendEntries(): any[] {
-    return this.colorbarData?.legend_data?.entries || [];
+    return this.colorbarState?.legend_data?.entries || [];
   }
 
   private createTileGridForProjection(projection: Projection) {
@@ -560,7 +555,12 @@ export class InteractiveMapComponent implements AfterViewInit, OnDestroy {
     }
   }
 
-  private async updateTileLayer(layer: TiffLayer, projection: Projection = 'EPSG:4326', fitToBounds = false) {
+    private async updateTileLayer(
+    layer: TiffLayer,
+    projection: Projection = 'EPSG:4326',
+    fitToBounds = false,
+    customRange?: { vmin: number; vmax: number }
+  ) {
     const layerKey = `${layer.name}_${projection}`;
     const isNewLayer = this.currentLayerKey !== layerKey;
 
@@ -580,7 +580,11 @@ export class InteractiveMapComponent implements AfterViewInit, OnDestroy {
     }
 
     const epsgCode = projection.replace('EPSG:', '');
-    const tileUrl = `/api/${validationIdValue}/tiles/${layer.metricName}/${layer.name}/${epsgCode}/{z}/{x}/{y}.png`;
+    let tileUrl = `/api/${validationIdValue}/tiles/${layer.metricName}/${layer.name}/${epsgCode}/{z}/{x}/{y}.png`;
+
+    if (customRange) {
+      tileUrl += `?vmin=${customRange.vmin}&vmax=${customRange.vmax}`;
+    }
 
     this.currentTileLayer = new TileLayer({
       source: new XYZ({
@@ -630,31 +634,25 @@ export class InteractiveMapComponent implements AfterViewInit, OnDestroy {
     }
   }
 
-  private async fitToLayerBounds(validationId: string, layerProjection: Projection = 'EPSG:4326') {
-    try {
-      const response = await fetch(`/api/${validationId}/bounds/`);
-      if (!response.ok) return;
-
-      const data = await response.json();
-      if (!data.extent) return;
-
-      let extent = data.extent;
-      const backendCRS = data.crs || 'EPSG:4326';
-      const viewProj = this.Map.getView().getProjection().getCode();
-
-      if (backendCRS !== viewProj) {
-        extent = transformExtent(extent, backendCRS, viewProj);
-      }
-
-      this.Map.renderSync();
-      this.Map.getView().fit(extent, {
-        padding: [MAP_FIT_PADDING, MAP_FIT_PADDING, MAP_FIT_PADDING, MAP_FIT_PADDING],
-        duration: 1000,
-        maxZoom: MAX_ZOOM
+  private fitToLayerBounds(validationId: string, projection: Projection = 'EPSG:4326'): void {
+    this.httpClient.get<{ extent: number[]; crs?: string }>(`/api/${validationId}/bounds/`)
+      .subscribe({
+        next: (data) => {
+          if (!data.extent) return;
+          let extent = data.extent;
+          const backendCRS = data.crs || 'EPSG:4326';
+          const viewProj = this.Map.getView().getProjection().getCode();
+          if (backendCRS !== viewProj) {
+            extent = transformExtent(extent, backendCRS, viewProj);
+          }
+          this.Map.getView().fit(extent, {
+            padding: [MAP_FIT_PADDING, MAP_FIT_PADDING, MAP_FIT_PADDING, MAP_FIT_PADDING],
+            duration: 1000,
+            maxZoom: MAX_ZOOM
+          });
+        },
+        error: (err) => console.error('[fitToLayerBounds] Error:', err)
       });
-    } catch (error) {
-      console.error('[fitToLayerBounds] Error:', error);
-    }
   }
 
   async resetMapView() {
@@ -685,9 +683,15 @@ export class InteractiveMapComponent implements AfterViewInit, OnDestroy {
       maxZoom: TILE_GRID_MAX_ZOOM
     }));
 
-    await this.updateTileLayer(this.currentLayer, newProj);
+    // Preserve the custom range if one is currently active
+    const customRange = this.colorbarState?.isCustomRange
+      ? { vmin: this.colorbarState.vmin, vmax: this.colorbarState.vmax }
+      : undefined;
+
+    await this.updateTileLayer(this.currentLayer, newProj, false, customRange);
     await this.fitToLayerBounds(validationIdValue, newProj);
   }
+
 
   toggleFullscreen(): void {
     const mapElement = document.getElementById('imap') as any;
@@ -718,18 +722,126 @@ export class InteractiveMapComponent implements AfterViewInit, OnDestroy {
 
     this.plotService.getLayerRange(this.validationId(), currentMetric, selectedLayer.name).subscribe({
       next: (rangeData) => {
-        this.completeColormap = { ...colormapInfo, ...rangeData, metric_name: currentMetric };
-        if (this.completeColormap.is_categorical) {
-          this.showLegend(this.completeColormap, selectedLayer);
+        this.colorbarState = {
+          gradient: colormapInfo?.gradient ?? 'linear-gradient(to right, blue, red)',
+          vmin: rangeData.vmin,
+          vmax: rangeData.vmax,
+          metric_name: currentMetric,
+          metrics_description: colormapInfo?.metrics_description,
+          is_categorical: colormapInfo?.is_categorical ?? false,
+          legend_data: colormapInfo?.legend_data,
+          isCustomRange: false
+        };
+
+        this.originalVmin = rangeData.vmin;
+        this.originalVmax = rangeData.vmax;
+
+        if (this.colorbarState.is_categorical) {
+          this.showLegend(this.colorbarState, selectedLayer);
         } else {
-          this.showColorbar(this.completeColormap);
+          this.showColorbar();
         }
       },
-      error: () => {
-        this.showColorbar({ vmin: 0, vmax: 1, metric_name: currentMetric, is_categorical: false });
+      error: (err) => {
+        console.error('Failed to get layer range:', err);
+        this.colorbarState = {
+          gradient: 'linear-gradient(to right, blue, red)',
+          vmin: 0,
+          vmax: 1,
+          metric_name: currentMetric,
+          is_categorical: false,
+          isCustomRange: false
+        };
+        this.showColorbar();
       }
     });
   }
+
+  // ---- colorbar inline editing ----
+
+  startEditMin(): void {
+    this.editingMin = true;
+    setTimeout(() => {
+      const input = document.querySelector('.colorbar-min-input') as HTMLInputElement;
+      input?.focus();
+      input?.select();
+    });
+  }
+
+  startEditMax(): void {
+    this.editingMax = true;
+    setTimeout(() => {
+      const input = document.querySelector('.colorbar-max-input') as HTMLInputElement;
+      input?.focus();
+      input?.select();
+    });
+  }
+
+  cancelEditMin(): void {
+    this.editingMin = false;
+  }
+
+  cancelEditMax(): void {
+    this.editingMax = false;
+  }
+
+  confirmMin(rawValue: string): void {
+    // Idempotency guard: keydown.enter sets editingMin = false before blur fires,
+    // so a second call here is a no-op instead of a duplicate tile reload.
+    if (!this.editingMin) return;
+    this.editingMin = false;
+    const newMin = parseFloat(rawValue);
+    if (isNaN(newMin) || !this.colorbarState) return;
+    if (newMin >= this.colorbarState.vmax) return;
+    this.applyCustomRange(newMin, this.colorbarState.vmax);
+  }
+
+  confirmMax(rawValue: string): void {
+    // Same idempotency guard as confirmMin
+    if (!this.editingMax) return;
+    this.editingMax = false;
+    const newMax = parseFloat(rawValue);
+    if (isNaN(newMax) || !this.colorbarState) return;
+    if (newMax <= this.colorbarState.vmin) return;
+    this.applyCustomRange(this.colorbarState.vmin, newMax);
+  }
+
+  private applyCustomRange(newMin: number, newMax: number): void {
+    if (!this.colorbarState || !this.currentLayer) return;
+
+    // Only snapshot the originals the first time we enter custom mode
+    if (!this.colorbarState.isCustomRange) {
+      this.originalVmin = this.colorbarState.vmin;
+      this.originalVmax = this.colorbarState.vmax;
+    }
+
+    this.colorbarState = {
+      ...this.colorbarState,
+      vmin: newMin,
+      vmax: newMax,
+      isCustomRange: true
+    };
+
+    this.reloadTileLayerWithRange(newMin, newMax);
+  }
+
+  private reloadTileLayerWithRange(vmin: number, vmax: number): void {
+    if (!this.currentLayer) return;
+    this.updateTileLayer(this.currentLayer, this.currentProjection, false, { vmin, vmax });
+  }
+
+  resetColorbarRange(): void {
+    if (this.originalVmin !== null && this.originalVmax !== null && this.colorbarState) {
+      this.applyCustomRange(this.originalVmin, this.originalVmax);
+      // applyCustomRange sets isCustomRange = true; override it back to false
+      this.colorbarState = {
+        ...this.colorbarState,
+        isCustomRange: false
+      };
+    }
+  }
+
+  // ---- END: colorbar inline editing ----
 
   getAvailableLayersForCurrentMetric(): LayerDetail[] {
     if (!this.cachedMetadata || !this.selectedMetric) return [];
@@ -766,15 +878,15 @@ export class InteractiveMapComponent implements AfterViewInit, OnDestroy {
   }
 
   getColorbarGradient(): string {
-    return this.colorbarData?.gradient || DEFAULT_COLORBAR_GRADIENT;
+    return this.colorbarState?.gradient || DEFAULT_COLORBAR_GRADIENT;
   }
 
   getColorbarMin(): string {
-    return this.completeColormap?.vmin?.toFixed(2) || '0.0';
+    return this.colorbarState?.vmin?.toFixed(2) || '0.0';
   }
 
   getColorbarMax(): string {
-    return this.completeColormap?.vmax?.toFixed(2) || '1.0';
+    return this.colorbarState?.vmax?.toFixed(2) || '1.0';
   }
 
   onMapClick(event: MapBrowserEvent<any>) {
@@ -858,7 +970,6 @@ export class InteractiveMapComponent implements AfterViewInit, OnDestroy {
       this.pointLoc = candidate.gpi?.toString() || null;
     }
 
-    // Clear previous and add new marker
     this.markerSource.clear();
     const coords = this.currentProjection === 'EPSG:4326'
       ? [candidate.lon, candidate.lat]
@@ -870,10 +981,10 @@ export class InteractiveMapComponent implements AfterViewInit, OnDestroy {
 
   getCandidateName(candidate: any): string {
     if (this.isISMNData) {
-      let label = `${candidate.network || 'Unknown'} – ${candidate.station || 'Unknown'}`;
-      if (candidate.instrument) label += ` – ${candidate.instrument}`;
+      let label = `${candidate.network || 'Unknown'} - ${candidate.station || 'Unknown'}`;
+      if (candidate.instrument) label += ` - ${candidate.instrument}`;
       if (candidate.instrument_depthfrom != null && candidate.instrument_depthto != null) {
-        label += ` (${Number(candidate.instrument_depthfrom).toFixed(2)}–${Number(candidate.instrument_depthto).toFixed(2)} m)`;
+        label += ` (${Number(candidate.instrument_depthfrom).toFixed(2)}-${Number(candidate.instrument_depthto).toFixed(2)} m)`;
       } else if (candidate.instrument_depthfrom != null) {
         label += ` (${Number(candidate.instrument_depthfrom).toFixed(2)} m)`;
       }
@@ -905,7 +1016,7 @@ export class InteractiveMapComponent implements AfterViewInit, OnDestroy {
       if (this.instrument) {
         let instrumentInfo = `Instrument: ${this.instrument}`;
         if (this.instrumentDepthFrom !== null && this.instrumentDepthTo !== null) {
-          instrumentInfo += ` (${this.instrumentDepthFrom.toFixed(1)}–${this.instrumentDepthTo.toFixed(1)} m)`;
+          instrumentInfo += ` (${this.instrumentDepthFrom.toFixed(1)}-${this.instrumentDepthTo.toFixed(1)} m)`;
         } else if (this.instrumentDepthFrom !== null) {
           instrumentInfo += ` (${this.instrumentDepthFrom.toFixed(1)} m)`;
         }
@@ -937,14 +1048,13 @@ export class InteractiveMapComponent implements AfterViewInit, OnDestroy {
       this.currentLayer = null;
     }
     this.legendControl?.updateLegend(null, '');
-    this.colorbarData = null;
+    this.colorbarState = null;
     this.currentLayerKey = '';
     this.setLoading(false);
   }
 
-  private showColorbar(colorbarData: any) {
+  private showColorbar(): void {
     this.legendControl?.updateLegend(null, '');
-    this.colorbarData = colorbarData;
   }
 
   private showLegend(colorbarData: any, selectedLayer: LayerDetail) {
@@ -957,10 +1067,10 @@ export class InteractiveMapComponent implements AfterViewInit, OnDestroy {
     if (statusLegend && this.legendControl) {
       const legendData = { ...colorbarData, legend_data: statusLegend };
       this.legendControl.updateLegend(legendData, selectedLayer.metricName);
-      this.colorbarData = legendData;
+      this.colorbarState = legendData;
     } else {
       this.legendControl?.updateLegend(null, '');
-      this.colorbarData = null;
+      this.colorbarState = null;
     }
   }
 
@@ -1009,7 +1119,6 @@ export class InteractiveMapComponent implements AfterViewInit, OnDestroy {
     this.pointPopupVisible = false;
     this.cdr.detectChanges();
   }
-
 }
 
 export class AngularControl extends Control {
