@@ -757,11 +757,41 @@
   color: #2c3e50;
   min-width: 60px;
   font-family: 'Courier New', monospace;
-  background: rgba(108, 117, 125, 0.08);
-  padding: 2px 6px;
-  border-radius: 4px;
   font-size: 11px;
+
+  background: rgba(255, 255, 255, 0.75);
+  padding: 3px 8px;
+  border-radius: 4px;
+  border: 1.5px solid rgba(52, 73, 94, 0.4);
+
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, box-shadow 0.15s;
+
+  // Pencil always visible, not just on hover
+  &::after {
+    content: ' ✎';
+    font-size: 10px;
+    opacity: 0.45;
+    transition: opacity 0.15s;
+  }
+
+  &:hover {
+    background: #fff;
+    border-color: #2980b9;
+    box-shadow: 0 0 0 2px rgba(41, 128, 185, 0.2);
+    color: #1a252f;
+
+    &::after {
+      opacity: 1;
+      color: #2980b9;
+    }
+  }
+
+  &:active {
+    background: rgba(41, 128, 185, 0.1);
+  }
 }
+
 
 .colorbar-min {
   text-align: left;
@@ -779,6 +809,7 @@
   text-align: center;
   margin: 0 8px;
 }
+
 
 /* Fullscreen support for colorbar */
 :host ::ng-deep .ol-full-screen~.colorbar-container,
