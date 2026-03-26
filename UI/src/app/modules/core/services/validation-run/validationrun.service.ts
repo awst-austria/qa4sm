@@ -259,7 +259,16 @@ export class ValidationrunService {
 
   downloadSpatialResultFile(validationId: string, fileType: string, fileName: string): void {
     const fileUrl = `${urlPrefix}/download-result-spatial?validationId=${validationId}&fileType=${fileType}`;
-    saveAs(fileUrl, fileName);
+    
+    this.httpClient.get(fileUrl, {
+      headers,           
+      responseType: 'blob'
+    }).pipe(
+      catchError(err => this.httpError.handleError(err, 'Could not download file'))
+    ).subscribe({
+      next: (blob) => saveAs(blob, fileName),
+      error: (err) => console.error(err)
+    });
   }
 
 }

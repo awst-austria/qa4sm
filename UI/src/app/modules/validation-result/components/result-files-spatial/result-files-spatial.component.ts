@@ -81,7 +81,7 @@ export class ResultFilesSpatialComponent implements OnInit {
   }
 
   getPlots(files: string[]): Observable<PlotDto[]> {
-    const validFiles = files.filter(f => f && f.length > 0);  // ← фильтруем пустые
+    const validFiles = files.filter(f => f && f.length > 0);  
     if (!validFiles || validFiles.length === 0) return of([]);
     let params = new HttpParams();
     validFiles.forEach(f => params = params.append('file', f));

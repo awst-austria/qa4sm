@@ -14,7 +14,7 @@ from validator.models import ValidationRun, DatasetConfiguration, Dataset
 
 import mimetypes
 from wsgiref.util import FileWrapper
-from validator.validation import get_inspection_table, get_inspection_table_spatial, get_dataset_combis_and_metrics_from_files
+from validator.validation import get_inspection_table, get_inspection_table_spatial, get_dataset_combis_and_metrics_from_files, get_dataset_combis_and_metrics_from_files_spatial
 from validator.validation.globals import ISMN, METADATA_PLOT_NAMES, ISMN_LIST_FILE_NAME
 
 
@@ -317,7 +317,7 @@ def get_ismn_list_file(request):
         return HttpResponse("File not found", status=404)
 
 @api_view(['GET'])
-@permission_classes([AllowAny])
+@permission_classes([IsAuthenticated])
 def get_results_spatial(request):
     validation_id = request.query_params.get('validationId', None)
     file_type = request.query_params.get('fileType', None)
@@ -349,7 +349,7 @@ def get_results_spatial(request):
 
 
 @api_view(['GET'])
-@permission_classes([AllowAny])
+@permission_classes([IsAuthenticated])
 def get_metric_names_and_associated_files_spatial(request):
     validation_id = request.query_params.get('validationId', None)
     validation = get_object_or_404(ValidationRun, pk=validation_id)
@@ -365,35 +365,63 @@ def get_metric_names_and_associated_files_spatial(request):
         except FileNotFoundError as e:
             return JsonResponse({'message': str(e)}, status=404)
 
-        pairs, triples, metrics, ref0_config = get_dataset_combis_and_metrics_from_files(validation)
+        # parsing function for spatial validation
+        pairs, triples, metrics, ref0_config = get_dataset_combis_and_metrics_from_files_spatial(validation)
         combis = OrderedDict(sorted({**pairs, **triples}.items()))
         metrics = OrderedDict(sorted([(val, key) for key, val in metrics.items()]))
-
-        # ищем n_gpi_was_used напрямую в списке файлов
-        gpi_overview_files = []
-        gpi_datasets = []
-        for f in files:
-            if f.startswith('overview_') and f.endswith('_n_gpi_was_used.png'):
-                gpi_overview_files.append(plot_dir + f)
-                dataset_part = f.replace('overview_', '').replace('_n_gpi_was_used.png', '')
-                gpi_datasets.append(' '.join(dataset_part.split('_')))
 
         response = []
         boxplot_prefix = 'bulk_boxplot_spatial_'
         tsplot_prefix = 'bulk_tsplot_'
         barplot_prefix = 'barplot_'
+        independent_metrics = ['n_obs', 'status']
 
         for metric_ind, key in enumerate(metrics):
+
             boxplot_file = ''
             tsplot_file = ''
+            metric_query = metrics[key]  # 'R', 'snr_for_1-C3S_combined', 'status'...
 
-            if metrics[key] == 'status':
+            # relevant combinations for overview
+            if metric_query in independent_metrics:
+                # n_obs, status → все комбинации
+                relevant_combis = combis
+
+            elif '_for_' in metric_query:
+                # TC metrics → only triples with the relevant dataset
+                # 'snr_for_1-C3S_combined' → ds_met = '1-C3S_combined'
+                ds_met = metric_query.split('_for_')[1]
+                relevant_combis = OrderedDict(
+                    (k, v) for k, v in combis.items()
+                    if k.count('_and_') == 2  # triple
+                    and ds_met in k            # dataset participates
+                )
+
+            else:
+                # ordinary metrics → only pairs with the relevant dataset
+                relevant_combis = OrderedDict(
+                    (k, v) for k, v in combis.items()
+                    if k.count('_and_') == 1  # пара
+                )
+
+            # combining overview files and datasets for the metric
+            metric_overview_files = []
+            metric_datasets = []
+            for combi, pretty_name in relevant_combis.items():
+                overview_file = plot_dir + f'overview_{combi}_n_gpi_was_used.png'
+                if os.path.exists(overview_file):
+                    metric_overview_files.append(overview_file)
+                    metric_datasets.append(pretty_name)
+
+            # boxplot files
+            if metric_query == 'status':
                 barplot_files = [f for f in files if f.startswith(barplot_prefix + 'status')]
                 boxplot_file_name = barplot_files[0] if barplot_files else ''
             else:
-                boxplot_file_name = boxplot_prefix + metrics[key] + '.png'
+                boxplot_file_name = boxplot_prefix + metric_query + '.png'
 
-            tsplot_file_name = tsplot_prefix + metrics[key] + '.png'
+            # tsplot files
+            tsplot_file_name = tsplot_prefix + metric_query + '.png'
 
             if boxplot_file_name and boxplot_file_name in files:
                 boxplot_file = plot_dir + boxplot_file_name
@@ -403,13 +431,13 @@ def get_metric_names_and_associated_files_spatial(request):
 
             metric_dict = {
                 'ind': metric_ind,
-                'metric_query_name': metrics[key],
+                'metric_query_name': metric_query,
                 'metric_pretty_name': key,
                 'boxplot_dicts': [{'ind': 0, 'name': 'Boxplot', 'file': boxplot_file}],
-                'overview_files': gpi_overview_files,
+                'overview_files': metric_overview_files,
                 'metadata_files': [],
                 'comparison_boxplot': [],
-                'datasets': gpi_datasets,
+                'datasets': metric_datasets,
                 'tsplot_file': [tsplot_file] if tsplot_file else [],
             }
             response.append(metric_dict)
