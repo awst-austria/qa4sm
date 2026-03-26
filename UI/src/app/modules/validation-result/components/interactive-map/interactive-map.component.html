@@ -79,24 +79,25 @@
     <!-- Editable colorbar -->
     <div *ngIf="colorbarState && !colorbarState.is_categorical" class="colorbar-container">
       <div class="colorbar-wrapper">
+
         <div class="colorbar-gradient" [style.background]="colorbarState.gradient"></div>
         <div class="colorbar-labels">
 
           <!-- Editable Min -->
-          <span *ngIf="!editingMin"
-                class="colorbar-min clickable"
-                (click)="startEditMin()"
-                title="Click to edit minimum value">
+          <span *ngIf="!editingMin" class="colorbar-min clickable" (click)="startEditMin()"
+            title="Click to edit minimum value">
             {{ colorbarState.vmin | number:'1.0-3' }}
           </span>
-          <input *ngIf="editingMin"
-                 class="colorbar-min-input"
-                 type="number"
-                 [value]="colorbarState.vmin"
-                 (keydown.enter)="confirmMin($any($event.target).value)"
-                 (keydown.escape)="cancelEditMin()"
-                 (blur)="confirmMin($any($event.target).value)"
-                 step="0.01" />
+          <input *ngIf="editingMin" class="colorbar-min-input" type="number" [value]="colorbarState.vmin"
+            (keydown.enter)="confirmMin($any($event.target).value)" (keydown.escape)="cancelEditMin()"
+            (blur)="confirmMin($any($event.target).value)" step="0.01" />
+
+          <!-- Intermediate ticks -->
+          <span *ngFor="let tick of getColorbarTicks()" class="colorbar-tick"
+            [style.left]="'calc(' + tick.percent + '% - ' + (tick.percent / 100 * 120 - 60) + 'px)'">
+            {{ tick.value | number:'1.0-3' }}
+          </span>
+
 
           <!-- Metric Name -->
           <span class="colorbar-title">
@@ -104,28 +105,19 @@
           </span>
 
           <!-- Editable Max -->
-          <span *ngIf="!editingMax"
-                class="colorbar-max clickable"
-                (click)="startEditMax()"
-                title="Click to edit maximum value">
+          <span *ngIf="!editingMax" class="colorbar-max clickable" (click)="startEditMax()"
+            title="Click to edit maximum value">
             {{ colorbarState.vmax | number:'1.0-3' }}
           </span>
-          <input *ngIf="editingMax"
-                 class="colorbar-max-input"
-                 type="number"
-                 [value]="colorbarState.vmax"
-                 (keydown.enter)="confirmMax($any($event.target).value)"
-                 (keydown.escape)="cancelEditMax()"
-                 (blur)="confirmMax($any($event.target).value)"
-                 step="0.01" />
+          <input *ngIf="editingMax" class="colorbar-max-input" type="number" [value]="colorbarState.vmax"
+            (keydown.enter)="confirmMax($any($event.target).value)" (keydown.escape)="cancelEditMax()"
+            (blur)="confirmMax($any($event.target).value)" step="0.01" />
         </div>
       </div>
 
       <!-- Reset button: only visible when user has overridden the range -->
-      <button *ngIf="colorbarState.isCustomRange"
-              class="colorbar-reset-btn"
-              (click)="resetColorbarRange()"
-              title="Reset to original range">
+      <button *ngIf="colorbarState.isCustomRange" class="colorbar-reset-btn" (click)="resetColorbarRange()"
+        title="Reset to original range">
         &#x21BA;
       </button>
     </div>

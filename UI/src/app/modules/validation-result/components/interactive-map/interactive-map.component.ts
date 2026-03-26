@@ -439,7 +439,7 @@ export class InteractiveMapComponent implements AfterViewInit, OnDestroy {
 
     const barWidth = Math.max(500, canvas.width - CANVAS_PADDING * 2);
     const x = (canvas.width - barWidth) / 2;
-    const y = canvas.height - 50;
+    const y = canvas.height - 65;
 
     ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
     ctx.fillRect(0, canvas.height - 55, canvas.width, 55);
@@ -465,11 +465,32 @@ export class InteractiveMapComponent implements AfterViewInit, OnDestroy {
     const capitalizedMetricName = this.colorbarState.metric_name.charAt(0).toUpperCase() +
       this.colorbarState.metric_name.slice(1);
     const metricText = capitalizedMetricName + (this.colorbarState.metrics_description ?? '');
-    ctx.fillText(metricText, canvas.width / 2, y + COLORBAR_HEIGHT + 15);
+    ctx.fillText(metricText, canvas.width / 2, y + COLORBAR_HEIGHT + 30);
 
     ctx.textAlign = 'right';
     ctx.font = '12px Arial, sans-serif';
     ctx.fillText(parseFloat(this.colorbarState.vmax.toFixed(3)).toString(), x + barWidth, y + COLORBAR_HEIGHT + 15);
+
+    const ticks = this.getColorbarTicks();
+    ticks.forEach(tick => {
+      const tickX = x + (tick.percent / 100) * barWidth;
+      ctx.textAlign = 'center';
+      ctx.font = '11px Arial, sans-serif';
+      ctx.fillStyle = '#555';
+      ctx.fillText(
+        parseFloat(tick.value.toFixed(3)).toString(),
+        tickX,
+        y + COLORBAR_HEIGHT + 15
+      );
+      // Small tick mark
+      ctx.strokeStyle = '#888';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(tickX, y + COLORBAR_HEIGHT);
+      ctx.lineTo(tickX, y + COLORBAR_HEIGHT + 5);
+      ctx.stroke();
+    });
+
   }
 
   private parseGradientColors(gradientString: string): string[] {
@@ -555,7 +576,7 @@ export class InteractiveMapComponent implements AfterViewInit, OnDestroy {
     }
   }
 
-    private async updateTileLayer(
+  private async updateTileLayer(
     layer: TiffLayer,
     projection: Projection = 'EPSG:4326',
     fitToBounds = false,
@@ -1102,6 +1123,19 @@ export class InteractiveMapComponent implements AfterViewInit, OnDestroy {
       error: (error) => console.error('Error loading metrics:', error)
     });
   }
+
+  getColorbarTicks(): { value: number; percent: number }[] {
+    if (!this.colorbarState) return [];
+    const { vmin, vmax } = this.colorbarState;
+    const range = vmax - vmin;
+    if (range === 0) return [];
+
+    return [0.25, 0.5, 0.75].map(p => ({
+      value: vmin + p * range,
+      percent: p * 100
+    }));
+  }
+
 
   @HostListener('document:keydown.escape')
   onEscapeKey() {

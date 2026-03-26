@@ -62,8 +62,9 @@ def compute_norm_params(validation_id, zarr_path, metric_name, layer_name):
             ds = ds.sel(tsw='bulk')
 
         var_data = ds[layer_name].values
-        vmin_data = float(np.nanmin(var_data))
-        vmax_data = float(np.nanmax(var_data))
+        # Compute 10th and 90th percentiles, ignoring NaNs
+        vmin_data = float(np.nanpercentile(var_data, 10))
+        vmax_data = float(np.nanpercentile(var_data, 90))
 
         vmax = max(abs(vmin_data), abs(vmax_data))
         vmin = -abs(vmax)

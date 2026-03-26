@@ -749,7 +749,29 @@
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
   font-size: 12px;
   color: #34495e;
+  position: relative; /* needed so the title can anchor to this */
+   height: 32px; 
 }
+
+.colorbar-tick {
+  position: absolute;
+  transform: translateX(-50%);
+  font-size: 0.7rem;
+  color: #555;
+  white-space: nowrap;
+  top: -15px;          /* negative pulls it up, increase magnitude to go higher */
+
+  &::before {
+    content: '|';
+    display: block;
+    text-align: center;
+    font-size: 0.6rem;
+    color: #888;
+    margin-bottom: -11px;  /* more negative = less gap between | and the number */
+  }
+}
+
+
 
 .colorbar-min,
 .colorbar-max {
@@ -801,13 +823,20 @@
   text-align: right;
 }
 
+
 .colorbar-title {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  top: 74%;                        /* center vertically within the labels row */
+  transform: translate(-50%, -50%);
   font-weight: 600;
   font-size: 13px;
   color: #2c3e50;
-  flex: 1;
   text-align: center;
-  margin: 0 8px;
+  white-space: nowrap;
+  pointer-events: none;
+  margin: 0;
 }
 
 
