@@ -37,6 +37,7 @@ export class ValidationSummaryComponent implements OnInit, OnDestroy {
   originalDate = signal<Date | undefined>(undefined)
   runTime: number;
   errorRate: number;
+  errorRateSpatial: number;
   isOwner: boolean;
   dataFetchError = signal(false);
   // some BS added to avoid refreshing component every time sth changes
@@ -236,6 +237,8 @@ export class ValidationSummaryComponent implements OnInit, OnDestroy {
     this.runTime = this.getRunTime(this.validationRun.start_time, this.validationRun.end_time);
     this.errorRate = this.validationRun.total_points !== 0 ?
       (this.validationRun.total_points - this.validationRun.ok_points) / this.validationRun.total_points : 1;
+    this.errorRateSpatial = this.validationRun.total_times !== 0 ?
+      (this.validationRun.total_times - this.validationRun.ok_times) / this.validationRun.total_times : 1;
     this.isOwner = this.validationRun.user === this.authService.currentUser.id;
     this.valName.set(this.validationRun.name_tag);
     this.isArchived.set(this.validationRun.is_archived);

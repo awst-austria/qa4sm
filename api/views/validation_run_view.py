@@ -164,7 +164,7 @@ def validation_run_by_id(request, **kwargs):
 def validation_run_status(request, validation_id):
     run = get_object_or_404(ValidationRun, id=validation_id)
 
-    status_value = determine_status(run.progress, run.end_time, run.status)
+    status_value = determine_status(run.progress, run.end_time, run.status, run.progress_spatial, run.val_type)
 
     return JsonResponse(
         {

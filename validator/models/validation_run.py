@@ -100,6 +100,10 @@ class ValidationRun(models.Model):
     error_points = models.IntegerField(default=0)
     ok_points = models.IntegerField(default=0)
     progress = models.IntegerField(default=0)
+    total_times = models.IntegerField(default=0)
+    error_times = models.IntegerField(default=0)
+    ok_times = models.IntegerField(default=0)
+    progress_spatial = models.IntegerField(default=0)
 
     spatial_reference_configuration = models.ForeignKey(to=DatasetConfiguration, on_delete=models.SET_NULL,
                                                         related_name='spat_ref_validation_run', null=True)
@@ -314,7 +318,13 @@ class ValidationRun(models.Model):
 
     def update_status(self):
         from validator.validation.util import determine_status  # Delayed Import to avoid circular imports
-        self.status = determine_status(self.progress, self.end_time, self.status)
+        self.status = determine_status(
+            self.progress,
+            self.end_time,
+            self.status,
+            progress_spatial=self.progress_spatial,
+            val_type=self.val_type
+        )
 
     def save(self, *args, **kwargs):
         """Override save to automatically update status."""
@@ -375,6 +385,9 @@ def create_deleted_validation_run(instance):
         total_points=instance.total_points,
         error_points=instance.error_points,
         ok_points=instance.ok_points,
+        total_times = instance.total_times,
+        error_times = instance.error_times,
+        ok_times = instance.ok_times,
         datasets=val_datasets,
         spatial_reference=spatial_ref,
         temporal_reference=temporal_ref,

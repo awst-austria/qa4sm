@@ -384,7 +384,7 @@ def get_metric_names_and_associated_files_spatial(request):
 
             # relevant combinations for overview
             if metric_query in independent_metrics:
-                # n_obs, status → все комбинации
+                # n_obs, status → all combinations. Need to discuss.
                 relevant_combis = combis
 
             elif '_for_' in metric_query:

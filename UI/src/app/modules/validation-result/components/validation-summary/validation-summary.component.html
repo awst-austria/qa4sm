@@ -218,19 +218,31 @@
         <li *ngIf="validationRun.progress === -100">This validation was cancelled due to service outage. You can easily
           restart it using 'Load settings' button.
         </li>
-        <li *ngIf="!forComparison && validationRun.total_points !== 0 && validationRun.progress !== -1
-        && validationRun.progress !== -100 && validationRun.val_type !== 'spatial'" 
-        [ngClass]="{'alert-danger': errorRate > 0}">
+        
+        <!-- temporal and both -->
+        <li *ngIf="!forComparison 
+          && (validationRun.val_type === 'temporal' || validationRun.val_type === 'both')
+          && validationRun.total_points !== 0
+          && validationRun.progress !== -1
+          && validationRun.progress !== -100"
+          [ngClass]="{'alert-danger': errorRate > 0}">
           for {{ errorRate * 100 | number: '.0' }}% ({{ validationRun.error_points }}
-          of {{ validationRun.total_points }}) of the processed locations (grid points) the validation metrics could
-          not be calculated. For an overview of potential causes select '# status' (available from version 2.2) in the
-          'Result files' section.
+          of {{ validationRun.total_points }}) of the processed locations (grid points) the temporal validation metrics could
+          not be calculated.
         </li>
 
-        <li *ngIf="!forComparison && validationRun.val_type === 'spatial' && validationRun.progress !== -1
-        && validationRun.progress !== -100">
-         <b>Spatial validation metrics were computed across time steps.</b> 
+        <!-- spatial and both -->
+        <li *ngIf="!forComparison 
+          && (validationRun.val_type === 'spatial' || validationRun.val_type === 'both')
+          && validationRun.total_times !== 0
+          && validationRun.progress !== -1
+          && validationRun.progress !== -100"
+          [ngClass]="{'alert-danger': errorRateSpatial > 0}">
+          for {{ errorRateSpatial * 100 | number: '.0' }}% ({{ validationRun.error_times }}
+          of {{ validationRun.total_times }}) of the processed time steps the spatial validation metrics could
+          not be calculated.
         </li>
+
         <li *ngIf="!forComparison && validationRun.total_points === 0
         && validationRun.progress !== -1 && validationRun.progress !== -100" [ngClass]="'alert-danger'">
           <b>

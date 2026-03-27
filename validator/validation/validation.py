@@ -1374,12 +1374,14 @@ def run_validation(validation_id, val_type="temporal"):
                             ntimes = len(sr[list(sr.keys())[0]]["date_time"])
                             validation_run.ok_times += nok
                             validation_run.error_times += ntimes - nok
+                            validation_run.total_times = ntimes
 
-                    elif val_type in ["spatial"]:
+                    elif val_type == "spatial":
                         nok, ok = get_ok_points(sr)                     
                         ntimes = len(sr[list(sr.keys())[0]]["date_time"])
                         validation_run.ok_times += nok
                         validation_run.error_times += ntimes - nok
+                        validation_run.total_times = ntimes
 
             except Exception as e:
                 validation_run.error_points += num_gpis_from_job(
@@ -1397,11 +1399,28 @@ def run_validation(validation_id, val_type="temporal"):
                 async_result.forget()
 
             if not validation_aborted:
-                validation_run.progress = round(
-                    ((validation_run.ok_points + validation_run.error_points) /
-                     validation_run.total_points) * 100)
+                if val_type == "temporal":
+                    validation_run.progress = round(
+                        (validation_run.ok_points + validation_run.error_points) /
+                        validation_run.total_points * 100)
+
+                elif val_type == "spatial":
+                    validation_run.progress_spatial = round(
+                        (validation_run.ok_times + validation_run.error_times) /
+                        validation_run.total_times * 100)
+                    validation_run.progress = validation_run.progress_spatial  
+
+                elif val_type == "both":
+                    validation_run.progress = round(
+                        (validation_run.ok_points + validation_run.error_points) /
+                        validation_run.total_points * 100)
+                    validation_run.progress_spatial = round(
+                        (validation_run.ok_times + validation_run.error_times) /
+                        validation_run.total_times * 100)
+                      
             else:
                 validation_run.progress = -1
+                validation_run.progress_spatial = -1
             validation_run.save()
             __logger.info(
                 "Dealt with task {}, validation {} is {} % done...".format(

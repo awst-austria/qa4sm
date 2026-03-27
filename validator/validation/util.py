@@ -29,18 +29,26 @@ def get_function_name() -> str:
     frame = inspect.currentframe().f_back
     return frame.f_code.co_name
 
-def determine_status(progress, end_time, current_status):
+def determine_status(progress, end_time, current_status, progress_spatial=None, val_type=None):
     """Determine the status based on progress and end_time."""
     if current_status == 'DONE':
         return 'DONE'  # Keep 'DONE' unchanged
+    
+    if val_type == 'spatial':
+        relevant_progress = progress_spatial
+    elif val_type == 'both':
+        # both temporal and spatial progress must be considered, take the minimum of the two if spatial progress is available
+        relevant_progress = min(progress, progress_spatial) if progress_spatial is not None else progress
+    else:
+        relevant_progress = progress
 
-    if progress == 0 and not end_time:
+    if relevant_progress == 0 and not end_time:
         return 'SCHEDULED'
-    elif progress == 100 and end_time:
+    elif relevant_progress == 100 and end_time:
         return 'DONE'
-    elif progress < 0:
+    elif relevant_progress < 0:
         return 'CANCELLED'
-    elif end_time and progress < 100:
+    elif end_time and relevant_progress < 100:
         return 'ERROR'
     else:
         return 'RUNNING'

@@ -192,20 +192,38 @@ export class ValidationsComponent implements OnInit, OnDestroy {
 
   // Define the status progress
   getStatusDisplay(valrun: any): { label: string, severity: string, progress?: number } {
+    // Cancelled
+    if (valrun.progress === -1 || valrun.progress === -100) {
+        return { label: 'Cancelled', severity: 'secondary' };
+    }
+    // Scheduled 
     if (valrun.progress === 0 && valrun.end_time === null) {
-      return { label: 'Scheduled', severity: 'info' };
-    } else if (valrun.progress === -1 || valrun.progress === -100) {
-      return { label: 'Cancelled', severity: 'secondary' };
-    } else if (valrun.val_type !== 'temporal' && valrun.end_time) {
-      return { label: 'Done', severity: 'secondary' };
-    } else if (valrun.progress === 100 && valrun.end_time) {
-      return { label: 'Done', severity: 'secondary' };
-    } else if (valrun.val_type !== 'temporal'  && (valrun.end_time != null || valrun.total_points == 0)) {
-      return { label: 'Error', severity: 'danger' };
-    } else if (valrun.end_time != null || valrun.total_points == 0) {
-      return { label: 'Error', severity: 'danger' };
+        return { label: 'Scheduled', severity: 'info' };
+    }
+    const relevantProgress = this.getRelevantProgress(valrun);
+    // Done
+    if (relevantProgress === 100 && valrun.end_time) {
+        return { label: 'Done', severity: 'success' };
+    }
+    if (relevantProgress === 100 && !valrun.end_time) {
+        return { label: 'Generating plots...', severity: 'warning' };
+    }
+    // Error 
+    if (valrun.end_time && relevantProgress < 100) {
+        return { label: 'Error', severity: 'danger' };
+    }
+    // Running
+    return { label: `Running ${relevantProgress}%`, severity: 'warning', progress: relevantProgress };
+  }
+
+  getRelevantProgress(valrun: any): number {
+    if (valrun.val_type === 'spatial') {
+        return valrun.progress_spatial;
+    } else if (valrun.val_type === 'both') {
+        return Math.min(valrun.progress, valrun.progress_spatial);
     } else {
-      return { label: `Running ${valrun.progress}%`, severity: 'warning', progress: valrun.progress };
+        // temporal
+        return valrun.progress;
     }
   }
 
@@ -242,7 +260,8 @@ export class ValidationsComponent implements OnInit, OnDestroy {
   }
 
   isLive(valrun: any): boolean {
-    return valrun.progress > 0 && valrun.progress < 100 && !valrun.end_time;
+    const relevantProgress = this.getRelevantProgress(valrun);
+    return !valrun.end_time && valrun.progress !== -1 && valrun.progress !== -100;
   }
 
   onPageChange(event: any): void {
