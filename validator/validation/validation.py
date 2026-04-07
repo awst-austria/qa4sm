@@ -805,7 +805,7 @@ def compact_results(results):
             c_results[key][field_name] = np.array(entries, dtype=first_val.dtype)
     return c_results
 
-def spatial_validation_xr(val, ds_use, only_with_reference=True, handle_errors="ignore"):
+def spatial_validation_xr(val, ds_use, only_with_reference=True, handle_errors="ignore", validation_run=None):
     """
     Performs a spatial validation by calculating metrics for every timestep.
 
@@ -860,7 +860,10 @@ def spatial_validation_xr(val, ds_use, only_with_reference=True, handle_errors="
                 gpi_n_use_dict[c] = {gpi: 0 for gpi in ds_use.gpi.values}
     df_all = ds_use.to_dataframe()
 
-    for time_val in ds_use.date_time:
+    total_times = len(ds_use.date_time)
+    SAVE_INTERVAL = max(1, total_times // 100)  # save progress
+
+    for i, time_val in enumerate(ds_use.date_time):
         try:
             result = {}
             # Slicing the pre-computed DataFrame is faster than xarray .sel().values
@@ -926,6 +929,12 @@ def spatial_validation_xr(val, ds_use, only_with_reference=True, handle_errors="
         # 3. Efficiently merge into global results
         for r, metrics_data in result.items():
             results.setdefault(r, []).extend(metrics_data)
+
+        # update progress every SAVE_INTERVAL timesteps or on the last timestep
+        if validation_run is not None and (i % SAVE_INTERVAL == 0 or i == total_times - 1):
+            validation_run.progress_spatial = round((i + 1) / total_times * 100)
+            validation_run.save()
+            
     c_results = compact_results(results)
 
     # Append the dictionary containing information about how often a GPI was used for calculation
@@ -1122,13 +1131,13 @@ def run_xArray_validation(self, validation_id, gpi_tuple, val_type="both", min_o
             ds_use = ds_all.where(ds_all.n_gpi>=min_obs, drop=True) # if you want to filter beforehand: should be filtered to min_obs in pytesmo, probably 10
             if any(np.array([len(ds_use[coord]) for coord in ds_use.dims]) < 1):
                 raise ValueError(f"No Timestamp with enough gpi observations")
-            spatial_result = spatial_validation_xr(val, ds_use, only_with_reference)
+            spatial_result = spatial_validation_xr(val, ds_use, only_with_reference, validation_run=validation_run)
             temporal_result = temporal_validation_xr(val, ds_all, only_with_reference)
         elif val_type == "spatial":
             ds_use = ds_all.where(ds_all.n_gpi>=min_obs, drop=True) # if you want to filter beforehand: should be filtered to min_obs in pytesmo, probably 10
             if any(np.array([len(ds_use[coord]) for coord in ds_use.dims]) < 1):
                 raise ValueError(f"No Timestamp with enough gpi observations")
-            spatial_result = spatial_validation_xr(val, ds_use, only_with_reference)
+            spatial_result = spatial_validation_xr(val, ds_use, only_with_reference, validation_run=validation_run)
             temporal_result = None
         elif val_type == "temporal": #Shouldn't be used, original implementation way faster
             temporal_result = temporal_validation_xr(val, ds_use, only_with_reference)

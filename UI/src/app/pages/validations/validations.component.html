@@ -166,8 +166,11 @@
 
           <td class="status-cell">
             @let status = getStatusDisplay(rowData);
-              <p-tag [severity]="status.severity" [value]="status.label" [style]="{ 'background': 'transparent' }">
-                  @if (status.severity === 'warning') {
+              <p-tag 
+              [severity]="status.severity" 
+              [value]="status.label" 
+              [style]="status.severity !== 'warn' ? { 'background': 'transparent' } : { 'white-space': 'pre-line' }">
+                  @if (status.spinning) {
                       <i class="pi pi-spin pi-spinner mr-1" style="font-size: 0.7rem"></i>
                   }
               </p-tag>

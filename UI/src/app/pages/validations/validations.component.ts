@@ -2,7 +2,7 @@ import { Component, OnDestroy, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { Observable, BehaviorSubject, combineLatest, of, interval, Subscription} from 'rxjs';
-import { catchError, debounceTime, distinctUntilChanged, map, shareReplay, startWith, tap, switchMap, take } from 'rxjs/operators';
+import { catchError, debounceTime, distinctUntilChanged, map, shareReplay, startWith, tap, switchMap, take, filter } from 'rxjs/operators';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup } from '@angular/forms';
 
 // PrimeNG
@@ -117,14 +117,11 @@ export class ValidationsComponent implements OnInit, OnDestroy {
     this.rows$ = dataState$.pipe(map(res => res.rows));
     this.totalRecords$ = dataState$.pipe(map(res => res.total));
 
-    this.statusSubscription = interval(60000).pipe(
-      // If we have on the page at least one running validation
+    this.statusSubscription = interval(10000).pipe(
       switchMap(() => this.rows$.pipe(take(1))),
-      map(rows => rows.some(r => this.isLive(r)))
-    ).subscribe(hasLive => {
-      if (hasLive) {
-        this.page$.next({ ...this.page$.value }); // page reload
-      }
+      filter(rows => rows.some(r => this.isLive(r)))
+    ).subscribe(() => {
+      this.page$.next({ ...this.page$.value });
     });
 
   }
@@ -191,7 +188,7 @@ export class ValidationsComponent implements OnInit, OnDestroy {
   }
 
   // Define the status progress
-  getStatusDisplay(valrun: any): { label: string, severity: string, progress?: number } {
+  getStatusDisplay(valrun: any): { label: string, severity: string, progress?: number, spinning?: boolean } {
     
     const relevantProgress = this.getRelevantProgress(valrun);
 
@@ -207,22 +204,41 @@ export class ValidationsComponent implements OnInit, OnDestroy {
     if (relevantProgress === 100 && valrun.end_time) {
         return { label: 'Done', severity: 'success' };
     }
-    if (relevantProgress === 100 && !valrun.end_time) {
-        return { label: 'Generating plots...', severity: 'warning' };
-    }
     // Error 
     if (valrun.end_time && relevantProgress < 100) {
         return { label: 'Error', severity: 'danger' };
     }
-    // Running
-    return { label: `Running ${relevantProgress}%`, severity: 'warning', progress: relevantProgress };
+    // Running both
+    if (valrun.val_type === 'both') {
+      if (valrun.progress === 100 && valrun.progress_spatial === 100 && !valrun.end_time) {
+        return { label: 'Generating plots...', severity: 'warn', spinning: true };
+      }
+      return { label: `Running\n Temporal: ${valrun.progress}% \nSpatial: ${valrun.progress_spatial}%`, severity: 'warn', progress: relevantProgress, spinning: true };
+    }
+    // Running spatial
+    if (valrun.val_type === 'spatial') {
+      if (valrun.progress_spatial === 100 && !valrun.end_time) {
+        return { label: 'Generating plots...', severity: 'warn', spinning: true };
+      }
+      return { 
+        label: `Running\n Spatial: ${valrun.progress_spatial}%`, 
+        severity: 'warn', 
+        progress: relevantProgress, 
+        spinning: true };
+    }
+    // Generating plots (only for temporal)
+    if (relevantProgress === 100 && !valrun.end_time) {
+      return { label: 'Generating plots...', severity: 'warn', spinning: true };
+    }
+    // Running temporal
+    return { label: `Running ${valrun.progress}%`, severity: 'warn', progress: relevantProgress, spinning: true };
   }
 
   getRelevantProgress(valrun: any): number {
     if (valrun.val_type === 'spatial') {
         return valrun.progress_spatial;
     } else if (valrun.val_type === 'both') {
-        return Math.min(valrun.progress, valrun.progress_spatial);
+        return valrun.progress_spatial;
     } else {
         // temporal
         return valrun.progress;
