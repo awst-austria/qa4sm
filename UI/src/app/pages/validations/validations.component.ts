@@ -192,15 +192,17 @@ export class ValidationsComponent implements OnInit, OnDestroy {
 
   // Define the status progress
   getStatusDisplay(valrun: any): { label: string, severity: string, progress?: number } {
+    
+    const relevantProgress = this.getRelevantProgress(valrun);
+
     // Cancelled
-    if (valrun.progress === -1 || valrun.progress === -100) {
-        return { label: 'Cancelled', severity: 'secondary' };
+    if (relevantProgress === -1 || relevantProgress === -100) {
+      return { label: 'Cancelled', severity: 'secondary' };
     }
     // Scheduled 
-    if (valrun.progress === 0 && valrun.end_time === null) {
+    if (relevantProgress === 0 && valrun.end_time === null) {
         return { label: 'Scheduled', severity: 'info' };
     }
-    const relevantProgress = this.getRelevantProgress(valrun);
     // Done
     if (relevantProgress === 100 && valrun.end_time) {
         return { label: 'Done', severity: 'success' };
@@ -261,7 +263,7 @@ export class ValidationsComponent implements OnInit, OnDestroy {
 
   isLive(valrun: any): boolean {
     const relevantProgress = this.getRelevantProgress(valrun);
-    return !valrun.end_time && valrun.progress !== -1 && valrun.progress !== -100;
+    return !valrun.end_time && relevantProgress !== -1 && relevantProgress !== -100;
   }
 
   onPageChange(event: any): void {

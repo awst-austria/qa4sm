@@ -1561,6 +1561,7 @@ def stop_running_validation(validation_id):
     __logger.info("Stopping validation {} ".format(validation_id))
     validation_run = ValidationRun.objects.get(pk=validation_id)
     validation_run.progress = -1
+    validation_run.progress_spatial = -1
     validation_run.save()
 
     celery_tasks = CeleryTask.objects.filter(validation=validation_run)
