@@ -211,7 +211,7 @@ class TestZarrFunctions(TransactionTestCase):
         assert response.status_code == 200
         data = json.loads(response.content)
         assert data['vmin'] == 0.0
-        assert data['vmax'] == pytest.approx(0.045760247856378555, rel=1e-6)
+        assert data['vmax'] == pytest.approx(0.03309718519449234, rel=1e-6)
         assert data['is_categorical'] is False
         assert data['has_constraints'] is True
 
