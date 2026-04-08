@@ -117,7 +117,7 @@ export class ValidationsComponent implements OnInit, OnDestroy {
     this.rows$ = dataState$.pipe(map(res => res.rows));
     this.totalRecords$ = dataState$.pipe(map(res => res.total));
 
-    this.statusSubscription = interval(10000).pipe(
+    this.statusSubscription = interval(30000).pipe(
       switchMap(() => this.rows$.pipe(take(1))),
       filter(rows => rows.some(r => this.isLive(r)))
     ).subscribe(() => {
@@ -236,12 +236,13 @@ export class ValidationsComponent implements OnInit, OnDestroy {
 
   getRelevantProgress(valrun: any): number {
     if (valrun.val_type === 'spatial') {
-        return valrun.progress_spatial;
+      return valrun.progress_spatial ?? 0;
     } else if (valrun.val_type === 'both') {
-        return valrun.progress_spatial;
+      const sp = valrun.progress_spatial ?? 0;
+      const tp = valrun.progress ?? 0;
+      return Math.round((sp + tp) / 2);
     } else {
-        // temporal
-        return valrun.progress;
+      return valrun.progress ?? 0;
     }
   }
 

@@ -932,7 +932,7 @@ def spatial_validation_xr(val, ds_use, only_with_reference=True, handle_errors="
 
         # update progress every SAVE_INTERVAL timesteps or on the last timestep
         if validation_run is not None and (i % SAVE_INTERVAL == 0 or i == total_times - 1):
-            validation_run.progress_spatial = round((i + 1) / total_times * 100)
+            validation_run.progress_spatial = max(1, round((i + 1) / total_times * 100))
             validation_run.save()
             
     c_results = compact_results(results)
@@ -947,7 +947,7 @@ def spatial_validation_xr(val, ds_use, only_with_reference=True, handle_errors="
         c_results[key]["lon"] = list(ds_use.lon.values)
     return c_results
 
-def temporal_validation_xr(val, ds_use, only_with_reference=True, handle_errors="ignore"):
+def temporal_validation_xr(val, ds_use, only_with_reference=True, handle_errors="ignore", validation_run=None):
     """
     Performs a temporal validation using an xarray by calculating metrics for every gpi.
 
@@ -1002,6 +1002,9 @@ def temporal_validation_xr(val, ds_use, only_with_reference=True, handle_errors=
     lats = ds_use.lat.values
     gpi_vals = ds_use.gpi.values
 
+    total_gpis = len(gpi_vals)
+    SAVE_INTERVAL = max(1, total_gpis // 100)
+
     for i, gpi in enumerate(gpi_vals):
         try:
             result = {}
@@ -1054,6 +1057,10 @@ def temporal_validation_xr(val, ds_use, only_with_reference=True, handle_errors=
         
         for r, metrics_data in result.items():
             results.setdefault(r, []).extend(metrics_data)
+
+        if validation_run is not None and (i % SAVE_INTERVAL == 0 or i == total_gpis - 1):
+            validation_run.progress = max(1, round((i + 1) / total_gpis * 100))
+            validation_run.save()
             
     c_results = compact_results(results)
     return c_results
@@ -1132,7 +1139,8 @@ def run_xArray_validation(self, validation_id, gpi_tuple, val_type="both", min_o
             if any(np.array([len(ds_use[coord]) for coord in ds_use.dims]) < 1):
                 raise ValueError(f"No Timestamp with enough gpi observations")
             spatial_result = spatial_validation_xr(val, ds_use, only_with_reference, validation_run=validation_run)
-            temporal_result = temporal_validation_xr(val, ds_all, only_with_reference)
+            temporal_result = temporal_validation_xr(val, ds_all, only_with_reference, validation_run=validation_run)
+            
         elif val_type == "spatial":
             ds_use = ds_all.where(ds_all.n_gpi>=min_obs, drop=True) # if you want to filter beforehand: should be filtered to min_obs in pytesmo, probably 10
             if any(np.array([len(ds_use[coord]) for coord in ds_use.dims]) < 1):
@@ -1140,7 +1148,7 @@ def run_xArray_validation(self, validation_id, gpi_tuple, val_type="both", min_o
             spatial_result = spatial_validation_xr(val, ds_use, only_with_reference, validation_run=validation_run)
             temporal_result = None
         elif val_type == "temporal": #Shouldn't be used, original implementation way faster
-            temporal_result = temporal_validation_xr(val, ds_use, only_with_reference)
+            temporal_result = temporal_validation_xr(val, ds_use, only_with_reference, validation_run=validation_run)
             spatial_result = None
         else:
             spatial_result = None
@@ -1244,6 +1252,7 @@ def untrack_celery_task(task_id):
 
 
 def run_validation(validation_id, val_type="temporal"):
+
     __logger.info("Starting validation: {}".format(validation_id))
     validation_run = ValidationRun.objects.get(pk=validation_id)
     validation_aborted = False
@@ -1325,14 +1334,17 @@ def run_validation(validation_id, val_type="temporal"):
                                 __logger.debug(
                                     'Validation got cancelled, dropping task {}: {}'
                                     .format(async_result.id, te))
-
+                                
                 # in case there where no points with overlapping data within
                 # the validation period, results is an empty dictionary, and we
                 # count this job as error
+
                 if validation_aborted or not results:
+                   
                     validation_run.error_points += num_gpis_from_job(
                         job_table[async_result.id])
                 else:
+                    
                     if val_type=="temporal":
                         results = _pytesmo_to_qa4sm_results(results)
                         check_and_store_results(async_result.id, results, run_dir)
@@ -1408,28 +1420,26 @@ def run_validation(validation_id, val_type="temporal"):
                 async_result.forget()
 
             if not validation_aborted:
+                
                 if val_type == "temporal":
                     validation_run.progress = round(
                         (validation_run.ok_points + validation_run.error_points) /
                         validation_run.total_points * 100)
-
+                  
                 elif val_type == "spatial":
                     validation_run.progress_spatial = round(
                         (validation_run.ok_times + validation_run.error_times) /
                         validation_run.total_times * 100)
-                    validation_run.progress = validation_run.progress_spatial  
+                    validation_run.progress = validation_run.progress_spatial 
 
                 elif val_type == "both":
-                    validation_run.progress = round(
-                        (validation_run.ok_points + validation_run.error_points) /
-                        validation_run.total_points * 100)
-                    validation_run.progress_spatial = round(
-                        (validation_run.ok_times + validation_run.error_times) /
-                        validation_run.total_times * 100)
+                    validation_run.refresh_from_db(fields=['progress', 'progress_spatial'])
+                    pass
                       
             else:
                 validation_run.progress = -1
                 validation_run.progress_spatial = -1
+
             validation_run.save()
             __logger.info(
                 "Dealt with task {}, validation {} is {} % done...".format(
