@@ -112,10 +112,12 @@ def set_outfile(validation_run, run_dir, val_type="temporal"):
         if outfile is not None:
             outfile = regex_sub('/?' + OUTPUT_FOLDER + '/?', '', outfile)
             validation_run.output_file.name = outfile
+            validation_run.zarr_path = os.path.join(OUTPUT_FOLDER, os.path.splitext(outfile)[0] + '.zarr')
     elif val_type == "spatial":
         if outfile is not None:
             outfile = regex_sub('/?' + OUTPUT_FOLDER + '/?', '', outfile)
             validation_run.output_file_spatial.name = outfile
+            validation_run.zarr_path = ''        
 
 
 def save_validation_config(validation_run):
@@ -1498,7 +1500,7 @@ def run_validation(validation_id, val_type="temporal"):
                             ds.setncattr('val_dc_variable_pretty_name' + str(i), dataset_config.variable.short_name)
                         ds.val_scaling_method = validation_run.scaling_method
                         ds.val_anomalies = validation_run.anomalies
-                   
+                
                     sp_transcriber.compress(path=spatial_outname, compression='zlib', complevel=9)
 
                     if temp_sub_wdws is None:
@@ -1524,17 +1526,22 @@ def run_validation(validation_id, val_type="temporal"):
                                             get_period(validation_run))
                 temp_sub_wdw_instance = iam_dict['temp_sub_wdw_instance']
                 temp_sub_wdws = iam_dict['temp_sub_wdws']
+                pytesmo_res=os.path.join(OUTPUT_FOLDER,
+                                                validation_run.output_file.name)
 
                 transcriber = Pytesmo2Qa4smResultsTranscriber(
-                    pytesmo_results=os.path.join(OUTPUT_FOLDER,
-                                                validation_run.output_file.name),
+                    pytesmo_results=pytesmo_res,
                     intra_annual_slices=temp_sub_wdw_instance,
                     keep_pytesmo_ncfile=False)
                 if transcriber.exists:
                     restructured_results = transcriber.get_transcribed_dataset()
-                    transcriber.output_file_name = transcriber.build_outname(
+                    transcriber.output_file_name, transcriber.output_zarr_name = transcriber.build_outname(
                         run_dir, results.keys())
                     transcriber.write_to_netcdf(transcriber.output_file_name)
+                    transcriber.write_to_zarr_filtered(
+                        path=transcriber.output_zarr_name,
+                        tsw_value=DEFAULT_TSW
+                    )
 
                     save_validation_config(validation_run)
 

@@ -69,7 +69,7 @@
       <form *ngIf="file" [formGroup]="metadataForm" (ngSubmit)="onSaveData()">
         <div class="py-3">
             <label for="dataset-name" class="block my-1 text-sm">Dataset name
-              <span pTooltip="Required. Up to 30 characters. Letters, numbers, and @ . + - _ only."
+              <span pTooltip="Required. Up to 30 characters. Letters, numbers, and @ + - _ only."
                   class="pi pi-question-circle">
               </span>
             </label>
@@ -81,7 +81,7 @@
 
           <label for="dataset-pretty-name" class="block my-1 text-sm">Dataset display name (optional)
               <span
-                pTooltip="Optional. Up to 30 characters. Letters, digits, space and @ . + - _ only. If not provided, the name from the field above will be used."
+                pTooltip="Optional. Up to 30 characters. Letters, digits, space and @ + - _ only. If not provided, the name from the field above will be used."
                 class="pi pi-question-circle">
               </span>
             </label>
@@ -93,7 +93,7 @@
               formControlName="dataset_pretty_name">
        
           <label for="version-name" class="block my-1 text-sm">Version name
-          <span pTooltip="Required. Up to 30 characters. Letters, numbers, and @ . + - _ only."
+          <span pTooltip="Required. Up to 30 characters. Letters, numbers, and @ + - _ only."
                 class="pi pi-question-circle">    
           </span>
           </label>
@@ -105,7 +105,7 @@
         
           <label for="version-pretty-name" class="block my-1 text-sm">Version display name (optional)
           <span
-            pTooltip="Optional. Up to 30 characters. Letters, digits, space and @ . + - _ only. If not provided, the name from the field above will be used."
+            pTooltip="Optional. Up to 30 characters. Letters, digits, space and @ + - _ only. If not provided, the name from the field above will be used."
             class="pi pi-question-circle">
           </span>
           </label>

@@ -18,11 +18,12 @@ from django.conf import settings
 from cartopy import config as cconfig
 from typing import List, Tuple, Dict, Set
 from pathlib import PosixPath
+from itertools import combinations
 
 cconfig['data_dir'] = path.join(settings.BASE_DIR, 'cartopy')
 
 from validator.validation.globals import OUTPUT_FOLDER, METRICS as READER_METRICS, METRIC_TEMPLATE, TC_METRICS, \
-    TC_METRIC_TEMPLATE, DEFAULT_TSW, STABILITY_METRICS
+    TC_METRIC_TEMPLATE, DEFAULT_TSW, STABILITY_METRICS, QR_METRIC_TEMPLATE, QR_METRIC_TC_TEMPLATE
 import os
 from io import BytesIO
 import base64
@@ -127,7 +128,7 @@ def generate_all_graphs(validation_run, temporal_sub_windows: List[str], outfold
         clean_output_folder(dir=outfolder,
                             to_be_deleted=[x for x in temporal_sub_windows if x != DEFAULT_TSW])
 
-def get_dataset_combis_and_metrics_from_files(validation_run):
+def get_dataset_combis_and_metrics_from_files(validation_run, dataset_names):
     """
     Go through plots of validation run and detect the dataset names and ids.
     Create combinations of id-REF_and_id-SAT to show the plots on the results
@@ -137,6 +138,8 @@ def get_dataset_combis_and_metrics_from_files(validation_run):
     ----------
     validation_run
         Validation run object
+    dataset_names : list
+        List of dataset names where first element is ref, second is ds
 
     Returns
     -------
@@ -148,8 +151,12 @@ def get_dataset_combis_and_metrics_from_files(validation_run):
         All metrics that are found
     ref0_config : bool or None
         True if the ref has id 0 (sorted ids).
+    zarr_metrics : dict
+        Transformed metrics for map visualisation
+    zarr_var_list : list
+        List of zarr variable names
     """
-
+    N_OBS_METRIC = "n_obs"
     run_dir = path.join(OUTPUT_FOLDER, str(validation_run.id))
     metric_template = METRIC_TEMPLATE[0]
 
@@ -165,10 +172,13 @@ def get_dataset_combis_and_metrics_from_files(validation_run):
     if "bulk" in run_dir:
         bulk_prefix += 'bulk_'
 
+    METRICS = {**READER_METRICS}
+
     if validation_run.stability_metrics:
-        METRICS = {**READER_METRICS, **STABILITY_METRICS}
-    else:
-        METRICS = READER_METRICS
+        METRICS = {**METRICS, **STABILITY_METRICS}
+
+    if validation_run.tcol:
+        METRICS = {**METRICS, **TC_METRICS}
 
     # if validation_run
     for root, dirs, files in os.walk(run_dir):
@@ -220,7 +230,7 @@ def get_dataset_combis_and_metrics_from_files(validation_run):
                     ds2 = f"{parsed['id_sat2']}-{parsed['ds_sat2']}"
                     ds_met = f"{parsed['id_met']}-{parsed['ds_met']}"
 
-                    metric = f"{tcol_metric}_for_{ds_met}"
+                    metric = f"{tcol_metric}_{ds_met}"
 
                     if metric not in metrics.keys():
                         metrics[metric] = f"{TC_METRICS[tcol_metric]} for {ds_met}"
@@ -230,11 +240,301 @@ def get_dataset_combis_and_metrics_from_files(validation_run):
                     if triple not in triples.keys():
                         triples[triple] = pretty_triple
 
+        if dataset_names and len(dataset_names) > 1:
+            zarr_metrics = {}
+            zarr_var_list = []
+
+            # Initialize dictionary with metric keys
+            for metric_key in metrics.keys():
+                if metric_key == "n_obs":
+                    zarr_metrics[metric_key] = [N_OBS_METRIC]
+                else:
+                    zarr_metrics[metric_key] = []
+
+            # Create all 2-dataset combinations for regular metrics (not n_obs and not TC metrics)
+            for ds1, ds2 in combinations(dataset_names, 2):
+                for metric_key in metrics:
+                    if metric_key != "n_obs" and not any(metric_key.startswith(tcol) for tcol in TC_METRICS.keys()):
+                        formatted_metric = f"{metric_key}{QR_METRIC_TEMPLATE.format(ds1=ds1, ds2=ds2)}"
+                        zarr_metrics[metric_key].append(formatted_metric)
+                        zarr_var_list.append(formatted_metric)
+
+            # Create all 3-dataset combinations for triple collocation metrics
+            if len(dataset_names) >= 3:
+                for ds1, ds2, ds3 in combinations(dataset_names, 3):
+                    for metric_key in metrics:
+                        if any(metric_key.startswith(tcol) for tcol in TC_METRICS.keys()):
+                            formatted_metric = f"{metric_key}{QR_METRIC_TC_TEMPLATE.format(ds1=ds1, ds2=ds2, ds3=ds3)}"
+                            zarr_metrics[metric_key].append(formatted_metric)
+                            zarr_var_list.append(formatted_metric)
+
+            # Add n_obs to the list if it exists
+            if "n_obs" in zarr_metrics:
+                zarr_var_list.append(N_OBS_METRIC)
+
+    # Remove duplicates from list while preserving order
+    zarr_var_list = list(dict.fromkeys(zarr_var_list))
+
+
     # import logging
     # __logger = logging.getLogger(__name__)
     # __logger.debug(f"Pairs: {pairs}")
     # __logger.debug(f"Triples: {triples}")
     # __logger.debug(f"Metrics: {metrics}")
+
+    return pairs, triples, metrics, ref0_config, zarr_metrics, zarr_var_list
+
+
+def get_dataset_combis_and_metrics_from_files_spatial(validation_run):
+    """
+    Go through spatial plots of validation run and detect the dataset names and ids.
+    Supports both regular validation (pairs) and Triple Collocation (triples).
+
+    Parameters
+    ----------
+    validation_run
+        Validation run object
+
+    Returns
+    -------
+    pairs : dict
+        Dataset pairs and pretty names to show in the dropdown
+    triples : dict
+        Dataset triples and pretty names to show in the dropdown
+    metrics : dict
+        All metrics that are found (including TC metrics)
+    ref0_config : bool or None
+        True if the ref has id 0 (sorted ids).
+    """
+
+    run_dir = path.join(OUTPUT_FOLDER, str(validation_run.id), 'bulk', 'spatial')
+
+    pairs = {}
+    triples = {}
+    ref0_config = None
+    metrics = {}
+
+    if validation_run.stability_metrics:
+        METRICS = {**READER_METRICS, **STABILITY_METRICS}
+    else:
+        METRICS = READER_METRICS
+
+    try:
+        files = os.listdir(run_dir)
+    except FileNotFoundError:
+        return pairs, triples, metrics, ref0_config
+
+    # --- templates for overview files ---
+    # pair:   overview_0-ISMN_and_1-C3S_combined_n_gpi_was_used.png
+    # triple: overview_0-ISMN_and_1-C3S_combined_and_2-C3S_rzsm_n_gpi_was_used.png
+    pair_template   = 'overview_{id_ref}-{ds_ref}_and_{id_sat}-{ds_sat}_n_gpi_was_used.png'
+    triple_template = 'overview_{id_ref}-{ds_ref}_and_{id_sat}-{ds_sat}_and_{id_sat2}-{ds_sat2}_n_gpi_was_used.png'
+
+    for f in files:
+        # check triples
+        parsed = parse(triple_template, f)
+        if parsed is not None:
+            ref  = f"{parsed['id_ref']}-{parsed['ds_ref']}"
+            ds   = f"{parsed['id_sat']}-{parsed['ds_sat']}"
+            ds2  = f"{parsed['id_sat2']}-{parsed['ds_sat2']}"
+
+            triple        = f"{ref}_and_{ds}_and_{ds2}"
+            pretty_triple = f"{ref} and {ds} and {ds2}"
+
+            if triple not in triples:
+                triples[triple] = pretty_triple
+
+            if ref0_config is None and parsed['id_ref'] == '0':
+                ref0_config = True
+            continue
+
+        # chaeck pairs
+        parsed = parse(pair_template, f)
+        if parsed is not None:
+            ref = f"{parsed['id_ref']}-{parsed['ds_ref']}"
+            ds  = f"{parsed['id_sat']}-{parsed['ds_sat']}"
+
+            pair        = f"{ref}_and_{ds}"
+            pretty_pair = f"{ref} and {ds}"
+
+            if pair not in pairs:
+                pairs[pair] = pretty_pair
+
+            if ref0_config is None and parsed['id_ref'] == '0':
+                ref0_config = True
+
+    # --- ordinary metrics bulk_boxplot_spatial_ ---
+    # bulk_boxplot_spatial_R.png
+    # bulk_boxplot_spatial_n_obs.png
+    boxplot_template = 'bulk_boxplot_spatial_{metric}.png'
+
+    for f in files:
+        parsed = parse(boxplot_template, f)
+        if parsed is None:
+            continue
+
+        metric_name = parsed['metric']  # 'R', 'RMSD', 'BIAS', 'n_obs'...
+
+        # skip TC metrics 'beta_for_1-C3S_combined' — parse them separately
+        if '_for_' in metric_name:
+            continue
+
+        if metric_name in METRICS and metric_name not in metrics:
+            metrics[metric_name] = METRICS[metric_name]
+
+    # --- TC metrics bulk_boxplot_spatial_beta/snr/err_std_for_X ---
+    # bulk_boxplot_spatial_beta_for_1-C3S_combined.png
+    tc_metric_template = 'bulk_boxplot_spatial_{tc_metric}_for_{id_ds}-{ds_name}.png'
+
+    for f in files:
+        parsed = parse(tc_metric_template, f)
+        if parsed is None:
+            continue
+
+        tc_metric = parsed['tc_metric']   # 'beta', 'snr', 'err_std'
+        id_ds     = parsed['id_ds']       # '1'
+        ds_name   = parsed['ds_name']     # 'C3S_combined'
+        ds_met    = f"{id_ds}-{ds_name}"  # '1-C3S_combined'
+
+        metric_key  = f"{tc_metric}_for_{ds_met}"           # 'beta_for_1-C3S_combined'
+        metric_pretty = f"{TC_METRICS.get(tc_metric, tc_metric)} for {ds_met}"
+
+        if metric_key not in metrics:
+            metrics[metric_key] = metric_pretty
+
+    # --- status from barplot_status_ ---
+    # barplot_status_0-ISMN_and_1-C3S_combined.png
+    for f in files:
+        if f.startswith('barplot_status_') and 'status' not in metrics:
+            metrics['status'] = METRICS.get('status', 'Status')
+            break
+
+    return pairs, triples, metrics, ref0_config
+
+
+def get_dataset_combis_and_metrics_from_files_spatial(validation_run):
+    """
+    Go through spatial plots of validation run and detect the dataset names and ids.
+    Supports both regular validation (pairs) and Triple Collocation (triples).
+
+    Parameters
+    ----------
+    validation_run
+        Validation run object
+
+    Returns
+    -------
+    pairs : dict
+        Dataset pairs and pretty names to show in the dropdown
+    triples : dict
+        Dataset triples and pretty names to show in the dropdown
+    metrics : dict
+        All metrics that are found (including TC metrics)
+    ref0_config : bool or None
+        True if the ref has id 0 (sorted ids).
+    """
+
+    run_dir = path.join(OUTPUT_FOLDER, str(validation_run.id), 'bulk', 'spatial')
+
+    pairs = {}
+    triples = {}
+    ref0_config = None
+    metrics = {}
+
+    if validation_run.stability_metrics:
+        METRICS = {**READER_METRICS, **STABILITY_METRICS}
+    else:
+        METRICS = READER_METRICS
+
+    try:
+        files = os.listdir(run_dir)
+    except FileNotFoundError:
+        return pairs, triples, metrics, ref0_config
+
+    # --- templates for overview files ---
+    # pair:   overview_0-ISMN_and_1-C3S_combined_n_gpi_was_used.png
+    # triple: overview_0-ISMN_and_1-C3S_combined_and_2-C3S_rzsm_n_gpi_was_used.png
+    pair_template   = 'overview_{id_ref}-{ds_ref}_and_{id_sat}-{ds_sat}_n_gpi_was_used.png'
+    triple_template = 'overview_{id_ref}-{ds_ref}_and_{id_sat}-{ds_sat}_and_{id_sat2}-{ds_sat2}_n_gpi_was_used.png'
+
+    for f in files:
+        # check triples
+        parsed = parse(triple_template, f)
+        if parsed is not None:
+            ref  = f"{parsed['id_ref']}-{parsed['ds_ref']}"
+            ds   = f"{parsed['id_sat']}-{parsed['ds_sat']}"
+            ds2  = f"{parsed['id_sat2']}-{parsed['ds_sat2']}"
+
+            triple        = f"{ref}_and_{ds}_and_{ds2}"
+            pretty_triple = f"{ref} and {ds} and {ds2}"
+
+            if triple not in triples:
+                triples[triple] = pretty_triple
+
+            if ref0_config is None and parsed['id_ref'] == '0':
+                ref0_config = True
+            continue
+
+        # chaeck pairs
+        parsed = parse(pair_template, f)
+        if parsed is not None:
+            ref = f"{parsed['id_ref']}-{parsed['ds_ref']}"
+            ds  = f"{parsed['id_sat']}-{parsed['ds_sat']}"
+
+            pair        = f"{ref}_and_{ds}"
+            pretty_pair = f"{ref} and {ds}"
+
+            if pair not in pairs:
+                pairs[pair] = pretty_pair
+
+            if ref0_config is None and parsed['id_ref'] == '0':
+                ref0_config = True
+
+    # --- ordinary metrics bulk_boxplot_spatial_ ---
+    # bulk_boxplot_spatial_R.png
+    # bulk_boxplot_spatial_n_obs.png
+    boxplot_template = 'bulk_boxplot_spatial_{metric}.png'
+
+    for f in files:
+        parsed = parse(boxplot_template, f)
+        if parsed is None:
+            continue
+
+        metric_name = parsed['metric']  # 'R', 'RMSD', 'BIAS', 'n_obs'...
+
+        # skip TC metrics 'beta_for_1-C3S_combined' — parse them separately
+        if '_for_' in metric_name:
+            continue
+
+        if metric_name in METRICS and metric_name not in metrics:
+            metrics[metric_name] = METRICS[metric_name]
+
+    # --- TC metrics bulk_boxplot_spatial_beta/snr/err_std_for_X ---
+    # bulk_boxplot_spatial_beta_for_1-C3S_combined.png
+    tc_metric_template = 'bulk_boxplot_spatial_{tc_metric}_for_{id_ds}-{ds_name}.png'
+
+    for f in files:
+        parsed = parse(tc_metric_template, f)
+        if parsed is None:
+            continue
+
+        tc_metric = parsed['tc_metric']   # 'beta', 'snr', 'err_std'
+        id_ds     = parsed['id_ds']       # '1'
+        ds_name   = parsed['ds_name']     # 'C3S_combined'
+        ds_met    = f"{id_ds}-{ds_name}"  # '1-C3S_combined'
+
+        metric_key  = f"{tc_metric}_for_{ds_met}"           # 'beta_for_1-C3S_combined'
+        metric_pretty = f"{TC_METRICS.get(tc_metric, tc_metric)} for {ds_met}"
+
+        if metric_key not in metrics:
+            metrics[metric_key] = metric_pretty
+
+    # --- status from barplot_status_ ---
+    # barplot_status_0-ISMN_and_1-C3S_combined.png
+    for f in files:
+        if f.startswith('barplot_status_') and 'status' not in metrics:
+            metrics['status'] = METRICS.get('status', 'Status')
+            break
 
     return pairs, triples, metrics, ref0_config
 

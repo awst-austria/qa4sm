@@ -9,6 +9,8 @@ https://docs.djangoproject.com/en/2.1/howto/deployment/wsgi/
 
 import os
 
+os.environ['NUMBA_CACHE_DIR'] = '/tmp/numba_cache'
+
 from django.core.wsgi import get_wsgi_application
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'valentina.settings')

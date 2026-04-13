@@ -19,12 +19,14 @@ class Dataset(models.Model):
 
     is_spatial_reference = models.BooleanField(default=False)
     is_scattered_data = models.BooleanField(default=False)
+    
 
     versions = models.ManyToManyField(DatasetVersion, related_name='versions')
 
 
     # filters = models.ManyToManyField(DataFilter, related_name='filters') #TODO this must be put into version.py
     resolution = models.JSONField(null=True, blank=True)
+    plot_resolution = models.FloatField(null=True, blank=True, default=None) # irregular grids have varying steps, resultuion != plot_resolution
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, blank=True, null=True)
     user_groups = models.ManyToManyField(to='DataManagementGroup', related_name='custom_datasets', null=True,
                                          blank=True)

@@ -93,7 +93,7 @@ def create_version_entry(version_name, version_pretty_name,
         raise Exception(version_serializer.errors)
 
 
-def create_dataset_entry(dataset_name, dataset_pretty_name, version, user, is_scattered_data=False):
+def create_dataset_entry(dataset_name, dataset_pretty_name, version, user, is_scattered_data=False, plot_resolution=None):
     current_max_id = Dataset.objects.all().last().id if Dataset.objects.all(
     ) else 0
     dataset_data = {
@@ -108,6 +108,7 @@ def create_dataset_entry(dataset_name, dataset_pretty_name, version, user, is_sc
         'user': user.pk,
         'versions': [version.pk],
         'is_scattered_data': is_scattered_data,
+        'plot_resolution': plot_resolution
     }
 
     dataset_serializer = DatasetSerializer(data=dataset_data)
@@ -220,7 +221,7 @@ class UploadedFileError(BaseException):
 def upload_user_data(request, filename):
     user = request.user.username
     user_data_dir = getattr(settings, 'USER_DATA_DIR', '/tmp/user_data_dir/')
-    user_path = Path(user_data_dir) / user / 'log'
+    user_path = Path(user_data_dir) / user
     user_path.mkdir(parents=True, exist_ok=True)
 
     file = request.FILES['file']

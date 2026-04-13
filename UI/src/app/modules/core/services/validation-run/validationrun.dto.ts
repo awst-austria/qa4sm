@@ -50,6 +50,7 @@ export class ValidationrunDto {
               public comparison_label?: string,
               public contains_user_data?: boolean,
               public all_files_exist?: boolean,
+              public zarr_path?: string,
               public output_file_spatial?: string,
               public val_type?: string
             ) {

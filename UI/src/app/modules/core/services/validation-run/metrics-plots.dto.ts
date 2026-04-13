@@ -14,6 +14,8 @@ export interface MetricsPlotsDto {
   metadata_files: string[],
   comparison_boxplot: string[],
   datasets: string[],
+  zarr_metrics: { [key: string]: string },
+  zarr_var_list: string[],
   boxplotFiles?: Observable<PlotDto[]>,
   overviewFiles?: Observable<PlotDto[]>,
   tsplotFiles?: Observable<PlotDto[]>,
