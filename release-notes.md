@@ -1,3 +1,9 @@
+QA4SM v4.0.0
+======================================================
+# Updates
+1. Add spatial validation feature
+2. Add interactive maps to result page
+
 QA4SM v3.5.0 - Release notes 2026-01-26
 ======================================================
 
