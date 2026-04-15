@@ -1020,14 +1020,27 @@ def files_to_zip(plot_dict: Dict[str, Dict[str, List[PosixPath]]], filetype: str
         A set of the filepaths of the given filetype.
     """
     try:
-        _files = plot_dict['fnb'][filetype] + plot_dict['fnm'][filetype]
+        _files = plot_dict['fnb'][filetype]
     except KeyError as e:  # if there are no comparison boxplots the 'fncb' key will not be present
         warnings.warn(f"KeyError: {e}. No plots found. Skipping...")
     try:
-        _files += plot_dict['fncb'][filetype]
+        if _files:
+            _files += plot_dict['fnm'][filetype]
+        else:
+            _files = plot_dict['fnm'][filetype]
+    except KeyError as e:  # if there are no comparison boxplots the 'fncb' key will not be present
+        warnings.warn(f"KeyError: {e}. No overviewplots found. Skipping...")
+    try:
+        if _files:
+            _files += plot_dict['fncb'][filetype]
+        else:
+            _files = plot_dict['fncb'][filetype]
     except KeyError as e:  # if there are no comparison boxplots the 'fncb' key will not be present
         warnings.warn(f"KeyError: {e}. No comparison boxplots found. Skipping...")
     finally:
-        _files = set(_files)
+        if _files:
+            _files = set(_files)
+        else:
+            _files=None
 
     return _files
