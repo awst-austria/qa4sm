@@ -523,7 +523,7 @@ def get_point_value(request, validation_id, layer_name, zarr_path, x, y, z,
     # Get resolution/distance threshold
     resolution = get_plot_resolution(validation_id)
 
-    if not resolution['is_scattered']:
+    if not resolution['is_scattered'] and not resolution["is_ismn"]:
         max_distance_deg = resolution['plot_resolution'] * (2 / z)**0.25
     else:
         max_distance_deg = 4 / (z**1.75)

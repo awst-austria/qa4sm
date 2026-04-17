@@ -915,7 +915,7 @@ class TestValidation(TestCase):
         run_id = run.id
 
         # run the validation
-        val.run_validation(run_id)
+        val.run_validation(run_id, val_type="temporal")
 
         new_run = ValidationRun.objects.get(pk=run_id)
 

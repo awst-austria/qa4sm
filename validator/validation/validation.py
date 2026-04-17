@@ -1292,8 +1292,8 @@ def run_validation(validation_id, val_type="temporal"):
 
     # 2026-14-04: FIX UNTIL SOMEONE TAKES LOOK AT TEMPORAL XARRAY VALIDATION
     if val_type in ["both"]:
-        temporal_run = run_validation(validation_id, val_type="temporal")
         spatial_run = run_validation(validation_id, val_type="spatial")
+        temporal_run = run_validation(validation_id, val_type="temporal")
         return (temporal_run, spatial_run)
     # ----------------------------------------------------------------------
     
