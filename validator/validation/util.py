@@ -14,12 +14,13 @@ def mkdir_if_not_exists(the_dir):
 
 
 def first_file_in(the_dir, extension, val_type="temporal"):
+    substringlist = ["Spatial", "SPATIAL", "spatial"]
     for file in listdir(the_dir):
         if val_type=="temporal":
-            if (file.endswith(extension)) and ("SPATIAL" not in file) and ("spatial" not in file):
+            if (file.endswith(extension)) and not (any(ss in file for ss in substringlist)):
                 return path.join(the_dir, file)
         elif val_type=="spatial":
-            if (file.endswith(extension)) and ("SPATIAL" in file):
+            if (file.endswith(extension)) and (any(ss in file for ss in substringlist)):
                 return path.join(the_dir, file)
     return None
 

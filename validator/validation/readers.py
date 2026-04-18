@@ -165,6 +165,7 @@ def create_reader(dataset, version) -> GriddedNcTs:
             dataset.short_name == globals.CCI_RZSM or
             dataset.short_name == globals.CCIGF or
             dataset.short_name == globals.CCIMF or
+            dataset.short_name == globals.CCISD or
             dataset.short_name == globals.CCICMR):
         reader = CCITs(folder_name, ioclass_kws={'read_bulk': True})
 
