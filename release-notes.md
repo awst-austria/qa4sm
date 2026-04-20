@@ -4,6 +4,22 @@ QA4SM v4.0.0
 1. Add spatial validation feature
 2. Add interactive maps to result page
 
+QA4SM v3.6.1 - Release notes 2026-03-12
+======================================================
+# Updates
+1. Add ESA CCI SUBDAILY dataset.
+
+# Fixes
+1. Change original_file_size to bigint.
+
+QA4SM v3.6.0 - Release notes 2026-02-26
+======================================================
+# Updates
+1. Updated the QA4SM Published Validations page.
+2. Updated the My Validations page: added filtering and pagination, and restyled the page.
+3. Added display_name field to variables.
+4. Removed redundant file duplication during user file uploads.
+
 QA4SM v3.5.0 - Release notes 2026-01-26
 ======================================================
 
