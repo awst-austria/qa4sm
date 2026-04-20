@@ -11,8 +11,6 @@ import { NavigationBarModule } from './modules/navigation-bar/navigation-bar.mod
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 import { ErrorPageComponent } from './pages/error/error-page.component';
-
-import { ValidationsComponent } from './pages/validations/validations.component';
 import { ValidationResultComponent } from './pages/validation-result/validation-result.component';
 import { HTTP_INTERCEPTORS, provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 import { HttpTokenInterceptor } from './modules/core/interceptors/http-token.interceptor';
@@ -32,7 +30,6 @@ import { InputTextModule } from 'primeng/inputtext';
 import { FilterModule } from './modules/filter/filter.module';
 import { ToastModule } from 'primeng/toast';
 import { MessageService } from 'primeng/api';
-import { PublishedValidationsComponent } from './pages/published-validations/published-validations.component';
 import { ValidationResultModule } from './modules/validation-result/validation-result.module';
 import { SpatialSubsetModule } from './modules/spatial-subset/spatial-subset.module';
 import { CarouselModule } from 'primeng/carousel';
@@ -41,15 +38,12 @@ import { MetricsModule } from './modules/metrics/metrics.module';
 import { AnomaliesModule } from './modules/anomalies/anomalies.module';
 import { ScalingModule } from './modules/scaling/scaling.module';
 import { MapModule } from './modules/map/map.module';
-import { TermsComponent } from './pages/terms/terms.component';
-import { DatasetInfoComponent } from './pages/dataset-info/dataset-info.component';
 import { ComparisonComponent } from './pages/comparison/comparison.component';
 import { ComparisonModule } from './modules/comparison/comparison.module';
 import {
   TemporalMatchingComponent
 } from './modules/temporal-matching/components/temporal-matching/temporal-matching.component';
 import { TemporalMatchingModule } from './modules/temporal-matching/temporal-matching.module';
-import { HelpComponent } from './pages/help/help.component';
 import { CoreModule } from './modules/core/core.module';
 import { SignupComponent } from './pages/signup/signup.component';
 import { UserModule } from './modules/user/user.module';
@@ -78,9 +72,6 @@ import { providePrimeNG } from 'primeng/config';
 import Aura from '@primeuix/themes/aura';
 import { ResultFilesSpatialComponent } from './modules/validation-result/components/result-files-spatial/result-files-spatial.component';
 import { SummaryStatisticsSpatialComponent } from './modules/validation-result/components/summary-statistics-spatial/summary-statistics-spatial.component';
-import {
-  InteractiveMapComponent
-} from './modules/validation-result/components/interactive-map/interactive-map.component';
 
 @NgModule({ declarations: [
         AppComponent,
@@ -146,8 +137,7 @@ import {
         SharedPrimeNgModule,
         MaintenanceModeComponent,
         ResultFilesSpatialComponent,
-        SummaryStatisticsSpatialComponent,
-        InteractiveMapComponent], providers: [
+        SummaryStatisticsSpatialComponent], providers: [
         {
             provide: HTTP_INTERCEPTORS,
             useClass: HttpTokenInterceptor,

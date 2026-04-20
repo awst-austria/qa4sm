@@ -1,3 +1,4 @@
+import gc
 import warnings
 
 import matplotlib.pyplot as plt
@@ -76,6 +77,8 @@ def generate_all_graphs(validation_run, temporal_sub_windows: List[str], outfold
             dpi=dpi,
             val_type=val_type,
         )
+        plt.close('all')
+        gc.collect()
 
         plot_all_output_dict = sort_filenames_to_filetypes((fnb, fnm, fcsv, fncb))
         flattened_list = [item for inner_dict in plot_all_output_dict.values() for lst in inner_dict.values() for item in lst]
@@ -108,6 +111,8 @@ def generate_all_graphs(validation_run, temporal_sub_windows: List[str], outfold
                     val_type=val_type
 
                 )
+        plt.close('all')
+        gc.collect()
         
         plot_all_output_dict = sort_filenames_to_filetypes((fnb, fnm, fcsv, fncb))
         flattened_list = [item for inner_dict in plot_all_output_dict.values() for lst in inner_dict.values() for item in lst]
@@ -857,7 +862,8 @@ def encoded_comparisonPlots(
     )
 
     plt.savefig(image, format='png')
-
+    plt.close('all')
+    gc.collect()
     encoded = base64.b64encode(image.getvalue()).decode('utf-8')
 
     return encoded
@@ -906,6 +912,9 @@ def get_extent_image(
         )
         plt.tight_layout()
         plt.savefig(image, format='png')
+        plt.close('all')
+        gc.collect()
+        
         if encoded:
             encoded = base64.encodebytes(image.getvalue()).decode('utf-8')
             return encoded
