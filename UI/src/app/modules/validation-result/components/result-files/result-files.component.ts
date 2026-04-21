@@ -35,6 +35,7 @@ export class ResultFilesComponent implements OnInit {
   activeAdditionalPlotIndex = 0;
 
   selectedMetric: WritableSignal<MetricsPlotsDto> = signal({} as MetricsPlotsDto);
+  currentOverviewFiles: WritableSignal<Observable<PlotDto[]>> = signal(of([]));
 
   fileError = signal(false);
   dataFetchError = signal(false);
@@ -70,6 +71,7 @@ export class ResultFilesComponent implements OnInit {
         ),
         tap(data => {
           this.selectedMetric.set(data[0]);
+          this.updateOverviewForMetric(data[0]);
         }),
         catchError((error: CustomHttpError) => {
           this.dataFetchError.set(true);
@@ -79,10 +81,26 @@ export class ResultFilesComponent implements OnInit {
       );
   }
 
+  private updateOverviewForMetric(metric: MetricsPlotsDto): void {
+    if (metric.boxplot_type === 'dataset_combination') {
+      // for status: show overview of first combination by default
+      const firstDict = metric.boxplot_dicts[0];
+      this.currentOverviewFiles.set(
+        firstDict?.overview_files?.length > 0
+          ? this.getPlots(firstDict.overview_files)
+          : of([])
+      );
+    } else {
+      // for classification metrics: show all overview files
+      this.currentOverviewFiles.set(this.getPlots(metric.overview_files));
+    }
+  }
+
   onMetricChange(option): void {
     this.selectedMetric.set(option.value);
     // resetting boxplot index
     this.boxplotIndx = 0;
+    this.updateOverviewForMetric(option.value);
   }
 
   private checkZarrFile(): void {
@@ -106,6 +124,20 @@ export class ResultFilesComponent implements OnInit {
 
   onBoxPlotChange(event): void {
     this.boxplotIndx = event.value.ind;
+    const metric = this.selectedMetric();
+    if (metric.boxplot_type === 'dataset_combination') {
+      // for status: update overview when combination changes
+      const selectedDict = metric.boxplot_dicts[event.value.ind];
+      this.currentOverviewFiles.set(
+        selectedDict?.overview_files?.length > 0
+          ? this.getPlots(selectedDict.overview_files)
+          : of([])
+      );
+    }
+  }
+
+  isDatasetCombination(metric: MetricsPlotsDto): boolean {
+    return metric?.boxplot_type === 'dataset_combination';
   }
 
   showGallery(index: number = 0, plotType: string): void {
