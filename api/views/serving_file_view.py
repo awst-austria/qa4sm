@@ -14,7 +14,7 @@ from validator.models import ValidationRun, DatasetConfiguration, Dataset
 import mimetypes
 from wsgiref.util import FileWrapper
 from validator.validation import get_inspection_table, get_inspection_table_spatial, get_dataset_combis_and_metrics_from_files, get_dataset_combis_and_metrics_from_files_spatial
-from validator.validation.globals import ISMN, METADATA_PLOT_NAMES, ISMN_LIST_FILE_NAME
+from validator.validation.globals import ISMN, METADATA_PLOT_NAMES, ISMN_LIST_FILE_NAME, TC_METRICS
 
 
 @api_view(['GET'])
@@ -74,7 +74,6 @@ def get_csv_with_statistics(request):
 
     return response
 
-
 def build_status_boxplot_dicts(files, file_path, barplot_prefix):
     """
     Builds boxplot_dicts for status metric, linking each barplot to its overview file.
@@ -89,9 +88,11 @@ def build_status_boxplot_dicts(files, file_path, barplot_prefix):
                          and 'tc_status' not in f])
     
     for f in pair_files:
+        # extract pair name: '0-ISMN_and_1-C3S_combined'
         pair_key = f.replace(barplot_prefix + 'status_', '').replace('.png', '')
         pretty_name = pair_key.replace('_', ' ')
         
+        # find matching overview: bulk_overview_0-ISMN_and_1-C3S_combined*status.png
         overview = [file_path + o for o in files 
                     if o.startswith(f'bulk_overview_{pair_key}') 
                     and o.endswith('_status.png')]
@@ -125,6 +126,7 @@ def build_status_boxplot_dicts(files, file_path, barplot_prefix):
         ind += 1
 
     return boxplot_dicts if boxplot_dicts else [{'ind': 0, 'name': 'Unclassified', 'file': '', 'overview_files': []}]
+
 
 
 @api_view(['GET'])
@@ -191,6 +193,7 @@ def get_metric_names_and_associated_files(request):
     metrics = OrderedDict(sorted([(v, k) for k, v in metrics.items()]))
     response = []
 
+    tc_metric_keys = list(TC_METRICS.keys())  # ['snr', 'err_std', 'beta']
     overview_independent_metrics = ['n_obs']
 
     for metric_ind, key in enumerate(metrics):
@@ -198,23 +201,33 @@ def get_metric_names_and_associated_files(request):
         seasonal_file_name = seasonal_prefix + '_' + metrics[key] + '.png'
 
         if metrics[key] == 'status':
-            # status: one barplot per dataset combination, overview linked per combination
             boxplot_type = 'dataset_combination'
             boxplot_dicts = build_status_boxplot_dicts(files, file_path, barplot_prefix)
             overview_files = []
             datasets = []
 
         else:
-            # all other metrics: classification-based boxplots
             boxplot_type = 'classification'
-            boxplot_file_name = boxplot_prefix + metrics[key] + '.png'
-            boxplot_file = file_path + boxplot_file_name if boxplot_file_name in files else ''
 
+            # check if TC metric: snr_3-ERA5, err_std_1-C3S_combined, beta_2-ERA5
+            is_tc_metric = any(metrics[key].startswith(tc + '_') for tc in tc_metric_keys)
+
+            if is_tc_metric:
+                # file uses '_for_': snr_3-ERA5 → bulk_boxplot_snr_for_3-ERA5.png
+                tc_key = next(tc for tc in tc_metric_keys if metrics[key].startswith(tc + '_'))
+                ds_part = metrics[key][len(tc_key) + 1:]  # '3-ERA5'
+                file_suffix = f'{tc_key}_for_{ds_part}'   # 'snr_for_3-ERA5'
+                boxplot_file_name = boxplot_prefix + file_suffix + '.png'
+            else:
+                file_suffix = metrics[key]
+                boxplot_file_name = boxplot_prefix + metrics[key] + '.png'
+
+            boxplot_file = file_path + boxplot_file_name if boxplot_file_name in files else ''
             boxplot_dicts = [{'ind': 0, 'name': 'Unclassified', 'file': boxplot_file, 'overview_files': []}]
 
             if ref_dataset_name == ISMN:
                 metadata_plots = [
-                    {'file_name': boxplot_prefix + metrics[key] + '_' + metadata_name + '.png'}
+                    {'file_name': boxplot_prefix + file_suffix + '_' + metadata_name + '.png'}
                     for metadata_name in METADATA_PLOT_NAMES.values()
                 ]
                 plot_ind = 1
@@ -228,16 +241,40 @@ def get_metric_names_and_associated_files(request):
                         })
                         plot_ind += 1
 
-            if metrics[key] not in overview_independent_metrics:
-                overview_plots = [{'file_name': overview_prefix + name_key + '_' + metrics[key] + '.png',
-                                   'datasets': name_key} for name_key in combis]
+            if is_tc_metric:
+                # overview files end with _{tc_key}_for_{ds_part}.png
+                # e.g. bulk_overview_0-ISMN_and_1-C3S_and_2-ERA5_snr_for_3-ERA5.png
+                overview_suffix = f'_{file_suffix}.png'
+                tc_overview_files = [
+                    f for f in files
+                    if f.startswith(overview_prefix)
+                    and f.endswith(overview_suffix)
+                ]
+                overview_files = [file_path + f for f in tc_overview_files]
+                datasets = [
+                    f.replace(overview_prefix, '')
+                     .replace(overview_suffix, '')
+                     .replace('_', ' ')
+                    for f in tc_overview_files
+                ]
+
+            elif metrics[key] not in overview_independent_metrics:
+                overview_plots = [
+                    {'file_name': overview_prefix + name_key + '_' + metrics[key] + '.png',
+                     'datasets': name_key}
+                    for name_key in combis
+                ]
+                overview_files = [file_path + file_dict['file_name'] for file_dict in overview_plots
+                                  if file_dict['file_name'] in files]
+                datasets = [' '.join(file_dict['datasets'].split('_')) for file_dict in overview_plots
+                           if file_dict['file_name'] in files]
+
             else:
                 overview_plots = [{'file_name': overview_prefix + metrics[key] + '.png', 'datasets': ''}]
-
-            overview_files = [file_path + file_dict['file_name'] for file_dict in overview_plots
-                              if file_dict['file_name'] in files]
-            datasets = [' '.join(file_dict['datasets'].split('_')) for file_dict in overview_plots
-                       if file_dict['file_name'] in files]
+                overview_files = [file_path + file_dict['file_name'] for file_dict in overview_plots
+                                  if file_dict['file_name'] in files]
+                datasets = [' '.join(file_dict['datasets'].split('_')) for file_dict in overview_plots
+                           if file_dict['file_name'] in files]
 
         if len(seasonal_files) and seasonal_file_name in seasonal_files:
             seasonal_metric_file = [seasonal_files_path + seasonal_file_name]
@@ -258,203 +295,6 @@ def get_metric_names_and_associated_files(request):
         response.append(metric_dict)
 
     return JsonResponse(response, status=200, safe=False)
-
-
-def build_status_boxplot_dicts(files, file_path, barplot_prefix):
-    """
-    Builds boxplot_dicts for status metric, linking each barplot to its overview file.
-    Handles pairs (barplot_status_*) and triples (barplot_tc_status_*).
-    """
-    boxplot_dicts = []
-    ind = 0
-
-    # collect pairs: bulk_barplot_status_0-ISMN_and_1-C3S_combined.png
-    pair_files = sorted([f for f in files 
-                         if f.startswith(barplot_prefix + 'status_')
-                         and 'tc_status' not in f])
-    
-    for f in pair_files:
-        # extract pair name: '0-ISMN_and_1-C3S_combined'
-        pair_key = f.replace(barplot_prefix + 'status_', '').replace('.png', '')
-        pretty_name = pair_key.replace('_', ' ')
-        
-        # find matching overview: bulk_overview_0-ISMN_and_1-C3S_combined*status.png
-        overview = [file_path + o for o in files 
-                    if o.startswith(f'bulk_overview_{pair_key}') 
-                    and o.endswith('_status.png')]
-        
-        boxplot_dicts.append({
-            'ind': ind,
-            'name': pretty_name,
-            'file': file_path + f,
-            'overview_files': overview
-        })
-        ind += 1
-
-    # collect triples: bulk_barplot_tc_status_0-ISMN_and_1-C3S_combined_and_2-ERA5.png
-    triple_files = sorted([f for f in files 
-                           if f.startswith(barplot_prefix + 'tc_status_')])
-    
-    for f in triple_files:
-        triple_key = f.replace(barplot_prefix + 'tc_status_', '').replace('.png', '')
-        pretty_name = triple_key.replace('_', ' ')
-        
-        overview = [file_path + o for o in files 
-                    if o.startswith(f'bulk_overview_{triple_key}') 
-                    and o.endswith('_status.png')]
-        
-        boxplot_dicts.append({
-            'ind': ind,
-            'name': pretty_name,
-            'file': file_path + f,
-            'overview_files': overview
-        })
-        ind += 1
-
-    return boxplot_dicts if boxplot_dicts else [{'ind': 0, 'name': 'Unclassified', 'file': '', 'overview_files': []}]
-
-
-
-
-
-
-
-
-
-@api_view(['GET'])
-@permission_classes([AllowAny])
-def get_metric_names_and_associated_files_old(request):
-    validation_id = request.query_params.get('validationId', None)
-    validation = get_object_or_404(ValidationRun, pk=validation_id)
-    ref_dataset_name = DatasetConfiguration.objects.get(
-        id=validation.spatial_reference_configuration_id).dataset.pretty_name
-
-    # Get all dataset configurations with spatial reference first, then ordered by _order
-    dataset_configs = DatasetConfiguration.objects.filter(
-        validation_id=validation.id
-    ).order_by('-is_spatial_reference', '_order')
-
-    # Create dataset_names with custom ordering: spatial reference first (index 0), then by _order
-    dataset_names = [
-        f"{i}-{config.dataset.short_name}"
-        for i, config in enumerate(dataset_configs)
-    ]
-    bulk_prefix = ''
-    seasonal_prefix = ''
-    seasonal_files_path = ''
-
-    try:
-        file_path = validation.output_dir_url.replace(settings.MEDIA_URL, settings.MEDIA_ROOT)
-    except AttributeError:
-        return JsonResponse({'message': 'Given validation has no output directory assigned'}, status=404)
-
-    try:
-        path_content = os.listdir(file_path)
-
-        # for now we assume that there can be either intra-annual metrics or stability metrics, so the seasonal prefix
-        # should be simply set accordingly
-        # todo: update this part for stability metrics
-
-        if validation.intra_annual_metrics or validation.stability_metrics:
-            seasonal_prefix = 'comparison_boxplot'
-
-        if f'{seasonal_prefix}s' in path_content:
-            seasonal_files_path = file_path + f'{seasonal_prefix}s/'
-
-        if "bulk" in path_content:
-            file_path += 'bulk/'
-            bulk_prefix = 'bulk_'
-
-        boxplot_prefix = bulk_prefix + 'boxplot_'
-        barplot_prefix = bulk_prefix + 'barplot_'
-        overview_prefix = bulk_prefix + 'overview_'
-    except FileNotFoundError:
-        return JsonResponse({'message': 'Output directory does not contain any files.'}, status=404)
-
-
-    seasonal_files = []
-    if seasonal_files_path:
-        seasonal_files = os.listdir(seasonal_files_path)
-        if len(seasonal_files) == 0:
-            return JsonResponse({'message': 'Comparison files have not been created'}, status=404)
-
-    try:
-        files = os.listdir(file_path)
-
-        if len(files) == 0 or not any(file.endswith('.png') for file in files):
-            return JsonResponse({'message': 'There are no result files in the given directory'}, status=404)
-
-    except FileNotFoundError as e:
-        return JsonResponse({'message': str(e)}, status=404)
-
-    pairs, triples, metrics, ref0_config, zarr_metrics, zarr_var_list = get_dataset_combis_and_metrics_from_files(validation, dataset_names)
-    combis = OrderedDict(sorted({**pairs, **triples}.items()))
-    metrics = OrderedDict(sorted([(v, k) for k, v in metrics.items()]))
-    response = []
-
-    # 'n_obs' doesn't refer to datasets, so I create a list with independent metrics, if there are other similar
-    # metrics it's just enough to add them here:
-    independent_metrics = ['n_obs', 'status']
-    overview_independent_metrics = ['n_obs'] 
-    barplot_metric = ['status']
-
-    for metric_ind, key in enumerate(metrics):
-        boxplot_file = ''
-        seasonal_metric_file = ''
-        seasonal_file_name = seasonal_prefix + '_' + metrics[key] + '.png'
-
-        if metrics[key] == 'status':
-            barplot_files = [f for f in files if f.startswith(barplot_prefix + 'status')]
-            boxplot_file_name = barplot_files[0] if barplot_files else ''
-        else:
-            boxplot_file_name = boxplot_prefix + metrics[key] + '.png'
-
-        if metrics[key] not in overview_independent_metrics:
-            overview_plots = [{'file_name': overview_prefix + name_key + '_' + metrics[key] + '.png',
-                               'datasets': name_key} for name_key in combis]
-        else:
-            overview_plots = [{'file_name': overview_prefix + metrics[key] + '.png', 'datasets': ''}]
-
-        if boxplot_file_name in files:
-            boxplot_file = file_path + boxplot_file_name
-
-        if len(seasonal_files) and seasonal_file_name in seasonal_files:
-            seasonal_metric_file = [
-                seasonal_files_path + seasonal_file_name]  # for now there is only one file for intra-annual metrics;
-
-        overview_files = [file_path + file_dict['file_name'] for file_dict in overview_plots if
-                          file_dict['file_name'] in files]
-        datasets = [' '.join(file_dict['datasets'].split('_')) for file_dict in overview_plots if
-                    file_dict['file_name'] in files]
-
-        # for ISMN there might be also metadata plots
-        boxplot_dicts = [{'ind': 0, 'name': 'Unclassified', 'file': boxplot_file}]
-
-        if ref_dataset_name == ISMN:
-            metadata_plots = [{'file_name': f'{boxplot_prefix if metrics[key] not in barplot_metric else barplot_prefix}' +
-                                            metrics[key] + '_' + metadata_name + '.png'}
-                              for metadata_name in METADATA_PLOT_NAMES.values()]
-            plot_ind = 1
-            for meta_ind, file_dict in enumerate(metadata_plots):
-                if file_dict['file_name'] in files:
-                    boxplot_dicts.append({'ind': plot_ind, 'name': list(METADATA_PLOT_NAMES.keys())[meta_ind],
-                                          'file': file_path + file_dict['file_name']})
-                    plot_ind += 1
-        metric_dict = {'ind': metric_ind,
-                       'metric_query_name': metrics[key],
-                       'metric_pretty_name': key,
-                       'boxplot_dicts': boxplot_dicts,
-                       'overview_files': overview_files,
-                       'metadata_files': [],
-                       'comparison_boxplot': seasonal_metric_file,
-                       'zarr_metrics': zarr_metrics,
-                       'zarr_var_list': zarr_var_list,
-                       'datasets': datasets,
-                       }
-        response.append(metric_dict)
-    #
-    return JsonResponse(response, status=200, safe=False)
-
 
 @api_view(['GET'])
 @permission_classes([AllowAny])
