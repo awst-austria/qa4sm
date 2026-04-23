@@ -318,13 +318,14 @@ class ValidationRun(models.Model):
         return len(user_data) > 0
 
     def update_status(self):
-        from validator.validation.util import determine_status  # Delayed Import to avoid circular imports
+        from validator.validation.util import determine_status
         self.status = determine_status(
             self.progress,
             self.end_time,
-            self.status,
             progress_spatial=self.progress_spatial,
-            val_type=self.val_type
+            val_type=self.val_type,
+            output_file=self.output_file.name if self.output_file else None,
+            output_file_spatial=self.output_file_spatial.name if self.output_file_spatial else None,
         )
 
     def save(self, *args, **kwargs):

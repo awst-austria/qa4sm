@@ -1319,6 +1319,7 @@ def run_validation(validation_id, val_type="temporal"):
                 dataset_config=validation_run.spatial_reference_configuration)
 
             validation_run.total_points = total_points
+            validation_run.progress = 1
             validation_run.save()  # save the number of gpis before we start
 
             __logger.debug("Jobs to run: {}".format([job[:-1] for job in jobs]))
@@ -1340,6 +1341,7 @@ def run_validation(validation_id, val_type="temporal"):
                 dataset_config=validation_run.spatial_reference_configuration)
             jobs = [tuple([i for i in np.concatenate(jobs, axis=1)])] # Only run one big job, otherwise parallelization makes xArray creation impossible
             validation_run.total_points = total_points
+            validation_run.progress_spatial = 1 
             validation_run.save()  # save the number of gpis before we start
 
             __logger.debug("Jobs to run: {}".format([job[:-1] for job in jobs]))

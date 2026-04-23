@@ -117,7 +117,7 @@ export class ValidationsComponent implements OnInit, OnDestroy {
     this.rows$ = dataState$.pipe(map(res => res.rows));
     this.totalRecords$ = dataState$.pipe(map(res => res.total));
 
-    this.statusSubscription = interval(30000).pipe(
+    this.statusSubscription = interval(30000).pipe(  // ← change this number
       switchMap(() => this.rows$.pipe(take(1))),
       filter(rows => rows.some(r => this.isLive(r)))
     ).subscribe(() => {
@@ -187,62 +187,43 @@ export class ValidationsComponent implements OnInit, OnDestroy {
     }
   }
 
-  // Define the status progress
-  getStatusDisplay(valrun: any): { label: string, severity: string, progress?: number, spinning?: boolean } {
+  // Show the status progress
+  getStatusDisplay(valrun: any): { label: string, severity: string, spinning?: boolean } {
     
-    const relevantProgress = this.getRelevantProgress(valrun);
-
-    // Cancelled
-    if (relevantProgress === -1 || relevantProgress === -100) {
-      return { label: 'Cancelled', severity: 'secondary' };
-    }
-    // Scheduled 
-    if (relevantProgress === 0 && valrun.end_time === null) {
-        return { label: 'Scheduled', severity: 'info' };
-    }
-    // Done
-    if (relevantProgress === 100 && valrun.end_time) {
+    switch (valrun.status) {
+      case 'DONE':
         return { label: 'Done', severity: 'success' };
-    }
-    // Error 
-    if (valrun.end_time && relevantProgress < 100) {
+      case 'CANCELLED':
+        return { label: 'Cancelled', severity: 'secondary' };
+      case 'ERROR':
         return { label: 'Error', severity: 'danger' };
-    }
-    // Running both
-    if (valrun.val_type === 'both') {
-      if (valrun.progress === 100 && valrun.progress_spatial === 100 && !valrun.end_time) {
-        return { label: 'Generating plots...', severity: 'warn', spinning: true };
-      }
-      return { label: `Running\n Temporal: ${valrun.progress}% \nSpatial: ${valrun.progress_spatial}%`, severity: 'warn', progress: relevantProgress, spinning: true };
-    }
-    // Running spatial
-    if (valrun.val_type === 'spatial') {
-      if (valrun.progress_spatial === 100 && !valrun.end_time) {
-        return { label: 'Generating plots...', severity: 'warn', spinning: true };
-      }
-      return { 
-        label: `Running\n Spatial: ${valrun.progress_spatial}%`, 
-        severity: 'warn', 
-        progress: relevantProgress, 
-        spinning: true };
-    }
-    // Generating plots (only for temporal)
-    if (relevantProgress === 100 && !valrun.end_time) {
-      return { label: 'Generating plots...', severity: 'warn', spinning: true };
-    }
-    // Running temporal
-    return { label: `Running ${valrun.progress}%`, severity: 'warn', progress: relevantProgress, spinning: true };
-  }
+      case 'SCHEDULED':
+        return { label: 'Scheduled', severity: 'info' };
+      case 'RUNNING':
+        if (valrun.val_type === 'both') {
+          // both progresses at 100 but files not yet written
+          if (valrun.progress === 100 && valrun.progress_spatial === 100) {
+            return { label: 'Generating plots...', severity: 'warn', spinning: true };
+          }
+          // spatial done, temporal still running
+          if (valrun.progress_spatial === 100 && valrun.progress < 100) {
+            return { label: `Running\nTemporal: ${valrun.progress}%\nSpatial: done`, severity: 'warn', spinning: true };
+          }
+          return { label: `Running\nTemporal: ${valrun.progress}%\nSpatial: ${valrun.progress_spatial}%`, severity: 'warn', spinning: true };
+        }
+        if (valrun.val_type === 'spatial') {
+          if (valrun.progress_spatial === 100) {
+            return { label: 'Generating plots...', severity: 'warn', spinning: true };
+          }
+          return { label: `Running\nSpatial: ${valrun.progress_spatial}%`, severity: 'warn', spinning: true };
+        }
+        if (valrun.progress === 100) {
+          return { label: 'Generating plots...', severity: 'warn', spinning: true };
+        }
+        return { label: `Running ${valrun.progress}%`, severity: 'warn', spinning: true };
 
-  getRelevantProgress(valrun: any): number {
-    if (valrun.val_type === 'spatial') {
-      return valrun.progress_spatial ?? 0;
-    } else if (valrun.val_type === 'both') {
-      const sp = valrun.progress_spatial ?? 0;
-      const tp = valrun.progress ?? 0;
-      return Math.round((sp + tp) / 2);
-    } else {
-      return valrun.progress ?? 0;
+      default:
+        return { label: 'Unknown', severity: 'secondary' };
     }
   }
 
@@ -279,8 +260,7 @@ export class ValidationsComponent implements OnInit, OnDestroy {
   }
 
   isLive(valrun: any): boolean {
-    const relevantProgress = this.getRelevantProgress(valrun);
-    return !valrun.end_time && relevantProgress !== -1 && relevantProgress !== -100;
+    return valrun.status === 'RUNNING' || valrun.status === 'SCHEDULED';
   }
 
   onPageChange(event: any): void {

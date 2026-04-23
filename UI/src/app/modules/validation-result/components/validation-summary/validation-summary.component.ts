@@ -219,18 +219,14 @@ export class ValidationSummaryComponent implements OnInit, OnDestroy {
   }
 
   getOriginalDate(): void {
-    this.validationModel.validationRun$
-      .subscribe(data => {
-      if (data.is_a_copy) {
-        this.validationService.getCopiedRunRecord(data.id)
-          .subscribe(copiedRun => {
-            // error handled directly in the HTML file
-            copiedRun.original_run_date ?
-              this.originalDate.set(copiedRun.original_run_date) :
-              this.originalDate.set(data.start_time)
-          });
-      }
-    });
+    if (this.validationRun.is_a_copy) {
+      this.validationService.getCopiedRunRecord(this.validationRun.id)
+        .subscribe(copiedRun => {
+          copiedRun.original_run_date ?
+            this.originalDate.set(copiedRun.original_run_date) :
+            this.originalDate.set(this.validationRun.start_time)
+        });
+    }
   }
 
   setInitialValues(): void {

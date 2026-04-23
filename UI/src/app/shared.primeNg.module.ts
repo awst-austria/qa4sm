@@ -44,6 +44,7 @@ import { DividerModule } from 'primeng/divider';
 import { ScrollPanelModule } from 'primeng/scrollpanel';
 import { PanelMenuModule } from 'primeng/panelmenu';
 import { SelectModule } from 'primeng/select';
+import { MessageModule } from 'primeng/message';
 
 @NgModule({
   imports: [
@@ -76,6 +77,7 @@ import { SelectModule } from 'primeng/select';
     InputTextModule,
     MenubarModule,
     MenuModule,
+    MessageModule,
     MultiSelectModule,
     PaginatorModule,
     PanelMenuModule,
@@ -123,6 +125,7 @@ import { SelectModule } from 'primeng/select';
     InputTextModule,
     MenubarModule,
     MenuModule,
+    MessageModule,
     MultiSelectModule,
     PaginatorModule,
     PanelMenuModule,

@@ -214,7 +214,7 @@
 
         <li *ngIf="!forComparison">Processing took {{ runTime }} minutes (wall time).</li>
 
-        <li *ngIf="validationRun.progress === -1">The validation was cancelled.</li>
+        <li *ngIf="validationRun.status === 'CANCELLED' && validationRun.progress !== -100">The validation was cancelled.</li>
         <li *ngIf="validationRun.progress === -100">This validation was cancelled due to service outage. You can easily
           restart it using 'Load settings' button.
         </li>
@@ -223,8 +223,7 @@
         <li *ngIf="!forComparison 
           && (validationRun.val_type === 'temporal' || validationRun.val_type === 'both')
           && validationRun.total_points !== 0
-          && validationRun.progress !== -1
-          && validationRun.progress !== -100"
+          && validationRun.status !== 'CANCELLED'"
           [ngClass]="{'alert-danger': errorRate > 0}">
           for {{ errorRate * 100 | number: '.0' }}% ({{ validationRun.error_points }}
           of {{ validationRun.total_points }}) of the processed locations (grid points) the temporal validation metrics could
@@ -235,8 +234,7 @@
         <li *ngIf="!forComparison 
           && (validationRun.val_type === 'spatial' || validationRun.val_type === 'both')
           && validationRun.total_times !== 0
-          && validationRun.progress !== -1
-          && validationRun.progress !== -100"
+          && validationRun.status !== 'CANCELLED'"
           [ngClass]="{'alert-danger': errorRateSpatial > 0}">
           for {{ errorRateSpatial * 100 | number: '.0' }}% ({{ validationRun.error_times }}
           of {{ validationRun.total_times }}) of the processed time steps the spatial validation metrics could

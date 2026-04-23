@@ -1,5 +1,4 @@
 import { NgModule } from '@angular/core';
-import { ValidationrunRowComponent } from './components/validationrun-row/validationrun-row.component';
 import { RouterModule } from '@angular/router';
 import { ValidationSummaryComponent } from './components/validation-summary/validation-summary.component';
 import { ButtonsComponent } from './components/buttons/buttons.component';
@@ -12,7 +11,7 @@ import { InteractiveMapComponent } from './components/interactive-map/interactiv
 import { SharedPrimeNgModule } from 'src/app/shared.primeNg.module';
 
 @NgModule({
-  declarations: [ValidationrunRowComponent,
+  declarations: [
     ValidationSummaryComponent,
     ButtonsComponent,
     SummaryStatisticsComponent,
@@ -21,7 +20,6 @@ import { SharedPrimeNgModule } from 'src/app/shared.primeNg.module';
     ExistingValidationComponent],
   
   exports: [
-    ValidationrunRowComponent,
     ValidationSummaryComponent,
     SummaryStatisticsComponent,
     ResultFilesComponent,

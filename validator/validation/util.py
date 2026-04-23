@@ -30,30 +30,41 @@ def get_function_name() -> str:
     frame = inspect.currentframe().f_back
     return frame.f_code.co_name
 
-def determine_status(progress, end_time, current_status, progress_spatial=None, val_type=None):
-    """Determine the status based on progress and end_time."""
-    if current_status == 'DONE':
-        return 'DONE'  # Keep 'DONE' unchanged
+def determine_status(progress, end_time, progress_spatial=None, val_type=None, 
+                     output_file=None, output_file_spatial=None):
+    
+    """Determine the status based on progress, end_time and output files."""
     
     if val_type == 'spatial':
-        relevant_progress = progress_spatial
+        relevant_progress = progress_spatial if progress_spatial is not None else progress
     elif val_type == 'both':
-        # both temporal and spatial progress must be considered, take the minimum of the two if spatial progress is available
         relevant_progress = min(progress, progress_spatial) if progress_spatial is not None else progress
     else:
         relevant_progress = progress
 
     if relevant_progress == 0 and not end_time:
+        if val_type == 'both' and progress_spatial is not None and progress_spatial > 0:
+            return 'RUNNING'
+        if val_type == 'both' and progress is not None and progress > 0:
+            return 'RUNNING'
         return 'SCHEDULED'
-    elif relevant_progress == 100 and end_time:
-        return 'DONE'
     elif relevant_progress < 0:
         return 'CANCELLED'
-    elif end_time and relevant_progress < 100:
+    elif end_time and relevant_progress == 100:
+        if val_type == 'spatial' and not output_file_spatial:
+            return 'ERROR'
+        elif val_type == 'temporal' and not output_file:
+            return 'ERROR'
+        elif val_type == 'both':
+            if not output_file and not output_file_spatial:
+                return 'ERROR'
+            if not output_file or not output_file_spatial:
+                return 'RUNNING'  # one file missing — still in progress
+        return 'DONE'
+    elif end_time and relevant_progress < 100 and val_type != 'both':
         return 'ERROR'
     else:
         return 'RUNNING'
-    
 
 def has_csv_in_zip(file):
     """
