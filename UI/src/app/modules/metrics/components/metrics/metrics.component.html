@@ -9,17 +9,25 @@
 
   <div class="grid pt-3">
 
-    <div class="col-12" *ngIf="!ISMN_isTrue()">
-      <p-floatLabel>
-        <p-select id="valTypeSelector"
-                  [options]="valTypeOptions"
-                  [(ngModel)]="validationModel().valType"
-                  optionLabel="label"
-                  optionValue="value"
-                  [style]="{'width': '100%'}">
-        </p-select>
-        <label for="valTypeSelector">Validation type</label>
-      </p-floatLabel>
+    <div class="col-12">
+      <div class="flex flex-row align-items-center gap-2">
+        <p-floatLabel class="flex-1">
+          <p-select id="valTypeSelector"
+                    [options]="valTypeOptions"
+                    [(ngModel)]="validationModel().valType"
+                    optionLabel="label"
+                    optionValue="value"
+                    [disabled]="ISMN_isTrue()"
+                    [style]="{'width': '100%'}">
+          </p-select>
+          <label for="valTypeSelector">Validation type</label>
+        </p-floatLabel>
+        <label class="p-panel-header-icon"
+              pTooltip="Spatial validation is only available when ISMN is selected as a dataset"
+              tooltipPosition="bottom">
+          <span class="pi pi-question-circle"></span>
+        </label>
+      </div>
     </div>
 
     <div *ngFor="let metric of validationModel().metrics" class="col-12">
