@@ -410,7 +410,7 @@ def get_dataset_combis_and_metrics_from_files_spatial(validation_run):
     # --- status from barplot_status_ ---
     # barplot_status_0-ISMN_and_1-C3S_combined.png
     for f in files:
-        if f.startswith('barplot_status_') and 'status' not in metrics:
+        if f.startswith('bulk_barplot_status_') and 'status' not in metrics:
             metrics['status'] = METRICS.get('status', 'Status')
             break
 

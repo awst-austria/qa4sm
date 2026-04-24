@@ -452,8 +452,104 @@ def get_results_spatial(request):
 
 
 @api_view(['GET'])
-@permission_classes([IsAuthenticated])
+@permission_classes([AllowAny])
 def get_metric_names_and_associated_files_spatial(request):
+    validation_id = request.query_params.get('validationId', None)
+    validation = get_object_or_404(ValidationRun, pk=validation_id)
+
+    try:
+        plot_dir = os.path.join(settings.MEDIA_ROOT, str(validation.id), 'bulk', 'spatial') + '/'
+        files = os.listdir(plot_dir)
+    except FileNotFoundError as e:
+        return JsonResponse({'message': str(e)}, status=404)
+
+    if not any(f.endswith('.png') for f in files):
+        return JsonResponse({'message': 'No spatial plot files found'}, status=404)
+
+    # take metrics pretty names
+    _, _, metrics, _ = get_dataset_combis_and_metrics_from_files_spatial(validation)
+
+    if not metrics:
+        return JsonResponse({'message': 'No metrics found'}, status=404)
+    
+    priority = ['n_obs', 'status']
+    prioritized = {k: metrics[k] for k in priority if k in metrics}
+    rest = {k: v for k, v in sorted(metrics.items()) if k not in priority}
+    metrics = {**prioritized, **rest}
+
+    # all overview files in folder
+    all_overview_files = sorted([
+        f for f in files
+        if f.startswith('bulk_overview_') and f.endswith('_n_gpi_was_used.png')
+    ])
+
+    independent_metrics = ['n_obs', 'status']
+    barplot_prefix = 'bulk_barplot_'
+    boxplot_prefix = 'bulk_boxplot_spatial_'
+    tsplot_prefix  = 'bulk_tsplot_'
+
+    response = []
+
+    for ind, (metric_query, metric_pretty) in enumerate(metrics.items()):
+
+        # --- overview files ---
+        metric_overview_files = []
+        metric_datasets = []
+
+        for ov in all_overview_files:
+            combi_key = ov \
+                .removeprefix('bulk_overview_') \
+                .removesuffix('_n_gpi_was_used.png')
+
+            is_triple = combi_key.count('_and_') == 2
+            is_pair   = combi_key.count('_and_') == 1
+
+            if metric_query in independent_metrics:
+                include = True
+            elif '_for_' in metric_query:
+                ds_with_id = metric_query.split('_for_')[1]   
+                ds_name = '-'.join(ds_with_id.split('-')[1:])  
+                include = is_triple and ds_name in combi_key
+            else:
+                include = is_pair
+
+            if include:
+                metric_overview_files.append(plot_dir + ov)
+                metric_datasets.append(combi_key.replace('_', ' '))
+
+        # --- boxplot / barplot ---
+        if metric_query == 'status':
+            boxplot_dicts = build_status_boxplot_dicts(files, plot_dir, barplot_prefix)
+        else:
+            bf = f'{boxplot_prefix}{metric_query}.png'
+            boxplot_dicts = [{'ind': 0, 'name': 'Boxplot',
+                               'file': plot_dir + bf if bf in files else ''}]
+
+        # --- tsplot ---
+        tf = f'{tsplot_prefix}{metric_query}.png'
+        tsplot = [plot_dir + tf] if tf in files else []
+
+        response.append({
+            'ind': ind,
+            'metric_query_name': metric_query,
+            'metric_pretty_name': metric_pretty,  
+            'boxplot_dicts': boxplot_dicts,
+            'overview_files': metric_overview_files,
+            'metadata_files': [],
+            'comparison_boxplot': [],
+            'datasets': metric_datasets,
+            'tsplot_file': tsplot,
+        })
+
+    return JsonResponse(response, status=200, safe=False)
+
+
+
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_metric_names_and_associated_files_spatial_old(request):
     validation_id = request.query_params.get('validationId', None)
     validation = get_object_or_404(ValidationRun, pk=validation_id)
 
@@ -476,7 +572,7 @@ def get_metric_names_and_associated_files_spatial(request):
         response = []
         boxplot_prefix = 'bulk_boxplot_spatial_'
         tsplot_prefix = 'bulk_tsplot_'
-        barplot_prefix = 'barplot_'
+        barplot_prefix = 'bulk_barplot_'
         independent_metrics = ['n_obs', 'status']
 
         for metric_ind, key in enumerate(metrics):
@@ -504,14 +600,14 @@ def get_metric_names_and_associated_files_spatial(request):
                 # ordinary metrics → only pairs with the relevant dataset
                 relevant_combis = OrderedDict(
                     (k, v) for k, v in combis.items()
-                    if k.count('_and_') == 1  # пара
+                    if k.count('_and_') == 1  
                 )
 
             # combining overview files and datasets for the metric
             metric_overview_files = []
             metric_datasets = []
             for combi, pretty_name in relevant_combis.items():
-                overview_file = plot_dir + f'overview_{combi}_n_gpi_was_used.png'
+                overview_file = plot_dir + f'bulk_overview_{combi}_n_gpi_was_used.png'
                 if os.path.exists(overview_file):
                     metric_overview_files.append(overview_file)
                     metric_datasets.append(pretty_name)

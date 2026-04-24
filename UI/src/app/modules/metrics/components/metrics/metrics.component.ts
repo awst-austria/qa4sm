@@ -103,6 +103,13 @@ export class MetricsComponent implements OnInit {
 
     const hasDatasetISMN = datasets.some(d => d.datasetModel.selectedDataset?.id === 4);
 
+    if (!hasDatasetISMN && this.validationModel().valType !== 'temporal') {
+      this.validationModel.update(model => {
+        model.valType = 'temporal';
+        return model;
+      });
+    }
+
     return !hasDatasetISMN;
   }
 
