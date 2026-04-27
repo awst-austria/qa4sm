@@ -88,7 +88,7 @@ tc_dataset_path = os.path.join(os.getcwd(), 'data', tc_dataset_name)
 tc_plot_obj = CustomPlotObject(tc_dataset_path)
 tc_plot_obj.display_metrics_and_datasets()
 tc_plot_obj.plot_map(metric='snr', output_dir=output_path, dataset_list=['ISMN'], title='ISMN SNR relative to ERA5_LAND and ESA_CCI_SM_passive', title_fontsize=20, colorbar_label='SNR', colorbar_ticks_fontsize=20, xy_ticks_fontsize=20)`,
-    image: null
+    image: '/static/images/customplots/imageStep8.webp'
   },
 ];
 
