@@ -177,7 +177,7 @@
           </td>
 
           <td class="delete-cell">
-            @if (isLive(rowData)) {
+            @if (isStoppable(rowData)) {
                 <button
                     pButton
                     type="button"
@@ -187,15 +187,12 @@
                     tooltipPosition="left"
                     (click)="openStopDialog(rowData, $event)">
                 </button>
-            } @else {
-
-              @if (rowData.doi || rowData.is_published) {
-                <p-tag severity="secondary" value="Published"></p-tag>
-              } 
-              @else if (rowData.is_archived) {
-                <p-tag severity="secondary" value="Archived"></p-tag>
-              } 
-              @else {
+            } @else if (!isLive(rowData)) {
+                @if (rowData.doi || rowData.is_published) {
+                  <p-tag severity="secondary" value="Published"></p-tag>
+                } @else if (rowData.is_archived) {
+                  <p-tag severity="secondary" value="Archived"></p-tag>
+                } @else {
                   <button
                     pButton
                     type="button"
@@ -205,8 +202,9 @@
                     tooltipPosition="left"
                     (click)="openDeleteDialog(rowData, $event)">
                   </button>
+                }
               }
-            }
+              <!-- isLive but not isStoppable = generating plots → show nothing -->
           </td>
         </tr>
       </ng-template>

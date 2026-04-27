@@ -259,6 +259,19 @@ export class ValidationsComponent implements OnInit, OnDestroy {
     });
   }
 
+  isStoppable(valrun: any): boolean {
+    if (!this.isLive(valrun)) return false;
+    
+    // Generating plots — no celery tasks to stop
+    if (valrun.status === 'RUNNING') {
+      if (valrun.val_type === 'both' && valrun.progress === 100 && valrun.progress_spatial === 100) return false;
+      if (valrun.val_type === 'spatial' && valrun.progress_spatial === 100) return false;
+      if (valrun.val_type === 'temporal' && valrun.progress === 100) return false;
+    }
+    
+    return true;
+  }
+
   isLive(valrun: any): boolean {
     return valrun.status === 'RUNNING' || valrun.status === 'SCHEDULED';
   }

@@ -9,7 +9,7 @@ from shutil import copy2, copytree
 from typing import List, Tuple, Dict, Union
 
 from celery.app import shared_task
-from celery.exceptions import TaskRevokedError, TimeoutError
+from celery.exceptions import TaskRevokedError, TimeoutError, Terminated
 from dateutil.tz import tzlocal
 from django.conf import settings
 
@@ -536,6 +536,9 @@ def execute_job(self, validation_id, job):
             "Finished job {} from validation {}, took {} seconds for {} gpis".
             format(task_id, validation_id, duration, numgpis))
         return result
+    except (TaskRevokedError, Terminated) as e:
+        raise 
+
     except Exception as e:
         self.retry(countdown=2, exc=e)
 
@@ -1299,6 +1302,15 @@ def run_validation(validation_id, val_type="temporal"):
     
     __logger.info("Starting validation: {}".format(validation_id))
     validation_run = ValidationRun.objects.get(pk=validation_id)
+
+    # Validation cancel id shedueled
+    if validation_run.progress == -1:
+        __logger.info(f"Validation {validation_id} was cancelled before starting.")
+        validation_run.end_time = datetime.now(tzlocal())
+        validation_run.save()
+        return
+    
+
     validation_aborted = False
 
     if (not hasattr(settings, 'CELERY_TASK_ALWAYS_EAGER')) or (
@@ -1644,7 +1656,7 @@ def stop_running_validation(validation_id):
     celery_tasks = CeleryTask.objects.filter(validation=validation_run)
 
     for task in celery_tasks:
-        app.control.revoke(str(task.celery_task_id))  # @UndefinedVariable
+        app.control.revoke(str(task.celery_task_id), terminate=True, signal='SIGTERM')  # @UndefinedVariable
         task.delete()
 
     run_dir = os.path.join(OUTPUT_FOLDER, str(validation_run.id))
