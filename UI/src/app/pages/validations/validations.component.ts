@@ -117,7 +117,7 @@ export class ValidationsComponent implements OnInit, OnDestroy {
     this.rows$ = dataState$.pipe(map(res => res.rows));
     this.totalRecords$ = dataState$.pipe(map(res => res.total));
 
-    this.statusSubscription = interval(30000).pipe(  // ← change this number
+    this.statusSubscription = interval(30000).pipe(  // every 30 seconds
       switchMap(() => this.rows$.pipe(take(1))),
       filter(rows => rows.some(r => this.isLive(r)))
     ).subscribe(() => {
@@ -260,14 +260,14 @@ export class ValidationsComponent implements OnInit, OnDestroy {
   }
 
   isStoppable(valrun: any): boolean {
-    if (!this.isLive(valrun)) return false;
+
+    if (valrun.status === 'SCHEDULED') return false;  
+    if (valrun.status !== 'RUNNING') return false;
     
     // Generating plots — no celery tasks to stop
-    if (valrun.status === 'RUNNING') {
-      if (valrun.val_type === 'both' && valrun.progress === 100 && valrun.progress_spatial === 100) return false;
-      if (valrun.val_type === 'spatial' && valrun.progress_spatial === 100) return false;
-      if (valrun.val_type === 'temporal' && valrun.progress === 100) return false;
-    }
+    if (valrun.val_type === 'spatial' && valrun.progress_spatial === 100) return false;
+    if (valrun.val_type === 'temporal' && valrun.progress === 100) return false;
+    if (valrun.val_type === 'both' && valrun.progress === 100 && valrun.progress_spatial === 100) return false;
     
     return true;
   }
