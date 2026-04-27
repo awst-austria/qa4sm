@@ -35,10 +35,13 @@ def determine_status(progress, end_time, progress_spatial=None, val_type=None,
     
     """Determine the status based on progress, end_time and output files."""
     
+    if progress == -1 or (progress_spatial is not None and progress_spatial == -1):
+        return 'CANCELLED'
+    
     if val_type == 'spatial':
-        relevant_progress = progress_spatial if progress_spatial is not None else progress
+        relevant_progress = progress_spatial
     elif val_type == 'both':
-        relevant_progress = min(progress, progress_spatial) if progress_spatial is not None else progress
+        relevant_progress = min(progress, progress_spatial)
     else:
         relevant_progress = progress
 
@@ -48,8 +51,6 @@ def determine_status(progress, end_time, progress_spatial=None, val_type=None,
         if val_type == 'both' and progress is not None and progress > 0:
             return 'RUNNING'
         return 'SCHEDULED'
-    elif relevant_progress < 0:
-        return 'CANCELLED'
     elif end_time and relevant_progress == 100:
         if val_type == 'spatial' and not output_file_spatial:
             return 'ERROR'

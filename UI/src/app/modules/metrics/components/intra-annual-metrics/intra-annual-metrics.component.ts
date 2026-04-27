@@ -24,11 +24,9 @@ export class IntraAnnualMetricsComponent {
 
   constructor() {
     effect(() => {
- 
       if (this.disabled() && this.selectedMetric()?.intra_annual_metrics) {
         this.toggleMetricSelection(false);
       }
-      console.log('disabled:', this.disabled(), 'intra_annual:', this.selectedMetric()?.intra_annual_metrics);
     });
   }
 

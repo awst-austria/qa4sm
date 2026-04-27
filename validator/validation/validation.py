@@ -1293,15 +1293,8 @@ def untrack_celery_task(task_id):
 
 def run_validation(validation_id, val_type="temporal"):
 
-    # 2026-14-04: FIX UNTIL SOMEONE TAKES LOOK AT TEMPORAL XARRAY VALIDATION
-    if val_type in ["both"]:
-        spatial_run = run_validation(validation_id, val_type="spatial")
-        temporal_run = run_validation(validation_id, val_type="temporal")
-        return (temporal_run, spatial_run)
-    # ----------------------------------------------------------------------
-    
     __logger.info("Starting validation: {}".format(validation_id))
-    validation_run = ValidationRun.objects.get(pk=validation_id)
+    validation_run = ValidationRun.objects.get(pk=validation_id) 
 
     # Validation cancel id shedueled
     if validation_run.progress == -1:
@@ -1309,8 +1302,20 @@ def run_validation(validation_id, val_type="temporal"):
         validation_run.end_time = datetime.now(tzlocal())
         validation_run.save()
         return
-    
 
+    # 2026-14-04: FIX UNTIL SOMEONE TAKES LOOK AT TEMPORAL XARRAY VALIDATION
+    if val_type in ["both"]:
+        spatial_run = run_validation(validation_id, val_type="spatial")
+        validation_run.refresh_from_db(fields=['progress', 'progress_spatial'])
+    
+        if validation_run.progress == -1:
+            __logger.info(f"Validation {validation_id} was cancelled after spatial, skipping temporal.")
+            return (None, spatial_run)
+        
+        temporal_run = run_validation(validation_id, val_type="temporal")
+        return (temporal_run, spatial_run)
+    # ----------------------------------------------------------------------
+    
     validation_aborted = False
 
     if (not hasattr(settings, 'CELERY_TASK_ALWAYS_EAGER')) or (
@@ -1371,6 +1376,11 @@ def run_validation(validation_id, val_type="temporal"):
                 track_celery_task(validation_run, celery_job.id)
 
         for async_result in async_results:
+
+            validation_run.refresh_from_db(fields=['progress', 'progress_spatial'])
+            if validation_run.progress == -1:
+                validation_aborted = True
+
             try:
                 if not validation_aborted:  # only wait for this task if the validation hasn't been cancelled
                     task_running = True
@@ -1439,8 +1449,8 @@ def run_validation(validation_id, val_type="temporal"):
                         nok = sum(ok)
                         return nok, ok
                     
-                    validation_run.ok_times = 0
-                    validation_run.error_times = 0
+                    #validation_run.ok_times = 0
+                    #validation_run.error_times = 0
 
                     if val_type in ["both", "temporal"]:
                         nok, ok = get_ok_points(results)                     
@@ -1458,6 +1468,8 @@ def run_validation(validation_id, val_type="temporal"):
                             validation_run.total_times = ntimes
 
                     elif val_type == "spatial":
+                        validation_run.ok_times = 0
+                        validation_run.error_times = 0
                         nok, ok = get_ok_points(sr)                     
                         ntimes = len(sr[list(sr.keys())[0]]["date_time"])
                         validation_run.ok_times += nok
