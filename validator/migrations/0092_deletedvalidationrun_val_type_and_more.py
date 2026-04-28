@@ -6,7 +6,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('validator', '0090_userdatasetfile_original_file_size'),
+        ('validator', '0091_alter_userdatasetfile_original_file_size'),
     ]
 
     operations = [
