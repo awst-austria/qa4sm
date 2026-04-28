@@ -22,7 +22,6 @@ QA4SM v3.6.0 - Release notes 2026-02-26
 
 QA4SM v3.5.0 - Release notes 2026-01-26
 ======================================================
-
 # Fixes
 1. Update Home and Validate Page Frontend.
 2. BugFix Pinned Validations.
@@ -31,7 +30,6 @@ QA4SM v3.5.0 - Release notes 2026-01-26
 
 QA4SM v3.4.1 - Release notes 2026-01-15
 ======================================================
-
 # Fixes
 1. Fixed broken URLs in automated email and within NetCDF file.
 2. Update requirements.txt and AngularCore.
