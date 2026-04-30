@@ -81,7 +81,7 @@ python-dateutil==2.9.0.post0
 pytz==2024.1
 pyyaml==6.0.2
 qa4sm-preprocessing==0.6.3
-qa4sm-reader @ git+https://github.com/awst-austria/qa4sm-reader.git@master
+qa4sm-reader==0.12.3
 redis==5.2.0
 requests==2.32.4
 scipy==1.15.1
