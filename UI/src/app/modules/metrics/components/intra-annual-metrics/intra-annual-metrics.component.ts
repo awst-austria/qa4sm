@@ -1,4 +1,4 @@
-import {Component, Input, model, signal} from '@angular/core';
+import {Component, effect, input, model, signal} from '@angular/core';
 import {IntraAnnualMetricsDto} from "../../../../pages/validate/service/validation-run-config-dto";
 import { SharedPrimeNgModule } from 'src/app/shared.primeNg.module';
 
@@ -10,7 +10,7 @@ import { SharedPrimeNgModule } from 'src/app/shared.primeNg.module';
     styleUrl: './intra-annual-metrics.component.scss'
 })
 export class IntraAnnualMetricsComponent {
-  @Input() disabled: boolean = false;
+  disabled = input<boolean>(false);
 
   intraAnnualMetricTypes: string[] = ['Seasonal', 'Monthly'];
 
@@ -22,8 +22,13 @@ export class IntraAnnualMetricsComponent {
   maxIntraAnnualOverlap = signal(45);
   selectedMetric = model<IntraAnnualMetricsDto | null>(null)
 
-
-
+  constructor() {
+    effect(() => {
+      if (this.disabled() && this.selectedMetric()?.intra_annual_metrics) {
+        this.toggleMetricSelection(false);
+      }
+    });
+  }
 
   updateType(value: string) {
     this.selectedMetric.update((metric) => {

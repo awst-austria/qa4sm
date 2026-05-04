@@ -27,6 +27,12 @@ export class MetricsComponent implements OnInit {
   stabilityMetrics: MetricModel;
   // ad a metric instance
 
+   valTypeOptions = [
+    { label: 'Temporal', value: 'temporal' },
+    { label: 'Spatial', value: 'spatial' },
+    { label: 'Both', value: 'both' }
+  ];
+
 
   constructor() {
   }
@@ -81,11 +87,36 @@ export class MetricsComponent implements OnInit {
   }
 
   stabilityMetricsDisabled(): boolean {
-    return this.validationModel().intraAnnualMetrics.intra_annual_metrics;
+    return this.validationModel().intraAnnualMetrics.intra_annual_metrics
+    || this.isSpatialOrBoth();
   }
 
   intraAnnulMetricDisabled(): boolean{
-    return this.stabilityMetrics.value;
+    return this.stabilityMetrics.value
+    || this.isSpatialOrBoth();
+  }
+
+  // Activate spatial validation only if ISMN is selected
+
+  ISMN_isTrue(): boolean {
+    const datasets = this.validationModel().datasetConfigurations;
+
+    const hasDatasetISMN = datasets.some(d => d.datasetModel.selectedDataset?.id === 4);
+
+    if (!hasDatasetISMN && this.validationModel().valType !== 'temporal') {
+      this.validationModel.update(model => {
+        model.valType = 'temporal';
+        return model;
+      });
+    }
+
+    return !hasDatasetISMN;
+  }
+
+  // Auxilary function to deactivate Stability or Intra-Annual metrics if ValType is set to spatial or both
+  isSpatialOrBoth(): boolean {
+    const valType = this.validationModel().valType;
+    return valType === 'spatial' || valType === 'both';
   }
 
   // If something else should happen, when the metric is checked, add a proper function here

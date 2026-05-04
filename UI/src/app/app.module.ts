@@ -1,58 +1,57 @@
-import {NgModule} from '@angular/core';
-import {BrowserModule} from '@angular/platform-browser';
+import { NgModule } from '@angular/core';
+import { BrowserModule } from '@angular/platform-browser';
 
-import {AppRoutingModule} from './app-routing.module';
-import {AppComponent} from './app.component';
-import {HomeComponent} from './pages/home/home.component';
-import {ValidateComponent} from './pages/validate/validate.component';
-import {FormsModule, ReactiveFormsModule} from '@angular/forms';
-import {NavigationBarModule} from './modules/navigation-bar/navigation-bar.module';
+import { AppRoutingModule } from './app-routing.module';
+import { AppComponent } from './app.component';
+import { HomeComponent } from './pages/home/home.component';
+import { ValidateComponent } from './pages/validate/validate.component';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { NavigationBarModule } from './modules/navigation-bar/navigation-bar.module';
 
-import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
-import {ErrorPageComponent} from './pages/error/error-page.component';
+import { ErrorPageComponent } from './pages/error/error-page.component';
+import { ValidationResultComponent } from './pages/validation-result/validation-result.component';
+import { HTTP_INTERCEPTORS, provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
+import { HttpTokenInterceptor } from './modules/core/interceptors/http-token.interceptor';
+import { LoggerModule, NgxLoggerLevel } from 'ngx-logger';
 
-import {ValidationResultComponent} from './pages/validation-result/validation-result.component';
-import {HTTP_INTERCEPTORS, provideHttpClient, withInterceptorsFromDi} from '@angular/common/http';
-import {HttpTokenInterceptor} from './modules/core/interceptors/http-token.interceptor';
-import {LoggerModule, NgxLoggerLevel} from 'ngx-logger';
+import { UserProfileComponent } from './pages/user-profile/user-profile.component';
 
-import {UserProfileComponent} from './pages/user-profile/user-profile.component';
-
-import {DatasetModule} from './modules/dataset/dataset.module';
-import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
-import {FontAwesomeModule} from '@fortawesome/angular-fontawesome';
-import {PanelModule} from 'primeng/panel';
-import {AccordionModule} from 'primeng/accordion';
-import {TooltipModule} from 'primeng/tooltip';
-import {ButtonModule} from 'primeng/button';
-import {PasswordModule} from 'primeng/password';
-import {InputTextModule} from 'primeng/inputtext';
-import {FilterModule} from './modules/filter/filter.module';
-import {ToastModule} from 'primeng/toast';
-import {MessageService} from 'primeng/api';
-import {ValidationResultModule} from './modules/validation-result/validation-result.module';
-import {SpatialSubsetModule} from './modules/spatial-subset/spatial-subset.module';
-import {CarouselModule} from 'primeng/carousel';
-import {ValidationPeriodModule} from './modules/validation-period/validation-period.module';
-import {MetricsModule} from './modules/metrics/metrics.module';
-import {AnomaliesModule} from './modules/anomalies/anomalies.module';
-import {ScalingModule} from './modules/scaling/scaling.module';
-import {MapModule} from './modules/map/map.module';
-import {ComparisonComponent} from './pages/comparison/comparison.component';
-import {ComparisonModule} from './modules/comparison/comparison.module';
+import { DatasetModule } from './modules/dataset/dataset.module';
+import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { PanelModule } from 'primeng/panel';
+import { AccordionModule } from 'primeng/accordion';
+import { TooltipModule } from 'primeng/tooltip';
+import { ButtonModule } from 'primeng/button';
+import { PasswordModule } from 'primeng/password';
+import { InputTextModule } from 'primeng/inputtext';
+import { FilterModule } from './modules/filter/filter.module';
+import { ToastModule } from 'primeng/toast';
+import { MessageService } from 'primeng/api';
+import { ValidationResultModule } from './modules/validation-result/validation-result.module';
+import { SpatialSubsetModule } from './modules/spatial-subset/spatial-subset.module';
+import { CarouselModule } from 'primeng/carousel';
+import { ValidationPeriodModule } from './modules/validation-period/validation-period.module';
+import { MetricsModule } from './modules/metrics/metrics.module';
+import { AnomaliesModule } from './modules/anomalies/anomalies.module';
+import { ScalingModule } from './modules/scaling/scaling.module';
+import { MapModule } from './modules/map/map.module';
+import { ComparisonComponent } from './pages/comparison/comparison.component';
+import { ComparisonModule } from './modules/comparison/comparison.module';
 import {
   TemporalMatchingComponent
 } from './modules/temporal-matching/components/temporal-matching/temporal-matching.component';
-import {TemporalMatchingModule} from './modules/temporal-matching/temporal-matching.module';
-import {CoreModule} from './modules/core/core.module';
-import {SignupComponent} from './pages/signup/signup.component';
-import {UserModule} from './modules/user/user.module';
-import {SignupCompleteComponent} from './pages/signup-complete/signup-complete.component';
-import {DeactivateUserCompleteComponent} from './pages/deactivate-user-complete/deactivate-user-complete.component';
-import {PasswordResetComponent} from './pages/password-reset/password-reset.component';
-import {PasswordResetDoneComponent} from './pages/password-reset-done/password-reset-done.component';
-import {SetPasswordComponent} from './pages/set-password/set-password.component';
+import { TemporalMatchingModule } from './modules/temporal-matching/temporal-matching.module';
+import { CoreModule } from './modules/core/core.module';
+import { SignupComponent } from './pages/signup/signup.component';
+import { UserModule } from './modules/user/user.module';
+import { SignupCompleteComponent } from './pages/signup-complete/signup-complete.component';
+import { DeactivateUserCompleteComponent } from './pages/deactivate-user-complete/deactivate-user-complete.component';
+import { PasswordResetComponent } from './pages/password-reset/password-reset.component';
+import { PasswordResetDoneComponent } from './pages/password-reset-done/password-reset-done.component';
+import { SetPasswordComponent } from './pages/set-password/set-password.component';
 import {
   PasswordResetValidateTokenComponent
 } from './pages/password-reset-validate-token/password-reset-validate-token.component';
@@ -71,6 +70,8 @@ import {MaintenanceModeComponent} from "./modules/core/maintenance-mode/maintena
 import { SharedPrimeNgModule } from './shared.primeNg.module';
 import { providePrimeNG } from 'primeng/config';
 import Aura from '@primeuix/themes/aura';
+import { ResultFilesSpatialComponent } from './modules/validation-result/components/result-files-spatial/result-files-spatial.component';
+import { SummaryStatisticsSpatialComponent } from './modules/validation-result/components/summary-statistics-spatial/summary-statistics-spatial.component';
 
 @NgModule({ declarations: [
         AppComponent,
@@ -90,6 +91,7 @@ import Aura from '@primeuix/themes/aura';
         TemporalMatchingComponent,
         MyDatasetsComponent,
         ContactUsComponent,
+
     ],
     bootstrap: [AppComponent],
     imports: [LoggerModule.forRoot({level: NgxLoggerLevel.DEBUG, serverLogLevel: NgxLoggerLevel.ERROR}),
@@ -133,9 +135,9 @@ import Aura from '@primeuix/themes/aura';
         ContactModule,
         SelectButtonModule, 
         SharedPrimeNgModule,
-        MaintenanceModeComponent], 
-        
-        providers: [
+        MaintenanceModeComponent,
+        ResultFilesSpatialComponent,
+        SummaryStatisticsSpatialComponent], providers: [
         {
             provide: HTTP_INTERCEPTORS,
             useClass: HttpTokenInterceptor,

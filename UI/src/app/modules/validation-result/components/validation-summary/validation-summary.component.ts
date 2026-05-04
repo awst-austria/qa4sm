@@ -33,10 +33,11 @@ export class ValidationSummaryComponent implements OnInit, OnDestroy {
   configurations$: Observable<any>;
   dateFormat = 'medium';
   timeZone = 'UTC';
-  hideElement = true;
+  hideElement = signal(true);
   originalDate = signal<Date | undefined>(undefined)
   runTime: number;
   errorRate: number;
+  errorRateSpatial: number;
   isOwner: boolean;
   dataFetchError = signal(false);
   // some BS added to avoid refreshing component every time sth changes
@@ -46,6 +47,7 @@ export class ValidationSummaryComponent implements OnInit, OnDestroy {
   isNearExpiry = signal<boolean | undefined>(undefined);
   noFilters = signal(false);
   noParamFilters = signal(false);
+  nameLength = 0;
 
   faIcons = {faArchive: fas.faArchive, faPencil: fas.faPen};
   public isPublishingWindowOpen: boolean;
@@ -164,24 +166,44 @@ export class ValidationSummaryComponent implements OnInit, OnDestroy {
   }
 
   toggleEditing(): void {
-    this.hideElement = !this.hideElement;
+    this.hideElement.set(!this.hideElement());
   }
 
   saveNameObserver = (newName: string) => {
     return {
-      next: () => this.onNameSave(newName),
-      error: (error: CustomHttpError) => this.toastService.showErrorWithHeader(error.errorMessage.header, error.errorMessage.message),
-      complete: () => this.toastService.showSuccess('Name updated')
+      next: () => {
+        this.valName.set(newName);  
+      },
+      error: (error: CustomHttpError) => 
+        this.toastService.showErrorWithHeader(
+          error.errorMessage.header, 
+          error.errorMessage.message
+        ),
+      complete: () => {
+        this.hideElement.set(true);  
+        this.toastService.showSuccess('Name updated');
+      }
     }
   }
 
   onNameSave(newName: string): void {
     this.valName.set(newName);
-    this.toggleEditing();
   }
 
   saveName(validationId: string, newName: string): void {
+    if (newName.length > 80) {
+      this.toastService.showErrorWithHeader(
+        'Name too long', 
+        `Name must be 80 characters or less (currently ${newName.length})`
+      );
+      return;
+    }
     this.validationService.saveResultsName(validationId, newName).subscribe(this.saveNameObserver(newName));
+  }
+
+
+  onNameInput(value: string): void {
+    this.nameLength = value.length;
   }
 
   update(doUpdate: any): void {
@@ -197,24 +219,22 @@ export class ValidationSummaryComponent implements OnInit, OnDestroy {
   }
 
   getOriginalDate(): void {
-    this.validationModel.validationRun$
-      .subscribe(data => {
-      if (data.is_a_copy) {
-        this.validationService.getCopiedRunRecord(data.id)
-          .subscribe(copiedRun => {
-            // error handled directly in the HTML file
-            copiedRun.original_run_date ?
-              this.originalDate.set(copiedRun.original_run_date) :
-              this.originalDate.set(data.start_time)
-          });
-      }
-    });
+    if (this.validationRun.is_a_copy) {
+      this.validationService.getCopiedRunRecord(this.validationRun.id)
+        .subscribe(copiedRun => {
+          copiedRun.original_run_date ?
+            this.originalDate.set(copiedRun.original_run_date) :
+            this.originalDate.set(this.validationRun.start_time)
+        });
+    }
   }
 
   setInitialValues(): void {
     this.runTime = this.getRunTime(this.validationRun.start_time, this.validationRun.end_time);
     this.errorRate = this.validationRun.total_points !== 0 ?
       (this.validationRun.total_points - this.validationRun.ok_points) / this.validationRun.total_points : 1;
+    this.errorRateSpatial = this.validationRun.total_times !== 0 ?
+      (this.validationRun.total_times - this.validationRun.ok_times) / this.validationRun.total_times : 1;
     this.isOwner = this.validationRun.user === this.authService.currentUser.id;
     this.valName.set(this.validationRun.name_tag);
     this.isArchived.set(this.validationRun.is_archived);

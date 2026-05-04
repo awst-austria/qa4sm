@@ -13,6 +13,9 @@ class DeletedValidationRun(models.Model):
     total_points = models.IntegerField(default=0)
     error_points = models.IntegerField(default=0)
     ok_points = models.IntegerField(default=0)
+    total_times = models.IntegerField(default=0)
+    error_times = models.IntegerField(default=0)
+    ok_times = models.IntegerField(default=0)
     datasets = models.JSONField(default=list)
     spatial_reference = models.CharField(max_length=200, default=None, null=True)
     temporal_reference = models.CharField(max_length=200, default=None, null=True)
@@ -53,6 +56,11 @@ class DeletedValidationRun(models.Model):
 
     stability_metrics = models.BooleanField(default=False)
     status = models.CharField(max_length=10, default='DONE')
+    val_type = models.CharField(
+        max_length=10,
+        default='temporal',   # default for old deleted records
+        blank=True
+    )
 
 
     def __str__(self):

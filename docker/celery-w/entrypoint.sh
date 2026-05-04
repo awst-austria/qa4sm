@@ -23,6 +23,11 @@ if [[ "$QA4SM_INSTANCE" == "TEST" ]]; then
     git switch test-branch || git checkout -b test-branch origin/test-branch
 fi
 
+if [[ "$QA4SM_INSTANCE" == "TEST2" ]]; then
+    git fetch origin
+    git switch interactive-maps-test || git checkout -b interactive-maps-test origin/interactive-maps-test
+fi
+
 if [[ "$QA4SM_INSTANCE" == "PROD" ]]; then
     git fetch origin
     git switch main

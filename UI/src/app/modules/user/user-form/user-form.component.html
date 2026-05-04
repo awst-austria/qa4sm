@@ -1,245 +1,254 @@
 <p-toast></p-toast>
 <p-confirmDialog key="apiTokenConfirm" [style]="{width: '30vw'}" [baseZIndex]="10000"></p-confirmDialog>
 
-<div class="w-11 md:w-10 lg:w-12 xl:w-12">
-  <qa-maintenance-mode *ngIf="maintenanceMode" [action]="userData ? 'update your data' : 'sign up'"/>
-  <div *ngIf="!maintenanceMode">
-    <div class="center">
-      <h1 *ngIf="!userData" class="text-center"> Sign up </h1>
-      <h1 *ngIf="userData" class="text-center">User profile</h1>
+<div class="flex flex-column justify-content-center align-items-center px-2 py-5">
+  <div class="w-11">
+
+    <qa-maintenance-mode *ngIf="maintenanceMode" [action]="userData ? 'update your data' : 'sign up'"/>
+
+    <div *ngIf="!maintenanceMode">
+      <h1 *ngIf="!userData" class="text-center mb-4">Sign up</h1>
+      <h1 *ngIf="userData" class="text-center mb-4">User profile</h1>
+
+      <p-panel>
+        <form [formGroup]="userForm" (ngSubmit)="onSubmit()" class="p-fluid flex flex-column gap-5">
+
+          <!-- Username -->
+          <div class="mt-4">
+            <p-floatLabel>
+              <input pInputText
+                     id="username"
+                     formControlName="username"
+                     class="w-full"
+                     type="text"
+                     autocomplete="username"
+                     [ngClass]="{'ng-invalid ng-dirty': formErrors?.username}">
+              <label for="username">Username</label>
+            </p-floatLabel>
+            <small class="text-muted">
+              Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only.
+            </small>
+            <div *ngIf="formErrors && formErrors.username" class="mt-1">
+              <small *ngFor="let error of formErrors.username" class="error-message">{{ error.message }}<br></small>
+            </div>
+          </div>
+
+          <!-- Password -->
+          <div *ngIf="!userForm.controls['password1'].disabled">
+            <p-floatLabel>
+              <input pInputText
+                     id="password"
+                     formControlName="password1"
+                     class="w-full"
+                     type="password"
+                     autocomplete="new-password"
+                     [ngClass]="{'ng-invalid ng-dirty': formErrors?.password1}">
+              <label for="password">Password</label>
+            </p-floatLabel>
+            <small class="text-muted">
+              At least 8 characters. Cannot be entirely numeric or too common.
+            </small>
+            <div *ngIf="formErrors && formErrors.password1" class="alert mt-1">
+              <small *ngFor="let error of formErrors.password1" class="error-message">{{ error.message }}<br></small>
+            </div>
+          </div>
+
+          <!-- Password confirmation -->
+          <div *ngIf="!userForm.controls['password2'].disabled">
+            <p-floatLabel>
+              <input pInputText
+                     id="password-confirm"
+                     formControlName="password2"
+                     class="w-full"
+                     type="password"
+                     [ngClass]="{'ng-invalid ng-dirty': formErrors?.password2}">
+              <label for="password-confirm">Password confirmation</label>
+            </p-floatLabel>
+            <small class="text-muted">Enter the same password as before, for verification.</small>
+            <div *ngIf="formErrors && formErrors.password2" class="alert mt-1">
+              <small *ngFor="let error of formErrors.password2" class="error-message">{{ error.message }}<br></small>
+            </div>
+          </div>
+
+          <!-- Email -->
+          <div>
+            <p-floatLabel>
+              <input pInputText
+                     id="email"
+                     formControlName="email"
+                     class="w-full"
+                     type="email"
+                     autocomplete="email"
+                     [ngClass]="{'ng-invalid ng-dirty': formErrors?.email}">
+              <label for="email">Email address</label>
+            </p-floatLabel>
+            <small class="text-muted">Required. You will receive validation notifications here.</small>
+            <div *ngIf="formErrors && formErrors.email" class="alert mt-1">
+              <small *ngFor="let error of formErrors.email" class="error-message">{{ error.message }}<br></small>
+            </div>
+          </div>
+
+          <!-- First name -->
+          <p-floatLabel>
+            <input pInputText
+                   id="first-name"
+                   formControlName="first_name"
+                   class="w-full"
+                   type="text">
+            <label for="first-name">First name <span class="text-muted">(optional)</span></label>
+          </p-floatLabel>
+
+          <!-- Last name -->
+          <p-floatLabel>
+            <input pInputText
+                   id="last-name"
+                   formControlName="last_name"
+                   class="w-full"
+                   type="text">
+            <label for="last-name">Last name <span class="text-muted">(optional)</span></label>
+          </p-floatLabel>
+
+          <!-- Organisation -->
+          <p-floatLabel>
+            <input pInputText
+                   id="organisation"
+                   formControlName="organisation"
+                   class="w-full"
+                   type="text">
+            <label for="organisation">Organisation <span class="text-muted">(optional)</span></label>
+          </p-floatLabel>
+
+          <!-- Country -->
+          <p-floatLabel class="w-full">
+            <p-select
+              inputId="selectCountry"
+              [options]="countries$|async"
+              styleClass="w-full"
+              [style]="{'width': '100%', 'height': '2.5rem'}"
+              formControlName="country"
+              optionLabel="name"
+              optionValue="code"
+              placeholder=" "
+              ngDefaultControl>
+            </p-select>
+            <label for="selectCountry">Country <span class="text-muted">(optional)</span></label>
+          </p-floatLabel>
+
+          <!-- ORCID -->
+          <div>
+            <p-floatLabel>
+              <input pInputText
+                     id="orcid"
+                     formControlName="orcid"
+                     class="w-full"
+                     type="text"
+                     [ngClass]="{'ng-invalid ng-dirty': formErrors?.orcid}">
+              <label for="orcid">ORCID <span class="text-muted">(optional)</span></label>
+            </p-floatLabel>
+            <small class="text-muted">
+              e.g. 0000-0002-1825-0097 — used to identify you as author when publishing to Zenodo.
+            </small>
+            <div *ngIf="formErrors && formErrors.orcid" class="alert mt-1">
+              <small *ngFor="let error of formErrors.orcid" class="error-message">{{ error.message }}<br></small>
+            </div>
+          </div>
+
+          <!-- Terms -->
+          <div *ngIf="!userData" class="flex align-items-center gap-2">
+            <p-checkbox id="terms" formControlName="terms_consent" [binary]="true"></p-checkbox>
+            <label for="terms" class="cursor-pointer">
+              I accept the <a [routerLink]="['/terms']" target="_blank">terms, conditions and privacy policy</a>.
+            </label>
+          </div>
+
+          <!-- Honeypot -->
+          <div *ngIf="!userData" class="flex flex-column gap-2">
+            <label for="honeypot-user" class="text-muted text-sm">
+              <i class="pi pi-shield mr-2"></i>
+              Are you a real person? Slide the handle all the way to the right
+              <i class="pi pi-angle-double-right ml-1"></i>
+            </label>
+            <p-slider id="honeypot-user" formControlName="honeypot"></p-slider>
+          </div>
+
+          <!-- Submit -->
+          <div class="flex justify-content-center">
+            <button *ngIf="!userData"
+                    pButton
+                    type="submit"
+                    label="Sign up"
+                    class="w-6"
+                    [disabled]="!userForm.valid">
+            </button>
+            <button *ngIf="userData"
+                    pButton
+                    type="submit"
+                    label="Save changes"
+                    class="w-6">
+            </button>
+          </div>
+
+        </form>
+      </p-panel>
+
+      <!-- API Token & Account actions (only for existing users) -->
+      <div *ngIf="userData" class="flex flex-column gap-3 mt-4">
+
+        <p-panel header="API Token">
+          <div class="flex flex-column gap-3 pt-4">
+            <p-floatLabel>
+              <input #tokenInput
+                     pInputText
+                     id="api-token"
+                     class="w-full"
+                     type="text"
+                     [value]="apiToken || 'No token assigned'"
+                     readonly>
+              <label for="api-token">
+                <i class="pi pi-key mr-2"></i>API Token
+              </label>
+            </p-floatLabel>
+
+            <div class="flex justify-content-center gap-2">
+              <button pButton
+                      type="button"
+                      label="Request API token"
+                      class="w-6"
+                      (click)="confirmRequestToken()"
+                      pTooltip="Request a unique API token for submitting validations via public API">
+              </button>
+              <button *ngIf="hasToken()"
+                      pButton
+                      type="button"
+                      icon="pi pi-copy"
+                      class="p-button-secondary"
+                      (click)="copyToken(tokenInput)"
+                      pTooltip="Copy token to clipboard">
+              </button>
+            </div>
+          </div>
+        </p-panel>
+
+        <p-panel header="Account">
+          <div class="flex flex-column align-items-center  gap-2 pt-2">
+            
+              <button pButton
+                      type="button"
+                      label="Update password"
+                      class="w-6"
+                      (click)="redirectToSetPassword()">
+              </button>
+              <button pButton
+                      type="button"
+                      label="Deactivate my account"
+                      class="p-button-danger w-6"
+                      (click)="deactivateAccount()">
+              </button>
+            
+          </div>
+        </p-panel>
+
+      </div>
     </div>
-    <form [formGroup]="userForm" (ngSubmit)="onSubmit()" *ngIf="!maintenanceMode">
-      <div class="py-3">
-        <span class="p-float-label">
-          <input pInputText
-            id="username"
-            formControlName="username"
-            class="form-field w-full"  
-            type="text"
-            autocomplete="username">
-          <label for="username">Username</label>
-          <span pTooltip="Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only."
-                class="pi pi-question-circle">
-          </span>
-        </span>
-        <div *ngIf="formErrors && formErrors.username"
-             class="alert">
-          <span *ngFor="let error of formErrors.username">{{ error.message }}<br></span>
-        </div>
-      </div>
-
-      <div class="py-3" *ngIf="!userForm.controls['password1'].disabled">
-        <span class="p-float-label">
-          <input pInputText 
-            id="password" 
-            formControlName="password1"
-            class="form-field w-full" 
-            type="password" 
-            autocomplete="new-password">
-          <label for="password">Password</label>
-          <span
-            pTooltip="Your password can't be too similar to your other personal information.Your password must contain at least 8 characters. Your password can't be a commonly used password. Your password can't be entirely numeric."
-            class="pi pi-question-circle">
-          </span>
-        </span>
-        <div *ngIf="formErrors && formErrors.password1"
-             class="alert">
-          <span *ngFor="let error of formErrors.password1">{{ error.message }}<br></span>
-        </div>
-      </div>
-
-      <div class="py-3" *ngIf="!userForm.controls['password2'].disabled">
-        <span class="p-float-label">
-          <input pInputText
-            id="password-confirm"
-            class="form-field w-full" 
-            formControlName="password2"
-            type="password">
-          <label for="password-confirm">Password confirmation</label>
-          <span pTooltip="Enter the same password as before, for verification."
-                class="pi pi-question-circle">
-          </span>
-        </span>
-        <div *ngIf="formErrors && formErrors.password2"
-             class="alert">
-          <span *ngFor="let error of formErrors.password2">{{ error.message }}<br></span>
-        </div>
-      </div>
-
-      <div class="py-3">
-        <span class="p-float-label">
-          <input pInputText 
-            id="email"
-            formControlName="email"
-            class="form-field w-full"  
-            type="email"
-            autocomplete="email">
-          <label for="email">Email address</label>
-          <span pTooltip="Required. A valid email address where you can receive notifications about validations."
-                class="pi pi-question-circle">
-          </span>
-        </span>
-        <div *ngIf="formErrors && formErrors.email"
-             class="alert">
-          <span *ngFor="let error of formErrors.email">{{ error.message }}<br></span>
-        </div>
-      </div>
-
-      <div class="py-3">
-        <span class="p-float-label">
-          <input class="form-field w-full" id="first-name" type="text" pInputText formControlName="first_name">
-          <label for="first-name">First name (optional)</label>
-          <span pTooltip="Optional."
-                class="pi pi-question-circle">
-          </span>
-        </span>
-      </div>
-
-      <div class="py-3">
-        <span class="p-float-label">
-          <input class="form-field w-full" id="last-name" type="text" pInputText formControlName="last_name">
-          <label for="last-name">Last name (optional)</label>
-          <span pTooltip="Optional."
-                class="pi pi-question-circle">
-          </span>
-        </span>
-      </div>
-
-      <div class="py-3">
-        <span class="p-float-label">
-          <input class="form-field w-full" id="organisation" type="text" pInputText formControlName="organisation">
-          <label for="organisation">Organisation (optional)</label>
-          <span pTooltip="Optional. The organisation (university, company, etc.) you work for or represent."
-                class="pi pi-question-circle">
-          </span>
-        </span>
-      </div>
-
-      <div class="py-3">
-        <div class="p-float-label">
-          <p-select class="form-field w-full"
-                      inputId="selectCountry"
-                      [options]="countries$|async"
-                      [style]="{'width':'15rem', 'height': '2.5rem'}"
-                      formControlName="country"
-                      optionLabel="name"
-                      optionValue="code"
-                      placeholder=" "
-                      ngDefaultControl>
-          </p-select>
-          <label for="selectCountry">Country (optional)</label>
-          <span pTooltip="Optional. The country where your organisation (or you) resides."
-                [ngClass]="{'pi pi-question-circle': true, 'verticalAlign': this.userForm.controls.country.value===''}"
-                id="countryHelp">
-          </span>
-        </div>
-      </div>
-
-      <div class="py-3">
-        <span class="p-float-label">
-          <input class="form-field w-full" id="orcid" type="text" pInputText formControlName="orcid">
-          <label for="orcid">ORCID (optional)</label>
-          <span
-            pTooltip="Optional. Your ORCID identifier from https://orcid.org/, e.g. 0000-0002-1825-0097. Will be used to identify you as the author if you publish results to zenodo through QA4SM."
-            class="pi pi-question-circle">
-          </span>
-        </span>
-        <div *ngIf="formErrors && formErrors.orcid"
-             class="alert">
-          <span *ngFor="let error of formErrors.orcid">{{ error.message }}<br></span>
-        </div>
-      </div>
-
-      <div *ngIf="!userData" class="py-3" style="max-width: 15rem; line-height: 1.2rem">
-        <p-checkbox id="terms" formControlName="terms_consent" binary="true"></p-checkbox>
-        <label for="terms"> I accept the <a [routerLink]="['/terms']" target="_blank">terms, conditions and privacy
-          policy</a>.</label>
-      </div>
-
-
-      <div *ngIf="!userData" class="py-3" style="line-height: 1.2rem">
-        <span class="p-float-label">
-          <p-slider id="honeypot-user" formControlName="honeypot"></p-slider>
-          <label for="honeypot-user" style="margin-top: -1rem"> Are you a real person? Slide the handle all the way to the right <span
-            class="pi pi-angle-double-right"></span></label>
-        </span>
-      </div>
-
-      <button *ngIf="!userData"
-              pButton
-              type="submit"
-              label="Submit"
-              class="w-full"
-              [disabled]="!userForm.valid">
-      </button>
-      <button *ngIf="userData"
-              pButton
-              type="submit"
-              class="w-full"
-              label="Save"
-      >
-      </button>
-    </form>
-
-    <hr class="w-12 mt-4" style="opacity: 1.0;">
-
-      <div *ngIf="userData" class="py-3">
-        <span class="p-float-label">
-          <input #tokenInput
-                 class="form-field w-full" 
-                 id="api-token" 
-                 type="text" 
-                 pInputText 
-                 [value]="apiToken || 'No token assigned'" 
-                 readonly>
-          <label for="api-token">API Token</label>
-          <span
-             *ngIf="!hasToken()"
-            pTooltip="Unique user token required to submit validations via public API."
-            class="pi pi-question-circle">
-          </span>
-          <button *ngIf="hasToken()"
-                  pButton
-                  type="button"
-                  icon="pi pi-copy"
-                  class="p-button-text p-button-sm"
-                  style="margin-left: -0.5rem"
-                  (click)="copyToken(tokenInput)"
-                  pTooltip="Copy token to clipboard">
-          </button>
-        </span>
-      </div>
-    
-      <p class="flex align-items-center gap-2">
-        <button *ngIf="userData"
-                pButton
-                type="button"
-                label="Request API token"
-                (click)="confirmRequestToken()"
-                class="p-button-request w-full">
-        </button>
-        <span *ngIf="userData"
-          pTooltip="Request an unique API token that can be used to submit validations via public API access."
-          class="pi pi-question-circle">
-        </span>
-      </p>
-    <p>
-      <button *ngIf="userData"
-              pButton
-              type="button"
-              label="Update password"
-              (click)="redirectToSetPassword()"
-              class="p-button-secondary w-full">
-      </button>
-    </p>
-    <p>
-      <button *ngIf="userData"
-              pButton
-              type="button"
-              label="Deactivate my account"
-              (click)="deactivateAccount()"
-              class="p-button-danger w-full">
-      </button>
-    </p>
   </div>
 </div>

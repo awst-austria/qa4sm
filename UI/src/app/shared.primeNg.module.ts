@@ -28,6 +28,7 @@ import { MultiSelectModule } from 'primeng/multiselect';
 import { PanelModule } from 'primeng/panel';
 import { PasswordModule } from 'primeng/password';
 import { ProgressBarModule } from 'primeng/progressbar';
+import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { RippleModule } from 'primeng/ripple';
 import { ScrollTopModule } from 'primeng/scrolltop';
 import { SelectButtonModule } from 'primeng/selectbutton';
@@ -43,6 +44,7 @@ import { DividerModule } from 'primeng/divider';
 import { ScrollPanelModule } from 'primeng/scrollpanel';
 import { PanelMenuModule } from 'primeng/panelmenu';
 import { SelectModule } from 'primeng/select';
+import { MessageModule } from 'primeng/message';
 
 @NgModule({
   imports: [
@@ -75,12 +77,14 @@ import { SelectModule } from 'primeng/select';
     InputTextModule,
     MenubarModule,
     MenuModule,
+    MessageModule,
     MultiSelectModule,
     PaginatorModule,
     PanelMenuModule,
     PanelModule,
     PasswordModule,
     ProgressBarModule,
+    ProgressSpinnerModule,
     RippleModule,
     ScrollPanelModule,
     ScrollTopModule,
@@ -121,12 +125,14 @@ import { SelectModule } from 'primeng/select';
     InputTextModule,
     MenubarModule,
     MenuModule,
+    MessageModule,
     MultiSelectModule,
     PaginatorModule,
     PanelMenuModule,
     PanelModule,
     PasswordModule,
     ProgressBarModule,
+    ProgressSpinnerModule,
     RippleModule,
     ScrollPanelModule,
     ScrollTopModule,

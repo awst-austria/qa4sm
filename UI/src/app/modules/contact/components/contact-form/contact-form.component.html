@@ -1,91 +1,94 @@
-<div class="flex flex-column justify-content-center align-items-center px-2">
-  <div class="w-11 md:w-10 lg:w-8 xl:w-8">
-  
-  <h1 class="text-center">Contact us:</h1>
-  <p class="text-lg mt-3 mb-5 px-3 md:px-0">
-    You are very welcome to contact us with any questions about 
-    <b>soil moisture validation</b>, <b>satellite data</b>, or 
-    the <b>QA4SM platform</b>.  
-    <br />
-    Whether you are a geophysicist, researcher, or simply curious about 
-    how satellite soil moisture data are evaluated — we’d be happy to hear from you.
-  </p>
+<div class="flex flex-column justify-content-center align-items-center px-2 py-5">
+  <div class="w-11 md:w-10 lg:w-7 xl:w-6">
 
-  <form class="p-fluid" [formGroup]="contactForm" (ngSubmit)="onSubmit()">
-      <!-- Email -->
-    <div class="py-3">
-      <span class="p-float-label">
-        <input pInputText
-           id="email"
-           formControlName="email"
-           class="form-field w-full"
-           type="email"
-           autocomplete="email"
-           aria-required="true">
-        <label for="email">E-mail address</label>
-      </span>
-    </div>
+    <h1 class="text-center mb-2">Contact us</h1>
+    <p class="text-center text-muted mb-5">
+      You are very welcome to contact us with any questions about
+      <b>soil moisture validation</b>, <b>satellite data</b>, or
+      the <b>QA4SM platform</b>.
+      Whether you are a geophysicist, researcher, or simply curious about
+      how satellite soil moisture data are evaluated — we'd be happy to hear from you.
+    </p>
 
-      <!-- Name -->
-    <div class="py-3">
-      <span class="p-float-label">
-        <input pInputText
-           id="name"
-           formControlName="name"
-           class="form-field w-full"
-           type="text"
-           autocomplete="name"
-           aria-required="true">
-        <label for="name">Name</label>
-      </span>
-    </div>
+    <p-panel>
+      <form class="p-fluid flex flex-column gap-5 pt-4" [formGroup]="contactForm" (ngSubmit)="onSubmit()">
 
-      <!-- Message -->
-    <div class="py-3">
-      <span class="p-float-label">
-        <textarea pInputTextarea
-              id="content"
-              formControlName="content"
-              class="form-field w-full"
-              autocomplete="off"
-              aria-required="true"
-              rows="5">
-            </textarea>
-        <label for="content">Message</label>
-      </span>
-    </div>
+        <!-- Email -->
+        <p-floatLabel>
+          <input pInputText
+                 id="email"
+                 formControlName="email"
+                 class="w-full"
+                 type="email"
+                 autocomplete="email">
+          <label for="email">
+            <i class="pi pi-envelope mr-2"></i>E-mail address
+          </label>
+        </p-floatLabel>
 
-    <!-- Checkboxes -->
-    <div class="py-3">
-      <p-checkbox inputId="copy"
-              formControlName="send_copy_to_user"
-              [binary]="true"></p-checkbox>
-      <label for="copy">Send a copy to me.</label>
-    </div>
+        <!-- Name -->
+        <p-floatLabel>
+          <input pInputText
+                 id="name"
+                 formControlName="name"
+                 class="w-full"
+                 type="text"
+                 autocomplete="name">
+          <label for="name">
+            <i class="pi pi-user mr-2"></i>Name
+          </label>
+        </p-floatLabel>
 
-    <!-- Slider -->
-     <div class="py-3">
+        <!-- Message -->
+        <p-floatLabel>
+          <textarea pInputTextarea
+                    id="content"
+                    formControlName="content"
+                    class="w-full"
+                    autocomplete="off"
+                    rows="6">
+          </textarea>
+          <label for="content">
+            <i class="pi pi-comment mr-2"></i>Message
+          </label>
+        </p-floatLabel>
 
-      <p-slider
-        id="honeypot"                   
-        formControlName="honeypot"
-        [min]="0" [max]="100" [step]="1"
-        [attr.aria-labelledby]="'honeypotLabel'">
-      </p-slider>
+        <!-- Checkbox -->
+        <div class="flex align-items-center gap-2">
+          <p-checkbox inputId="copy"
+                      formControlName="send_copy_to_user"
+                      [binary]="true">
+          </p-checkbox>
+          <label for="copy" class="cursor-pointer">Send a copy to me</label>
+        </div>
 
-      <span class="py-3" id="honeypotLabel">
-        To prove you're a real person, slide the handle all the way to the right
-      <span class="pi pi-angle-double-right"></span>
-      </span>
-    </div>
+        <!-- Honeypot slider -->
+        <div class="flex flex-column gap-2">
+          <label id="honeypotLabel" class="text-muted text-sm">
+            <i class="pi pi-shield mr-2"></i>
+            To prove you're a real person, slide the handle all the way to the right
+            <i class="pi pi-angle-double-right ml-1"></i>
+          </label>
+          <p-slider
+            id="honeypot"
+            formControlName="honeypot"
+            [min]="0" [max]="100" [step]="1"
+            [attr.aria-labelledby]="'honeypotLabel'">
+          </p-slider>
+        </div>
 
-    <button id="sendMessageForm"
-              pButton
-              type="submit"
-              label="Send"
-              [disabled]="!contactForm.valid">
-    </button>
-  </form> 
+        <!-- Submit -->
+        <button pButton
+                type="submit"
+                label="Send message"
+                icon="pi pi-send"
+                iconPos="right"
+                [disabled]="!contactForm.valid"
+                class="w-full mt-2">
+        </button>
+
+      </form>
+    </p-panel>
+
+  </div>
 </div>
-</div>
-

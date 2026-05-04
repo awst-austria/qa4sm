@@ -7,52 +7,64 @@
       </div>
     </ng-template>
     <ng-template *ngIf="!forComparison" pTemplate="header">
-      <div class="mx-auto flex items-center flex-wrap gap-2 text-center">
+      <div class="flex align-items-center justify-content-center gap-2 w-full">
         <span>Summary:</span>
-        <span *ngIf="validationRun.is_unpublished && isOwner">
-          <span *ngIf="hideElement" class="my-0 font-weight-normal no_edit_name">{{ valName() }} </span>
-          <button
-            pButton
-            type="button"
-            [ngClass]="{'btn-action edit_name_btn': true, 'hidden': !hideElement}"
-            pTooltip="Change Name"
-            [life]="globalParamsService.tooltipLifetime"
-            icon="faIcons.faPencil"
-            (click)="toggleEditing()">
-            <fa-icon [icon]="faIcons.faPencil"></fa-icon>
-          </button>
-          <span *ngIf="!hideElement">
-            <label for="new-name"></label>
-            <input id="new-name"
-                   type="text"
-                   value="{{valName()}}"
-                   #newName
-                   [ngClass]="{'edit_name': true}">
-            <button
-              pButton
-              type="button"
-              [ngClass]="{'btn-action save_name_btn result_page': true}"
-              pTooltip="Save Name"
-              [life]="globalParamsService.tooltipLifetime"
-              icon="pi pi-save"
-              (click)="saveName(validationRun.id, newName.value)">
+
+        <ng-container *ngIf="validationRun.is_unpublished && isOwner">
+
+          <ng-container *ngIf="hideElement()">
+              <span class="my-0 font-weight-normal no_edit_name">{{ valName() }}</span>
+              <button
+                pButton
+                type="button"
+                class="p-button-rounded p-button-text p-button-sm p-button-secondary"
+                pTooltip="Change Name"
+                [life]="globalParamsService.tooltipLifetime"
+                (click)="toggleEditing()">
+                <fa-icon [icon]="faIcons.faPencil"></fa-icon>
+              </button>
+          </ng-container>
+
+
+          <ng-container *ngIf="!hideElement()">
+            <input  pInputText
+                    id="new-name"
+                    type="text"
+                    [value]="valName()"
+                    #newName
+                    maxlength="80"
+                    style="height: 1.75rem; padding: 0.25rem 0.5rem; font-size: 0.875rem;"
+                    (input)="onNameInput(newName.value)">
+           
+            <small [ngClass]="{'text-danger': nameLength > 80, 'text-muted': nameLength <= 80}">
+              {{ nameLength }}/80
+            </small>
+
+            <button pButton
+                    type="button"
+                    class="p-button-rounded p-button-text p-button-sm p-button-success"
+                    pTooltip="Save Name"
+                    [life]="globalParamsService.tooltipLifetime"
+                    icon="pi pi-save"
+                            (click)="saveName(validationRun.id, newName.value)">
             </button>
-            <button
-              pButton
-              type="button"
-              [ngClass]="{'btn-action cancel_editing_btn result_page': true}"
-              pTooltip="Cancel"
-              [life]="globalParamsService.tooltipLifetime"
-              icon="pi pi-ban"
-              (click)="toggleEditing()">
+            <button pButton
+                    type="button"
+                    class="p-button-rounded p-button-text p-button-sm p-button-danger"
+                    pTooltip="Cancel"
+                    [life]="globalParamsService.tooltipLifetime"
+                    icon="pi pi-ban"
+                    (click)="toggleEditing()">
             </button>
-          </span>
-        </span>
-        <span *ngIf="!validationRun.is_unpublished"
-            class="my-0 font-weight-normal no_edit_name">{{ valName() }}
-          <span class="no_name_change_info pi pi-question-circle help-icon"
+
+          </ng-container>
+        </ng-container>
+
+            <span *ngIf="!validationRun.is_unpublished"
+              class="my-0 font-weight-normal no_edit_name">{{ valName() }}
+            <span class="no_name_change_info pi pi-question-circle help-icon"
                   pTooltip="Validation has been published. There is no possibility of changing its name."> </span>
-        </span>
+            </span>
         <span *ngIf="!isOwner && validationRun.is_unpublished"
                 class="my-0 font-weight-normal no_edit_name">{{ valName() }}
             <span class="no_name_change_info pi pi-question-circle help-icon"
@@ -202,17 +214,33 @@
 
         <li *ngIf="!forComparison">Processing took {{ runTime }} minutes (wall time).</li>
 
-        <li *ngIf="validationRun.progress === -1">The validation was cancelled.</li>
+        <li *ngIf="validationRun.status === 'CANCELLED' && validationRun.progress !== -100">The validation was cancelled.</li>
         <li *ngIf="validationRun.progress === -100">This validation was cancelled due to service outage. You can easily
           restart it using 'Load settings' button.
         </li>
-        <li *ngIf="!forComparison && validationRun.total_points !== 0 && validationRun.progress !== -1
-        && validationRun.progress !== -100" [ngClass]="{'alert-danger': errorRate > 0}">
+        
+        <!-- temporal and both -->
+        <li *ngIf="!forComparison 
+          && (validationRun.val_type === 'temporal' || validationRun.val_type === 'both')
+          && validationRun.total_points !== 0
+          && validationRun.status !== 'CANCELLED'"
+          [ngClass]="{'alert-danger': errorRate > 0}">
           for {{ errorRate * 100 | number: '.0' }}% ({{ validationRun.error_points }}
-          of {{ validationRun.total_points }}) of the processed locations (grid points) the validation metrics could
-          not be calculated. For an overview of potential causes select '# status' (available from version 2.2) in the
-          'Result files' section.
+          of {{ validationRun.total_points }}) of the processed locations (grid points) the temporal validation metrics could
+          not be calculated.
         </li>
+
+        <!-- spatial and both -->
+        <li *ngIf="!forComparison 
+          && (validationRun.val_type === 'spatial' || validationRun.val_type === 'both')
+          && validationRun.total_times !== 0
+          && validationRun.status !== 'CANCELLED'"
+          [ngClass]="{'alert-danger': errorRateSpatial > 0}">
+          for {{ errorRateSpatial * 100 | number: '.0' }}% ({{ validationRun.error_times }}
+          of {{ validationRun.total_times }}) of the processed time steps the spatial validation metrics could
+          not be calculated.
+        </li>
+
         <li *ngIf="!forComparison && validationRun.total_points === 0
         && validationRun.progress !== -1 && validationRun.progress !== -100" [ngClass]="'alert-danger'">
           <b>

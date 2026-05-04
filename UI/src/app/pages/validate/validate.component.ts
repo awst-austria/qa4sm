@@ -373,6 +373,11 @@ export class ValidateComponent implements OnInit, AfterViewInit {
 
     // Name
     this.validationModel.nameTag$.next(validationRunConfig.name_tag);
+
+    // Val type
+    if (validationRunConfig.val_type) {
+      this.validationModel.valType = validationRunConfig.val_type;
+    }
   }
 
   includeFilter(toInclude: string, basicFilters: any, enabled: boolean): void {
@@ -896,7 +901,8 @@ export class ValidateComponent implements OnInit, AfterViewInit {
       scaling_method: this.validationModel.scalingMethod.methodName,
       scale_to: '0',
       name_tag: this.validationModel.nameTag$.getValue(),
-      temporal_matching: this.validationModel.temporalMatchingModel.size$.getValue()
+      temporal_matching: this.validationModel.temporalMatchingModel.size$.getValue(),
+      val_type: this.validationModel.valType
     };
     this.validationConfigService.startValidation(newValidation, checkForExistingValidation)
       .subscribe(this.startValidationObserver);

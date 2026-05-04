@@ -1,35 +1,52 @@
-.pcol:hover{
+.pcol:hover {
   transform: scale(1.1);
 }
-.result-plot{
+
+.result-plot {
   border-color: rgba(0, 0, 0, 0.1);
   border-style: solid;
   border-width: thin;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1), 0 6px 20px rgba(0, 0, 0, 0.1);
 }
-.result-plot:hover{
+
+.result-plot:hover {
   box-shadow: 0 0 2em gray;
   z-index: 1;
   cursor: pointer;
 }
-.center{
+
+.center {
   text-align: center;
 }
-.image-label{
+
+.image-label {
   font-size: 0.7rem;
 }
-.image-container{
+
+.image-container {
   text-align: center;
 }
+
 .subtitle {
   text-align: center;
   font-size: 1.7rem;
   color: dimgray;
   padding-bottom: 1rem;
 }
-.plot-spot{
+
+.plot-spot {
   box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1), 0 6px 10px rgba(0, 0, 0, 0.1);
   border-radius: 5px;
-  padding: 20px; /* Optional: Space inside the div */
+  padding: 20px;
 }
 
+// Responsive design for parent layout
+@media (max-width: 768px) {
+  .plot-spot {
+    padding: 15px;
+  }
+  
+  .subtitle {
+    font-size: 1.4rem;
+  }
+}

@@ -9,12 +9,12 @@ from shutil import copy2, copytree
 from typing import List, Tuple, Dict, Union
 
 from celery.app import shared_task
-from celery.exceptions import TaskRevokedError, TimeoutError
+from celery.exceptions import TaskRevokedError, TimeoutError, Terminated
 from dateutil.tz import tzlocal
 from django.conf import settings
 
 from pytesmo.validation_framework.adapters import AnomalyAdapter, AnomalyClimAdapter
-from pytesmo.validation_framework.data_manager import DataManager
+from pytesmo.validation_framework.data_manager import DataManager, get_result_combinations
 from pytesmo.validation_framework.metric_calculators import (
     get_dataset_names,
     PairwiseIntercomparisonMetrics,
@@ -23,9 +23,13 @@ from pytesmo.validation_framework.metric_calculators import (
 from pytesmo.validation_framework.temporal_matchers import (
     make_combined_temporal_matcher, )
 import pandas as pd
+import xarray as xr
+import numpy as np
+import warnings
 from pytesmo.validation_framework.results_manager import netcdf_results_manager, build_filename
 from pytesmo.validation_framework.validation import Validation
 from pytesmo.validation_framework.metric_calculators_adapters import SubsetsMetricsAdapter, TsDistributor
+import pytesmo.validation_framework.error_handling as eh
 
 from pytz import UTC
 import pytz
@@ -40,7 +44,7 @@ from validator.models import ValidationRun, DatasetVersion
 from validator.validation.batches import create_jobs, create_upscaling_lut
 from validator.validation.filters import setup_filtering
 from validator.validation.globals import OUTPUT_FOLDER, IRREGULAR_GRIDS, VR_FIELDS, DS_FIELDS, ISMN, DEFAULT_TSW, \
-    TEMPORAL_SUB_WINDOW_SEPARATOR, METRICS, TEMPORAL_SUB_WINDOWS
+    TEMPORAL_SUB_WINDOW_SEPARATOR, METRICS, TEMPORAL_SUB_WINDOWS, ONLY_WITH_REFERENCE
 from validator.validation.graphics import generate_all_graphs
 from validator.validation.readers import create_reader, adapt_timestamp
 from validator.validation.util import mkdir_if_not_exists, first_file_in
@@ -102,11 +106,18 @@ def _get_spatial_reference_reader(val_run) -> Tuple['Reader', str, dict]:
     return ref_reader, read_name, read_kwargs
 
 
-def set_outfile(validation_run, run_dir):
-    outfile = first_file_in(run_dir, '.nc')
-    if outfile is not None:
-        outfile = regex_sub('/?' + OUTPUT_FOLDER + '/?', '', outfile)
-        validation_run.output_file.name = outfile
+def set_outfile(validation_run, run_dir, val_type="temporal"):
+    outfile = first_file_in(run_dir, '.nc', val_type=val_type)
+    if val_type == "temporal":
+        if outfile is not None:
+            outfile = regex_sub('/?' + OUTPUT_FOLDER + '/?', '', outfile)
+            validation_run.output_file.name = outfile
+            validation_run.zarr_path = os.path.join(OUTPUT_FOLDER, os.path.splitext(outfile)[0] + '.zarr')
+    elif val_type == "spatial":
+        if outfile is not None:
+            outfile = regex_sub('/?' + OUTPUT_FOLDER + '/?', '', outfile)
+            validation_run.output_file_spatial.name = outfile
+            validation_run.zarr_path = ''        
 
 
 def save_validation_config(validation_run):
@@ -256,7 +267,7 @@ def save_validation_config(validation_run):
         __logger.exception('Validation configuration could not be stored.')
 
 
-def create_pytesmo_validation(validation_run):
+def create_pytesmo_validation(validation_run, val_type="temporal"):
     ds_list = []
     ds_read_names = []
     spatial_ref_name = None
@@ -368,7 +379,10 @@ def create_pytesmo_validation(validation_run):
 
     # set value of the metadata template according to what reference dataset is used
     if spatial_ref_short_name == ISMN:
-        metadata_template = METADATA_TEMPLATE['ismn_ref']
+        if val_type == "temporal":
+            metadata_template = METADATA_TEMPLATE['ismn_ref']
+        else:
+            metadata_template = METADATA_TEMPLATE['other_ref']
     else:
         metadata_template = METADATA_TEMPLATE['other_ref']
 
@@ -509,11 +523,11 @@ def execute_job(self, validation_id, job):
     start_time = datetime.now(tzlocal())
     try:
         validation_run = ValidationRun.objects.get(pk=validation_id)
-        val = create_pytesmo_validation(validation_run)
+        val = create_pytesmo_validation(validation_run, val_type="temporal")
 
         result = val.calc(*job,
                           rename_cols=False,
-                          only_with_reference=True,
+                          only_with_reference=ONLY_WITH_REFERENCE,
                           handle_errors="ignore")
         end_time = datetime.now(tzlocal())
         duration = end_time - start_time
@@ -522,6 +536,671 @@ def execute_job(self, validation_id, job):
             "Finished job {} from validation {}, took {} seconds for {} gpis".
             format(task_id, validation_id, duration, numgpis))
         return result
+    except (TaskRevokedError, Terminated) as e:
+        raise 
+
+    except Exception as e:
+        self.retry(countdown=2, exc=e)
+
+def get_val_dict(val, gpi_info):
+    """Returns Dictionary containing all data of a Validation for one GPI.
+    
+    Parameters
+    ----------
+    val: ValidationRun
+        The validation run object
+    gpi_info: tuple
+        Tuple containing (GPI, longitude, latitude, {meta_information})
+
+    Returns
+    -------
+    df_dict: dictionary
+        Dictionary containing data of Validation run for specified GPI
+
+    Raises
+    ------
+    eh.DataManagerError
+        If data retrieval for gpi fails
+    eh.NoGpiDataError
+        If retrieved data is empty
+    """
+    try:
+        df_dict = val.data_manager.get_data(gpi_info[0], gpi_info[1], gpi_info[2])
+    except Exception as e:
+        raise eh.DataManagerError(
+            f"Getting the data for gpi {gpi_info} failed with"
+            f" error: {e}")   
+    # if no data is available continue with the next gpi
+    if len(df_dict) == 0:
+        raise eh.NoGpiDataError(f"No data for gpi {gpi_info}")
+    return df_dict
+
+def arraydata_gpi(val, gpi_info):
+    """
+    Retrieves, matches, and scales data for a specific GPI during a validation run.
+
+    This function performs the temporal matching of datasets, handles 
+    insufficient data cases by generating dummy results, and applies 
+    scaling if configured in the validation run. It also updates the 
+    metadata dictionary with spatial coordinates.
+
+    Parameters
+    ----------
+    val : ValidationRun
+        The validation run object containing configuration, data managers, 
+        and metric calculators.
+    gpi_info : tuple
+        Tuple containing (gpi, lon, lat, {meta_information}).
+
+    Returns
+    -------
+    data : pd.DataFrame
+        The processed and matched DataFrame containing the observations 
+        for the specified GPI.
+    gpi_info : dict
+        The fourth element of the input tuple (meta_information), 
+        now updated with 'gpi', 'lon', and 'lat' keys.
+
+    Raises
+    ------
+    eh.NoTempMatchedDataError
+        If no temporally matched data exists for the given dataset 
+        combinations at this GPI.
+    eh.ScalingError
+        If the scaling process fails for the retrieved data.
+    """
+
+    # read ts
+    df_dict = get_val_dict(val, gpi_info)
+    data_df_dict = {}
+    for ds in df_dict:
+        columns = val.data_manager.datasets[ds]["columns"]
+        data_df_dict[ds] = df_dict[ds][columns]
+    # match ts
+    try:
+        for n, k in val.metrics_c:
+            matched = val.temp_matching(data_df_dict, val.temporal_ref, n=n, k=k)
+    except Exception:
+        raise eh.TemporalMatchingError(
+            f"Temporal matching failed for gpi {gpi_info}!"
+        )
+    names = tuple([(k, val.data_manager.datasets[k]["columns"][0]) 
+                for k in val.data_manager.datasets.keys() if k in df_dict.keys()])
+    data = val.get_data_for_result_tuple(matched, names)
+    if data.empty:
+        raise eh.NoTempMatchedDataError(
+            f"Temporal matching didn't produce overlap for {gpi_info[0]}!"
+        )
+    # SCALING
+    data = data.rename(columns=lambda x: x[0])
+    # check if there should be scaling, 
+    # if the scaling dataset is in the data and 
+    # if the data for the scaling dataset is not empty
+    if val.scaling is not None and \
+    val.scaling_ref in data.columns and \
+    not data[val.scaling_ref].isnull().all():
+        scaling_index = data.columns.tolist().index(
+            val.scaling_ref
+        )
+        try:
+            data = val.scaling.scale(
+                data, scaling_index, gpi_info
+            )
+        except Exception as e:
+            raise eh.ScalingError(f"Scaling failed for gpi {gpi_info[0]} with error {e}!")
+
+    gpi_info[3].update({"gpi":gpi_info[0], "lon":gpi_info[1], "lat":gpi_info[2]})
+    return data, gpi_info
+    
+def build_xarray(job, val, keep_meta=True, handle_errors="ignore"):
+    """
+    Assembles a synchronized xarray Dataset from multiple GPI.
+
+    This function iterates through a set of GPIs provided by a job and retrieves 
+    the relevant data using `arraydata_gpi`. It performs a temporal union to 
+    create a common time index and aligns disparate station data into a preallocated, 
+    sparse-aware multidimensional structure.
+
+    Parameters
+    ----------
+    job : iterable
+        An iterable (e.g., a list of tuples) containing task information 
+        that can be unpacked into `gpi_info`.
+    val : ValidationRun
+        The validation run object used for data retrieval and configuration.
+
+    Returns
+    -------
+    ds_all : xr.Dataset
+        A consolidated Dataset with dimensions ('date_time', 'gpi'). 
+        Includes data variables aligned to the union of all timestamps 
+        and coordinate metadata (lon, lat, etc.) mapped to the 'gpi' dimension.
+
+    Raises
+    ------
+    eh.NoGpiDataError
+        If data retrieval fails for a GPI and `handle_errors` is set to "raise",
+        or if no valid GPI data is found at all.
+    """
+    gpis_meta = {}
+    data_vars = list(val.data_manager.datasets.keys())
+    gpis_data = {}
+    time_key = "date_time"
+    for i, gpi_info in enumerate(zip(*job)):
+        try:
+            data, gpi_info = arraydata_gpi(val, gpi_info)
+        except Exception as e:
+            if handle_errors == "raise":
+                raise eh.NoGpiDataError(
+                    f"Data retrieval failed for gpi {gpi_info[0]} with error {e}!"
+                )
+            else:
+                warnings.warn(f"Data retrieval failed for gpi {gpi_info[0]} with error {e}!")
+                if isinstance(e, eh.NoGpiDataError):
+                    gpi_info[3]["status"] = eh.INSUFFICIENT_DATA
+                elif isinstance(e, eh.TemporalMatchingError):
+                    gpi_info[3]["status"] = eh.TEMPORAL_MATCHING_FAILED
+                elif isinstance(e, eh.NoTempMatchedDataError):
+                    gpi_info[3]["status"] = eh.NO_TEMP_MATCHED_DATA
+                elif isinstance(e, eh.ScalingError):
+                    gpi_info[3]["status"] = eh.SCALING_FAILED
+                else:
+                    gpi_info[3]["status"] = eh.UNCAUGHT
+
+                gpi_info[3]["gpi"] = gpi_info[0]
+                gpis_meta[gpi_info[3]["gpi"]] = gpi_info[3]
+                gpis_data[gpi_info[3]["gpi"]] = None
+                continue
+        
+        # reset index so date_time becomes a regular column
+        data.index.name = time_key  # ensure index is named 'date_time'
+        data_reset = data.reset_index()
+
+        # skip if empty or date_time column missing
+        if data_reset.empty or time_key not in data_reset.columns:
+            warnings.warn(
+                f"No '{time_key}' column for gpi {gpi_info[3].get('gpi', '?')}, skipping"
+            )
+            gpi_info[3]["status"] = eh.INSUFFICIENT_DATA
+            gpi_info[3]["gpi"] = gpi_info[0]
+            gpis_meta[gpi_info[3]["gpi"]] = gpi_info[3]
+            gpis_data[gpi_info[3]["gpi"]] = None
+            continue
+
+        gpis_meta[gpi_info[3]["gpi"]] = gpi_info[3]
+        gpis_data[gpi_info[3]["gpi"]] = {c: data_reset[c] for c in data_reset.columns}
+
+    # -- GUARD: nothing to build --
+    if not gpis_data:
+        raise eh.NoGpiDataError(
+            "No valid GPI data found for this job — all GPIs were skipped."
+        )
+
+    # -- BUILDING XARRAY -- #
+    # Build union time index across all GPIs
+    full_time = pd.DatetimeIndex(
+        sorted(set().union(*[d[time_key] for d in gpis_data.values() if d is not None])),
+        name=time_key
+    )
+
+    if len(full_time) == 0:
+        raise eh.NoGpiDataError(
+            "No valid timestamps found across all GPIs."
+        )
+
+    # Preallocate arrays
+    n_stations = len(gpis_meta)
+    shape = (len(full_time), n_stations)
+
+    data_arrays = {var: np.full(shape, np.nan, dtype="float64") for var in data_vars}
+
+    # Fill arrays with station data 
+    for j, gpi in enumerate(gpis_meta.keys()):
+        dat = gpis_data[gpi]
+        if dat is None:
+            continue
+        aligned_idx = full_time.get_indexer(dat[time_key])  # positions in full_time
+
+        for var in data_vars:
+            if var in dat.keys():
+                values = dat[var].values.astype("float64")
+                # only fill positions where alignment succeeded (aligned_idx >= 0)
+                valid_mask = aligned_idx >= 0
+                data_arrays[var][aligned_idx[valid_mask], j] = values[valid_mask]
+
+    # Build final dataset 
+    df_meta = pd.DataFrame.from_dict(gpis_meta, orient='index')
+
+    if 'status' in df_meta.columns:
+        df_meta['status'] = df_meta['status'].fillna(eh.UNCAUGHT).astype(int)
+
+    df_meta.index.name = "gpi"
+    ds_all = xr.Dataset(
+        {var: ((time_key, "gpi"), arr) for var, arr in data_arrays.items()},
+        coords={
+            time_key: full_time,
+            "gpi": df_meta.index.values,
+        }
+    )
+    if keep_meta:
+        for col in df_meta.columns:
+            # Use .values to ensure we pass the underlying numpy/object array
+            ds_all.coords[str(col)] = ("gpi", df_meta[col].values)
+    return ds_all
+
+def get_spatial_meta(ds_use, time, metakeys):
+    """
+    Extracts specific metadata variables for a given timestamp across all GPIs.
+
+    Parameters
+    ----------
+    ds_use : xr.Dataset
+        The input dataset containing spatial and temporal data.
+    time : numpy.datetime64 or xr.DataArray
+        The specific timestep for which to retrieve metadata.
+    metakeys : list of str
+        The names of the variables in ds_use to be extracted as metadata.
+
+    Returns
+    -------
+    date_meta : dict
+        A dictionary where keys are the variable names and values are 
+        NumPy arrays containing the metadata for all stations at that timestep.
+    """
+    date_meta = {k:ds_use.sel(date_time=time)[k].values for k in metakeys}
+    return date_meta
+
+def compact_results(results):
+    """
+    Converts a list of result dictionaries into a dictionary of NumPy arrays.
+
+    This function "stacks" individual metric results collected over multiple 
+    timesteps into a contiguous format, making them suitable for conversion 
+    into xarray DataArrays or pandas DataFrames.
+
+    Parameters
+    ----------
+    results : dict
+        A dictionary where keys are dataset combinations (tuples) and 
+        values are lists of dictionaries containing calculated metrics.
+
+    Returns
+    -------
+    c_results : dict
+        A dictionary with the same keys, where each metric field is 
+        represented as a NumPy array instead of a list.
+    """
+
+    # Changed logic massively increased performance
+    c_results = {}
+    for key, result_list in results.items():
+        c_results[key] = {}
+        first_res = result_list[0]
+        
+        for field_name, first_val in first_res.items():
+            entries = [np.atleast_1d(res[field_name])[0] for res in result_list]   
+            c_results[key][field_name] = np.array(entries, dtype=first_val.dtype)
+    return c_results
+
+def spatial_validation_xr(val, ds_use, only_with_reference=True, handle_errors="ignore", validation_run=None):
+    """
+    Performs a spatial validation by calculating metrics for every timestep.
+
+    Instead of calculating metrics across time for a single GPI, this function 
+    iterates through the 'date_time' dimension and calculates metrics across 
+    all available GPIs (stations) for each timestamp. This is typically used 
+    to generate spatial performance maps or to analyze how validation 
+    agreement changes over time.
+
+    Parameters
+    ----------
+    val : ValidationRun
+        The validation run object used for data retrieval and configuration.
+    ds_use : xr.Dataset
+        The consolidated dataset with dimensions ('date_time', 'gpi').
+    only_with_reference: bool, optional (default: True)
+        Only compute metrics for dataset combinations where the reference
+        is included.
+
+    Returns
+    -------
+    c_results : dict
+        Compacted validation results containing the metrics for each 
+        dataset combination, indexed by time.
+
+    Raises
+    ------
+    eh.NoTempMatchedDataError
+        If no data is found for a specific combination and error handling 
+        is set to 'raise'.
+    eh.MetricsCalculationError
+        If the metrics calculator fails and error handling is set to 'raise'.
+
+    Notes
+    -----
+    - The 'gpi_info' passed to the calculator is modified to represent a 
+      temporal slice rather than a spatial point.
+    """
+
+    results = {}
+    gpi_n_use_dict = {} # used to count number each gpi is used
+
+    all_combinations = {}
+    for n, k in val.metrics_c:
+        combos = list(get_result_combinations(val.data_manager.ds_dict, n=k))
+        for c in combos:
+            c_list = [j[0] for j in c]
+            if only_with_reference and val.data_manager.reference_name not in c_list:
+                continue
+            all_combinations[c] = (c_list, val.metrics_c[(n, k)])
+            if c not in gpi_n_use_dict:
+                gpi_n_use_dict[c] = {gpi: 0 for gpi in ds_use.gpi.values}
+    df_all = ds_use.to_dataframe()
+
+    total_times = len(ds_use.date_time)
+    SAVE_INTERVAL = max(1, total_times // 100)  # save progress
+
+    for i, time_val in enumerate(ds_use.date_time):
+        metrics = np.nan
+        try:
+            result = {}
+            # Slicing the pre-computed DataFrame is faster than xarray .sel().values
+            df_date = df_all.xs(time_val.values, level='date_time')
+            
+            date_meta = get_spatial_meta(ds_use, time_val, metakeys=[])
+            date_info = (0, 0, 0, date_meta)
+            time_np = time_val.values
+
+            for c, (c_list, metrics_calculator) in all_combinations.items():
+                res_list = result.setdefault(c, [])
+                
+                # Efficient dropping and counting
+                df_comb = df_date[c_list].dropna()
+                
+                # Update GPI counts in bulk
+                current_gpi_counts = gpi_n_use_dict[c]
+                for gpi in df_comb.index:
+                    current_gpi_counts[gpi] += 1
+
+                if df_comb.empty:
+                    if handle_errors == "raise":
+                        raise eh.NoTempMatchedDataError(f"Empty data for {c}")
+                    metrics = metrics_calculator(pd.DataFrame(columns=c_list), date_info)
+                    metrics["status"][0] = eh.NO_TEMP_MATCHED_DATA
+                else:
+                    try:
+                        metrics = metrics_calculator(data=df_comb, gpi_info=date_info)
+                    except Exception:
+                        if handle_errors == "raise":
+                            raise eh.MetricsCalculationError(f"Metrics failed for {c}")
+                        metrics = metrics_calculator(pd.DataFrame(columns=c_list), date_info)
+                        metrics["status"][0] = eh.METRICS_CALCULATION_FAILED
+
+                if metrics:
+                    # Cleanup metrics dictionary
+                    for k_pop in ["lat", "lon", "gpi"]:
+                        metrics.pop(k_pop, None)
+                    if isinstance(metrics["status"], (int, np.integer)):
+                        metrics["status"] = np.array([metrics["status"]])
+                    
+                    metrics["date_time"] = time_np
+                    res_list.append(metrics)
+
+        except Exception as e:
+            if handle_errors == 'raise':
+                raise e
+            elif handle_errors == "ignore":
+                logging.error(f"{date_info}: {e}")
+                result = val.dummy_validation_result(
+                    date_info, rename_cols=False,
+                    only_with_reference=only_with_reference)
+                if isinstance(e, eh.ValidationError):
+                    retcode = e.return_code
+                else:
+                    retcode = eh.VALIDATION_FAILED
+                for key in result:
+                    for k in result[key][0].keys():
+                        # default case or subgroups status update
+                        if (isinstance(k, str) and k == "status") or \
+                            (isinstance(k, tuple) and k[1] == "status"):
+                            result[key][0][k][0] = retcode  
+
+        # 3. Efficiently merge into global results
+        for r, metrics_data in result.items():
+            results.setdefault(r, []).extend(metrics_data)
+
+        # update progress every SAVE_INTERVAL timesteps or on the last timestep
+        if validation_run is not None and (i % SAVE_INTERVAL == 0 or i == total_times - 1):
+            validation_run.progress_spatial = max(1, round((i + 1) / total_times * 100))
+            validation_run.save()
+            
+    c_results = compact_results(results)
+
+    # Append the dictionary containing information about how often a GPI was used for calculation
+    for key in gpi_n_use_dict.keys():
+        c_results[key]["n_gpi_was_used"] = list(gpi_n_use_dict[key].values())
+    # For meta-mapplots about gpi location
+    for key in c_results.keys():
+        c_results[key]["gpi"] = list(ds_use.gpi.values)
+        c_results[key]["lat"] = list(ds_use.lat.values) 
+        c_results[key]["lon"] = list(ds_use.lon.values)
+    return c_results
+
+def temporal_validation_xr(val, ds_use, only_with_reference=True, handle_errors="ignore", validation_run=None):
+    """
+    Performs a temporal validation using an xarray by calculating metrics for every gpi.
+
+    Calculates metrics across time for a single GPI, this function 
+    iterates through the 'gpi' dimension and calculates metrics across 
+    all available timesteps (stations) for each gpi. 
+
+    Parameters
+    ----------
+    val : ValidationRun
+        The validation run object used for data retrieval and configuration.
+    ds_use : xr.Dataset
+        The consolidated dataset with dimensions ('date_time', 'gpi').
+    only_with_reference: bool, optional (default: False)
+        Only compute metrics for dataset combinations where the reference
+        is included.
+
+    Returns
+    -------
+    c_results : dict
+        Compacted validation results containing the metrics for each 
+        dataset combination, indexed by date_time.
+
+    Raises
+    ------
+    eh.NoTempMatchedDataError
+        If no data is found for a specific combination and error handling 
+        is set to 'raise'.
+    eh.MetricsCalculationError
+        If the metrics calculator fails and error handling is set to 'raise'.
+
+    """
+    results = {}
+    gpi_metakeys = [name for name, coord in ds_use.coords.items() if coord.dims == ('gpi',)]
+    
+    # 1. Pre-calculate combinations and structures outside the GPI loop
+    all_combinations = {}
+    for n, k in val.metrics_c:
+        combos = list(get_result_combinations(val.data_manager.ds_dict, n=k))
+        for c in combos:
+            c_list = [j[0] for j in c]
+            if only_with_reference and val.data_manager.reference_name not in c_list:
+                continue
+            all_combinations[c] = (c_list, val.metrics_c[(n, k)])
+
+    # 2. Convert Dataset to DataFrame once (MultiIndex: gpi, date_time)
+    # This is much faster than repeatedly calling .sel(gpi=gpi)
+    df_all = ds_use.to_dataframe()
+    
+    # Pre-extract coordinate values for fast access
+    lons = ds_use.lon.values
+    lats = ds_use.lat.values
+    gpi_vals = ds_use.gpi.values
+
+    total_gpis = len(gpi_vals)
+    SAVE_INTERVAL = max(1, total_gpis // 100)
+
+    for i, gpi in enumerate(gpi_vals):
+        try:
+            metrics = np.nan
+            result = {}
+            # Faster slicing using the MultiIndex
+            df_gpi = df_all.xs(gpi, level='gpi')
+            
+            gpi_meta = {key: ds_use[key].values[i] for key in gpi_metakeys} 
+            gpi_info = (gpi, lons[i], lats[i], gpi_meta) 
+
+            for c, (c_list, metrics_calculator) in all_combinations.items():
+                res_list = result.setdefault(c, [])
+                
+                df_comb = df_gpi[c_list].dropna()
+                
+                if df_comb.empty:
+                    if handle_errors == "raise":
+                        raise eh.NoTempMatchedDataError(f"Empty data for {c} at {gpi_info}")
+                    metrics = metrics_calculator(pd.DataFrame(columns=c_list), gpi_info)
+                    metrics["status"][0] = gpi_meta["status"]
+                else:
+                    try:
+                        metrics_calculator.__self__.metadata_template = METADATA_TEMPLATE['ismn_ref']
+                        metrics_calculator.__self__.result_template.update(metrics_calculator.__self__.metadata_template)
+                        metrics = metrics_calculator(data=df_comb, gpi_info=gpi_info)
+                    except Exception:
+                        if handle_errors == "raise":
+                            raise eh.MetricsCalculationError(f"Metrics failed for {c}")
+                        metrics = metrics_calculator(pd.DataFrame(columns=c_list), gpi_info)
+                        metrics["status"][0] = eh.METRICS_CALCULATION_FAILED
+                
+                res_list.append(metrics)
+                
+        except Exception as e:
+            if handle_errors == 'raise':
+                raise e
+            elif handle_errors == "ignore":
+                logging.error(f"{gpi_info}: {e}")
+                result = val.dummy_validation_result(
+                    gpi_info, rename_cols=False,
+                    only_with_reference=only_with_reference)
+                
+                retcode = e.return_code if isinstance(e, eh.ValidationError) else eh.VALIDATION_FAILED
+                
+                for key in result:
+                    for k in result[key][0].keys():
+                        if (isinstance(k, str) and k == "status") or \
+                           (isinstance(k, tuple) and k[1] == "status"):
+                            result[key][0][k][0] = retcode  
+        
+        for r, metrics_data in result.items():
+            results.setdefault(r, []).extend(metrics_data)
+
+        if validation_run is not None and (i % SAVE_INTERVAL == 0 or i == total_gpis - 1):
+            validation_run.progress = max(1, round((i + 1) / total_gpis * 100))
+            validation_run.save()
+            
+    c_results = compact_results(results)
+    return c_results
+
+@shared_task(bind=True, max_retries=3)
+def run_xArray_validation(self, validation_id, gpi_tuple, val_type="both", min_obs=1, include_secondary_meta=False, only_with_reference=ONLY_WITH_REFERENCE):
+    """
+    Executes a pytesmo-based validation using xArray datasets.
+
+    The function builds an xArray from the provided GPIs, calculates 
+    metadata coordinates (e.g., number of valid GPIs per timestamp), 
+    filters by minimum observations, and performs spatial and/or 
+    temporal validation.
+
+    Parameters
+    ----------
+    validation_id : int
+        Primary key of the ValidationRun object.
+    gpi_tuple : tuple
+        A tuple defining the Grid Point Indices (GPIs) to be processed.
+    val_type : str, optional
+        Type of validation to perform. Default is 'both'.
+        'spatial' creates graphs for spatial validation.
+        'temporal' creates graphs for temporal validation.
+        'both' performs both spatial and temporal validation.
+    min_obs : int, optional
+        Minimum number of valid samples (GPIs) required per timestamp 
+        to include it in the validation. Default is 10.
+    include_secondary_meta : bool, optional
+        If True, calculates and adds secondary metadata dicts (land cover, 
+        climate class, etc.). Default is False. NOT IMPLEMENTED
+    only_with_reference : bool, optional
+        Whether to restrict the validation to combinations with the reference 
+        dataset.
+
+    Return
+    ------
+    temporal_result : object or None
+        Result of the temporal validation logic.
+    spatial_result : object or None
+        Result of the spatial validation logic.
+    """
+    numgpis = num_gpis_from_job(gpi_tuple)
+    __logger.debug("Executing xArray validation for validation {}, # of gpis: {}".format(validation_id, numgpis))
+    start_time = datetime.now(tzlocal())
+    try:
+        # Create Validation run
+        validation_run = ValidationRun.objects.get(pk=validation_id)
+        val = create_pytesmo_validation(validation_run, val_type="spatial")
+        # Hijack run and create xArray
+        ds_all = build_xarray(gpi_tuple, val)
+
+        # create spatial metadata
+        date_meta = {}
+        first_var = next(iter(ds_all.data_vars))
+
+        # secondary metadata not that useful
+        if include_secondary_meta:
+            metakeys = ["frm_class", "lc_2010", "climate_KG"] # for now only with classed values, no binning for continous meta implemented yet
+            metalist = []
+            for time in ds_all.date_time:
+                mask = ds_all.sel(date_time=time)[first_var].values
+                metadict = {key:pd.Series(np.where(np.isnan(mask), np.nan, ds_all.sel(date_time=time)[key].values)).value_counts(dropna=False).to_dict() for key in metakeys}
+                metalist.append(metadict)
+
+            for key in metakeys:
+                ds_all.coords["n_gpi_"+key] = ("date_time", [metalist[time][key] for time in range(ds_all.date_time.__len__())])
+
+        date_meta["n_gpi"] = ds_all[first_var].count(dim='gpi').values   
+        ds_all.coords["n_gpi"] = ("date_time", date_meta["n_gpi"]) #Number of gpi where not all values are missing (at each timestamp)
+
+        # Run validations depending on chosen type
+        if val_type == "both":
+            ds_use = ds_all
+            # ds_use = ds_all.where(ds_all.n_gpi>=min_obs, drop=True) # if you want to filter beforehand: should be filtered to min_obs in pytesmo, probably 10
+            if any(np.array([len(ds_use[coord]) for coord in ds_use.dims]) < 1):
+                raise ValueError(f"No Timestamp with enough gpi observations")
+            spatial_result = spatial_validation_xr(val, ds_use, only_with_reference, validation_run=validation_run)
+            temporal_result = temporal_validation_xr(val, ds_all, only_with_reference, validation_run=validation_run)
+            
+        elif val_type == "spatial":
+            ds_use = ds_all
+            # ds_use = ds_all.where(ds_all.n_gpi>=min_obs, drop=True) # if you want to filter beforehand: should be filtered to min_obs in pytesmo, probably 10
+            if any(np.array([len(ds_use[coord]) for coord in ds_use.dims]) < 1):
+                raise ValueError(f"No Timestamp with enough gpi observations")
+            spatial_result = spatial_validation_xr(val, ds_use, only_with_reference, validation_run=validation_run)
+            temporal_result = None
+        elif val_type == "temporal": #Shouldn't be used, original implementation way faster
+            temporal_result = temporal_validation_xr(val, ds_use, only_with_reference, validation_run=validation_run)
+            spatial_result = None
+        else:
+            spatial_result = None
+            temporal_result = None
+
+        end_time = datetime.now(tzlocal())
+        duration = end_time - start_time
+        duration = (duration.days * 86400) + duration.seconds
+        __logger.debug(
+            "Finished xArray validation for validation {}, took {} seconds for {} gpis".
+            format(validation_id, duration, numgpis))
+        return temporal_result, spatial_result
     except Exception as e:
         self.retry(countdown=2, exc=e)
 
@@ -534,6 +1213,63 @@ def check_and_store_results(job_id, results, save_path):
 
     netcdf_results_manager(results, save_path)
 
+def check_and_store_spatial_results(job_id, results, save_path):
+    if len(results) < 1:
+        __logger.warning(
+            'Potentially problematic job: {} - no results'.format(job_id))
+        return
+    else:
+        netcdf_results_manager_spatial(results, save_path)
+
+def append_attributes_spatial(ds):
+    """Appends certain attributes to dataset variables. Should be expanded."""
+    for k in list(ds.keys()):
+        if list(ds[k].coords.keys()) == ["date_time"]:
+            ds[k].attrs["coordinates"] = "date_time"
+        elif list(ds[k].coords.keys()) == ["gpi"]:
+            ds[k].attrs["coordinates"] = "gpi"
+        if k == "lon":
+            ds[k].attrs = dict(
+                        long_name="location longitude",
+                        coordinates="gpi",
+                        standard_name="longitude",
+                        units="degrees_east",
+                        valid_range=np.array([-180, 180]),
+                        axis="X",
+                    )
+        if k == "lat":
+            ds[k].attrs = dict(
+                        long_name="location latitude",
+                        coordinates="gpi",
+                        standard_name="latitude",
+                        units="degrees_north",
+                        valid_range=np.array([-90, 90]),
+                        axis="Y",
+                    )
+    return ds
+    
+def netcdf_results_manager_spatial(results, run_dir, spatial_metadict=["n_gpi", "gpi", "lat", "lon"]):
+    for ds_names, data in results.items():
+        fname = build_filename(run_dir, ds_names)
+
+        meta = {k:v for k, v in data.items() if any([ss in k for ss in spatial_metadict])}
+        data = {k:v for k, v in data.items() if not any([ss in k for ss in spatial_metadict])}
+        ds = xr.Dataset()
+        for key, values in data.items():
+            # Create a coordinate for the values (e.g., obs_index)
+            # and a coordinate for the key itself
+            ds[key] = xr.DataArray(
+                values, 
+                dims=["date_time"])
+
+        for m_key, m_val in meta.items():
+            # If meta is a complex dict, JSON serialize it
+            if isinstance(m_val, dict):
+                ds[m_key] = xr.DataArray(json.dumps(m_val), dims=["gpi"],coords={"gpi": meta["gpi"]})
+            else:
+                ds[m_key] = xr.DataArray(m_val, dims=["gpi"],coords={"gpi": meta["gpi"]})
+        ds = append_attributes_spatial(ds)
+        ds.to_netcdf(fname.replace(".nc", ".SPATIAL.nc"))
 
 def track_celery_task(validation_run, task_id):
     celery_task = CeleryTask()
@@ -555,9 +1291,31 @@ def untrack_celery_task(task_id):
         __logger.debug('Task {} already deleted from db.'.format(task_id))
 
 
-def run_validation(validation_id):
+def run_validation(validation_id, val_type="temporal"):
+
     __logger.info("Starting validation: {}".format(validation_id))
-    validation_run = ValidationRun.objects.get(pk=validation_id)
+    validation_run = ValidationRun.objects.get(pk=validation_id) 
+
+    # Validation cancel id shedueled
+    if validation_run.progress == -1:
+        __logger.info(f"Validation {validation_id} was cancelled before starting.")
+        validation_run.end_time = datetime.now(tzlocal())
+        validation_run.save()
+        return
+
+    # 2026-14-04: FIX UNTIL SOMEONE TAKES LOOK AT TEMPORAL XARRAY VALIDATION
+    if val_type in ["both"]:
+        spatial_run = run_validation(validation_id, val_type="spatial")
+        validation_run.refresh_from_db(fields=['progress', 'progress_spatial'])
+    
+        if validation_run.progress == -1:
+            __logger.info(f"Validation {validation_id} was cancelled after spatial, skipping temporal.")
+            return (None, spatial_run)
+        
+        temporal_run = run_validation(validation_id, val_type="temporal")
+        return (temporal_run, spatial_run)
+    # ----------------------------------------------------------------------
+    
     validation_aborted = False
 
     if (not hasattr(settings, 'CELERY_TASK_ALWAYS_EAGER')) or (
@@ -571,29 +1329,58 @@ def run_validation(validation_id):
 
         ref_reader, read_name, read_kwargs = _get_spatial_reference_reader(
             validation_run)
+        if val_type=="temporal":
+            total_points, jobs = create_jobs(
+                validation_run=validation_run,
+                reader=ref_reader,
+                dataset_config=validation_run.spatial_reference_configuration)
 
-        total_points, jobs = create_jobs(
-            validation_run=validation_run,
-            reader=ref_reader,
-            dataset_config=validation_run.spatial_reference_configuration)
+            validation_run.total_points = total_points
+            validation_run.progress = 1
+            validation_run.save()  # save the number of gpis before we start
 
-        validation_run.total_points = total_points
-        validation_run.save()  # save the number of gpis before we start
+            __logger.debug("Jobs to run: {}".format([job[:-1] for job in jobs]))
 
-        __logger.debug("Jobs to run: {}".format([job[:-1] for job in jobs]))
+            save_path = run_dir
 
-        save_path = run_dir
+            async_results = []
+            job_table = {}
+            for j in jobs:
+                celery_job = execute_job.apply_async(
+                    args=[validation_id, j], queue=validation_run.user.username)
+                async_results.append(celery_job)
+                job_table[celery_job.id] = j
+                track_celery_task(validation_run, celery_job.id)
+        elif val_type in ["both", "spatial"]:
+            total_points, jobs = create_jobs(
+                validation_run=validation_run,
+                reader=ref_reader,
+                dataset_config=validation_run.spatial_reference_configuration)
+            jobs = [tuple([i for i in np.concatenate(jobs, axis=1)])] # Only run one big job, otherwise parallelization makes xArray creation impossible
+            validation_run.total_points = total_points
+            validation_run.progress_spatial = 1 
+            validation_run.save()  # save the number of gpis before we start
 
-        async_results = []
-        job_table = {}
-        for j in jobs:
-            celery_job = execute_job.apply_async(
-                args=[validation_id, j], queue=validation_run.user.username)
-            async_results.append(celery_job)
-            job_table[celery_job.id] = j
-            track_celery_task(validation_run, celery_job.id)
+            __logger.debug("Jobs to run: {}".format([job[:-1] for job in jobs]))
+
+            save_path = run_dir
+
+            async_results = [] 
+            job_table = {}
+            for j in jobs:
+
+                celery_job = run_xArray_validation.apply_async(
+                    args=[validation_id, j, val_type], queue=validation_run.user.username)
+                async_results.append(celery_job)
+                job_table[celery_job.id] = j
+                track_celery_task(validation_run, celery_job.id)
 
         for async_result in async_results:
+
+            validation_run.refresh_from_db(fields=['progress', 'progress_spatial'])
+            if validation_run.progress == -1:
+                validation_aborted = True
+
             try:
                 if not validation_aborted:  # only wait for this task if the validation hasn't been cancelled
                     task_running = True
@@ -617,16 +1404,28 @@ def run_validation(validation_id):
                                 __logger.debug(
                                     'Validation got cancelled, dropping task {}: {}'
                                     .format(async_result.id, te))
-
+                                
                 # in case there where no points with overlapping data within
                 # the validation period, results is an empty dictionary, and we
                 # count this job as error
+
                 if validation_aborted or not results:
+                   
                     validation_run.error_points += num_gpis_from_job(
                         job_table[async_result.id])
                 else:
-                    results = _pytesmo_to_qa4sm_results(results)
-                    check_and_store_results(async_result.id, results, run_dir)
+                    
+                    if val_type=="temporal":
+                        results = _pytesmo_to_qa4sm_results(results)
+                        check_and_store_results(async_result.id, results, run_dir)
+                    elif val_type in ["both", "spatial"]:
+                        temporal_result, spatial_result = results
+                        sr = _pytesmo_to_qa4sm_results(spatial_result)
+                        check_and_store_spatial_results(async_result.id, sr, run_dir)
+                        if val_type=="both":
+                            tr = _pytesmo_to_qa4sm_results(temporal_result)
+                            results = tr
+                            check_and_store_results(async_result.id, results, run_dir)
 
                     # If the job ran successfully, we have to check the status
                     # attribute to see if the job actually calculated something
@@ -636,22 +1435,46 @@ def run_validation(validation_id):
                     # that in one case the validation fails because there is
                     # not enough data. For "ok_points" we only count the points
                     # where all validations fail.
+                    def get_ok_points(result):
+                        """Iterates over status keys in dataset to determine # of gpi/date_time where every calculation worked"""
+                        result_key = list(result.keys())[0]  # there is only 1 key
+                        res = result[result_key]
+                        status_result_keys = list(
+                            filter(
+                                lambda s: "status" in s and not s.split("|")[0].
+                                isdigit(), res.keys()))
+                        ok = res[status_result_keys[0]] == 0
+                        for statkey in status_result_keys[1:]:
+                            ok = ok & (res[statkey] == 0)
+                        nok = sum(ok)
+                        return nok, ok
+                    
+                    #validation_run.ok_times = 0
+                    #validation_run.error_times = 0
 
-                    result_key = list(results.keys())[0]  # there is only 1 key
-                    res = results[result_key]
-                    status_result_keys = list(
-                        filter(
-                            lambda s: "status" in s and not s.split("|")[0].
-                            isdigit(), res.keys()))
-                    ok = res[status_result_keys[0]] == 0
-                    for statkey in status_result_keys[1:]:
-                        ok = ok & (res[statkey] == 0)
-                    ngpis = num_gpis_from_job(
-                        job_table[async_result.id]
-                    )  # ? so we need a new criterion to determine, if the job was ok or not? like ngpis * len(time slices)
-                    nok = sum(ok)
-                    validation_run.ok_points += nok
-                    validation_run.error_points += ngpis - nok
+                    if val_type in ["both", "temporal"]:
+                        nok, ok = get_ok_points(results)                     
+                        ngpis = num_gpis_from_job(
+                            job_table[async_result.id]
+                        )  # ? so we need a new criterion to determine, if the job was ok or not? like ngpis * len(time slices)
+                        validation_run.ok_points += nok
+                        validation_run.error_points += ngpis - nok
+
+                        if val_type == "both":
+                            nok, ok = get_ok_points(sr)                     
+                            ntimes = len(sr[list(sr.keys())[0]]["date_time"])
+                            validation_run.ok_times += nok
+                            validation_run.error_times += ntimes - nok
+                            validation_run.total_times = ntimes
+
+                    elif val_type == "spatial":
+                        validation_run.ok_times = 0
+                        validation_run.error_times = 0
+                        nok, ok = get_ok_points(sr)                     
+                        ntimes = len(sr[list(sr.keys())[0]]["date_time"])
+                        validation_run.ok_times += nok
+                        validation_run.error_times += ntimes - nok
+                        validation_run.total_times = ntimes
 
             except Exception as e:
                 validation_run.error_points += num_gpis_from_job(
@@ -669,11 +1492,26 @@ def run_validation(validation_id):
                 async_result.forget()
 
             if not validation_aborted:
-                validation_run.progress = round(
-                    ((validation_run.ok_points + validation_run.error_points) /
-                     validation_run.total_points) * 100)
+                
+                if val_type == "temporal":
+                    validation_run.progress = round(
+                        (validation_run.ok_points + validation_run.error_points) /
+                        validation_run.total_points * 100)
+                  
+                elif val_type == "spatial":
+                    validation_run.progress_spatial = round(
+                        (validation_run.ok_times + validation_run.error_times) /
+                        validation_run.total_times * 100)
+                    validation_run.progress = validation_run.progress_spatial 
+
+                elif val_type == "both":
+                    validation_run.refresh_from_db(fields=['progress', 'progress_spatial'])
+                    pass
+                      
             else:
                 validation_run.progress = -1
+                validation_run.progress_spatial = -1
+
             validation_run.save()
             __logger.info(
                 "Dealt with task {}, validation {} is {} % done...".format(
@@ -685,44 +1523,122 @@ def run_validation(validation_id):
         # we have metrics for at least one gpi - otherwise no netcdf output file
 
         if (not validation_aborted):
-            set_outfile(validation_run, run_dir)
+            if val_type in ["spatial", "both"]:
+                set_outfile(validation_run, run_dir, val_type="spatial") 
 
-            iam_dict = define_tsw_metrics(validation_run,
-                                          get_period(validation_run))
-            temp_sub_wdw_instance = iam_dict['temp_sub_wdw_instance']
-            temp_sub_wdws = iam_dict['temp_sub_wdws']
+                iam_dict = define_tsw_metrics(validation_run,
+                            get_period(validation_run))
+                temp_sub_wdw_instance = iam_dict['temp_sub_wdw_instance']
+                temp_sub_wdws = iam_dict['temp_sub_wdws']
 
-            transcriber = Pytesmo2Qa4smResultsTranscriber(
-                pytesmo_results=os.path.join(OUTPUT_FOLDER,
-                                             validation_run.output_file.name),
-                intra_annual_slices=temp_sub_wdw_instance,
-                keep_pytesmo_ncfile=False)
-            if transcriber.exists:
-                restructured_results = transcriber.get_transcribed_dataset()
-                transcriber.output_file_name = transcriber.build_outname(
-                    run_dir, results.keys())
-                transcriber.write_to_netcdf(transcriber.output_file_name)
+                sp_transcriber = Pytesmo2Qa4smResultsTranscriber(
+                    pytesmo_results=os.path.join(OUTPUT_FOLDER,
+                                                validation_run.output_file_spatial.name),
+                                                intra_annual_slices=temp_sub_wdw_instance,
+                                                keep_pytesmo_ncfile=False)
+                if sp_transcriber.exists:
+                    restructured_results = sp_transcriber.get_transcribed_dataset()
 
-                save_validation_config(validation_run)
 
-                transcriber.compress(path=transcriber.output_file_name,
-                                     compression='zlib',
-                                     complevel=9)
+                    base = os.path.basename(validation_run.output_file_spatial.name).replace('.SPATIAL.nc', '_spatial_result.nc')
+                    spatial_outname = os.path.join(run_dir, base)
+                    
+                    restructured_results.to_netcdf(spatial_outname)
+                    
+                    # Update DB reference
+                    validation_run.output_file_spatial.name = regex_sub(
+                        '/?' + OUTPUT_FOLDER + '/?', '', spatial_outname)
+                    validation_run.save()
 
-                if temp_sub_wdws is None:
-                    temporal_sub_windows_names = [DEFAULT_TSW]
-                else:
-                    temporal_sub_windows_names = temp_sub_wdw_instance.names
+                    # Copy attributes from temporal file to spatial file
+                    # Add required attributes directly
+                    with netCDF4.Dataset(spatial_outname, 'a') as ds:
+                        ds.val_ref = 'val_dc_dataset0'
+                        j = 1
+                        for dataset_config in validation_run.dataset_configurations.all():
+                            if (validation_run.spatial_reference_configuration and
+                                    dataset_config.id == validation_run.spatial_reference_configuration.id):
+                                i = 0
+                            else:
+                                i = j
+                                j += 1
+                            ds.setncattr('val_dc_dataset' + str(i), dataset_config.dataset.short_name)
+                            ds.setncattr('val_dc_version' + str(i), dataset_config.version.short_name)
+                            ds.setncattr('val_dc_variable' + str(i), dataset_config.variable.pretty_name)
+                            ds.setncattr('val_dc_dataset_pretty_name' + str(i), dataset_config.dataset.pretty_name)
+                            ds.setncattr('val_dc_version_pretty_name' + str(i), dataset_config.version.pretty_name)
+                            ds.setncattr('val_dc_variable_pretty_name' + str(i), dataset_config.variable.short_name)
+                        ds.val_scaling_method = validation_run.scaling_method
+                        ds.val_anomalies = validation_run.anomalies
+                
+                    sp_transcriber.compress(path=spatial_outname, compression='zlib', complevel=9)
 
-                __logger.info(
-                    f'temporal_sub_windows_names: {temporal_sub_windows_names}'
-                )
+                    # Delete uncompressed version
+                    path_SPATIAL = os.path.join(run_dir, base.replace("_spatial_result.nc", ".SPATIAL.nc"))
+                    if os.path.exists(path_SPATIAL):
+                        os.remove(path_SPATIAL)
 
-                generate_all_graphs(
-                    validation_run=validation_run,
-                    outfolder=run_dir,
-                    temporal_sub_windows=temporal_sub_windows_names,
-                    save_metadata=validation_run.plots_save_metadata)
+                    if temp_sub_wdws is None:
+                        temporal_sub_windows_names = [DEFAULT_TSW]
+                    else:
+                        temporal_sub_windows_names = temp_sub_wdw_instance.names
+
+                    __logger.info(
+                        f'temporal_sub_windows_names: {temporal_sub_windows_names}'
+                    )
+
+                    generate_all_graphs(
+                        validation_run=validation_run,
+                        outfolder=run_dir,
+                        temporal_sub_windows=temporal_sub_windows_names,
+                        save_metadata=validation_run.plots_save_metadata,
+                        val_type="spatial")
+
+            if val_type in ["temporal", "both"]:
+                set_outfile(validation_run, run_dir, val_type="temporal")
+
+                iam_dict = define_tsw_metrics(validation_run,
+                                            get_period(validation_run))
+                temp_sub_wdw_instance = iam_dict['temp_sub_wdw_instance']
+                temp_sub_wdws = iam_dict['temp_sub_wdws']
+                pytesmo_res=os.path.join(OUTPUT_FOLDER,
+                                                validation_run.output_file.name)
+
+                transcriber = Pytesmo2Qa4smResultsTranscriber(
+                    pytesmo_results=pytesmo_res,
+                    intra_annual_slices=temp_sub_wdw_instance,
+                    keep_pytesmo_ncfile=False)
+                if transcriber.exists:
+                    restructured_results = transcriber.get_transcribed_dataset()
+                    transcriber.output_file_name, transcriber.output_zarr_name = transcriber.build_outname(
+                        run_dir, results.keys())
+                    transcriber.write_to_netcdf(transcriber.output_file_name)
+                    transcriber.write_to_zarr_filtered(
+                        path=transcriber.output_zarr_name,
+                        tsw_value=DEFAULT_TSW
+                    )
+
+                    save_validation_config(validation_run)
+
+                    transcriber.compress(path=transcriber.output_file_name,
+                                        compression='zlib',
+                                        complevel=9)
+
+                    if temp_sub_wdws is None:
+                        temporal_sub_windows_names = [DEFAULT_TSW]
+                    else:
+                        temporal_sub_windows_names = temp_sub_wdw_instance.names
+
+                    __logger.info(
+                        f'temporal_sub_windows_names: {temporal_sub_windows_names}'
+                    )
+
+                    generate_all_graphs(
+                        validation_run=validation_run,
+                        outfolder=run_dir,
+                        temporal_sub_windows=temporal_sub_windows_names,
+                        save_metadata=validation_run.plots_save_metadata,
+                        val_type="temporal")
 
     except Exception as e:
         __logger.exception('Unexpected exception during validation {}:'.format(
@@ -746,12 +1662,13 @@ def stop_running_validation(validation_id):
     __logger.info("Stopping validation {} ".format(validation_id))
     validation_run = ValidationRun.objects.get(pk=validation_id)
     validation_run.progress = -1
+    validation_run.progress_spatial = -1
     validation_run.save()
 
     celery_tasks = CeleryTask.objects.filter(validation=validation_run)
 
     for task in celery_tasks:
-        app.control.revoke(str(task.celery_task_id))  # @UndefinedVariable
+        app.control.revoke(str(task.celery_task_id), terminate=True, signal='SIGTERM')  # @UndefinedVariable
         task.delete()
 
     run_dir = os.path.join(OUTPUT_FOLDER, str(validation_run.id))
@@ -798,7 +1715,7 @@ def _pytesmo_to_qa4sm_results(results: dict) -> dict:
             else:
                 prefix = None
             # static 'metrics' (e.g. metadata, geoinfo) are not related to datasets
-            statics = ["gpi", "lat", "lon"]
+            statics = ["gpi", "lat", "lon", "date_time"] # had to append date_time to avoid rewriting entire function
             statics.extend(METADATA_TEMPLATE["ismn_ref"])
             if metric in statics:
                 new_key = metric

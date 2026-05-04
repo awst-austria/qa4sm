@@ -18,6 +18,7 @@ export interface ValidationRunConfigDto {
   scale_to: string;
   name_tag: string;
   temporal_matching: number;
+  val_type?: string;
   changes?: boolean;
   settings_changes?: ConfigurationChanges;
 }

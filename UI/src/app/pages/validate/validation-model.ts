@@ -24,6 +24,7 @@ export class ValidationModel {
               public anomalies: AnomaliesModel,
               public temporalMatchingModel: TemporalMatchingModel,
               public scalingMethod: ScalingModel,
-              public nameTag$: BehaviorSubject<string>) {
+              public nameTag$: BehaviorSubject<string>,
+              public valType: string = 'temporal') {
   }
 }

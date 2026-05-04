@@ -24,35 +24,32 @@ export class ValidationResultComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.route.params.subscribe(params => {
-      this.validationId = params.validationId;
-      this.validationModel = new ValidationResultModel(
-        this.validationRunService.getValidationRunById(this.validationId)
-          .pipe(
-            catchError(() => {
-              this.dataFetchError.set(true);
-              return EMPTY;
-            })
-          ),
-        this.datasetConfigurationService.getConfigByValidationrun(this.validationId)
-          .pipe(
-            catchError(() => {
-              this.dataFetchError.set(true);
-              return EMPTY;
-            })
-          )
-      );
-    });
-  }
-
-  update(): void{
-    this.validationModel.validationRun$ = this.validationRunService.getValidationRunById(this.validationId)
-      .pipe(
-      catchError(() => {
-        this.dataFetchError.set(true);
-          return EMPTY;
-      })
+    this.validationId = this.route.snapshot.params['validationId'];
+    this.validationModel = new ValidationResultModel(
+      this.validationRunService.getValidationRunById(this.validationId)
+        .pipe(
+          catchError(() => {
+            this.dataFetchError.set(true);
+            return EMPTY;
+          })
+        ),
+      this.datasetConfigurationService.getConfigByValidationrun(this.validationId)
+        .pipe(
+          catchError(() => {
+            this.dataFetchError.set(true);
+            return EMPTY;
+          })
+        )
     );
   }
 
+  update(): void {
+    this.validationModel.validationRun$ = this.validationRunService.getValidationRunById(this.validationId)
+      .pipe(
+        catchError(() => {
+          this.dataFetchError.set(true);
+          return EMPTY;
+        })
+      );
+  }
 }

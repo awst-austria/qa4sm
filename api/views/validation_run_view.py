@@ -11,8 +11,6 @@ from rest_framework.authentication import TokenAuthentication
 
 from api.views.auxiliary_functions import get_fields_as_list
 from validator.models import ValidationRun, CopiedValidations
-from validator.validation.util import determine_status
-
 from dateutil.parser import parse
 
 
@@ -160,20 +158,13 @@ def validation_run_by_id(request, **kwargs):
 
 
 @api_view(["GET"])
-@permission_classes([AllowAny])
 def validation_run_status(request, validation_id):
     run = get_object_or_404(ValidationRun, id=validation_id)
-
-    status_value = determine_status(run.progress, run.end_time, run.status)
-
-    return JsonResponse(
-        {
-            "id": str(run.id),
-            "status": status_value,
-            "progress": run.progress,
-        },
-        status=status.HTTP_200_OK
-    )
+    return JsonResponse({
+        "id": str(run.id),
+        "status": run.status,
+        "progress": run.progress,
+    })
 
 @api_view(["GET"])
 @permission_classes([AllowAny])

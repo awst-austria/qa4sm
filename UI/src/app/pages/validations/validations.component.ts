@@ -2,7 +2,7 @@ import { Component, OnDestroy, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { Observable, BehaviorSubject, combineLatest, of, interval, Subscription} from 'rxjs';
-import { catchError, debounceTime, distinctUntilChanged, map, shareReplay, startWith, tap, switchMap, take } from 'rxjs/operators';
+import { catchError, debounceTime, distinctUntilChanged, map, shareReplay, startWith, tap, switchMap, take, filter } from 'rxjs/operators';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup } from '@angular/forms';
 
 // PrimeNG
@@ -117,14 +117,11 @@ export class ValidationsComponent implements OnInit, OnDestroy {
     this.rows$ = dataState$.pipe(map(res => res.rows));
     this.totalRecords$ = dataState$.pipe(map(res => res.total));
 
-    this.statusSubscription = interval(60000).pipe(
-      // If we have on the page at least one running validation
+    this.statusSubscription = interval(30000).pipe(  // every 30 seconds
       switchMap(() => this.rows$.pipe(take(1))),
-      map(rows => rows.some(r => this.isLive(r)))
-    ).subscribe(hasLive => {
-      if (hasLive) {
-        this.page$.next({ ...this.page$.value }); // page reload
-      }
+      filter(rows => rows.some(r => this.isLive(r)))
+    ).subscribe(() => {
+      this.page$.next({ ...this.page$.value });
     });
 
   }
@@ -190,18 +187,43 @@ export class ValidationsComponent implements OnInit, OnDestroy {
     }
   }
 
-  // Define the status progress
-  getStatusDisplay(valrun: any): { label: string, severity: string, progress?: number } {
-    if (valrun.progress === 0 && valrun.end_time === null) {
-      return { label: 'Scheduled', severity: 'info' };
-    } else if (valrun.progress === 100 && valrun.end_time) {
-      return { label: 'Done', severity: 'secondary' };
-    } else if (valrun.progress === -1 || valrun.progress === -100) {
-      return { label: 'Cancelled', severity: 'secondary' };
-    } else if (valrun.end_time != null || valrun.total_points == 0) {
-      return { label: 'Error', severity: 'danger' };
-    } else {
-      return { label: `Running ${valrun.progress}%`, severity: 'warning', progress: valrun.progress };
+  // Show the status progress
+  getStatusDisplay(valrun: any): { label: string, severity: string, spinning?: boolean } {
+    
+    switch (valrun.status) {
+      case 'DONE':
+        return { label: 'Done', severity: 'success' };
+      case 'CANCELLED':
+        return { label: 'Cancelled', severity: 'secondary' };
+      case 'ERROR':
+        return { label: 'Error', severity: 'danger' };
+      case 'SCHEDULED':
+        return { label: 'Scheduled', severity: 'info' };
+      case 'RUNNING':
+        if (valrun.val_type === 'both') {
+          // both progresses at 100 but files not yet written
+          if (valrun.progress === 100 && valrun.progress_spatial === 100) {
+            return { label: 'Generating plots...', severity: 'warn', spinning: true };
+          }
+          // spatial done, temporal still running
+          if (valrun.progress_spatial === 100 && valrun.progress < 100) {
+            return { label: `Running\nTemporal: ${valrun.progress}%\nSpatial: done`, severity: 'warn', spinning: true };
+          }
+          return { label: `Running\nTemporal: ${valrun.progress}%\nSpatial: ${valrun.progress_spatial}%`, severity: 'warn', spinning: true };
+        }
+        if (valrun.val_type === 'spatial') {
+          if (valrun.progress_spatial === 100) {
+            return { label: 'Generating plots...', severity: 'warn', spinning: true };
+          }
+          return { label: `Running\nSpatial: ${valrun.progress_spatial}%`, severity: 'warn', spinning: true };
+        }
+        if (valrun.progress === 100) {
+          return { label: 'Generating plots...', severity: 'warn', spinning: true };
+        }
+        return { label: `Running ${valrun.progress}%`, severity: 'warn', spinning: true };
+
+      default:
+        return { label: 'Unknown', severity: 'secondary' };
     }
   }
 
@@ -237,8 +259,21 @@ export class ValidationsComponent implements OnInit, OnDestroy {
     });
   }
 
+  isStoppable(valrun: any): boolean {
+
+    if (valrun.status === 'SCHEDULED') return false;  
+    if (valrun.status !== 'RUNNING') return false;
+    
+    // Generating plots — no celery tasks to stop
+    if (valrun.val_type === 'spatial' && valrun.progress_spatial === 100) return false;
+    if (valrun.val_type === 'temporal' && valrun.progress === 100) return false;
+    if (valrun.val_type === 'both' && valrun.progress === 100 && valrun.progress_spatial === 100) return false;
+    
+    return true;
+  }
+
   isLive(valrun: any): boolean {
-    return valrun.progress > 0 && valrun.progress < 100 && !valrun.end_time;
+    return valrun.status === 'RUNNING' || valrun.status === 'SCHEDULED';
   }
 
   onPageChange(event: any): void {

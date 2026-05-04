@@ -33,15 +33,17 @@ __logger = logging.getLogger(__name__)
 @api_view(['DELETE'])
 @permission_classes([IsAuthenticated])
 def stop_validation(request, result_uuid):
-    if request.method == "DELETE":
-        validation_run = get_object_or_404(ValidationRun, pk=result_uuid)
-        if validation_run.user != request.user:
-            return HttpResponse(status=403)
+    validation_run = get_object_or_404(ValidationRun, pk=result_uuid)
+    
+    if validation_run.user != request.user:
+        return HttpResponse(status=403)
 
+    try:
         stop_running_validation(result_uuid)
         return HttpResponse(status=200)
-
-    return HttpResponse(status=405)  # if we're not DELETing, send back "Method not Allowed"
+    except Exception as e:
+        __logger.error(f"Failed to stop validation {result_uuid}: {e}")
+        return HttpResponse("Failed to stop validation", status=500)
 
 
 @api_view(['PATCH'])
@@ -229,8 +231,12 @@ def delete_result(request, result_uuid):
     if not val_run.is_unpublished or val_run.is_archived:
         return HttpResponse(status=status.HTTP_405_METHOD_NOT_ALLOWED)  # 405
 
-    val_run.delete()
-    return HttpResponse(status=status.HTTP_200_OK)
+    try:
+        val_run.delete()
+        return HttpResponse(status=status.HTTP_200_OK)
+    except Exception as e:
+        __logger.error(f"Failed to delete validation {result_uuid}: {e}")
+        return HttpResponse(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 @api_view(['DELETE'])

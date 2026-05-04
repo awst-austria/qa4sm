@@ -1,0 +1,30 @@
+.pcol:hover{
+  transform: scale(1.1);
+}
+.result-plot{
+  border-color: rgba(0, 0, 0, 0.1);
+  border-style: solid;
+  border-width: thin;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1), 0 6px 20px rgba(0, 0, 0, 0.1);
+}
+.result-plot:hover{
+  box-shadow: 0 0 2em gray;
+  z-index: 1;
+  cursor: pointer;
+}
+.center{
+  text-align: center;
+}
+.image-label{
+  font-size: 0.7rem;
+}
+.image-container{
+  text-align: center;
+}
+.subtitle {
+  text-align: center;
+  font-size: 1.7rem;
+  color: dimgray;
+  padding-bottom: 1rem;
+}
+

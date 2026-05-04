@@ -1,3 +1,4 @@
+import gc
 import warnings
 
 import matplotlib.pyplot as plt
@@ -18,11 +19,12 @@ from django.conf import settings
 from cartopy import config as cconfig
 from typing import List, Tuple, Dict, Set
 from pathlib import PosixPath
+from itertools import combinations
 
 cconfig['data_dir'] = path.join(settings.BASE_DIR, 'cartopy')
 
 from validator.validation.globals import OUTPUT_FOLDER, METRICS as READER_METRICS, METRIC_TEMPLATE, TC_METRICS, \
-    TC_METRIC_TEMPLATE, DEFAULT_TSW, STABILITY_METRICS
+    TC_METRIC_TEMPLATE, DEFAULT_TSW, STABILITY_METRICS, QR_METRIC_TEMPLATE, QR_METRIC_TC_TEMPLATE
 import os
 from io import BytesIO
 import base64
@@ -30,7 +32,7 @@ from parse import parse
 
 __logger = logging.getLogger(__name__)
 
-def generate_all_graphs(validation_run, temporal_sub_windows: List[str], outfolder: str, save_metadata='threshold'):
+def generate_all_graphs(validation_run, temporal_sub_windows: List[str], outfolder: str, save_metadata='threshold', out_type = ["png"], dpi=100, val_type="temporal"):
     """
     Create all default graphs for validation run. This is done
     using the qa4sm-reader plotting library.
@@ -47,45 +49,91 @@ def generate_all_graphs(validation_run, temporal_sub_windows: List[str], outfold
         'threshold' will only create box plots if there are enough observations
         'all' will create all plots, even if there are not enough observations
         'never' will never create box plots
+    val_type: str, optional (default: 'temporal')
+        'temporal' creates graphs for temporal validation
+        'spatial' creates graphs for spatial validation
     """
-    if not validation_run.output_file:
-        return None
 
-    zipfilename = path.join(outfolder, 'graphs.zip')
-    __logger.debug('Trying to create zipfile {}'.format(zipfilename))
+    # Ensure the relevant output file exists before attempting to generate graphs.
+    # For spatial check output_file_spatial
+    # For temporal check output_file
 
-    fnb, fnm, fcsv, fncb = plot_all(
-        validation_run.output_file.path,
-        temporal_sub_windows=temporal_sub_windows,
-        out_dir=outfolder,
-        out_type=['png', 'svg'],
-        save_metadata=save_metadata
-    )
+    if val_type == "spatial":
+        if not validation_run.output_file_spatial:
+            return None
+    else:
+        if not validation_run.output_file:
+            return None
 
-    plot_all_output_dict = sort_filenames_to_filetypes((fnb, fnm, fcsv, fncb))
-    flattened_list = [item for inner_dict in plot_all_output_dict.values() for lst in inner_dict.values() for item in lst]
-    root_dir = os.path.dirname(os.path.commonprefix(flattened_list))
+    if val_type=="temporal":
+        zipfilename = path.join(outfolder, 'graphs.zip')
+        __logger.debug('Trying to create zipfile {}'.format(zipfilename))
+        fnb, fnm, fcsv, fncb = plot_all(
+            validation_run.output_file.path,
+            temporal_sub_windows=temporal_sub_windows,
+            out_dir=outfolder,
+            out_type=out_type,
+            save_metadata=save_metadata,
+            dpi=dpi,
+            val_type=val_type,
+        )
+        plt.close('all')
+        gc.collect()
 
-    with ZipFile(zipfilename, 'w', ZIP_DEFLATED) as myzip:
-        pngfiles = files_to_zip(plot_all_output_dict, 'png')
-        svgfiles = files_to_zip(plot_all_output_dict, 'svg')
+        plot_all_output_dict = sort_filenames_to_filetypes((fnb, fnm, fcsv, fncb))
+        flattened_list = [item for inner_dict in plot_all_output_dict.values() for lst in inner_dict.values() for item in lst]
+        root_dir = os.path.dirname(os.path.commonprefix(flattened_list))
 
-        for pngfile in pngfiles:
-            arcname = os.path.relpath(pngfile, root_dir)
-            myzip.write(pngfile, arcname=arcname)
+        with ZipFile(zipfilename, 'w', ZIP_DEFLATED) as myzip:
+            for type in out_type:
+                files = files_to_zip(plot_all_output_dict, type)
 
-        for svgfile in svgfiles:
-            arcname = os.path.relpath(svgfile, root_dir)
-            myzip.write(svgfile, arcname=arcname)
-            remove(svgfile)
+                for file in files:
+                    arcname = os.path.relpath(file, root_dir)
+                    myzip.write(file, arcname=arcname)
+                    if type in ['svg']:
+                        remove(file)
 
-    collect_statitics_files(dir=outfolder)
+        collect_statitics_files(dir=outfolder, val_type=val_type)
 
-    clean_output_folder(dir=outfolder,
-                        to_be_deleted=[x for x in temporal_sub_windows if x != DEFAULT_TSW])
+        clean_output_folder(dir=outfolder,
+                            to_be_deleted=[x for x in temporal_sub_windows if x != DEFAULT_TSW])
+    elif val_type=="spatial":
+        zipfilename = path.join(outfolder, 'spatial_graphs.zip')
+        __logger.debug('Trying to create zipfile {}'.format(zipfilename))
+        fnb, fnm, fcsv, fncb = plot_all(
+                    validation_run.output_file_spatial.path,
+                    temporal_sub_windows=temporal_sub_windows,
+                    out_dir=outfolder,
+                    out_type=out_type,
+                    save_metadata=save_metadata,
+                    dpi=dpi,
+                    val_type=val_type
 
+                )
+        plt.close('all')
+        gc.collect()
+        
+        plot_all_output_dict = sort_filenames_to_filetypes((fnb, fnm, fcsv, fncb))
+        flattened_list = [item for inner_dict in plot_all_output_dict.values() for lst in inner_dict.values() for item in lst]
+        root_dir = os.path.dirname(os.path.commonprefix(flattened_list))
 
-def get_dataset_combis_and_metrics_from_files(validation_run):
+        with ZipFile(zipfilename, 'w', ZIP_DEFLATED) as myzip:
+            for type in out_type:
+                files = files_to_zip(plot_all_output_dict, type)
+
+                for file in files:
+                    arcname = os.path.relpath(file, root_dir)
+                    myzip.write(file, arcname=arcname)
+                    if type in ['svg']:
+                        remove(file)
+
+        collect_statitics_files(dir=outfolder, val_type=val_type)
+
+        clean_output_folder(dir=outfolder,
+                            to_be_deleted=[x for x in temporal_sub_windows if x != DEFAULT_TSW])
+
+def get_dataset_combis_and_metrics_from_files(validation_run, dataset_names):
     """
     Go through plots of validation run and detect the dataset names and ids.
     Create combinations of id-REF_and_id-SAT to show the plots on the results
@@ -95,6 +143,8 @@ def get_dataset_combis_and_metrics_from_files(validation_run):
     ----------
     validation_run
         Validation run object
+    dataset_names : list
+        List of dataset names where first element is ref, second is ds
 
     Returns
     -------
@@ -106,8 +156,12 @@ def get_dataset_combis_and_metrics_from_files(validation_run):
         All metrics that are found
     ref0_config : bool or None
         True if the ref has id 0 (sorted ids).
+    zarr_metrics : dict
+        Transformed metrics for map visualisation
+    zarr_var_list : list
+        List of zarr variable names
     """
-
+    N_OBS_METRIC = "n_obs"
     run_dir = path.join(OUTPUT_FOLDER, str(validation_run.id))
     metric_template = METRIC_TEMPLATE[0]
 
@@ -123,10 +177,13 @@ def get_dataset_combis_and_metrics_from_files(validation_run):
     if "bulk" in run_dir:
         bulk_prefix += 'bulk_'
 
+    METRICS = {**READER_METRICS}
+
     if validation_run.stability_metrics:
-        METRICS = {**READER_METRICS, **STABILITY_METRICS}
-    else:
-        METRICS = READER_METRICS
+        METRICS = {**METRICS, **STABILITY_METRICS}
+
+    if validation_run.tcol:
+        METRICS = {**METRICS, **TC_METRICS}
 
     # if validation_run
     for root, dirs, files in os.walk(run_dir):
@@ -178,7 +235,7 @@ def get_dataset_combis_and_metrics_from_files(validation_run):
                     ds2 = f"{parsed['id_sat2']}-{parsed['ds_sat2']}"
                     ds_met = f"{parsed['id_met']}-{parsed['ds_met']}"
 
-                    metric = f"{tcol_metric}_for_{ds_met}"
+                    metric = f"{tcol_metric}_{ds_met}"
 
                     if metric not in metrics.keys():
                         metrics[metric] = f"{TC_METRICS[tcol_metric]} for {ds_met}"
@@ -188,13 +245,179 @@ def get_dataset_combis_and_metrics_from_files(validation_run):
                     if triple not in triples.keys():
                         triples[triple] = pretty_triple
 
+        if dataset_names and len(dataset_names) > 1:
+            zarr_metrics = {}
+            zarr_var_list = []
+
+            # Initialize dictionary with metric keys
+            for metric_key in metrics.keys():
+                if metric_key == "n_obs":
+                    zarr_metrics[metric_key] = [N_OBS_METRIC]
+                else:
+                    zarr_metrics[metric_key] = []
+
+            # Create all 2-dataset combinations for regular metrics (not n_obs and not TC metrics)
+            for ds1, ds2 in combinations(dataset_names, 2):
+                for metric_key in metrics:
+                    if metric_key != "n_obs" and not any(metric_key.startswith(tcol) for tcol in TC_METRICS.keys()):
+                        formatted_metric = f"{metric_key}{QR_METRIC_TEMPLATE.format(ds1=ds1, ds2=ds2)}"
+                        zarr_metrics[metric_key].append(formatted_metric)
+                        zarr_var_list.append(formatted_metric)
+
+            # Create all 3-dataset combinations for triple collocation metrics
+            if len(dataset_names) >= 3:
+                for ds1, ds2, ds3 in combinations(dataset_names, 3):
+                    for metric_key in metrics:
+                        if any(metric_key.startswith(tcol) for tcol in TC_METRICS.keys()):
+                            formatted_metric = f"{metric_key}{QR_METRIC_TC_TEMPLATE.format(ds1=ds1, ds2=ds2, ds3=ds3)}"
+                            zarr_metrics[metric_key].append(formatted_metric)
+                            zarr_var_list.append(formatted_metric)
+
+            # Add n_obs to the list if it exists
+            if "n_obs" in zarr_metrics:
+                zarr_var_list.append(N_OBS_METRIC)
+
+    # Remove duplicates from list while preserving order
+    zarr_var_list = list(dict.fromkeys(zarr_var_list))
+
+
     # import logging
     # __logger = logging.getLogger(__name__)
     # __logger.debug(f"Pairs: {pairs}")
     # __logger.debug(f"Triples: {triples}")
     # __logger.debug(f"Metrics: {metrics}")
 
+    return pairs, triples, metrics, ref0_config, zarr_metrics, zarr_var_list
+
+
+def get_dataset_combis_and_metrics_from_files_spatial(validation_run):
+    """
+    Go through spatial plots of validation run and detect the dataset names and ids.
+    Supports both regular validation (pairs) and Triple Collocation (triples).
+
+    Parameters
+    ----------
+    validation_run
+        Validation run object
+
+    Returns
+    -------
+    pairs : dict
+        Dataset pairs and pretty names to show in the dropdown
+    triples : dict
+        Dataset triples and pretty names to show in the dropdown
+    metrics : dict
+        All metrics that are found (including TC metrics)
+    ref0_config : bool or None
+        True if the ref has id 0 (sorted ids).
+    """
+
+    run_dir = path.join(OUTPUT_FOLDER, str(validation_run.id), 'bulk', 'spatial')
+
+    pairs = {}
+    triples = {}
+    ref0_config = None
+    metrics = {}
+
+    if validation_run.stability_metrics:
+        METRICS = {**READER_METRICS, **STABILITY_METRICS}
+    else:
+        METRICS = READER_METRICS
+
+    try:
+        files = os.listdir(run_dir)
+    except FileNotFoundError:
+        return pairs, triples, metrics, ref0_config
+
+    # --- templates for overview files ---
+    # pair:   overview_0-ISMN_and_1-C3S_combined_n_gpi_was_used.png
+    # triple: overview_0-ISMN_and_1-C3S_combined_and_2-C3S_rzsm_n_gpi_was_used.png
+    pair_template   = 'overview_{id_ref}-{ds_ref}_and_{id_sat}-{ds_sat}_n_gpi_was_used.png'
+    triple_template = 'overview_{id_ref}-{ds_ref}_and_{id_sat}-{ds_sat}_and_{id_sat2}-{ds_sat2}_n_gpi_was_used.png'
+
+    for f in files:
+        # check triples
+        parsed = parse(triple_template, f)
+        if parsed is not None:
+            ref  = f"{parsed['id_ref']}-{parsed['ds_ref']}"
+            ds   = f"{parsed['id_sat']}-{parsed['ds_sat']}"
+            ds2  = f"{parsed['id_sat2']}-{parsed['ds_sat2']}"
+
+            triple        = f"{ref}_and_{ds}_and_{ds2}"
+            pretty_triple = f"{ref} and {ds} and {ds2}"
+
+            if triple not in triples:
+                triples[triple] = pretty_triple
+
+            if ref0_config is None and parsed['id_ref'] == '0':
+                ref0_config = True
+            continue
+
+        # chaeck pairs
+        parsed = parse(pair_template, f)
+        if parsed is not None:
+            ref = f"{parsed['id_ref']}-{parsed['ds_ref']}"
+            ds  = f"{parsed['id_sat']}-{parsed['ds_sat']}"
+
+            pair        = f"{ref}_and_{ds}"
+            pretty_pair = f"{ref} and {ds}"
+
+            if pair not in pairs:
+                pairs[pair] = pretty_pair
+
+            if ref0_config is None and parsed['id_ref'] == '0':
+                ref0_config = True
+
+    # --- ordinary metrics bulk_boxplot_spatial_ ---
+    # bulk_boxplot_spatial_R.png
+    # bulk_boxplot_spatial_n_obs.png
+    boxplot_template = 'bulk_boxplot_spatial_{metric}.png'
+
+    for f in files:
+        parsed = parse(boxplot_template, f)
+        if parsed is None:
+            continue
+
+        metric_name = parsed['metric']  # 'R', 'RMSD', 'BIAS', 'n_obs'...
+
+        # skip TC metrics 'beta_for_1-C3S_combined' — parse them separately
+        if '_for_' in metric_name:
+            continue
+
+        if metric_name in METRICS and metric_name not in metrics:
+            metrics[metric_name] = METRICS[metric_name]
+
+    # --- TC metrics bulk_boxplot_spatial_beta/snr/err_std_for_X ---
+    # bulk_boxplot_spatial_beta_for_1-C3S_combined.png
+    tc_metric_template = 'bulk_boxplot_spatial_{tc_metric}_for_{id_ds}-{ds_name}.png'
+
+    for f in files:
+        parsed = parse(tc_metric_template, f)
+        if parsed is None:
+            continue
+
+        tc_metric = parsed['tc_metric']   # 'beta', 'snr', 'err_std'
+        id_ds     = parsed['id_ds']       # '1'
+        ds_name   = parsed['ds_name']     # 'C3S_combined'
+        ds_met    = f"{id_ds}-{ds_name}"  # '1-C3S_combined'
+
+        metric_key  = f"{tc_metric}_for_{ds_met}"           # 'beta_for_1-C3S_combined'
+        metric_pretty = f"{TC_METRICS.get(tc_metric, tc_metric)} for {ds_met}"
+
+        if metric_key not in metrics:
+            metrics[metric_key] = metric_pretty
+
+    # --- status from barplot_status_ ---
+    # barplot_status_0-ISMN_and_1-C3S_combined.png
+    for f in files:
+        if f.startswith('bulk_barplot_status_') and 'status' not in metrics:
+            metrics['status'] = METRICS.get('status', 'Status')
+            break
+
     return pairs, triples, metrics, ref0_config
+
+
+
 
 
 def get_inspection_table(validation_run):
@@ -249,6 +472,38 @@ def get_inspection_table(validation_run):
         # This happens when the output file has not been generated yet, because
         # the validation is still running. In this case the table won't be
         # rendered anyways.
+        return None
+
+def get_inspection_table_spatial(validation_run):
+    """
+    Generate the quick inspection table with the summary statistics for spatial validation
+
+    Parameters
+    ----------
+    validation_run : ValidationRun
+        The validation run to make plots for.
+
+    Returns
+    -------
+    table : pd.DataFrame
+        Quick inspection table of the results.
+    """
+
+    outfile = validation_run.output_file_spatial
+    spatial_dir = path.join(OUTPUT_FOLDER, str(validation_run.id), 'bulk', 'spatial')
+    stats_file = path.join(spatial_dir, 'bulk_statistics_table.csv')
+
+    if bool(outfile) and path.exists(outfile.path):
+        if path.exists(stats_file):
+            stats = pd.read_csv(stats_file, index_col="Metric", dtype=str)
+            stats = stats.drop(columns="Group", errors="ignore")
+            return stats
+        else:
+            file_size = os.path.getsize(outfile.path)
+            if file_size > 100 * 2 ** 20:
+                return "No output"
+            return get_img_stats(outfile.path)
+    else:
         return None
 
 
@@ -356,7 +611,8 @@ def encoded_comparisonPlots(
     )
 
     plt.savefig(image, format='png')
-
+    plt.close('all')
+    gc.collect()
     encoded = base64.b64encode(image.getvalue()).decode('utf-8')
 
     return encoded
@@ -405,6 +661,9 @@ def get_extent_image(
         )
         plt.tight_layout()
         plt.savefig(image, format='png')
+        plt.close('all')
+        gc.collect()
+        
         if encoded:
             encoded = base64.encodebytes(image.getvalue()).decode('utf-8')
             return encoded
@@ -415,7 +674,7 @@ def get_extent_image(
         return "error encountered"
 
 
-def collect_statitics_files(dir: str) -> None:
+def collect_statitics_files(dir: str, val_type='temporal') -> None:
     """
     Collect all statistics files in a directory and store them in a zip file.
 
@@ -428,7 +687,7 @@ def collect_statitics_files(dir: str) -> None:
     -------
     None
     """
-    zipfilename = path.join(dir, 'statistics.zip')
+    zipfilename = path.join(dir, f'{val_type}_statistics.zip' if val_type in ['spatial'] else 'statistics.zip')
     __logger.debug('Trying to create zipfile {}'.format(zipfilename))
 
     with ZipFile(zipfilename, 'w', ZIP_DEFLATED) as myzip:
@@ -518,13 +777,28 @@ def files_to_zip(plot_dict: Dict[str, Dict[str, List[PosixPath]]], filetype: str
     _files : Set[PosixPath]
         A set of the filepaths of the given filetype.
     """
-    _files = plot_dict['fnb'][filetype] + plot_dict['fnm'][filetype]
-
     try:
-        _files += plot_dict['fncb'][filetype]
+        _files = plot_dict['fnb'][filetype]
+    except KeyError as e:  # if there are no comparison boxplots the 'fncb' key will not be present
+        warnings.warn(f"KeyError: {e}. No plots found. Skipping...")
+    try:
+        if _files:
+            _files += plot_dict['fnm'][filetype]
+        else:
+            _files = plot_dict['fnm'][filetype]
+    except KeyError as e:  # if there are no comparison boxplots the 'fncb' key will not be present
+        warnings.warn(f"KeyError: {e}. No overviewplots found. Skipping...")
+    try:
+        if _files:
+            _files += plot_dict['fncb'][filetype]
+        else:
+            _files = plot_dict['fncb'][filetype]
     except KeyError as e:  # if there are no comparison boxplots the 'fncb' key will not be present
         warnings.warn(f"KeyError: {e}. No comparison boxplots found. Skipping...")
     finally:
-        _files = set(_files)
+        if _files:
+            _files = set(_files)
+        else:
+            _files=None
 
     return _files

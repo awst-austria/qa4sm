@@ -19,6 +19,7 @@ const validationRunsUrl: string = urlPrefix + '/validation-runs';
 const trackedCustomRunsUrl: string = urlPrefix + '/custom-tracked-run';
 const downloadResultsUrl: string = urlPrefix + '/download-result';
 const summaryStatisticsUrl: string = urlPrefix + '/summary-statistics';
+const summaryStatisticsSpatialUrl: string = urlPrefix + '/summary-statistics-spatial';
 const downloadStatisticsCsvUrl: string = urlPrefix + '/download-statistics-csv';
 const metricsAndPlotsNamesUrl: string = urlPrefix + '/get-metric-and-plots-names';
 const validations4ComparisonUrl: string = urlPrefix + '/validation-runs-for-comparison';
@@ -199,7 +200,19 @@ export class ValidationrunService {
       );
   }
 
+  getSummaryStatisticsSpatial(params: any): Observable<any> {
+    return this.httpClient.get(summaryStatisticsSpatialUrl, {params, headers, responseType: 'text'})
+      .pipe(
+        catchError(err => this.httpError.handleError(err))
+      );
+  }
+
   downloadSummaryStatisticsCsv(validationId: string): void {
+    const fileUrl = `${downloadStatisticsCsvUrl}?validationId=${validationId}`;
+    saveAs(fileUrl);
+  }
+  
+  downloadSummaryStatisticsSpatialCsv(validationId: string): void {
     const fileUrl = `${downloadStatisticsCsvUrl}?validationId=${validationId}`;
     saveAs(fileUrl);
   }
@@ -236,6 +249,26 @@ export class ValidationrunService {
       .pipe(
         catchError(err => this.httpError.handleError(err))
       );
+  }
+  getMetricsAndPlotsNamesSpatial(params: HttpParams): Observable<MetricsPlotsDto[]> {
+    return this.httpClient.get<MetricsPlotsDto[]>(`${urlPrefix}/get-metric-and-plots-names-spatial`, {params})
+      .pipe(
+        catchError(err => this.httpError.handleError(err))
+      );
+  }
+
+  downloadSpatialResultFile(validationId: string, fileType: string, fileName: string): void {
+    const fileUrl = `${urlPrefix}/download-result-spatial?validationId=${validationId}&fileType=${fileType}`;
+    
+    this.httpClient.get(fileUrl, {
+      headers,           
+      responseType: 'blob'
+    }).pipe(
+      catchError(err => this.httpError.handleError(err, 'Could not download file'))
+    ).subscribe({
+      next: (blob) => saveAs(blob, fileName),
+      error: (err) => console.error(err)
+    });
   }
 
 }

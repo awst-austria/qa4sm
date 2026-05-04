@@ -8,6 +8,10 @@ export class ValidationrunDto {
               public total_points: number,
               public error_points: number,
               public progress: number,
+              public ok_times: number,
+              public error_times: number,
+              public total_times: number,
+              public progress_spatial: number,
               public dataset_configurations: number[],
               public spatial_reference_configuration: number,
               public temporal_reference_configuration: number,
@@ -45,7 +49,11 @@ export class ValidationrunDto {
               public intra_annual_type: string | null,
               public comparison_label?: string,
               public contains_user_data?: boolean,
-              public all_files_exist?: boolean) {
+              public all_files_exist?: boolean,
+              public zarr_path?: string,
+              public output_file_spatial?: string,
+              public val_type?: string
+            ) {
   }
 }
 

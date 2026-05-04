@@ -8,50 +8,54 @@
   [closeOnEscape]="true"
   [dismissableMask]="true"
   (onHide)="onWindowHide()"
-  [styleClass]="dialogClasses">
+  [styleClass]="dialogClasses"
+  [style]="{'width': '400px'}">
 
-  <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
-    <div class="p-fluid">
-      <span class="p-float-label mb-4">
-        <input pInputText 
-               id="username" 
-               formControlName="username"
-               class="w-full"
-               [attr.disabled]="isLoading">
-        <label for="username">Username or Email</label>
-      </span>
+  <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="p-fluid flex flex-column gap-4">
+    <!-- Username -->
+    <p-floatLabel class="mt-4">
+      <input pInputText
+             id="username"
+             formControlName="username"
+             class="w-full"
+             [attr.disabled]="isLoading">
+      <label for="username">Username or Email</label>
+    </p-floatLabel>
+
+    <!-- Password -->
+    <p-floatLabel class="mt-2">
+      <p-password
+             id="password"
+             formControlName="password"
+             styleClass="w-full"
+       [style]="{'width': '100%'}"
+       [inputStyle]="{'width': '100%'}"
+             [feedback]="false"
+             [disabled]="isLoading">
+      </p-password>
+      <label for="password">Password</label>
+    </p-floatLabel>
+
+    <!-- Submit -->
+    <div class="flex justify-content-center">
+      <button pButton
+              type="submit"
+              [label]="isLoading ? 'Logging in...' : 'Log in'"
+              [loading]="isLoading"
+              class="w-full"
+              [disabled]="!loginForm.valid || isLoading">
+      </button>
     </div>
 
-    <div class="p-fluid">
-      <span class="p-float-label mb-4">
-        <input pPassword 
-               type="password"
-               formControlName="password"
-               class="w-full"
-               [feedback]="false"
-               [attr.disabled]="isLoading">
-        <label for="password">Password</label>
-      </span>
-    </div>
-
-    <button pButton 
-            type="submit"
-            [label]="isLoading ? 'Logging in...' : 'Log in'"
-            [loading]="isLoading"
-            [disabled]="!loginForm.valid || isLoading">
-    </button>
-
-    <div class="mt-3">
-      <a [routerLink]="'/password-reset'" 
-         (click)="onWindowHide()">
+    <!-- Links -->
+    <div class="flex flex-column align-items-center gap-2">
+      <a [routerLink]="'/password-reset'" (click)="onWindowHide()">
         Forgot your password?
       </a>
-    </div>
-    <div class="mt-3">
-      <a [routerLink]="'/signup'"
-         (click)="onWindowHide()">
-        No account?
+      <a [routerLink]="'/signup'" (click)="onWindowHide()">
+        No account? Sign up
       </a>
     </div>
+
   </form>
 </p-dialog>

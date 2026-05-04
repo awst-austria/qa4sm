@@ -28,7 +28,7 @@ fi
 
 if [[ "$QA4SM_INSTANCE" == "TEST2" ]]; then
     git fetch origin
-    git switch subdaily || git checkout -b subdaily origin/subdaily
+    git switch interactive-maps-test || git checkout -b interactive-maps-test origin/interactive-maps-test
 fi
 
 if [[ "$QA4SM_INSTANCE" == "PROD" ]]; then
