@@ -47,16 +47,44 @@ class TestUploadUserDataView(TransactionTestCase):
     allow_database_queries = True
 
     def setUp(self):
-        self.auth_data, self.test_user = create_test_user()
-        self.second_user_data, self.second_test_user = create_alternative_user(
+        import uuid
+        unique_suffix = str(uuid.uuid4())[:8]
+        username = f'chuck_{unique_suffix}'
+        self.auth_data = {
+            'username': username,
+            'password': 'roundhousekick'
+        }
+        User = get_user_model()
+        self.test_user = User.objects.create_user(
+            username=username,
+            password='roundhousekick',
+            email=f'{username}@awst.at',
+            first_name='Chuck',
+            last_name='Norris',
         )
+        self.test_user.is_active = True
+        self.test_user.save()
+
+        # Second user
+        alt_username = f'cheater_{unique_suffix}'
+        self.second_user_data = {
+            'username': alt_username,
+            'password': 'cheatingalldaylong'
+        }
+        self.second_test_user = User.objects.create_user(
+            username=alt_username,
+            password='cheatingalldaylong',
+            email=f'{alt_username}@awst.at',
+        )
+        self.second_test_user.save()
 
         self.client = APIClient()
         self.client.login(**self.auth_data)
-        self.user_data_path = os.path.join(settings.BASE_DIR,
-                                           'testdata/user_data')
+
+        self.user_data_path = os.path.join(settings.BASE_DIR, 'testdata/user_data')
         self.test_user_data_path = f'{self.user_data_path}/{self.test_user.username}'
         Path(self.test_user_data_path).mkdir(exist_ok=True, parents=True)
+
 
         self.netcdf_file_name = 'teststack_c3s_2dcoords_min_attrs.nc'
         self.zipped_netcdf_file_name = 'test_data.zip'
