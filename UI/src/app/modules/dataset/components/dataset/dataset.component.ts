@@ -100,7 +100,10 @@ export class DatasetComponent implements OnInit {
   }
 
   private onSelectableVersionsComplete(): void {
-    this.selectableDatasetVariables$ = this.datasetVariableService.getVariablesByVersion(this.selectionModel.selectedVersion.id);
+    this.selectableDatasetVariables$ = this.datasetVariableService
+      .getVariablesByVersion(this.selectionModel.selectedVersion.id).pipe(
+        map(variables => [...variables].sort((a, b) => a.id - b.id))  // sorting by id
+      );
 
     this.selectableDatasetVariables$.subscribe(this.selectableDatasetVariablesObserver);
     this.setSelectorsId();

@@ -64,19 +64,19 @@ jobs:
       - name: Tests with token
         if: ${{ env.DOI_ACCESS_TOKEN_ENV }}
         run: |
-          pytest
+          pytest -n auto
       - name: Long running tests with token
         if: ${{ env.DOI_ACCESS_TOKEN_ENV }}
         run: |
-          pytest -m "not needs_advanced_setup and long_running and not graphs"
-      - name: Graphs tests
+          pytest -m "not needs_advanced_setup and long_running and not graphs" -n auto
+      - name: Graphs tests 
         run: |
-          pytest -m "graphs"
+          pytest -m "graphs" -n auto
       - name: Test with no token
         if: ${{ !env.DOI_ACCESS_TOKEN_ENV }}
         run: |
-          pytest -k "not test_result_publishing and not test_publish_result"
+          pytest -n auto -k "not test_result_publishing and not test_publish_result"
       - name: Long running tests with no token
         if: ${{ !env.DOI_ACCESS_TOKEN_ENV }}
         run: |
-          pytest -m "not needs_advanced_setup and long_running and not graphs" -k "not test_doi"
+          pytest -m "not needs_advanced_setup and long_running and not graphs" -n auto -k "not test_doi"
