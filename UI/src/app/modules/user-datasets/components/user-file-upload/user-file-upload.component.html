@@ -1,135 +1,76 @@
 <div class="flex flex-column w-12 justify-content-center align-content-center gap-4">
-  <div class="flex flex-row lg:flex-nowrap flex-wrap justify-content-center align-content-center gap-3 w-12">
-    <div class="lg:w-2 md:w-4 w-10 flex justify-content-center align-items-center text-center">
-      <input type="file" class="file-input text-center"
-             [accept]="allowedExtensions.join(',')"
-             (change)="onFileSelected($event)" #fileUpload>
-      <span class="label-button text-center">{{ file ? file.name : "No file chosen yet." }}</span>
-    </div>
-    <div class="lg:w-2 md:w-4 w-10 flex flex-column row-gap-1 justify-content-center align-items-center text-center">
-      <div class="flex flex-row w-12 column-gap-1">
-        <div class="lg:w-6 w-12 h-full">
-          <div class="p-fluid h-full">
-            <button pButton
-                    class="h-full"
-                    label="Select file"
-                    [disabled]="authService.currentUser.space_left === 0"
-                    (click)="dialogVisible=true">
-              <!--                  (click)="fileUpload.click()">-->
-            </button>
-          </div>
-        </div>
-        <div class="lg:w-6 w-12">
-          <div class="p-fluid">
-            <button pButton
-                    [disabled]="!file || !metadataForm.valid"
-                    label="Upload file"
-                    (click)="sendForm()">
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
+  
+  <input type="file" class="file-input"
+         [accept]="allowedExtensions.join(',')"
+         (change)="onFileSelected($event)" #fileUpload>
+
+  <div class="upload-zone" (click)="fileUpload.click()" 
+       [class.upload-zone--disabled]="authService.currentUser.space_left === 0">
+    <i class="pi pi-cloud-upload upload-zone__icon"></i>
+    <span class="upload-zone__text">{{ file ? file.name : 'Click to select a file' }}</span>
+    <span class="upload-zone__hint">Accepted: .zip, .nc, .nc4</span>
   </div>
-  <div class="text-center text-lg text-muted pb-3">
+
+  <div *ngIf="isFileTooBig" class="warning text-center">
+    File too big. You have {{ getTheFileSize() }} available.
+  </div>
+
+  <div *ngIf="file" class="flex gap-2 justify-content-center">
+    <button pButton
+            label="Change file"
+            class="p-button-outlined"
+            icon="pi pi-refresh"
+            (click)="fileUpload.click()">
+    </button>
+    <button pButton
+            label="Upload"
+            icon="pi pi-upload"
+            [disabled]="!metadataForm.valid"
+            (click)="onSaveData()">
+    </button>
+  </div>
+
+  <div class="text-center text-sm text-muted">
     <b>Note: </b> To validate your data with in situ observations, consider uploading time series at
-    <a href="javascript:void(0);" (click)="getISMNList()"> ISMN locations</a>
+    <a href="javascript:void(0);" (click)="getISMNList()">ISMN locations</a>
   </div>
+
 </div>
 
-<p-dialog id="user-data-form" header="Upload your own data" [(visible)]="dialogVisible">
-  <div class="pb-3 pl-0">
-    You can upload your own data using this form. Please follow this file
-    <a target="_blank" [routerLink]="['/user-data-guidelines2']">standard</a>
+<p-dialog id="user-data-form" header="Upload your own data" [(visible)]="dialogVisible" [style]="{width: '28rem'}">
+  
+  <div class="text-muted text-sm mb-3">
+    Please follow this file <a target="_blank" [routerLink]="['/user-data-guidelines']">standard</a>.
   </div>
-  <div class="grid" style="display: flex">
 
-    <div class="center col-12 pb-0 pr-3 text-center">
-      <div
-        [ngClass]="{'form-field' : true, 'warning': isFileTooBig}"
-      >
-        {{
-          file ? file.name : (isFileTooBig ? 'This file is too big, please choose another one. You still have ' + getTheFileSize() + ' available*'
-            : "No file chosen yet.")
-        }}
+  <form [formGroup]="metadataForm">
+    <div class="flex flex-column gap-3">
+
+      <div class="flex flex-column gap-1">
+        <label for="dataset-name" class="text-sm">Dataset name
+          <i class="pi pi-question-circle ml-1"
+             pTooltip="Required. Up to 30 characters. Letters, numbers, and @ + - _ only."></i>
+        </label>
+        <input id="dataset-name" type="text" pInputText class="w-full"
+               formControlName="dataset_name">
       </div>
-    </div>
 
-    <div class="center col-12 pt-1 pr-4">
-      <div class="form-field flex justify-content-center">
-        <button pButton
-                class="w-full"
-                [label]="file ? 'Change file' :'Add file'"
-                (click)="fileUpload.click()">
-        </button>
+      <div class="flex flex-column gap-1">
+        <label for="version-name" class="text-sm">Version name
+          <i class="pi pi-question-circle ml-1"
+             pTooltip="Required. Up to 30 characters. Letters, numbers, and @ + - _ only."></i>
+        </label>
+        <input id="version-name" type="text" pInputText class="w-full"
+               formControlName="version_name">
       </div>
+
+      <button pButton label="Save names" icon="pi pi-check" class="w-full"
+              [disabled]="!metadataForm.valid"
+              (click)="closeDialog()">
+      </button>
+
     </div>
-
-    <div class="center col-12">
-      <form *ngIf="file" [formGroup]="metadataForm" (ngSubmit)="onSaveData()">
-        <div class="py-3">
-            <label for="dataset-name" class="block my-1 text-sm">Dataset name
-              <span pTooltip="Required. Up to 30 characters. Letters, numbers, and @ + - _ only."
-                  class="pi pi-question-circle">
-              </span>
-            </label>
-            <input 
-                class="form-field w-full" 
-                id="dataset-name" 
-                type="text" 
-                pInputText formControlName="dataset_name">      
-
-          <label for="dataset-pretty-name" class="block my-1 text-sm">Dataset display name (optional)
-              <span
-                pTooltip="Optional. Up to 30 characters. Letters, digits, space and @ + - _ only. If not provided, the name from the field above will be used."
-                class="pi pi-question-circle">
-              </span>
-            </label>
-            <input 
-              class="form-field w-full" 
-              id="dataset-pretty-name" 
-              type="text" 
-              pInputText     
-              formControlName="dataset_pretty_name">
-       
-          <label for="version-name" class="block my-1 text-sm">Version name
-          <span pTooltip="Required. Up to 30 characters. Letters, numbers, and @ + - _ only."
-                class="pi pi-question-circle">    
-          </span>
-          </label>
-          <input 
-              class="form-field w-full" 
-              id="version-name" 
-              type="text" 
-              pInputText formControlName="version_name">
-        
-          <label for="version-pretty-name" class="block my-1 text-sm">Version display name (optional)
-          <span
-            pTooltip="Optional. Up to 30 characters. Letters, digits, space and @ + - _ only. If not provided, the name from the field above will be used."
-            class="pi pi-question-circle">
-          </span>
-          </label>
-          <input 
-              class="form-field w-full" 
-              id="version-pretty-name" 
-              type="text" 
-              pInputText formControlName="version_pretty_name">
-       
-        </div>
-
-        <div class="form-field flex justify-content-center">
-          <button pButton
-                  type="submit"
-                  label="Save"
-                  class="w-full"
-                  [disabled]="!metadataForm.valid">
-          </button>
-
-        </div>
-
-      </form>
-    </div>
-  </div>
+  </form>
 </p-dialog>
 
 <p-dialog id="uploading-data-spinner" [modal]="true" [showHeader]="false" [(visible)]="spinnerVisible"
@@ -141,4 +82,3 @@
     a few seconds to preprocess it..
   </div>
 </p-dialog>
-

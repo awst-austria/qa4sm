@@ -1,29 +1,34 @@
 <div class="grid align-content-center">
   <div class="col" style="max-width: 100%">
+    
     <p-floatLabel class="mb-4 mt-3">
       <p-select
         [inputId]="datasetSelectorId"
         (onChange)="updateSelectableVersionsAndVariableAndEmmit()"
-        [options]="(datasets$|async)"
+        [options]="groupedDatasets"
         [(ngModel)]="selectionModel.selectedDataset"
-        optionLabel="pretty_name" [style]="{'width': '100%'}">
-          <ng-template let-item pTemplate="item">
-            <span>{{ item.pretty_name }}
-              <em *ngIf="authService.authenticated.value">
-                {{item.user === authService.currentUser.id ? "  (user data)" :
-                  (item.user !== authService.currentUser.id && item.is_shared ? ' (shared data)' : "")}}
-              </em>
-            </span>
-          </ng-template>
+        optionLabel="pretty_name"
+        optionGroupLabel="label"
+        optionGroupChildren="items"
+        [group]="true"
+        [filter]="true"
+        filterBy="pretty_name"
+        [style]="{'width': '100%'}">
 
-          <ng-template let-item pTemplate="selectedItem">
-            <span>{{ item.pretty_name }}
-              <em *ngIf="authService.authenticated.value">
-                {{item.user === authService.currentUser.id ? "  (user data)" :
-               (item.user !== authService.currentUser.id && item.is_shared ? " (shared data)" : "")}}
-              </em>
-            </span>
-          </ng-template>
+        <ng-template let-group #group>
+          <div class="flex align-items-center gap-2 group-header">
+            <i [class]="group.icon"></i>
+            <span>{{ group.label }}</span>
+          </div>
+        </ng-template>
+
+        <ng-template let-item pTemplate="item">
+          <span>{{ item.pretty_name }}</span>
+        </ng-template>
+
+        <ng-template let-item pTemplate="selectedItem">
+          <span>{{ item.pretty_name }}</span>
+        </ng-template>
       </p-select>
       <label for="{{datasetSelectorId}}">Dataset name</label>
     </p-floatLabel>

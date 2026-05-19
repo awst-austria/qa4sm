@@ -1,4 +1,68 @@
 @use 'src/style.variables' as *;
+
+:host ::ng-deep .qa-datasets-table table {
+  table-layout: fixed;
+  width: 100%;
+}
+
+.content {
+  width: min(1600px, 100%);
+  padding: 0 1rem;
+  overflow-x: auto;
+}
+
+:host ::ng-deep .qa-datasets-table .p-datatable-thead > tr > th {
+  border-bottom: 1px solid $base-color;
+}
+:host ::ng-deep .qa-datasets-table .p-datatable-thead {
+  box-shadow: inset 0 -1px 0 $base-color;
+}
+
+/* Column widths */
+.qa-datasets-table th:nth-child(1) { width: 12%; } /* Upload date */
+.qa-datasets-table th:nth-child(2) { width: 23%; } /* Dataset */
+.qa-datasets-table th:nth-child(3) { width: 15%; } /* Size */
+.qa-datasets-table th:nth-child(4) { width: 27%; } /* Validations */
+.qa-datasets-table th:nth-child(5) { width: 15%; } /* Shared (staff) */
+.qa-datasets-table th:nth-child(6) { width: 8%; } /* Actions */
+
+:host ::ng-deep .qa-datasets-table .p-datatable-thead > tr > th {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+}
+
+:host ::ng-deep .qa-datasets-table .p-datatable-tbody > tr:hover > td {
+  background: #ECFDF5;
+}
+
+:host ::ng-deep .qa-datasets-table .p-datatable-tbody > tr > td {
+  vertical-align: top;
+}
+
+.muted {
+  font-size: 0.7rem;
+  opacity: 0.75;
+}
+
+.small-edit-icon {
+  font-size: 0.7rem;
+  opacity: 0.5;
+  transition: opacity 0.2s;
+
+  &:hover {
+    opacity: 1;
+  }
+}
+
+.text-red {
+  color: $danger-color;
+}
+
+.text-white {
+  color: #fff;
+}
+
 .readMoreOrLess {
   font-size: 1.25rem;
   cursor: pointer;
@@ -6,4 +70,20 @@
 }
 li{
   margin-top: 1.1rem;
+}
+
+
+@media (prefers-color-scheme: dark) {
+  :host ::ng-deep .qa-datasets-table .p-datatable-tbody > tr:hover > td {
+    background: rgba(34, 197, 94, 0.25);
+  }
+}
+
+@media (max-width: 900px) {
+  .qa-datasets-table th:nth-child(3),
+  .qa-datasets-table td:nth-child(3),
+  .qa-datasets-table th:nth-child(5),
+  .qa-datasets-table td:nth-child(5) {
+    display: none;
+  }
 }

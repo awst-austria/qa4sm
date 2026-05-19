@@ -11,7 +11,7 @@ export class DatasetDto {
               public versions: number[],
               public variables: number[],
               public not_as_reference: boolean,
-              public user: string,
-              public is_shared: boolean) {
+              public user: number | null = null,
+              public is_shared: number = 0) {
   }
 }

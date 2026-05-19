@@ -22,6 +22,7 @@ export class DatasetComponent implements OnInit {
 
   datasets$: Observable<DatasetDto[]>;
   allDatasets$: Observable<DatasetDto[]>;
+  groupedDatasets: { label: string; icon: string; items: DatasetDto[] }[] = [];
 
   selectableDatasetVersions$: Observable<DatasetVersionDto[]>;
   selectableDatasetVariables$: Observable<DatasetVariableDto[]>;
@@ -45,6 +46,7 @@ export class DatasetComponent implements OnInit {
   variableSelectorId: string;
   newerVersionExists = false;
   newestVersionId: number;
+
 
   constructor(private datasetService: DatasetService,
               private datasetVersionService: DatasetVersionService,
@@ -70,6 +72,8 @@ export class DatasetComponent implements OnInit {
     // No restrictions on user/non-user — all user datasets can be selected.
     this.datasets$ = this.allDatasets$;
     }
+    this.datasets$.subscribe(datasets => this.buildGroupedDatasets(datasets));
+
     });
 
     this.selectableDatasetVersions$ = this.datasetVersionService.getVersionsByDataset(this.selectionModel.selectedDataset.id).pipe(
@@ -93,6 +97,25 @@ export class DatasetComponent implements OnInit {
 
     this.selectableDatasetVersions$.subscribe(this.selectableDatasetVersionsObserver);
     this.setSelectorsId();
+  }
+
+  private buildGroupedDatasets(datasets: DatasetDto[]): void {
+    const currentUserId = this.authService.currentUser?.id; 
+    
+    const platform = datasets.filter(d => d.user === null || d.user === undefined);
+    const user     = datasets.filter(d => d.user === currentUserId);
+    const shared = datasets.filter(d => 
+      d.user !== null && 
+      d.user !== undefined && 
+      d.user !== currentUserId && 
+      d.is_shared > 0
+    );
+    this.groupedDatasets = [
+      platform.length ? { label: 'Platform datasets', icon: 'pi pi-database', items: platform } : null,
+      user.length     ? { label: 'User datasets',     icon: 'pi pi-user',     items: user }     : null,
+      shared.length   ? { label: 'Shared datasets',   icon: 'pi pi-share-alt',items: shared }   : null,
+    ].filter(Boolean);
+
   }
 
   private onSelectableVersionsNext(versions): void {
