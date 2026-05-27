@@ -13,8 +13,8 @@
   gap: 0.5rem;
 
   &:hover {
-    border-color: var(--primary-color);
-    background: var(--surface-hover);
+    border-color: $base-color;
+    background: $base-light;
   }
 
   &--disabled {
@@ -24,18 +24,18 @@
 
   &__icon {
     font-size: 2.5rem;
-    color: var(--primary-color);
+    color: $base-color;
   }
 
   &__text {
     font-size: 1rem;
     font-weight: 500;
-    color: var(--text-color);
+    color: $font-color-base;
   }
 
   &__hint {
     font-size: 0.8rem;
-    color: var(--text-color-secondary);
+    color: $font-color-base;
   }
 }
 
@@ -63,4 +63,10 @@
   animation-name: changeColor;
   animation-duration: 3s;
   animation-iteration-count: infinite;
+}
+
+@media (prefers-color-scheme: dark) {
+  .upload-zone:hover {
+    background: $base-dark-hover;
+  }
 }

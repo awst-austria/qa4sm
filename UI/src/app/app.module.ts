@@ -144,7 +144,9 @@ import { SummaryStatisticsSpatialComponent } from './modules/validation-result/c
             providePrimeNG({
             theme: {
               preset: Aura,
-              options: { cssLayer: 'primengAura' } 
+              options: { 
+                cssLayer: 'primengAura',
+                darkModeSelector: 'system', } 
             }
         }),
         MessageService,
