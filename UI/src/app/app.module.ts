@@ -56,7 +56,6 @@ import {
   PasswordResetValidateTokenComponent
 } from './pages/password-reset-validate-token/password-reset-validate-token.component';
 import {InputNumberModule} from 'primeng/inputnumber';
-import {MyDatasetsComponent} from './pages/my-datasets/my-datasets.component';
 import {UserDatasetsModule} from './modules/user-datasets/user-datasets.module';
 import {ValidationReferenceModule} from './modules/validation-reference/validation-reference.module';
 import {DialogModule} from 'primeng/dialog';
@@ -89,7 +88,6 @@ import { SummaryStatisticsSpatialComponent } from './modules/validation-result/c
         SetPasswordComponent,
         PasswordResetValidateTokenComponent,
         TemporalMatchingComponent,
-        MyDatasetsComponent,
         ContactUsComponent,
 
     ],
@@ -146,7 +144,9 @@ import { SummaryStatisticsSpatialComponent } from './modules/validation-result/c
             providePrimeNG({
             theme: {
               preset: Aura,
-              options: { cssLayer: 'primengAura' } 
+              options: { 
+                cssLayer: 'primengAura',
+                darkModeSelector: 'system', } 
             }
         }),
         MessageService,

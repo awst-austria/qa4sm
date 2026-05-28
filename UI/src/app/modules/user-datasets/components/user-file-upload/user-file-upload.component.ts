@@ -1,27 +1,40 @@
-import { Component } from '@angular/core';
-import { FormBuilder, Validators } from '@angular/forms';
-import { UserDatasetsService } from '../../services/user-datasets.service';
-import { ToastService } from '../../../core/services/toast/toast.service';
-import { BehaviorSubject, Subscription } from 'rxjs';
-import { finalize } from 'rxjs/operators';
-import { HttpEventType } from '@angular/common/http';
+import {Component} from '@angular/core';
+import {FormBuilder, ReactiveFormsModule, Validators} from '@angular/forms';
+import {UserDatasetsService} from '../../services/user-datasets.service';
+import {ToastService} from '../../../core/services/toast/toast.service';
+import {BehaviorSubject, Subscription} from 'rxjs';
+import {finalize} from 'rxjs/operators';
+import {HttpEventType} from '@angular/common/http';
 import * as uuid from 'uuid';
 import * as JSZip from 'jszip';
-import { AuthService } from '../../../core/services/auth/auth.service';
-import { UserFileMetadata } from '../../../core/services/form-interfaces/UserFileMetadataForm';
+import {AuthService} from '../../../core/services/auth/auth.service';
+import {UserFileMetadata} from '../../../core/services/form-interfaces/UserFileMetadataForm';
+import {CommonModule} from '@angular/common';
+import {RouterModule} from '@angular/router';
+import {ButtonModule} from 'primeng/button';
+import {DialogModule} from 'primeng/dialog';
+import {InputTextModule} from 'primeng/inputtext';
+import {TooltipModule} from 'primeng/tooltip';
 
 @Component({
-    selector: 'qa-user-file-upload',
-    templateUrl: './user-file-upload.component.html',
-    styleUrls: ['./user-file-upload.component.scss'],
-    standalone: false
+  selector: 'qa-user-file-upload',
+  templateUrl: './user-file-upload.component.html',
+  styleUrls: ['./user-file-upload.component.scss'],
+  standalone: true,
+  imports: [
+    CommonModule,
+    RouterModule,
+    ReactiveFormsModule,
+    ButtonModule,
+    DialogModule,
+    InputTextModule,
+    TooltipModule,
+  ]
 })
 export class UserFileUploadComponent {
-  // variables to store file information
   file: File;
   fileName = '';
   name = '';
-  // variable to open the form
   dialogVisible = false;
   spinnerVisible = false;
   isFileTooBig = false;
@@ -36,19 +49,19 @@ export class UserFileUploadComponent {
     complete: () => this.onUploadComplete()
   }
 
-  // dataset file form
   metadataForm = this.formBuilder.group<UserFileMetadata>({
     dataset_name: [null, [Validators.required, Validators.maxLength(30), Validators.pattern(/^[A-Za-z0-9@+\-_]*$/)]],
-    dataset_pretty_name: [null, [Validators.maxLength(30), Validators.pattern(/^[A-Za-z0-9@+\-_]*$/)]],
+    dataset_pretty_name: [null],
     version_name: [null, [Validators.required, Validators.maxLength(30), Validators.pattern(/^[A-Za-z0-9@+\-_]*$/)]],
-    version_pretty_name: [null, [Validators.maxLength(30), Validators.pattern(/^[A-Za-z0-9@+\-_]*$/)]],
+    version_pretty_name: [null],
   });
 
-  constructor(private userDatasetService: UserDatasetsService,
+  constructor(
+    private userDatasetService: UserDatasetsService,
     private formBuilder: FormBuilder,
     private toastService: ToastService,
-    public authService: AuthService) {
-  }
+    public authService: AuthService
+  ) {}
 
   private verifyZipContent(): void {
     const zip = new JSZip.default();
@@ -73,7 +86,6 @@ export class UserFileUploadComponent {
       return null;
     }
 
-
     const fileExtension = this.file.name.split('.').reverse()[0];
 
     if (!this.allowedExtensions.includes('.' + fileExtension)) {
@@ -87,23 +99,24 @@ export class UserFileUploadComponent {
 
     this.fileName = `${uuid.v4()}.${fileExtension}`;
     this.dialogVisible = true;
-    // I need to clean the selected file, otherwise there will be problem with choosing the same file next time
     event.target.value = null;
   }
 
   sendForm(): void {
     if (this.file) {
+      // copy values to pretty_name
+      this.metadataForm.patchValue({
+        dataset_pretty_name: this.metadataForm.value.dataset_name,
+        version_pretty_name: this.metadataForm.value.version_name,
+      });
+
       this.name = 'uploadedFile';
       this.spinnerVisible = true;
       const upload$ = this.userDatasetService.userFileUpload(this.name, this.file, this.fileName, this.metadataForm.value)
-        .pipe(
-          finalize(() => this.reset())
-        );
-      this.uploadSub = upload$
-        .subscribe(this.uploadObserver);
+        .pipe(finalize(() => this.reset()));
+      this.uploadSub = upload$.subscribe(this.uploadObserver);
     }
   }
-
 
   private onUploadNext(event): void {
     if (event.type === HttpEventType.UploadProgress) {
@@ -117,11 +130,9 @@ export class UserFileUploadComponent {
 
   private onUploadError(error: any): void {
     let errorMessage = 'File could not be uploaded. Please try again or contact our team.';
-
     if (error.errorMessage && error.errorMessage.message) {
       errorMessage = error.errorMessage.message;
     }
-
     this.toastService.showErrorWithHeader('File not saved', errorMessage);
   }
 
@@ -130,6 +141,14 @@ export class UserFileUploadComponent {
   }
 
   onSaveData(): void {
+    if (!this.metadataForm.valid) {
+      this.dialogVisible = true; // open dialog if names are not filled in
+      return;
+    }
+    this.sendForm();
+  }
+
+  closeDialog(): void {
     this.dialogVisible = false;
   }
 
@@ -147,7 +166,6 @@ export class UserFileUploadComponent {
   getTheFileSize(): string {
     return this.userDatasetService.getTheSizeInProperUnits(this.authService.currentUser.space_left);
   }
-
 
   getISMNList(): void {
     this.userDatasetService.getISMNList();
