@@ -170,16 +170,12 @@ def create_jobs(
         depth_from, depth_to = get_depths_params(
             dataset_config.parametrisedfilter_set.all()
         )
+        tolerance_calculation = True
+        top_tol = 0.1
+        bottom_tol = 0.1
+
         filter_meta_dict = get_meta_filter_dict(
             list(dataset_config.filters.all()))
-
-        ids = reader.get_dataset_ids(
-            variable=dataset_config.variable.short_name,
-            min_depth=depth_from,
-            max_depth=depth_to,
-            filter_meta_dict=filter_meta_dict,
-            groupby='network',
-        )
 
         def reshape_meta(metadata):
             # reshape metadata dictionary to facilitate use
@@ -198,29 +194,91 @@ def create_jobs(
 
             return reshaped
 
-        jobs = []
-        for network, net_ids in ids.items():
-            lons, lats, meta_list = [], [], []
-            for idx in net_ids:
-                meta = reader.read_metadata(idx, format="dict")
-                meta = reshape_meta(meta)
-                lons.append(meta['longitude'])
-                lats.append(meta['latitude'])
-                meta_list.append(meta)
-            gpis = net_ids
-            gpis, lons, lats = np.array(gpis), np.array(lons), np.array(lats)
-
-            gpis, lons, lats, index = _geographic_subsetting(
-                gpis, lons, lats, validation_run.min_lat,
-                validation_run.min_lon, validation_run.max_lat,
-                validation_run.max_lon
+        if not tolerance_calculation:
+            ids = reader.get_dataset_ids(
+                variable=dataset_config.variable.short_name,
+                min_depth=depth_from,
+                max_depth=depth_to,
+                filter_meta_dict=filter_meta_dict,
+                groupby='network',
             )
 
-            meta_list = np.array(meta_list)[index]
+            jobs = []
+            for network, net_ids in ids.items():
+                lons, lats, meta_list = [], [], []
+                for idx in net_ids:
+                    meta = reader.read_metadata(idx, format="dict")
+                    meta = reshape_meta(meta)
+                    lons.append(meta['longitude'])
+                    lats.append(meta['latitude'])
+                    meta_list.append(meta)
+                gpis = net_ids
+                gpis, lons, lats = np.array(gpis), np.array(lons), np.array(lats)
 
-            if len(gpis) > 0:
-                jobs.append((gpis, lons, lats, meta_list))
-                total_points += len(gpis)
+                gpis, lons, lats, index = _geographic_subsetting(
+                    gpis, lons, lats, validation_run.min_lat,
+                    validation_run.min_lon, validation_run.max_lat,
+                    validation_run.max_lon
+                )
+
+                meta_list = np.array(meta_list)[index]
+
+                if len(gpis) > 0:
+                    jobs.append((gpis, lons, lats, meta_list))
+                    total_points += len(gpis)
+
+        else:
+            ids = reader.get_dataset_ids(
+                variable=dataset_config.variable.short_name,
+                min_depth=depth_from - top_tol,
+                max_depth=depth_to + bottom_tol,
+                filter_meta_dict=filter_meta_dict,
+                groupby='station',
+            )
+
+            # --- geographic subsetting at station level ---
+            # all sensors of a station share a lon/lat, so one read per station
+            stations = list(ids.keys())
+            s_lons, s_lats = [], []
+            for station in stations:
+                meta = reader.read_metadata(ids[station][0], format="dict")
+                s_lons.append(meta['longitude'][0][0])
+                s_lats.append(meta['latitude'][0][0])
+
+            stations = np.array(stations, dtype=object)
+            s_lons, s_lats = np.array(s_lons), np.array(s_lats)
+            dummy = np.arange(len(stations))
+
+            _, _, _, index = _geographic_subsetting(
+                dummy, s_lons, s_lats,
+                validation_run.min_lat, validation_run.min_lon,
+                validation_run.max_lat, validation_run.max_lon,
+            )
+            stations = stations[index]
+
+            # --- depth/tolerance subsetting over the remaining stations ---
+            # build the primary -> other-sensors lookup for the read path
+            reader._merge_sensors = {}
+            jobs = []
+            for station in stations:
+                result = reader.find_sensors_by_tolerance_station_selection(
+                    ids[station],
+                    depth_top=depth_from, depth_bottom=depth_to,
+                    top_tol=top_tol, bottom_tol=bottom_tol,
+                    reshape_meta=reshape_meta,
+                )
+                if result is None:
+                    continue
+                primary_id, meta = result
+                if meta.get('other_ids'):
+                    reader._merge_sensors[int(primary_id)] = list(meta['other_ids'])
+                jobs.append((
+                    np.array([primary_id]),
+                    np.array([meta['longitude']]),
+                    np.array([meta['latitude']]),
+                    np.array([meta]),
+                ))
+                total_points += 1
 
     else:
         raise ValueError(
