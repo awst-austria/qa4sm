@@ -1,10 +1,10 @@
-import {Component, OnInit, signal} from '@angular/core';
+import {Component, OnDestroy, OnInit, signal} from '@angular/core';
 import {UserDatasetsService} from '../../modules/user-datasets/services/user-datasets.service';
-import {EMPTY, Observable} from 'rxjs';
+import {BehaviorSubject, EMPTY, Observable, Subscription} from 'rxjs';
 import {AuthService} from '../../modules/core/services/auth/auth.service';
 import {DataManagementGroupsDto} from '../../modules/user-datasets/services/data-management-groups.dto';
 import {SettingsService} from '../../modules/core/services/global/settings.service';
-import {catchError, tap} from 'rxjs/operators';
+import {catchError, switchMap, tap} from 'rxjs/operators';
 import {UserDataFileDto} from '../../modules/user-datasets/services/user-data-file.dto';
 import {DatasetService} from '../../modules/core/services/dataset/dataset.service';
 import {DatasetVersionService} from '../../modules/core/services/dataset/dataset-version.service';
@@ -35,7 +35,7 @@ interface DatasetMeta {
   editDataset: { opened: boolean };
   editVersion: { opened: boolean };
   editVariable: { opened: boolean };
-  filePreprocessingStatus: any;
+  filePreprocessingStatus: ReturnType<typeof setInterval> | null;
 }
 
 @Component({
@@ -44,12 +44,12 @@ interface DatasetMeta {
   styleUrls: ['./my-datasets.component.scss'],
   standalone: true,
   imports: [
-    CommonModule, FormsModule, RouterLink,  
+    CommonModule, FormsModule, RouterLink,
     TableModule, TagModule, ButtonModule, DialogModule,
     TooltipModule, InputTextModule, SelectModule, ScrollTopModule,
     UserFileUploadComponent]
 })
-export class MyDatasetsComponent implements OnInit {
+export class MyDatasetsComponent implements OnInit, OnDestroy {
 
   constructor(
     private userDatasetService: UserDatasetsService,
@@ -82,29 +82,50 @@ export class MyDatasetsComponent implements OnInit {
   deleteTarget: UserDataFileDto | null = null;
   deleting = false;
 
-  userDatasets$ = this.buildDatasetsStream();
+  // Single source of truth for "reload the list". Anything that needs a fresh
+  // list (initial load, upload finished, preprocessing finished, delete) just
+  // calls reload() -> the trigger fires -> switchMap re-fetches getUserDataList().
+  // Declared ABOVE userDatasets$ because class fields initialise top-to-bottom.
+  private refreshTrigger$ = new BehaviorSubject<void>(undefined);
 
-  private buildDatasetsStream(): Observable<UserDataFileDto[]> {
-    return this.userDatasetService.getUserDataList().pipe(
+  userDatasets$: Observable<UserDataFileDto[]> = this.refreshTrigger$.pipe(
+    switchMap(() => this.userDatasetService.getUserDataList().pipe(
       tap(datasets => datasets.forEach(d => this.initMeta(d))),
       catchError(() => this.datasetsFetchErrorHandling())
-    );
+    ))
+  );
+
+  private subs = new Subscription();
+
+  private reload(): void {
+    this.datasetFetchError = false;
+    this.refreshTrigger$.next();
   }
 
   ngOnInit(): void {
-    this.settingsService.getAllSettings()
-      .pipe(catchError(() => { this.settingsError = true; return EMPTY; }))
-      .subscribe(setting => this.maintenanceMode = setting[0].maintenance_mode);
+    this.subs.add(
+      this.settingsService.getAllSettings()
+        .pipe(catchError(() => { this.settingsError = true; return EMPTY; }))
+        .subscribe(setting => this.maintenanceMode = setting[0].maintenance_mode)
+    );
 
     this.hasNoSpaceLimit = !this.authService.currentUser.space_limit_value;
     this.hasNoSpaceAssigned = this.authService.currentUser.space_limit_value === 1;
     this.dataManagementGroups$ = this.userDatasetService.getDataManagementGroups();
 
-    this.userDatasetService.doRefresh.subscribe(value => {
-      if (value) {
-        this.userDatasets$ = this.buildDatasetsStream();
-      }
-    });
+    // External signal: upload component finished -> rebuild the list.
+    this.subs.add(
+      this.userDatasetService.doRefresh.subscribe(value => {
+        if (value) {
+          this.reload();
+        }
+      })
+    );
+  }
+
+  ngOnDestroy(): void {
+    this.metaMap.forEach(meta => this.stopPolling(meta));
+    this.subs.unsubscribe();
   }
 
   private initMeta(dataset: UserDataFileDto): void {
@@ -152,27 +173,55 @@ export class MyDatasetsComponent implements OnInit {
   }
 
   private startPreprocessingPolling(dataset: UserDataFileDto, meta: DatasetMeta): void {
-    if (!dataset.metadata_submitted) {
-      meta.filePreprocessingStatus = setInterval(() => {
-        this.userDatasetService.getUserDataFileById(dataset.id).subscribe({
-          next: (data) => {
-            if (data.metadata_submitted) {
-              this.loadVariable(data, meta);
-              if (meta.variable.prettyName() !== 'none') {
-                this.userDatasetService.refresh.next(true);
-              }
+    // Poll exactly the rows that currently show the "preprocessing" spinner.
+    if (dataset.status !== 'preprocessing') return;
+
+    let attempts = 0;
+    const maxAttempts = 150; // ~10 min at 4s, so a stuck file doesn't poll forever
+
+    meta.filePreprocessingStatus = setInterval(() => {
+      attempts++;
+      this.userDatasetService.getUserDataFileById(dataset.id).subscribe({
+        next: (data) => {
+          // TODO(remove): temporary diagnostic to confirm what the backend flips.
+          // console.log('poll', dataset.id, data.status, data.metadata_submitted);
+
+          // "Done" = the spinner condition no longer holds (status left
+          // 'preprocessing') OR the metadata flag flipped. Keying off status
+          // keeps this in sync with the template even if metadata_submitted lags.
+          const stillPreprocessing = data.status === 'preprocessing' && !data.metadata_submitted;
+          if (stillPreprocessing) {
+            if (attempts >= maxAttempts) {
+              this.stopPolling(meta);              // give up; leave row as-is
             }
-          },
-          error: () => {
-            this.userDatasetService.refresh.next(true);
-            this.toastService.showErrorWithHeader(
-              'File preprocessing failed',
-              'File could not be preprocessed. Please make sure you are uploading a proper file.',
-              10000
-            );
+            return;                                // keep polling
           }
-        });
-      }, 60 * 1000);
+
+          // Terminal state reached (done or failed) -> stop and refresh the row.
+          this.stopPolling(meta);
+          if (data.status !== 'failed') {
+            this.loadVariable(data, meta);         // refresh variable signals on success
+          }
+          this.reload();                           // re-render: status, size, log, etc.
+        },
+        error: () => {
+          // Genuine HTTP error (e.g. 404 if the entry was removed on failure).
+          this.stopPolling(meta);
+          this.reload();
+          this.toastService.showErrorWithHeader(
+            'File preprocessing failed',
+            'File could not be preprocessed. Please make sure you are uploading a proper file.',
+            10000
+          );
+        }
+      });
+    }, 4000);
+  }
+
+  private stopPolling(meta: DatasetMeta): void {
+    if (meta.filePreprocessingStatus) {
+      clearInterval(meta.filePreprocessingStatus);
+      meta.filePreprocessingStatus = null;
     }
   }
 
@@ -237,7 +286,11 @@ export class MyDatasetsComponent implements OnInit {
 
     obs.subscribe({
       next: () => {
+        const meta = this.metaMap.get(this.deleteTarget!.id);
+        if (meta) this.stopPolling(meta);
         this.metaMap.delete(this.deleteTarget!.id);
+        // Emit on the shared subject -> notifies other subscribers AND triggers
+        // our own doRefresh -> reload() in ngOnInit (single rebuild, no duplication).
         this.userDatasetService.refresh.next(true);
         this.authService.init();
         this.closeDeleteDialog();

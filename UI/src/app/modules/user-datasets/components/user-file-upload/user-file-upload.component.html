@@ -1,33 +1,23 @@
 <div class="flex flex-column w-12 justify-content-center align-content-center gap-4">
-  
+
   <input type="file" class="file-input"
          [accept]="allowedExtensions.join(',')"
          (change)="onFileSelected($event)" #fileUpload>
 
-  <div class="upload-zone" (click)="fileUpload.click()" 
-       [class.upload-zone--disabled]="authService.currentUser.space_left === 0">
+  <div class="upload-zone"
+       (click)="fileUpload.click()"
+       (dragover)="onDragOver($event)"
+       (dragleave)="onDragLeave($event)"
+       (drop)="onDrop($event)"
+       [class.upload-zone--disabled]="authService.currentUser.space_left === 0"
+       [class.upload-zone--dragover]="isDragOver">
     <i class="pi pi-cloud-upload upload-zone__icon"></i>
-    <span class="upload-zone__text">{{ file ? file.name : 'Click to select a file' }}</span>
+    <span class="upload-zone__text">{{ file ? file.name : 'Click or drag a file here' }}</span>
     <span class="upload-zone__hint">Accepted: .zip, .nc, .nc4</span>
   </div>
 
   <div *ngIf="isFileTooBig" class="warning text-center">
     File too big. You have {{ getTheFileSize() }} available.
-  </div>
-
-  <div *ngIf="file" class="flex gap-2 justify-content-center">
-    <button pButton
-            label="Change file"
-            class="p-button-outlined"
-            icon="pi pi-refresh"
-            (click)="fileUpload.click()">
-    </button>
-    <button pButton
-            label="Upload"
-            icon="pi pi-upload"
-            [disabled]="!metadataForm.valid"
-            (click)="onSaveData()">
-    </button>
   </div>
 
   <div class="text-center text-sm text-muted">
@@ -37,10 +27,20 @@
 
 </div>
 
-<p-dialog id="user-data-form" header="Upload your own data" [(visible)]="dialogVisible" [style]="{width: '28rem'}">
-  
+<!-- Metadata + upload dialog (single step) -->
+<p-dialog id="user-data-form"
+          header="Upload your own data"
+          [(visible)]="dialogVisible"
+          [modal]="true"
+          [style]="{width: '28rem'}"
+          (onHide)="onDialogHide()">
+
   <div class="text-muted text-sm mb-3">
     Please follow this file <a target="_blank" [routerLink]="['/user-data-guidelines']">standard</a>.
+  </div>
+
+  <div *ngIf="file" class="text-sm mb-3">
+    <span class="text-muted">File: </span><b>{{ file.name }}</b>
   </div>
 
   <form [formGroup]="metadataForm">
@@ -64,15 +64,23 @@
                formControlName="version_name">
       </div>
 
-      <button pButton label="Save names" icon="pi pi-check" class="w-full"
-              [disabled]="!metadataForm.valid"
-              (click)="closeDialog()">
-      </button>
-
     </div>
   </form>
+
+  <ng-template pTemplate="footer">
+    <button pButton type="button" label="Cancel"
+            class="p-button-text"
+            (click)="closeDialog()">
+    </button>
+    <button pButton type="button" label="Upload"
+            icon="pi pi-upload"
+            [disabled]="!metadataForm.valid"
+            (click)="onSaveData()">
+    </button>
+  </ng-template>
 </p-dialog>
 
+<!-- Upload progress spinner -->
 <p-dialog id="uploading-data-spinner" [modal]="true" [showHeader]="false" [(visible)]="spinnerVisible"
           class="text-center">
   <span class="pi pi-spinner loading-spinner" title="We are uploading your data..."></span>
