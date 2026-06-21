@@ -50,7 +50,7 @@ locket==1.0.0
 lz4==4.3.3
 markupsafe==3.0.2
 matplotlib==3.10.0
-msgpack==1.1.0
+msgpack==1.2.1
 munkres==1.1.4
 netcdf4==1.7.2
 numpy==2.0.2
