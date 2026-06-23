@@ -170,7 +170,7 @@ def create_jobs(
         depth_from, depth_to = get_depths_params(
             dataset_config.parametrisedfilter_set.all()
         )
-        tolerance_calculation = True
+        merge_ismn_sensors = True
         top_tol = 0.1
         bottom_tol = 0.1
 
@@ -194,7 +194,7 @@ def create_jobs(
 
             return reshaped
 
-        if not tolerance_calculation:
+        if not merge_ismn_sensors:
             ids = reader.get_dataset_ids(
                 variable=dataset_config.variable.short_name,
                 min_depth=depth_from,

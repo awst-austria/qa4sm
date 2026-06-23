@@ -49,7 +49,7 @@ from validator.validation.graphics import generate_all_graphs
 from validator.validation.readers import create_reader, adapt_timestamp
 from validator.validation.util import mkdir_if_not_exists, first_file_in
 from validator.validation.globals import START_TIME, END_TIME, METADATA_TEMPLATE
-from validator.validation.adapters import StabilityMetricsAdapter
+from validator.validation.adapters import StabilityMetricsAdapter, MergeSensorsAdapter
 import qa4sm_reader
 from qa4sm_reader.intra_annual_temp_windows import TemporalSubWindowsCreator, NewSubWindow, TemporalSubWindowsFactory
 from qa4sm_reader.netcdf_transcription import Pytesmo2Qa4smResultsTranscriber
@@ -289,6 +289,19 @@ def create_pytesmo_validation(validation_run, val_type="temporal"):
                 param_filters=list(dataset_config.parametrisedfilter_set.all()),
                 dataset=dataset_config.dataset,
                 variable=dataset_config.variable)
+
+        if (validation_run.spatial_reference_configuration
+                and (dataset_config.id
+                     == validation_run.spatial_reference_configuration.id)
+                and dataset_config.dataset.short_name == ISMN):
+            # average merged sensors of a station (set up per-gpi from the
+            # 'other_ids' job metadata), after filters have been applied to
+            # each sensor individually but before anomalies, so that any
+            # anomaly is computed on the averaged soil moisture series
+            reader = MergeSensorsAdapter(
+                reader,
+                variable=dataset_config.variable.short_name,
+                read_name=read_name)
 
         if validation_run.anomalies == ValidationRun.MOVING_AVG_35_D:
             reader = AnomalyAdapter(
