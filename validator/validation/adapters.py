@@ -3,7 +3,70 @@ import numpy as np
 import pandas as pd
 from scipy.stats import theilslopes
 from pytesmo.validation_framework.metric_calculators_adapters import SubsetsMetricsAdapter
+from pytesmo.validation_framework.adapters import BasicAdapter
 
+class MergeSensorsAdapter(BasicAdapter):
+    """
+    Wraps the (filtered/adapted) ISMN reference reader. When reading a
+    primary sensor that has merged sensors registered in `_merge_sensors`
+    on the underlying ISMN_Interface (set per-gpi by pytesmo's
+    Validation.calc from the `other_ids` job metadata), reads each merged
+    sensor through the same filter/adapter chain and averages the
+    requested variable across sensors, keeping only timestamps where all
+    of them have data.
+    """
+
+    def __init__(self, cls, variable, read_name=None):
+        """
+        Parameters
+        ----------
+        cls: object
+            The fully filtered/adapted ISMN reader to wrap.
+        variable: str
+            Short name of the variable column to read and average.
+        read_name: str, optional
+            See :class:`pytesmo.validation_framework.adapters.BasicAdapter`.
+        """
+        super().__init__(cls, read_name=read_name)
+        self.variable = variable
+
+        base_reader = cls
+        while hasattr(base_reader, "cls"):
+            base_reader = base_reader.cls
+        self._base_reader = base_reader
+
+    def _read_merged(self, read_func, gpi, *args, **kwargs):
+        primary = read_func(gpi, *args, **kwargs)
+
+        other_ids = getattr(self._base_reader, "_merge_sensors", {}).get(
+            int(gpi), [])
+        if not other_ids or primary is None or primary.empty \
+                or self.variable not in primary.columns:
+            return primary
+
+        dfs = [primary[[self.variable]]]
+        for other_id in other_ids:
+            other = read_func(other_id, *args, **kwargs)
+            if other is not None and not other.empty \
+                    and self.variable in other.columns:
+                dfs.append(other[[self.variable]])
+
+        if len(dfs) == 1:
+            return primary
+
+        # keep only timestamps where all sensors have data (exact match,
+        # no temporal tolerance), then average across sensors
+        merged = pd.concat(dfs, axis=1, join="inner")
+        averaged = merged.mean(axis=1)
+        return averaged.to_frame(self.variable)
+
+    def read(self, *args, **kwargs):
+        return self._read_merged(self.cls.read, *args, **kwargs)
+
+    def _adapt_custom(self, *args, **kwargs):
+        return self._read_merged(
+            getattr(self.cls, self.read_name), *args, **kwargs)
+    
 class StabilityMetricsAdapter(SubsetsMetricsAdapter):
     """
     Extend SubsetsMetricsAdapter to calculate additional stability metrics 
