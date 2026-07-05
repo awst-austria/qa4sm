@@ -19,7 +19,6 @@ cycler==0.12.1
 cython==3.0.12
 cytoolz==1.0.1
 dask==2026.1.1
-datedown==0.4
 distributed==2026.1.1
 django==5.1.15
 django-countries==7.6.1
@@ -29,7 +28,7 @@ djangorestframework==3.15.2
 donfig==0.8.1.post1
 drf-yasg==1.21.8
 exceptiongroup==1.2.2
-ecmwf-models==0.10.2
+ecmwf-models==0.11.1
 esa_cci_sm==0.5.0
 fonttools==4.61.0
 fsspec==2025.2.0
