@@ -53,6 +53,10 @@ services:
       - type: bind
         source: "${QA4SM_WORKSPACE}webapp/cronjob-scripts"
         target: /var/lib/qa4sm-web-val/valentina/cronjob-scripts
+      - type: bind
+        source: /qa4sm/autoreports/pdf
+        target: /var/lib/qa4sm-web-val/valentina/autoreports
+        read_only: true
     logging:
       driver: "json-file"
       options:

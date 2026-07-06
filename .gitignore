@@ -21,3 +21,4 @@ node_modules
 UI/.angular
 .local
 .vscode
+autoreports/

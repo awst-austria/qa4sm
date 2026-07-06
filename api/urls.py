@@ -37,7 +37,7 @@ from rest_framework.authtoken import views
 from api.views.autocleanup_view import run_auto_cleanup_script
 from api.views.validation_run_view import validation_run_status
 from api.views.validation_run_view import validation_run_timing
-
+from api.views.autoreports_view import get_report_series_list, get_reports, get_report_file
 
 # schema_view = get_schema_view(
 #     openapi.Info(
@@ -162,4 +162,8 @@ urlpatterns = [
     path('<uuid:validation_id>/range/<str:metric_name>/<str:layer_name>/', get_layer_range, name='layer_range'),
     path('<uuid:validation_id>/bounds/', get_layer_bounds, name='layer_bounds'),
     path('<uuid:validation_id>/check-zarr/', check_zarr_exists, name='check-zarr'),
+    path('autoreports', get_report_series_list, name='autoreports-series'),
+    path('autoreports/<str:report_series>', get_reports, name='autoreports-list'),
+    path('autoreports/<str:report_series>/<str:filename>', get_report_file, name='autoreports-file'),
+
 ]

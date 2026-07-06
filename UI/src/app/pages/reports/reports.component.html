@@ -1,0 +1,69 @@
+<main class="flex justify-content-center">
+<div class="reports-page">
+  <h2>Automated Validation Reports</h2>
+
+  <div class="series-select" *ngIf="seriesList.length > 1">
+    <p-floatLabel class="mb-4 mt-3">
+      <p-select
+        [inputId]="seriesSelectorId"
+        (onChange)="loadSeries($event.value)"
+        [options]="seriesList"
+        [(ngModel)]="selectedSeries"
+        [filter]="true"
+        [style]="{'width': '100%'}" />
+      <label for="{{seriesSelectorId}}">Report series</label>
+    </p-floatLabel>
+  </div>
+
+  <h3 *ngIf="selectedSeries">{{ selectedSeries }}</h3>
+
+  <p *ngIf="loading">Loading reports…</p>
+
+  <p-accordion [multiple]="true" [(value)]="activeYears"
+               *ngIf="!loading && yearGroups.length">
+    <p-accordion-panel *ngFor="let group of yearGroups" [value]="group.year">
+
+      <p-accordion-header>
+        <span class="year-header">
+          <span class="year-label">{{ group.year }}</span>
+          <span class="year-badges">
+            <span class="badge g" *ngIf="indicatorCount(group, 'G') as n"
+                  title="Good">{{ n }}</span>
+            <span class="badge y" *ngIf="indicatorCount(group, 'Y') as n"
+                  title="Warning">{{ n }}</span>
+            <span class="badge r" *ngIf="indicatorCount(group, 'R') as n"
+                  title="Critical">{{ n }}</span>
+          </span>
+        </span>
+      </p-accordion-header>
+
+      <p-accordion-content>
+        <div class="month-grid">
+          <ng-container *ngFor="let report of group.months; let i = index">
+            <a *ngIf="report"
+               class="month-tile"
+               [class.g]="report.indicator === 'G'"
+               [class.y]="report.indicator === 'Y'"
+               [class.r]="report.indicator === 'R'"
+               [href]="reportUrl(report)"
+               target="_blank"
+               [title]="'Report ' + report.report_date_iso
+                        + ' — generated ' + formatCreation(report.creation_date)">
+              {{ monthNames[i] }}
+            </a>
+            <span *ngIf="!report" class="month-tile empty"
+                  title="No report for this month">
+              {{ monthNames[i] }}
+            </span>
+          </ng-container>
+        </div>
+      </p-accordion-content>
+
+    </p-accordion-panel>
+  </p-accordion>
+
+  <p *ngIf="!loading && selectedSeries && !yearGroups.length">
+    No reports available for this series.
+  </p>
+</div>
+</main>

@@ -1,0 +1,87 @@
+@use 'src/style.variables' as *;
+
+.reports-page{
+  width: min(1600px, 100%);   /* max width for large screens */
+  padding: 0 1rem;
+  h2, h3 {
+    text-align: center;
+  }
+}
+
+.series-select {
+  display: flex;
+  justify-content: center;
+  margin-top: 1rem;
+
+  p-floatLabel, p-floatlabel {
+    width: min(24rem, 100%);  
+  }
+}
+
+.year-header {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+
+  .year-label {
+    font-weight: 700;
+  }
+
+  .year-badges {
+    display: flex;
+    gap: 0.35rem;
+  }
+
+  .badge {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 1.5rem;
+    height: 1.5rem;
+    padding: 0 0.3rem;          // keeps two-digit numbers inside
+    border-radius: 50%;
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: #fff;
+
+    &.g { background: $base-color; }
+    &.y { background: $highlight-color; color: #333; }
+    &.r { background: $pronouced-button-color; }
+  }
+}
+
+.month-grid {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: 0.4rem;
+
+  @media (max-width: 800px) {
+    grid-template-columns: repeat(6, 1fr);
+  }
+}
+
+.month-tile {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.5rem 0;
+  border-radius: 6px;
+  font-weight: 400;
+  color: #fff;
+  text-decoration: none;
+  transition: transform 0.1s;
+
+  &:not(.empty):hover {
+    transform: scale(1.07);
+  }
+
+  &.g { background: $base-color; }
+  &.y { background: $highlight-color; color: #333; }
+  &.r { background: $pronouced-button-color; }
+
+  &.empty {
+    background: var(--p-surface-200, #e5e7eb);
+    color: $font-color-muted;
+    cursor: default;
+  }
+}
