@@ -28,7 +28,7 @@ class Dataset(models.Model):
     resolution = models.JSONField(null=True, blank=True)
     plot_resolution = models.FloatField(null=True, blank=True, default=None) # irregular grids have varying steps, resultuion != plot_resolution
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, blank=True, null=True)
-    user_groups = models.ManyToManyField(to='DataManagementGroup', related_name='custom_datasets', null=True,
+    user_groups = models.ManyToManyField(to='DataManagementGroup', related_name='custom_datasets',
                                          blank=True)
 
     # many-to-one relationships coming from other models:
