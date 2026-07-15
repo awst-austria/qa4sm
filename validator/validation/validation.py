@@ -120,10 +120,11 @@ def set_outfile(validation_run, run_dir, val_type="temporal"):
             validation_run.zarr_path = ''        
 
 
-def save_validation_config(validation_run):
+def save_validation_config(validation_run, val_type="temporal"):
     try:
         with netCDF4.Dataset(os.path.join(OUTPUT_FOLDER,
-                                          validation_run.output_file.name),
+                                          validation_run.output_file.name if val_type =="temporal" 
+                                          else validation_run.output_file_spatial.name),
                              "a",
                              format="NETCDF4") as ds:
 
@@ -842,7 +843,7 @@ def compact_results(results):
             c_results[key][field_name] = np.array(entries, dtype=first_val.dtype)
     return c_results
 
-def spatial_validation_xr(val, ds_use, only_with_reference=True, handle_errors="ignore", validation_run=None):
+def spatial_validation_xr(val, ds_use, only_with_reference=True, handle_errors="ignore", validation_run=None, min_obs=None):
     """
     Performs a spatial validation by calculating metrics for every timestep.
 
@@ -861,6 +862,9 @@ def spatial_validation_xr(val, ds_use, only_with_reference=True, handle_errors="
     only_with_reference: bool, optional (default: True)
         Only compute metrics for dataset combinations where the reference
         is included.
+    min_obs: int, optional (Default: None)
+        Minimum # of observations needed to calculate metrics between datasets
+        If 'None' it falls back to the min_obs defined in pytesmo.metric_calculators.py
 
     Returns
     -------
@@ -912,6 +916,16 @@ def spatial_validation_xr(val, ds_use, only_with_reference=True, handle_errors="
             time_np = time_val.values
 
             for c, (c_list, metrics_calculator) in all_combinations.items():
+                if min_obs:
+                    # Changing minimum # of observations needed for calculation, if less throws status = 1
+                    # Mainly used for testing without needing large datasets
+                    if metrics_calculator.__func__ is PairwiseIntercomparisonMetrics.calc_metrics:
+                        metrics_calculator.__self__.min_obs = min_obs 
+                        # metrics_calculator.__self__.bootstrap_min_obs = min_obs 
+                    elif metrics_calculator.__func__ is TripleCollocationMetrics.calc_metrics:
+                        metrics_calculator.__self__.min_obs = min_obs 
+                        # metrics_calculator.__self__.bootstrap_min_obs = min_obs 
+
                 res_list = result.setdefault(c, [])
                 
                 # Efficient dropping and counting
@@ -986,7 +1000,7 @@ def spatial_validation_xr(val, ds_use, only_with_reference=True, handle_errors="
         c_results[key]["lon"] = list(ds_use.lon.values)
     return c_results
 
-def temporal_validation_xr(val, ds_use, only_with_reference=True, handle_errors="ignore", validation_run=None):
+def temporal_validation_xr(val, ds_use, only_with_reference=True, handle_errors="ignore", validation_run=None, min_obs=None):
     """
     Performs a temporal validation using an xarray by calculating metrics for every gpi.
 
@@ -1003,6 +1017,9 @@ def temporal_validation_xr(val, ds_use, only_with_reference=True, handle_errors=
     only_with_reference: bool, optional (default: False)
         Only compute metrics for dataset combinations where the reference
         is included.
+    min_obs: int, optional (Default: None)
+        Minimum # of observations needed to calculate metrics between datasets
+        If 'None' it falls back to the min_obs defined in pytesmo.metric_calculators.py
 
     Returns
     -------
@@ -1055,6 +1072,9 @@ def temporal_validation_xr(val, ds_use, only_with_reference=True, handle_errors=
             gpi_info = (gpi, lons[i], lats[i], gpi_meta) 
 
             for c, (c_list, metrics_calculator) in all_combinations.items():
+                if min_obs:
+                    metrics_calculator.__self__.min_obs = min_obs # Changing minimum # of observations needed for calculation, if less throws status = 1
+                
                 res_list = result.setdefault(c, [])
                 
                 df_comb = df_gpi[c_list].dropna()
@@ -1105,7 +1125,7 @@ def temporal_validation_xr(val, ds_use, only_with_reference=True, handle_errors=
     return c_results
 
 @shared_task(bind=True, max_retries=3)
-def run_xArray_validation(self, validation_id, gpi_tuple, val_type="both", min_obs=1, include_secondary_meta=False, only_with_reference=ONLY_WITH_REFERENCE):
+def run_xArray_validation(self, validation_id, gpi_tuple, val_type="both", min_obs=None, include_secondary_meta=False, only_with_reference=ONLY_WITH_REFERENCE):
     """
     Executes a pytesmo-based validation using xArray datasets.
 
@@ -1125,9 +1145,10 @@ def run_xArray_validation(self, validation_id, gpi_tuple, val_type="both", min_o
         'spatial' creates graphs for spatial validation.
         'temporal' creates graphs for temporal validation.
         'both' performs both spatial and temporal validation.
-    min_obs : int, optional
+    min_obs : int, optional (Default: None)
         Minimum number of valid samples (GPIs) required per timestamp 
-        to include it in the validation. Default is 10.
+        to include it in the validation. Default is 'None' which makes the
+        calculation fall back to min_obs values defined inpytesmo.metric_calculators.
     include_secondary_meta : bool, optional
         If True, calculates and adds secondary metadata dicts (land cover, 
         climate class, etc.). Default is False. NOT IMPLEMENTED
@@ -1177,18 +1198,18 @@ def run_xArray_validation(self, validation_id, gpi_tuple, val_type="both", min_o
             # ds_use = ds_all.where(ds_all.n_gpi>=min_obs, drop=True) # if you want to filter beforehand: should be filtered to min_obs in pytesmo, probably 10
             if any(np.array([len(ds_use[coord]) for coord in ds_use.dims]) < 1):
                 raise ValueError(f"No Timestamp with enough gpi observations")
-            spatial_result = spatial_validation_xr(val, ds_use, only_with_reference, validation_run=validation_run)
-            temporal_result = temporal_validation_xr(val, ds_all, only_with_reference, validation_run=validation_run)
+            spatial_result = spatial_validation_xr(val, ds_use, only_with_reference, validation_run=validation_run, min_obs=min_obs)
+            temporal_result = temporal_validation_xr(val, ds_all, only_with_reference, validation_run=validation_run, min_obs=min_obs)
             
         elif val_type == "spatial":
             ds_use = ds_all
             # ds_use = ds_all.where(ds_all.n_gpi>=min_obs, drop=True) # if you want to filter beforehand: should be filtered to min_obs in pytesmo, probably 10
             if any(np.array([len(ds_use[coord]) for coord in ds_use.dims]) < 1):
                 raise ValueError(f"No Timestamp with enough gpi observations")
-            spatial_result = spatial_validation_xr(val, ds_use, only_with_reference, validation_run=validation_run)
+            spatial_result = spatial_validation_xr(val, ds_use, only_with_reference, validation_run=validation_run, min_obs=min_obs)
             temporal_result = None
         elif val_type == "temporal": #Shouldn't be used, original implementation way faster
-            temporal_result = temporal_validation_xr(val, ds_use, only_with_reference, validation_run=validation_run)
+            temporal_result = temporal_validation_xr(val, ds_use, only_with_reference, validation_run=validation_run, min_obs=min_obs)
             spatial_result = None
         else:
             spatial_result = None
@@ -1303,7 +1324,7 @@ def run_validation(validation_id, val_type="temporal"):
         validation_run.save()
         return
 
-    # 2026-14-04: FIX UNTIL SOMEONE TAKES LOOK AT TEMPORAL XARRAY VALIDATION
+    # 2026-14-04: FIX UNTIL SOMEONE TAKES LOOK AT TEMPORAL XARRAY VALIDATION (MISSING VALUES)
     if val_type in ["both"]:
         spatial_run = run_validation(validation_id, val_type="spatial")
         validation_run.refresh_from_db(fields=['progress', 'progress_spatial'])
@@ -1370,7 +1391,7 @@ def run_validation(validation_id, val_type="temporal"):
             for j in jobs:
 
                 celery_job = run_xArray_validation.apply_async(
-                    args=[validation_id, j, val_type], queue=validation_run.user.username)
+                    args=[validation_id, j, val_type, min_obs], queue=validation_run.user.username)
                 async_results.append(celery_job)
                 job_table[celery_job.id] = j
                 track_celery_task(validation_run, celery_job.id)
@@ -1550,26 +1571,10 @@ def run_validation(validation_id, val_type="temporal"):
                         '/?' + OUTPUT_FOLDER + '/?', '', spatial_outname)
                     validation_run.save()
 
+
                     # Copy attributes from temporal file to spatial file
                     # Add required attributes directly
-                    with netCDF4.Dataset(spatial_outname, 'a') as ds:
-                        ds.val_ref = 'val_dc_dataset0'
-                        j = 1
-                        for dataset_config in validation_run.dataset_configurations.all():
-                            if (validation_run.spatial_reference_configuration and
-                                    dataset_config.id == validation_run.spatial_reference_configuration.id):
-                                i = 0
-                            else:
-                                i = j
-                                j += 1
-                            ds.setncattr('val_dc_dataset' + str(i), dataset_config.dataset.short_name)
-                            ds.setncattr('val_dc_version' + str(i), dataset_config.version.short_name)
-                            ds.setncattr('val_dc_variable' + str(i), dataset_config.variable.pretty_name)
-                            ds.setncattr('val_dc_dataset_pretty_name' + str(i), dataset_config.dataset.pretty_name)
-                            ds.setncattr('val_dc_version_pretty_name' + str(i), dataset_config.version.pretty_name)
-                            ds.setncattr('val_dc_variable_pretty_name' + str(i), dataset_config.variable.short_name)
-                        ds.val_scaling_method = validation_run.scaling_method
-                        ds.val_anomalies = validation_run.anomalies
+                    save_validation_config(validation_run, val_type="spatial")
                 
                     sp_transcriber.compress(path=spatial_outname, compression='zlib', complevel=9)
 
