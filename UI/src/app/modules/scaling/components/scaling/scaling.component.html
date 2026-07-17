@@ -1,8 +1,10 @@
 <p-panel header="Scaling" [toggleable]="false" class="validation-small-row">
   <ng-template pTemplate="icons">
-    <label class="p-panel-header-icon"
-           pTooltip="Remove biases (e.g., due to different measurement units, scale mismatch, or retrieval algorithm parameterization) in all candidate datasets relative to the chosen scaling reference before computing validation metrics."
-           tooltipPosition="bottom">
+    <label
+      class="p-panel-header-icon"
+      pTooltip="Remove biases (e.g., due to different measurement units, scale mismatch, or retrieval algorithm parameterization) in all candidate datasets relative to the chosen scaling reference before computing validation metrics."
+      tooltipPosition="bottom"
+    >
       <span class="pi pi-question-circle"></span>
     </label>
   </ng-template>
@@ -10,44 +12,61 @@
     <div style="width: 100%">
       <div class="col-12" id="scalingMethod">
         <p-floatLabel>
-          <p-select inputId="scalingMethodSelector"
-                      (onChange)="updateScalingMethod()"
-                      [options]="scalingMethods"
-                      [ngModel]="selectedScalingMethod$|async"
-                      (ngModelChange)="selectedScalingMethod$.next($event)"
-                      optionLabel="description" [style]="{'width': '100%'}"></p-select>
+          <p-select
+            inputId="scalingMethodSelector"
+            (onChange)="updateScalingMethod()"
+            [options]="scalingMethods"
+            [ngModel]="selectedScalingMethod$ | async"
+            (ngModelChange)="selectedScalingMethod$.next($event)"
+            optionLabel="description"
+            [style]="{ width: '100%' }"
+          ></p-select>
           <label for="scalingMethodSelector">Select scaling method</label>
         </p-floatLabel>
       </div>
     </div>
-    <div style="width: 100%" *ngIf="(selectedScalingMethod$|async)?.method !== 'none'">
-      <div class="col-12 pt-5" id="scalingTo">
-        <p-floatLabel>
-          <p-select inputId="scalingReferenceSelector"
-                      (onChange)="updateScaleTo(true)"
-                      [options]="validationModel.datasetConfigurations"
-                      [ngModel]="verifyScaleToModel()|async"
-                      (ngModelChange)="selectedScaleToModel$.next($event)"
-                      optionLabel="datasetModel.selectedDataset.pretty_name" [style]="{'width': '100%'}">
-            <ng-template let-item pTemplate="item">
-              <div (mouseover)="onHoverOverDataset(item, true)" (mouseleave)="onHoverOverDataset(item, false)"
-                   (mouseup)="onHoverOverDataset(item, false)">
-          <span>
-            {{item.datasetModel.selectedDataset?.pretty_name}} ({{item.datasetModel.selectedVersion?.pretty_name}})
-          </span>
-              </div>
-            </ng-template>
-            <ng-template let-item pTemplate="selectedItem">
-              <div>
-                <span>{{item.datasetModel.selectedDataset?.pretty_name}}
-                  ({{item.datasetModel.selectedVersion?.pretty_name}})</span>
-              </div>
-
-            </ng-template>
-          </p-select>
-          <label for="scalingReferenceSelector">Select scaling reference</label>
-        </p-floatLabel>
+    @if ((selectedScalingMethod$ | async)?.method !== "none") {
+      <div style="width: 100%">
+        <div class="col-12 pt-5" id="scalingTo">
+          <p-floatLabel>
+            <p-select
+              inputId="scalingReferenceSelector"
+              (onChange)="updateScaleTo(true)"
+              [options]="validationModel.datasetConfigurations"
+              [ngModel]="verifyScaleToModel() | async"
+              (ngModelChange)="selectedScaleToModel$.next($event)"
+              optionLabel="datasetModel.selectedDataset.pretty_name"
+              [style]="{ width: '100%' }"
+            >
+              <ng-template let-item pTemplate="item">
+                <div
+                  (mouseover)="onHoverOverDataset(item, true)"
+                  (mouseleave)="onHoverOverDataset(item, false)"
+                  (mouseup)="onHoverOverDataset(item, false)"
+                >
+                  <span>
+                    {{ item.datasetModel.selectedDataset?.pretty_name }} ({{
+                      item.datasetModel.selectedVersion?.pretty_name
+                    }})
+                  </span>
+                </div>
+              </ng-template>
+              <ng-template let-item pTemplate="selectedItem">
+                <div>
+                  <span
+                    >{{ item.datasetModel.selectedDataset?.pretty_name }} ({{
+                      item.datasetModel.selectedVersion?.pretty_name
+                    }})</span
+                  >
+                </div>
+              </ng-template>
+            </p-select>
+            <label for="scalingReferenceSelector"
+              >Select scaling reference</label
+            >
+          </p-floatLabel>
+        </div>
       </div>
-    </div>
+    }
   </div>
 </p-panel>

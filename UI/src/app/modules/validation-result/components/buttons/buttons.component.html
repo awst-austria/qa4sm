@@ -1,34 +1,41 @@
 <!--Buttons shown on the validation list page (both custom and published)-->
-<div *ngIf="validationList" class="btn-bar flex align-items-center" style="max-width: 25rem">
-  <!--  this one will be shown on custom validation page only due to given conditions-->
-  <button *ngIf="validationRun.progress > -1 && validationRun.progress < 100 && validationRun.end_time === null"
-          pButton
-          title="cancel-validation"
-          type="button"
-          icon="faIcons.faStop"
-          class="btn-action"
-          pTooltip="Cancel validation"
-          [life]="globals.tooltipLifetime"
-          (click)="stopValidation(validationRun.id)">
-    <span><fa-icon [icon]="faIcons.faStop"></fa-icon></span>
-  </button>
-  <!--  both pages -->
-<button
+@if (validationList) {
+  <div class="btn-bar flex align-items-center" style="max-width: 25rem">
+    <!--  this one will be shown on custom validation page only due to given conditions-->
+    @if (
+      validationRun.progress > -1 &&
+      validationRun.progress < 100 &&
+      validationRun.end_time === null
+    ) {
+      <button
         pButton
+        title="cancel-validation"
         type="button"
+        icon="faIcons.faStop"
         class="btn-action"
-        title="see-results"
-        icon="pi pi-folder-open"
-        pTooltip="View results"
+        pTooltip="Cancel validation"
         [life]="globals.tooltipLifetime"
-        (click)="router.navigate(['/validation-result', validationRun.id])">
-        </button>
-
-  <!--custom validations only-->
-  <span *ngIf="validationRun.end_time && validationRun.is_unpublished && isOwner"
-        [ngClass]="{'collapse': validationRun.publishing_in_progress}">
-
-    <button *ngIf="isArchived()"
+        (click)="stopValidation(validationRun.id)"
+      >
+        <span><fa-icon [icon]="faIcons.faStop"></fa-icon></span>
+      </button>
+    }
+    <!--  both pages -->
+    <button
+      pButton
+      type="button"
+      class="btn-action"
+      title="see-results"
+      icon="pi pi-folder-open"
+      pTooltip="View results"
+      [life]="globals.tooltipLifetime"
+      (click)="router.navigate(['/validation-result', validationRun.id])"
+    ></button>
+    <!--custom validations only-->
+    @if (validationRun.end_time && validationRun.is_unpublished && isOwner) {
+      <span [ngClass]="{ collapse: validationRun.publishing_in_progress }">
+        @if (isArchived()) {
+          <button
             pButton
             type="button"
             title="unarchive"
@@ -36,10 +43,11 @@
             pTooltip="Un-archive"
             [life]="globals.tooltipLifetime"
             class="btn-action"
-            (click)="archiveResults(validationRun.id, false)">
-    </button>
-
-    <button *ngIf="!isArchived()"
+            (click)="archiveResults(validationRun.id, false)"
+          ></button>
+        }
+        @if (!isArchived()) {
+          <button
             pButton
             type="button"
             title="archive"
@@ -47,86 +55,120 @@
             pTooltip="Archive"
             [life]="globals.tooltipLifetime"
             class="btn-action"
-            (click)="archiveResults(validationRun.id, true)">
-      <span><fa-icon [icon]="faIcons.faArchive"></fa-icon></span>
-    </button>
-
-  </span>
-
-  <div *ngIf="!published && !tracked" class="dropdown">
-    <button class="dropdownbutton" aria-label="collapse" title="dropdown">
-      <span class="pi pi-angle-double-right"></span>
-    </button>
-    <div class="dropdown-content" style="text-align: left">
-      <div *ngIf="validationRun.output_file">
-        <button pButton
+            (click)="archiveResults(validationRun.id, true)"
+          >
+            <span><fa-icon [icon]="faIcons.faArchive"></fa-icon></span>
+          </button>
+        }
+      </span>
+    }
+    @if (!published && !tracked) {
+      <div class="dropdown">
+        <button class="dropdownbutton" aria-label="collapse" title="dropdown">
+          <span class="pi pi-angle-double-right"></span>
+        </button>
+        <div class="dropdown-content" style="text-align: left">
+          @if (validationRun.output_file) {
+            <div>
+              <button
+                pButton
                 type="button"
                 class="dropdown-item"
                 icon="pi pi-download"
                 label="Download Graphs"
-                (click)="downloadResultFile(validationRun.id, 'graphics',validationRun.id + '_graphs.zip')"
+                (click)="
+                  downloadResultFile(
+                    validationRun.id,
+                    'graphics',
+                    validationRun.id + '_graphs.zip'
+                  )
+                "
                 pTooltip="Download graphs as a .zip file"
-                [life]="globals.tooltipLifetime">
-        </button>
-        <button pButton
+                [life]="globals.tooltipLifetime"
+              ></button>
+              <button
+                pButton
                 type="button"
                 class="dropdown-item"
                 label="Download NetCDF File"
-                (click)="downloadResultFile(validationRun.id, 'netCDF', validationRun.output_file_name)"
+                (click)="
+                  downloadResultFile(
+                    validationRun.id,
+                    'netCDF',
+                    validationRun.output_file_name
+                  )
+                "
                 pTooltip="Download validation run results as a .nc file"
-                [life]="globals.tooltipLifetime">
-          <span style="margin-right: 0.5rem; margin-left: 0.2rem"><fa-icon [icon]="faIcons.faFileDownload"></fa-icon></span>
-        </button>
-      </div>
-      <button *ngIf="canBeRerun"
+                [life]="globals.tooltipLifetime"
+              >
+                <span style="margin-right: 0.5rem; margin-left: 0.2rem"
+                  ><fa-icon [icon]="faIcons.faFileDownload"></fa-icon
+                ></span>
+              </button>
+            </div>
+          }
+          @if (canBeRerun) {
+            <button
               pButton
               routerLink="/validate/"
               class="dropdown-item"
-              [queryParams]="{validation_id: validationRun.id}"
+              [queryParams]="{ validation_id: validationRun.id }"
               pTooltip="Loading settings will redirect you to the validate page"
               [life]="globals.tooltipLifetime"
               label="Load Validation Settings"
-              icon="pi pi-replay">
-      </button>
-      <span *ngIf="validationRun.is_unpublished"
-            [ngClass]="{'collapse': validationRun.publishing_in_progress}">
-        <button *ngIf="!isArchived()"
-                pButton
-                type="button"
-                class="dropdown-item"
-                pTooltip="Remove this validation run"
-                [life]="globals.tooltipLifetime"
-                label="Delete Validation Run"
-                icon="pi pi-times"
-                (click)=deleteValidation(validationRun.id)>
-        </button>
-        <button *ngIf="!isArchived()"
-                pButton
-                type="button"
-                label="Extend Life Span"
-                icon="pi pi-calendar-plus"
-                class="dropdown-item"
-                pTooltip="Extend lifespan of this validation run"
-                [life]="globals.tooltipLifetime"
-
-                (click)=extendResults(validationRun.id)>
-        </button>
-      </span>
-    </div>
-  </div>
-  <!--published validations page only-->
-  <span *ngIf="published">
-    <button *ngIf="isLogged && canBeRerun"
+              icon="pi pi-replay"
+            ></button>
+          }
+          @if (validationRun.is_unpublished) {
+            <span
+              [ngClass]="{ collapse: validationRun.publishing_in_progress }"
+            >
+              @if (!isArchived()) {
+                <button
+                  pButton
+                  type="button"
+                  class="dropdown-item"
+                  pTooltip="Remove this validation run"
+                  [life]="globals.tooltipLifetime"
+                  label="Delete Validation Run"
+                  icon="pi pi-times"
+                  (click)="deleteValidation(validationRun.id)"
+                ></button>
+              }
+              @if (!isArchived()) {
+                <button
+                  pButton
+                  type="button"
+                  label="Extend Life Span"
+                  icon="pi pi-calendar-plus"
+                  class="dropdown-item"
+                  pTooltip="Extend lifespan of this validation run"
+                  [life]="globals.tooltipLifetime"
+                  (click)="extendResults(validationRun.id)"
+                ></button>
+              }
+            </span>
+          }
+        </div>
+      </div>
+    }
+    <!--published validations page only-->
+    @if (published) {
+      <span>
+        @if (isLogged && canBeRerun) {
+          <button
             pButton
             routerLink="/validate/"
             class="btn-action"
-            [queryParams]="{validation_id: validationRun.id}"
+            [queryParams]="{ validation_id: validationRun.id }"
             pTooltip="Loading settings will redirect you to the validate page"
             [life]="globals.tooltipLifetime"
             title="reload-settings"
-            icon="pi pi-replay">
-      </button>
-    <button *ngIf="isLogged && (isTrackedByTheUser())"
+            icon="pi pi-replay"
+          ></button>
+        }
+        @if (isLogged && isTrackedByTheUser()) {
+          <button
             pButton
             title="unpin"
             type="button"
@@ -134,9 +176,11 @@
             class="btn-action"
             pTooltip="Remove this validation from your list"
             [life]="globals.tooltipLifetime"
-            (click)="removeValidation(validationRun.id)">
-    </button>
-    <button *ngIf="isLogged && (!isTrackedByTheUser())"
+            (click)="removeValidation(validationRun.id)"
+          ></button>
+        }
+        @if (isLogged && !isTrackedByTheUser()) {
+          <button
             pButton
             title="pin-validation"
             type="button"
@@ -145,33 +189,50 @@
             pTooltip="Pin this validation. Pinning results gives a quick access to it."
             [life]="globals.tooltipLifetime"
             (click)="addValidation(validationRun.id)"
-            onclick="">
-    </button>
-  </span>
-
-
-  <!--  tracked validations on custom validations page-->
-  <span *ngIf="validationRun.output_file && tracked">
-    <button pButton
-            type="button"
-            icon="pi pi-download"
-            class="btn-action"
-            title="download-graphics"
-            (click)="downloadResultFile(validationRun.id, 'graphics',validationRun.id + '_graphs.zip')"
-            pTooltip="Download graphs .zip"
-            [life]="globals.tooltipLifetime">
-    </button>
-    <button pButton
-            type="button"
-            title="download-result"
-            icon="faIcons.faFileDownload"
-            class="btn-action"
-            (click)="downloadResultFile(validationRun.id, 'netCDF', validationRun.output_file_name)"
-            pTooltip="Download validation run .nc file"
-            [life]="globals.tooltipLifetime">
-      <span><fa-icon [icon]="faIcons.faFileDownload"></fa-icon></span>
-    </button>
-    <button *ngIf="isLogged"
+            onclick=""
+          ></button>
+        }
+      </span>
+    }
+    <!--  tracked validations on custom validations page-->
+    @if (validationRun.output_file && tracked) {
+      <span>
+        <button
+          pButton
+          type="button"
+          icon="pi pi-download"
+          class="btn-action"
+          title="download-graphics"
+          (click)="
+            downloadResultFile(
+              validationRun.id,
+              'graphics',
+              validationRun.id + '_graphs.zip'
+            )
+          "
+          pTooltip="Download graphs .zip"
+          [life]="globals.tooltipLifetime"
+        ></button>
+        <button
+          pButton
+          type="button"
+          title="download-result"
+          icon="faIcons.faFileDownload"
+          class="btn-action"
+          (click)="
+            downloadResultFile(
+              validationRun.id,
+              'netCDF',
+              validationRun.output_file_name
+            )
+          "
+          pTooltip="Download validation run .nc file"
+          [life]="globals.tooltipLifetime"
+        >
+          <span><fa-icon [icon]="faIcons.faFileDownload"></fa-icon></span>
+        </button>
+        @if (isLogged) {
+          <button
             pButton
             title="unpin"
             type="button"
@@ -179,19 +240,28 @@
             class="btn-action"
             pTooltip="Remove this validation from your list"
             [life]="globals.tooltipLifetime"
-            (click)="removeValidation(validationRun.id)">
-    </button>
-  </span>
-
-</div>
+            (click)="removeValidation(validationRun.id)"
+          ></button>
+        }
+      </span>
+    }
+  </div>
+}
 
 <!--Buttons shown on the single validation page (both custom and published)-->
-<div *ngIf="!validationList" class="flex flex-column w-12 align-content-end flex-wrap" style="text-align: right;">
-  <div *ngIf="isOwner && validationRun.is_unpublished; else elseSingleValidation" style="float: right"
-       class="flex flex-row w-12 align-content-end justify-content-end flex-wrap gap-1"
-       [ngClass]="{'collapse': validationRun.publishing_in_progress}">
-
-    <button *ngIf="isArchived(); else elseIsArchived"
+@if (!validationList) {
+  <div
+    class="flex flex-column w-12 align-content-end flex-wrap"
+    style="text-align: right"
+  >
+    @if (isOwner && validationRun.is_unpublished) {
+      <div
+        style="float: right"
+        class="flex flex-row w-12 align-content-end justify-content-end flex-wrap gap-1"
+        [ngClass]="{ collapse: validationRun.publishing_in_progress }"
+      >
+        @if (isArchived()) {
+          <button
             pButton
             type="button"
             icon="pi pi-calendar"
@@ -199,40 +269,45 @@
             label="Un-archive"
             pTooltip="Un-archive"
             [life]="globals.tooltipLifetime"
-            (click)="archiveResults(validationRun.id, false)">
-    </button>
-
-    <ng-template #elseIsArchived>
-      <button pButton
-              type="button"
-              icon="pi pi-times"
-              class="btn-action-large"
-              pTooltip="Remove this validation run"
-              [life]="globals.tooltipLifetime"
-              label="Delete"
-              (click)="deleteValidation(validationRun.id)">
-      </button>
-      <button pButton
-              type="button"
-              icon="pi pi-calendar-plus"
-              class="btn-action-large"
-              label="Renew"
-              pTooltip="Extend lifespan of this validation run"
-              [life]="globals.tooltipLifetime"
-              (click)="extendResults(validationRun.id)">
-      </button>
-      <button pButton
-              type="button"
-              class="btn-action-large"
-              label="Archive"
-              pTooltip="Archived results are not removed automatically"
-              [life]="globals.tooltipLifetime"
-              (click)="archiveResults(validationRun.id, true)">
-        <span class="pr-2"><fa-icon [icon]="faIcons.faArchive"></fa-icon></span>
-      </button>
-    </ng-template>
-
-    <button *ngIf="validationRun.output_file && !validationRun.contains_user_data"
+            (click)="archiveResults(validationRun.id, false)"
+          ></button>
+        } @else {
+          <button
+            pButton
+            type="button"
+            icon="pi pi-times"
+            class="btn-action-large"
+            pTooltip="Remove this validation run"
+            [life]="globals.tooltipLifetime"
+            label="Delete"
+            (click)="deleteValidation(validationRun.id)"
+          ></button>
+          <button
+            pButton
+            type="button"
+            icon="pi pi-calendar-plus"
+            class="btn-action-large"
+            label="Renew"
+            pTooltip="Extend lifespan of this validation run"
+            [life]="globals.tooltipLifetime"
+            (click)="extendResults(validationRun.id)"
+          ></button>
+          <button
+            pButton
+            type="button"
+            class="btn-action-large"
+            label="Archive"
+            pTooltip="Archived results are not removed automatically"
+            [life]="globals.tooltipLifetime"
+            (click)="archiveResults(validationRun.id, true)"
+          >
+            <span class="pr-2"
+              ><fa-icon [icon]="faIcons.faArchive"></fa-icon
+            ></span>
+          </button>
+        }
+        @if (validationRun.output_file && !validationRun.contains_user_data) {
+          <button
             pButton
             type="button"
             icon="pi pi-book"
@@ -242,75 +317,94 @@
             [life]="globals.tooltipLifetime"
             data-toggle="modal"
             data-target="#publishDialog"
-            (click)="open()">
-    </button>
-
-    <a *ngIf="isLogged && canBeRerun"
-       pButton
-       type="button"
-       icon="pi pi-replay"
-       class="btn-action-large"
-       label="Load settings"
-       routerLink="/validate/"
-       [queryParams]="{validation_id: validationRun.id}"
-       pTooltip="Loading settings will redirect you to the validate page"
-       [life]="globals.tooltipLifetime">
-    </a>
+            (click)="open()"
+          ></button>
+        }
+        @if (isLogged && canBeRerun) {
+          <a
+            pButton
+            type="button"
+            icon="pi pi-replay"
+            class="btn-action-large"
+            label="Load settings"
+            routerLink="/validate/"
+            [queryParams]="{ validation_id: validationRun.id }"
+            pTooltip="Loading settings will redirect you to the validate page"
+            [life]="globals.tooltipLifetime"
+          >
+          </a>
+        }
+      </div>
+    } @else {
+      <div style="float: right">
+        @if (
+          isLogged &&
+          validationRun.is_unpublished &&
+          !validationRun.contains_user_data
+        ) {
+          <button
+            pButton
+            type="button"
+            icon="pi pi-copy"
+            class="btn-action-large"
+            pTooltip="If you copy this validation, it will be added to the list of your validations with all the result files. You will have a full control over the copy."
+            [life]="globals.tooltipLifetime"
+            label="Copy validation"
+            (click)="copy(validationRun.id)"
+          ></button>
+        }
+        @if (validationRun.contains_user_data) {
+          <em style="color: orangered"
+            >You can not copy nor reload this validation, because it contains
+            data belonging to another user.</em
+          >
+        }
+        <!--      <p-tooltip [disabled]="!buttonEnabled" [tooltipPosition]="'top'" [content]="'Button is disabled'">-->
+        <!--        <button pButton type="button" label="Button" [disabled]="!buttonEnabled"></button>-->
+        <!--      </p-tooltip>-->
+        @if (isLogged && !validationRun.contains_user_data && canBeRerun) {
+          <a
+            pButton
+            type="button"
+            icon="pi pi-replay"
+            class="btn-action-large"
+            label="Load settings"
+            routerLink="/validate/"
+            [queryParams]="{ validation_id: validationRun.id }"
+            pTooltip="Load settings"
+            [life]="globals.tooltipLifetime"
+          >
+          </a>
+        }
+        @if (
+          isLogged && isTrackedByTheUser() && !validationRun.is_unpublished
+        ) {
+          <button
+            pButton
+            type="button"
+            icon="pi pi-times"
+            class="btn-action-large"
+            label="Unpin validation"
+            pTooltip="Remove this validation from your list"
+            [life]="globals.tooltipLifetime"
+            (click)="removeValidation(validationRun.id)"
+          ></button>
+        }
+        @if (
+          isLogged && !isTrackedByTheUser() && !validationRun.is_unpublished
+        ) {
+          <button
+            class="btn-action-large"
+            pButton
+            type="button"
+            icon="pi pi-plus"
+            label="Pin validation"
+            pTooltip="Pinning results gives a quick access to it."
+            [life]="globals.tooltipLifetime"
+            (click)="addValidation(validationRun.id)"
+          ></button>
+        }
+      </div>
+    }
   </div>
-
-
-  <ng-template #elseSingleValidation>
-    <div style="float: right;">
-      <button *ngIf="isLogged && validationRun.is_unpublished && !validationRun.contains_user_data" pButton
-              type="button"
-              icon="pi pi-copy"
-              class="btn-action-large"
-              pTooltip="If you copy this validation, it will be added to the list of your validations with all the result files. You will have a full control over the copy."
-              [life]="globals.tooltipLifetime"
-              label="Copy validation"
-              (click)="copy(validationRun.id)">
-      </button>
-      <em style="color: orangered" *ngIf="validationRun.contains_user_data">You can not copy nor reload this validation, because it contains data belonging to another user.</em>
-
-
-<!--      <p-tooltip [disabled]="!buttonEnabled" [tooltipPosition]="'top'" [content]="'Button is disabled'">-->
-<!--        <button pButton type="button" label="Button" [disabled]="!buttonEnabled"></button>-->
-<!--      </p-tooltip>-->
-
-      <a *ngIf="isLogged && !validationRun.contains_user_data && canBeRerun"
-         pButton
-         type="button"
-         icon="pi pi-replay"
-         class="btn-action-large"
-         label="Load settings"
-         routerLink="/validate/"
-         [queryParams]="{validation_id: validationRun.id}"
-         pTooltip="Load settings"
-         [life]="globals.tooltipLifetime">
-      </a>
-
-      <button *ngIf="isLogged && (isTrackedByTheUser()) && !validationRun.is_unpublished"
-              pButton
-              type="button"
-              icon="pi pi-times"
-              class="btn-action-large"
-              label="Unpin validation"
-              pTooltip="Remove this validation from your list"
-              [life]="globals.tooltipLifetime"
-              (click)="removeValidation(validationRun.id)">
-      </button>
-
-      <button *ngIf="isLogged && (!isTrackedByTheUser())&& !validationRun.is_unpublished"
-              class="btn-action-large"
-              pButton
-              type="button"
-              icon="pi pi-plus"
-              label="Pin validation"
-              pTooltip="Pinning results gives a quick access to it."
-              [life]="globals.tooltipLifetime"
-              (click)="addValidation(validationRun.id)">
-      </button>
-
-    </div>
-  </ng-template>
-</div>
+}

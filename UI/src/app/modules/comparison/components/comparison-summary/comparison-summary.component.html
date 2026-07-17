@@ -1,36 +1,54 @@
-<div *ngIf="this.valResModels.length > 0" class="flex">
-  <!--  use different if condition-->
-  <div class="w-12 py-2">
-    <p-panel [toggleable]="true" [collapsed]="true" class="validation-row">
-      <ng-template pTemplate="header">
-        <div class="text-center my-1" style="width: 92%">
-          <p class="my-0 font-weight-normal">Comparison summary</p>
-        </div>
-      </ng-template>
-      <ng-template pTemplate="icons">
-        <label class="mb-0 p-panel-header-icon "
-               pTooltip="Expand this section to inspect a table with the metric-wise difference of the two datasets."
-               tooltipPosition="bottom">
-          <span class="pi pi-question-circle help-icon"></span>
-        </label>
-      </ng-template>
-      <!--  description of the comparison-->
-      <table id="comparison_table{% if {{isSingle}} %}_single{% else %}_double{% endif %}"
-             class="table">
-        <tbody>
-        <tr>
-          <td *ngFor="let validationModel of valResModels" class="py-0 px-0">
-            <qa-validation-summary *ngIf="validationModel.validationRun$|async as valRun" [validationModel]="validationModel" [validationRun]="valRun" [forComparison]="true"/>
-          </td>
-        </tr>
-        <div *ngIf="noSummaryError()">
-          <p class="lead text-muted">
-            We could not generate a summary. Please try again later or <a routerLink="/contact-us"> contact </a> our support
-            team.
-          </p>
-        </div>
-        </tbody>
-      </table>
-    </p-panel>
+@if (this.valResModels.length > 0) {
+  <div class="flex">
+    <!--  use different if condition-->
+    <div class="w-12 py-2">
+      <p-panel [toggleable]="true" [collapsed]="true" class="validation-row">
+        <ng-template pTemplate="header">
+          <div class="text-center my-1" style="width: 92%">
+            <p class="my-0 font-weight-normal">Comparison summary</p>
+          </div>
+        </ng-template>
+        <ng-template pTemplate="icons">
+          <label
+            class="mb-0 p-panel-header-icon"
+            pTooltip="Expand this section to inspect a table with the metric-wise difference of the two datasets."
+            tooltipPosition="bottom"
+          >
+            <span class="pi pi-question-circle help-icon"></span>
+          </label>
+        </ng-template>
+        <!--  description of the comparison-->
+        <table
+          id="comparison_table{% if {{
+            isSingle
+          }} %}_single{% else %}_double{% endif %}"
+          class="table"
+        >
+          <tbody>
+            <tr>
+              @for (validationModel of valResModels; track validationModel) {
+                <td class="py-0 px-0">
+                  @if (validationModel.validationRun$ | async; as valRun) {
+                    <qa-validation-summary
+                      [validationModel]="validationModel"
+                      [validationRun]="valRun"
+                      [forComparison]="true"
+                    />
+                  }
+                </td>
+              }
+            </tr>
+            @if (noSummaryError()) {
+              <div>
+                <p class="lead text-muted">
+                  We could not generate a summary. Please try again later or
+                  <a routerLink="/contact-us"> contact </a> our support team.
+                </p>
+              </div>
+            }
+          </tbody>
+        </table>
+      </p-panel>
+    </div>
   </div>
-</div>
+}

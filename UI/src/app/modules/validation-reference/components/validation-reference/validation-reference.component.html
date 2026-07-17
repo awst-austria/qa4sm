@@ -2,38 +2,67 @@
   <div class="col" style="max-width: 100%">
     @if (selectionModel$ | async) {
       <p-floatLabel>
-        <p-select [inputId]="'datasetSelector_'+ referenceType"
-                (onChange)="onDatasetChange()"
-                [options]="verifyOptions()|async"
-                [ngModel]="verifyChosenValue()|async"
-                (ngModelChange)="selectionModel$.next($event)"
-                optionLabel="datasetModel.selectedDataset.pretty_name"
-                [style]="{'width': '100%', 'max-width': '100%'}">
-
+        <p-select
+          [inputId]="'datasetSelector_' + referenceType"
+          (onChange)="onDatasetChange()"
+          [options]="verifyOptions() | async"
+          [ngModel]="verifyChosenValue() | async"
+          (ngModelChange)="selectionModel$.next($event)"
+          optionLabel="datasetModel.selectedDataset.pretty_name"
+          [style]="{ width: '100%', 'max-width': '100%' }"
+        >
           <ng-template let-item pTemplate="item">
-            <div (mouseover)="onHoverOverDataset(item, true)"
-             (mouseleave)="onHoverOverDataset(item, false)"
-             (mouseup)="onHoverOverDataset(item, false)">
+            <div
+              (mouseover)="onHoverOverDataset(item, true)"
+              (mouseleave)="onHoverOverDataset(item, false)"
+              (mouseup)="onHoverOverDataset(item, false)"
+            >
               <span>
-                {{item.datasetModel.selectedDataset?.pretty_name}} ({{item.datasetModel.selectedVersion?.pretty_name}})
+                {{ item.datasetModel.selectedDataset?.pretty_name }} ({{
+                  item.datasetModel.selectedVersion?.pretty_name
+                }})
               </span>
-              <em *ngIf="referenceType==='temporalReference$' && item.datasetModel.selectedDataset?.pretty_name === 'ISMN'"> (Not recommended)</em>
-              <em *ngIf="referenceType==='spatialReference$' && item.datasetModel.selectedDataset?.user"> (Not recommended)</em>
+              @if (
+                referenceType === "temporalReference$" &&
+                item.datasetModel.selectedDataset?.pretty_name === "ISMN"
+              ) {
+                <em> (Not recommended)</em>
+              }
+              @if (
+                referenceType === "spatialReference$" &&
+                item.datasetModel.selectedDataset?.user
+              ) {
+                <em> (Not recommended)</em>
+              }
             </div>
           </ng-template>
 
           <ng-template let-item pTemplate="selectedItem">
             <div>
-              <span>{{item.datasetModel.selectedDataset?.pretty_name}} ({{item.datasetModel.selectedVersion?.pretty_name}})</span>
-              <em *ngIf="referenceType==='temporalReference$' && item.datasetModel.selectedDataset?.pretty_name === 'ISMN'"> (Not recommended)</em>
-              <em *ngIf="referenceType==='spatialReference$' && item.datasetModel.selectedDataset?.user"> (Not recommended)</em>
+              <span
+                >{{ item.datasetModel.selectedDataset?.pretty_name }} ({{
+                  item.datasetModel.selectedVersion?.pretty_name
+                }})</span
+              >
+              @if (
+                referenceType === "temporalReference$" &&
+                item.datasetModel.selectedDataset?.pretty_name === "ISMN"
+              ) {
+                <em> (Not recommended)</em>
+              }
+              @if (
+                referenceType === "spatialReference$" &&
+                item.datasetModel.selectedDataset?.user
+              ) {
+                <em> (Not recommended)</em>
+              }
             </div>
           </ng-template>
-
         </p-select>
-        <label for="{{'datasetSelector_'+ referenceType}}">Select dataset (version)</label>
+        <label for="{{ 'datasetSelector_' + referenceType }}"
+          >Select dataset (version)</label
+        >
       </p-floatLabel>
     }
   </div>
 </div>
-

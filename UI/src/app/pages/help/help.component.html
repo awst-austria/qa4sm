@@ -1,13 +1,11 @@
 <div class="help-shell">
-
   <!-- ── Sidebar ── -->
   <nav class="help-sidebar" aria-label="Help sections">
     <p class="sidebar-label">Help</p>
 
-    <ng-container *ngFor="let item of navItems">
-
+    @for (item of navItems; track item) {
       <!-- ── Group header ── -->
-      <ng-container *ngIf="item.isGroup; else leafItem">
+      @if (item.isGroup) {
         <button
           class="nav-item nav-group"
           [class.active]="isGroupActive(item)"
@@ -23,24 +21,23 @@
             aria-hidden="true"
           ></i>
         </button>
-
         <!-- ── Children ── -->
-        <div class="nav-children" *ngIf="item.expanded">
-          <button
-            *ngFor="let child of item.children"
-            class="nav-item nav-child"
-            [class.active]="isActive(child.id)"
-            (click)="setSection(child.id)"
-            [attr.aria-current]="isActive(child.id) ? 'page' : null"
-          >
-            <i [class]="child.icon" aria-hidden="true"></i>
-            <span>{{ child.label }}</span>
-          </button>
-        </div>
-      </ng-container>
-
-      <!-- ── Normal leaf item ── -->
-      <ng-template #leafItem>
+        @if (item.expanded) {
+          <div class="nav-children">
+            @for (child of item.children; track child) {
+              <button
+                class="nav-item nav-child"
+                [class.active]="isActive(child.id)"
+                (click)="setSection(child.id)"
+                [attr.aria-current]="isActive(child.id) ? 'page' : null"
+              >
+                <i [class]="child.icon" aria-hidden="true"></i>
+                <span>{{ child.label }}</span>
+              </button>
+            }
+          </div>
+        }
+      } @else {
         <button
           class="nav-item"
           [class.active]="isActive(item.id)"
@@ -50,9 +47,9 @@
           <i [class]="item.icon" aria-hidden="true"></i>
           <span>{{ item.label }}</span>
         </button>
-      </ng-template>
-
-    </ng-container>
+      }
+      <!-- ── Normal leaf item ── -->
+    }
 
     <div class="sidebar-divider"></div>
 
@@ -65,1096 +62,1277 @@
   <!-- ── Main content ── -->
   <main class="help-content">
     <!-- ════════════════════════════════════════
-         HOME
+    HOME
     ════════════════════════════════════════ -->
-    <section *ngIf="isActive('home')">
-      <h1>Welcome to QA4SM Help</h1>   
-      <p>
-        QA4SM is a free online service for validating satellite soil moisture data
-        against ground-station observations and model references.
-      </p>
-
-      <div class="info-box">
-        This help section walks you through every part of the platform — from
-        running your first validation to interpreting, sharing, and publishing
-        your results.
-      </div>
-
-      <h2>What you'll find here</h2>
-      <p class="mb-2">
-        Use the menu on the left to explore each topic. Here's a short overview of
-        what each section covers:
-      </p>
-
-      <ul class="check-list">
-        <li>
-          <span>
-            <strong>Validate</strong> — how to set up and run a validation step by
-            step: choosing datasets, applying filters, setting the reference, and
-            configuring scaling and metrics.
-          </span>
-        </li>
-        <li>
-          <span>
-            <strong>Results</strong> — where to find your validations and open published validations from other users.
-          </span>
-        </li>
-        <li>
-          <span>
-            <strong>Dataset upload</strong> — how to upload your own datasets and
-            use them in validations alongside the platform datasets.
-          </span>
-        </li>
-        <li>
-          <span>
-            <strong>Compare Validations</strong> — how to compare two validations side by
-            side, or two datasets within a single validation.
-          </span>
-        </li>
-        <li>
-          <span>
-            <strong>Public API</strong> — how to run validations from the command line
-            or your own scripts: submitting jobs, tracking progress, and downloading
-            results using your personal API token
-          </span>
-        </li>
+    @if (isActive("home")) {
+      <section>
+        <h1>Welcome to QA4SM Help</h1>
+        <p>
+          QA4SM is a free online service for validating satellite soil moisture
+          data against ground-station observations and model references.
+        </p>
+        <div class="info-box">
+          This help section walks you through every part of the platform — from
+          running your first validation to interpreting, sharing, and publishing
+          your results.
+        </div>
+        <h2>What you'll find here</h2>
+        <p class="mb-2">
+          Use the menu on the left to explore each topic. Here's a short
+          overview of what each section covers:
+        </p>
+        <ul class="check-list">
           <li>
-          <span>
-            <strong>Info</strong> — help, terms of use, datasets details, and other reference material.
-          </span>
-        </li>
-        <li>
-      </ul>
-    </section>
+            <span>
+              <strong>Validate</strong> — how to set up and run a validation
+              step by step: choosing datasets, applying filters, setting the
+              reference, and configuring scaling and metrics.
+            </span>
+          </li>
+          <li>
+            <span>
+              <strong>Results</strong> — where to find your validations and open
+              published validations from other users.
+            </span>
+          </li>
+          <li>
+            <span>
+              <strong>Dataset upload</strong> — how to upload your own datasets
+              and use them in validations alongside the platform datasets.
+            </span>
+          </li>
+          <li>
+            <span>
+              <strong>Compare Validations</strong> — how to compare two
+              validations side by side, or two datasets within a single
+              validation.
+            </span>
+          </li>
+          <li>
+            <span>
+              <strong>Public API</strong> — how to run validations from the
+              command line or your own scripts: submitting jobs, tracking
+              progress, and downloading results using your personal API token
+            </span>
+          </li>
+          <li>
+            <span>
+              <strong>Info</strong> — help, terms of use, datasets details, and
+              other reference material.
+            </span>
+          </li>
+          <li></li>
+        </ul>
+      </section>
+    }
 
     <!-- ════════════════════════════════════════
-         VALIDATE PAGE
-    ════════════════════════════════════════ -->
-    <section *ngIf="isActive('validate')">
-      <h1 >Validate page</h1>
-      <p class="panel-sub">How to configure and run a soil moisture validation
-        on the <a routerLink="/validate" target="_blank"><i class="pi pi-wrench mr-1" aria-hidden="true"></i>Validate</a> page?
-      </p>
-
-      <div class="step-list">
-
-        <div class="step">
-          <span class="step-num">1</span>
-          <div class="step-body">
-            <h3>Choose datasets</h3>
-            <p>
-              Select dataset name, version, and soil moisture variable. <br>
-              At least two datasets are needed — one will be used as the reference. <br>
-              All supported datasets are listed on the
-              <a routerLink="/datasets" target="_blank">datasets page</a>.
-            </p>
-            <p-panel header="Datasets" [toggleable]="false" class="example-panel">
-              <p class="example-line">
-                <strong>C3S COMBINED</strong> / v202505 / soil moisture 
-                <span class="example-tag">(spatialreference)</span>
+      VALIDATE PAGE
+      ════════════════════════════════════════ -->
+    @if (isActive("validate")) {
+      <section>
+        <h1>Validate page</h1>
+        <p class="panel-sub">
+          How to configure and run a soil moisture validation on the
+          <a routerLink="/validate" target="_blank"
+            ><i class="pi pi-wrench mr-1" aria-hidden="true"></i>Validate</a
+          >
+          page?
+        </p>
+        <div class="step-list">
+          <div class="step">
+            <span class="step-num">1</span>
+            <div class="step-body">
+              <h3>Choose datasets</h3>
+              <p>
+                Select dataset name, version, and soil moisture variable. <br />
+                At least two datasets are needed — one will be used as the
+                reference. <br />
+                All supported datasets are listed on the
+                <a routerLink="/datasets" target="_blank">datasets page</a>.
               </p>
-              <p class="example-line">
-                <strong>ESA CCI SM combined</strong> / v09.2 / soil moisture
-                <span class="example-tag">(temporal reference)</span>
-              </p>
-            </p-panel>
-          </div>
-        </div>
-
-        <div class="step">
-          <span class="step-num">2</span>
-          <div class="step-body">
-            <h3>Filter datasets</h3>
-            <p>
-              Filters narrow the data used in the validation. The available filters
-              depend on the chosen dataset — hover over the
-              <i class="pi pi-question-circle" aria-hidden="true"></i> next to each
-              filter for an explanation.
-            </p>
-            <p>Common filter types:</p>
-            <ul class="check-list">
-                <li>
-                  <i class="pi pi-check-square" aria-hidden="true"></i>
-                  <strong>Variable in valid geophysical range</strong> — removes NaNs and invalid values; available for nearly every dataset.
-                </li>
-                <li>
-                  <i class="pi pi-check-square" aria-hidden="true"></i>
-                  <strong>Ascending / descending mode only</strong> — keeps observations from one satellite overpass direction.
-                </li>
-                <li>
-                  <i class="pi pi-check-square" aria-hidden="true"></i>
-                  <strong>Soil not frozen</strong> — masks values where soil temperature indicates frozen conditions (e.g. ERA5, GLDAS).
-                </li>
-                <li>
-                  <i class="pi pi-check-square" aria-hidden="true"></i>
-                  <strong>Threshold filters</strong> — some datasets (SMAP, SMOS, ASCAT) let you set a numeric cut-off, such as a vegetation-water-content or RFI-probability threshold.
-                </li>
-            </ul>
-            <div class="info-box">
-              Some datasets have <strong>mandatory filters</strong> that cannot be
-              switched off — for example, ISMN requires a depth selection and a network
-              selection, and SMOS L3 requires its topography and RFI filters.
+              <p-panel
+                header="Datasets"
+                [toggleable]="false"
+                class="example-panel"
+              >
+                <p class="example-line">
+                  <strong>C3S COMBINED</strong> / v202505 / soil moisture
+                  <span class="example-tag">(spatialreference)</span>
+                </p>
+                <p class="example-line">
+                  <strong>ESA CCI SM combined</strong> / v09.2 / soil moisture
+                  <span class="example-tag">(temporal reference)</span>
+                </p>
+              </p-panel>
             </div>
           </div>
-        </div>
-
-        <div class="step">
-          <span class="step-num">3</span>
-          <div class="step-body">
-            <h3>ISMN networks &amp; depth</h3>
-            <p>
-              When the International Soil Moisture Network (ISMN) is part of your
-              validation, two filters must be configured.
-            </p>
-            <ul class="check-list">
-                <li>
-                  <i class="pi pi-check-square" aria-hidden="true"></i>
-                  <strong>Select Network(s)</strong> — choose which ISMN networks to
-                  include in the validation.
-                </li>
-                <li>
-                  <i class="pi pi-check-square" aria-hidden="true"></i>
-                  <strong>Select Measurement depth</strong> — choose the soil moisture measurement depth.
-                  Values are entered in metres (e.g. 0.0–0.05 for surface sensors). Only
-                  sensors within the selected range are included.
-                </li>
-            </ul>
-            <div class="info-box">
-              <strong>Both filters are mandatory.</strong> If no network is selected,
-              the validation returns no result. Note also that sensors below 10&nbsp;cm
-              depth are always classified as <em>not representative</em> under the
-              FRM4SM standard.
-            </div>
-          </div>
-        </div>
-
-        <div class="step">
-          <span class="step-num">4</span>
-          <div class="step-body">
-            <h3>Add more datasets (optional)</h3>
-            <p>
-              Click <strong>Add dataset</strong> to add another product. Each dataset is
-              configured in its own panel.
-            </p>
-            <div>
+          <div class="step">
+            <span class="step-num">2</span>
+            <div class="step-body">
+              <h3>Filter datasets</h3>
+              <p>
+                Filters narrow the data used in the validation. The available
+                filters depend on the chosen dataset — hover over the
+                <i class="pi pi-question-circle" aria-hidden="true"></i> next to
+                each filter for an explanation.
+              </p>
+              <p>Common filter types:</p>
               <ul class="check-list">
-                <li><strong>Minimum 2</strong> — one dataset to validate plus one reference.</li>
-                <li><strong>Up to 6</strong> — additional datasets can be compared against the common reference (intercomparison).</li>
-                <li><strong>3 or more</strong> — unlocks Triple Collocation Analysis (see step 9).</li>
+                <li>
+                  <i class="pi pi-check-square" aria-hidden="true"></i>
+                  <strong>Variable in valid geophysical range</strong> — removes
+                  NaNs and invalid values; available for nearly every dataset.
+                </li>
+                <li>
+                  <i class="pi pi-check-square" aria-hidden="true"></i>
+                  <strong>Ascending / descending mode only</strong> — keeps
+                  observations from one satellite overpass direction.
+                </li>
+                <li>
+                  <i class="pi pi-check-square" aria-hidden="true"></i>
+                  <strong>Soil not frozen</strong> — masks values where soil
+                  temperature indicates frozen conditions (e.g. ERA5, GLDAS).
+                </li>
+                <li>
+                  <i class="pi pi-check-square" aria-hidden="true"></i>
+                  <strong>Threshold filters</strong> — some datasets (SMAP,
+                  SMOS, ASCAT) let you set a numeric cut-off, such as a
+                  vegetation-water-content or RFI-probability threshold.
+                </li>
+              </ul>
+              <div class="info-box">
+                Some datasets have <strong>mandatory filters</strong> that
+                cannot be switched off — for example, ISMN requires a depth
+                selection and a network selection, and SMOS L3 requires its
+                topography and RFI filters.
+              </div>
+            </div>
+          </div>
+          <div class="step">
+            <span class="step-num">3</span>
+            <div class="step-body">
+              <h3>ISMN networks &amp; depth</h3>
+              <p>
+                When the International Soil Moisture Network (ISMN) is part of
+                your validation, two filters must be configured.
+              </p>
+              <ul class="check-list">
+                <li>
+                  <i class="pi pi-check-square" aria-hidden="true"></i>
+                  <strong>Select Network(s)</strong> — choose which ISMN
+                  networks to include in the validation.
+                </li>
+                <li>
+                  <i class="pi pi-check-square" aria-hidden="true"></i>
+                  <strong>Select Measurement depth</strong> — choose the soil
+                  moisture measurement depth. Values are entered in metres (e.g.
+                  0.0–0.05 for surface sensors). Only sensors within the
+                  selected range are included.
+                </li>
+              </ul>
+              <div class="info-box">
+                <strong>Both filters are mandatory.</strong> If no network is
+                selected, the validation returns no result. Note also that
+                sensors below 10&nbsp;cm depth are always classified as
+                <em>not representative</em> under the FRM4SM standard.
+              </div>
+            </div>
+          </div>
+          <div class="step">
+            <span class="step-num">4</span>
+            <div class="step-body">
+              <h3>Add more datasets (optional)</h3>
+              <p>
+                Click <strong>Add dataset</strong> to add another product. Each
+                dataset is configured in its own panel.
+              </p>
+              <div>
+                <ul class="check-list">
+                  <li>
+                    <strong>Minimum 2</strong> — one dataset to validate plus
+                    one reference.
+                  </li>
+                  <li>
+                    <strong>Up to 6</strong> — additional datasets can be
+                    compared against the common reference (intercomparison).
+                  </li>
+                  <li>
+                    <strong>3 or more</strong> — unlocks Triple Collocation
+                    Analysis (see step 9).
+                  </li>
+                </ul>
+              </div>
+              <div class="info-box">
+                <strong>Intercomparison:</strong> validates several satellite
+                datasets against a common reference. Only timestamps shared by
+                all datasets are used, so metric differences reflect actual
+                performance — not differences in temporal coverage.
+              </div>
+            </div>
+          </div>
+          <div class="step">
+            <span class="step-num">5</span>
+            <div class="step-body">
+              <h3>Set reference dataset</h3>
+              <p>
+                Choose the spatial and temporal reference. If ISMN is in the
+                pool it is set automatically and cannot be changed.
+              </p>
+              <p-panel
+                header="Reference"
+                [toggleable]="false"
+                class="example-panel"
+              >
+                <div class="mb-2">
+                  <strong>Spatial Reference</strong>
+                  <p>ISMN (version)</p>
+                </div>
+                <div>
+                  <strong>Temporal Reference</strong>
+                  <p>C3S SM combined (version)</p>
+                </div>
+              </p-panel>
+              <p>
+                Set the temporal matching window (default 12 h, range 1–24 h).
+              </p>
+            </div>
+          </div>
+          <div class="step">
+            <span class="step-num">6</span>
+            <div class="step-body">
+              <h3>Scaling</h3>
+              <p>
+                Choose how values are scaled before metric calculation and
+                select the target dataset. When <strong>No scaling</strong> is
+                selected no scaling reference is needed.
+              </p>
+            </div>
+          </div>
+          <div class="step">
+            <span class="step-num">7</span>
+            <div class="step-body">
+              <h3>Spatial Subsetting</h3>
+              <p>
+                Define the geographical area to be validated. Enter a lat/lon
+                bounding box or draw an area directly on the map — only
+                locations inside this area are included in the validation. The
+                trash icon clears all four fields. Leave the fields blank to run
+                a global validation.
+              </p>
+            </div>
+          </div>
+          <div class="step">
+            <span class="step-num">8</span>
+            <div class="step-body">
+              <h3>Temporal Subsetting</h3>
+              <p>
+                Set a validation date range in <code>YYYY-MM-DD</code> format.
+                Leaving date fields empty prevents the validation from starting.
+              </p>
+            </div>
+          </div>
+          <div class="step">
+            <span class="step-num optional">9</span>
+            <div class="step-body">
+              <h3>Metrics</h3>
+              <p>
+                Choose which metrics QA4SM calculates and how the validation is
+                run. The defaults work for most validations — the extra options
+                below add more detailed analysis at the cost of longer runtimes.
+              </p>
+              <h4 style="margin: 0.8rem 0 0.3rem">Validation type</h4>
+              <p>
+                Sets how the two datasets are matched up before metrics are
+                calculated:
+              </p>
+              <ul class="check-list">
+                <li>
+                  <i class="pi pi-check-square" aria-hidden="true"></i>
+                  <span>
+                    <strong>Temporal</strong> — datasets are matched temporally
+                    at each location, so that observations acquired within the
+                    same temporal matching window are compared. Metrics are
+                    computed from the resulting time series, characterising the
+                    temporal agreement between the datasets. This is the
+                    standard validation mode for soil moisture products.
+                  </span>
+                </li>
+                <li>
+                  <i class="pi pi-check-square" aria-hidden="true"></i>
+                  <span>
+                    <strong>Spatial</strong> — datasets are compared across
+                    their spatial domain rather than along the time axis.
+                    Metrics quantify the agreement between the spatial patterns
+                    of the datasets, indicating how consistently they represent
+                    the geographical distribution of soil moisture.
+                  </span>
+                </li>
+              </ul>
+              <h4 style="margin: 0.9rem 0 0.3rem">Additional metrics</h4>
+              <ul class="check-list">
+                <li>
+                  <i class="pi pi-check-square" aria-hidden="true"></i>
+                  <span>
+                    <strong>Include Triple Collocation metrics</strong> —
+                    available when 3 or more datasets are selected. Triple
+                    Collocation (TC) estimates the error of each individual
+                    dataset by comparing all possible triples (the reference is
+                    always included).
+                  </span>
+                </li>
+                <li>
+                  <i class="pi pi-check-square" aria-hidden="true"></i>
+                  <span>
+                    <strong>Bootstrap TC confidence intervals</strong> — adds
+                    confidence intervals to the Triple Collocation metrics by
+                    repeating the calculation 1000 times.
+                    <em>Warning: very slow — up to 5× the normal runtime.</em>
+                  </span>
+                </li>
+                <li>
+                  <i class="pi pi-check-square" aria-hidden="true"></i>
+                  <span>
+                    <strong>Include Stability metrics</strong> — checks how
+                    consistent the agreement is over the full validation period,
+                    rather than giving a single overall number.
+                  </span>
+                </li>
+                <li>
+                  <i class="pi pi-check-square" aria-hidden="true"></i>
+                  <span>
+                    <strong>Include Intra-Annual metrics</strong> — breaks the
+                    results down within the year (e.g. by season or month), so
+                    you can see how performance changes across the seasons.
+                  </span>
+                </li>
+              </ul>
+              <div class="info-box warning">
+                The bootstrapping and additional metric options noticeably
+                increase runtime. Enable them only when you need that level of
+                detail.
+              </div>
+            </div>
+          </div>
+          <div class="step">
+            <span class="step-num">10</span>
+            <div class="step-body">
+              <h3>Anomaly calculation</h3>
+              <p>Choose a method from the <strong>Method</strong> drop-down:</p>
+              <ul>
+                <li>
+                  <strong>Do not calculate</strong> — use absolute values
+                  (default).
+                </li>
+                <li>
+                  <strong>35-day moving average</strong> — subtract the 35-day
+                  running mean.
+                </li>
+                <li>
+                  <strong>Climatology</strong> — subtract the per-day-of-year
+                  average over a specified period.
+                </li>
               </ul>
             </div>
-            <div class="info-box">
-              <strong>Intercomparison:</strong> validates several satellite datasets
-              against a common reference. Only timestamps shared by all datasets are
-              used, so metric differences reflect actual performance — not differences
-              in temporal coverage.
+          </div>
+          <div class="step">
+            <span class="step-num">11</span>
+            <div class="step-body">
+              <h3>Name your validation</h3>
+              <p>
+                Give the run a descriptive name to make it easier to identify in
+                your validations list.
+              </p>
+            </div>
+          </div>
+          <div class="step">
+            <span class="step-num">12</span>
+            <div class="step-body">
+              <h3>Run</h3>
+              <p>
+                Click <strong>Validate</strong>. You will receive an email with
+                a link to the results once the run is complete — you do not need
+                to keep the browser open.
+              </p>
             </div>
           </div>
         </div>
-
-        <div class="step">
-          <span class="step-num">5</span>
-          <div class="step-body">
-            <h3>Set reference dataset</h3>
-            <p>Choose the spatial and temporal reference. If ISMN is in the pool it is set automatically and cannot be changed.</p>
-            <p-panel header="Reference" [toggleable]="false" class="example-panel">
-              <div class="mb-2">
-                <strong>Spatial Reference</strong>  
-                <p>ISMN (version)</p>
-              </div>
-              <div>
-                <strong>Temporal Reference</strong>  
-                <p>C3S SM combined (version)</p>
-              </div>
-            </p-panel>
-            <p>Set the temporal matching window (default 12 h, range 1–24 h).</p>
-          </div>
-        </div>
-
-        <div class="step">
-          <span class="step-num">6</span>
-          <div class="step-body">
-            <h3>Scaling</h3>
-            <p>Choose how values are scaled before metric calculation and select the target dataset. When <strong>No scaling</strong> is selected no scaling reference is needed.</p>
-          </div>
-        </div>
-
-        <div class="step">
-          <span class="step-num">7</span>
-          <div class="step-body">
-            <h3>Spatial Subsetting</h3>
-            <p>
-              Define the geographical area to be validated. Enter a lat/lon bounding box
-              or draw an area directly on the map — only locations inside this area are
-              included in the validation. The trash icon clears all four fields. Leave the
-              fields blank to run a global validation.
-            </p>
-          </div>
-        </div>
-
-        <div class="step">
-          <span class="step-num">8</span>
-          <div class="step-body">
-            <h3>Temporal Subsetting</h3>
-            <p>Set a validation date range in <code>YYYY-MM-DD</code> format. Leaving date fields empty prevents the validation from starting.</p>
-          </div>
-        </div>
-
-        <div class="step">
-          <span class="step-num optional">9</span>
-          <div class="step-body">
-            <h3>Metrics</h3>
-            <p>
-              Choose which metrics QA4SM calculates and how the validation is run.
-              The defaults work for most validations — the extra options below add
-              more detailed analysis at the cost of longer runtimes.
-            </p>
-
-            <h4 style="margin: 0.8rem 0 0.3rem;">Validation type</h4>
-            <p>
-              Sets how the two datasets are matched up before metrics are calculated:
-            </p>
-            <ul class="check-list">
-              <li>
-                <i class="pi pi-check-square" aria-hidden="true"></i>
-                <span>
-                     <strong>Temporal</strong> — datasets are matched temporally at each
-                      location, so that observations acquired within the same temporal
-                      matching window are compared. Metrics are computed from the resulting
-                      time series, characterising the temporal agreement between the
-                      datasets. This is the standard validation mode for soil moisture
-                      products.
-                </span>
-              </li>
-              <li>
-                <i class="pi pi-check-square" aria-hidden="true"></i>
-                <span>
-                  <strong>Spatial</strong> — datasets are compared across their spatial
-                  domain rather than along the time axis. Metrics quantify the agreement
-                  between the spatial patterns of the datasets, indicating how
-                  consistently they represent the geographical distribution of soil
-                  moisture.
-                </span>
-              </li>
-            </ul>
-
-            <h4 style="margin: 0.9rem 0 0.3rem;">Additional metrics</h4>
-            <ul class="check-list">
-              <li>
-                <i class="pi pi-check-square" aria-hidden="true"></i>
-                <span>
-                  <strong>Include Triple Collocation metrics</strong> — available when
-                  3 or more datasets are selected. Triple Collocation (TC) estimates the
-                  error of each individual dataset by comparing all possible triples
-                  (the reference is always included).
-                </span>
-              </li>
-              <li>
-                <i class="pi pi-check-square" aria-hidden="true"></i>
-                <span>
-                  <strong>Bootstrap TC confidence intervals</strong> — adds confidence
-                  intervals to the Triple Collocation metrics by repeating the
-                  calculation 1000 times.
-                  <em>Warning: very slow — up to 5× the normal runtime.</em>
-                </span>
-              </li>
-              <li>
-                <i class="pi pi-check-square" aria-hidden="true"></i>
-                <span>
-                  <strong>Include Stability metrics</strong> — checks how consistent
-                  the agreement is over the full validation period, rather than giving
-                  a single overall number.
-                </span>
-              </li>
-              <li>
-                <i class="pi pi-check-square" aria-hidden="true"></i>
-                <span>
-                  <strong>Include Intra-Annual metrics</strong> — breaks the results
-                  down within the year (e.g. by season or month), so you can see how
-                  performance changes across the seasons.
-                </span>
-              </li>
-            </ul>
-
-            <div class="info-box warning">
-              The bootstrapping and additional metric options noticeably increase
-              runtime. Enable them only when you need that level of detail.
-            </div>
-          </div>
-        </div>
-
-        <div class="step">
-          <span class="step-num">10</span>
-          <div class="step-body">
-            <h3>Anomaly calculation</h3>
-            <p>Choose a method from the <strong>Method</strong> drop-down:</p>
-            <ul>
-              <li><strong>Do not calculate</strong> — use absolute values (default).</li>
-              <li><strong>35-day moving average</strong> — subtract the 35-day running mean.</li>
-              <li><strong>Climatology</strong> — subtract the per-day-of-year average over a specified period.</li>
-            </ul>
-          </div>
-        </div>
-
-        <div class="step">
-          <span class="step-num">11</span>
-          <div class="step-body">
-            <h3>Name your validation</h3>
-            <p>Give the run a descriptive name to make it easier to identify in your validations list.</p>
-          </div>
-        </div>
-
-        <div class="step">
-          <span class="step-num">12</span>
-          <div class="step-body">
-            <h3>Run</h3>
-            <p>Click <strong>Validate</strong>. You will receive an email with a link to the results once the run is complete — you do not need to keep the browser open.</p>
-          </div>
-        </div>
-
-      </div>
-    </section>
+      </section>
+    }
 
     <!-- ════════════════════════════════════════
-         MY VALIDATIONS
-    ════════════════════════════════════════ -->
-    <section *ngIf="isActive('my-validations')">
-      <h1>My validations</h1>
-      <p>
-          The <a routerLink="/my-validations"><i class="pi pi-folder mr-1" aria-hidden="true"></i>My validations </a> page lists all validation runs associated with your
-          account, ordered with the most recent first. Individual runs can be
-          inspected, reused as the basis for a new validation, or sorted via the
-          search and filter controls.
-      </p>
-      <p-image [src]="myValidations" alt="My validations page"
-         [preview]="true" styleClass="help-image" />
-
-      <h2 class="sub-head">Pinned validations</h2>
-      <p>
-        Validations you have pinned on the <a routerLink="/published-validations"><i class="pi pi-globe mr-1" aria-hidden="true"></i>Published validations </a> page appear in a separate section at the top of the
-        page for quick access, independent of the main list below. Each pinned
-        entry shows its name together with action buttons to open, download, or
-        remove it.
-      </p>
-      <h2 class="sub-head">Searching and filtering</h2>
-      <p>
-        The header above the list shows how many validation runs were found. Three
-        controls let you narrow the list:
-      </p>
-      <ul class="check-list">
-        <li>
-          <i class="pi pi-calendar" aria-hidden="true"></i>
-          <span><strong>Choose date range</strong> — show only validations run within a selected period.</span>
-        </li>
-        <li>
-          <i class="pi pi-search" aria-hidden="true"></i>
-          <span><strong>Search by name</strong> — filter by the name you gave a validation.</span>
-        </li>
-        <li>
-          <i class="pi pi-search" aria-hidden="true"></i>
-          <span><strong>Search by dataset</strong> — filter by a dataset used in the validation.</span>
-        </li>
-      </ul>
-
-      <h2 class="sub-head">The validations table</h2>
-      <p>Each row is one validation run. The columns are:</p>
-      <ul class="check-list">
-        <li>
-          <span><strong>Date</strong> — when the validation was run. Click the column header to sort.</span>
-        </li>
-        <li>
-          <span><strong>Name</strong> — the validation's name. Click the pencil icon to rename it.</span>
-        </li>
-        <li>
-          <span><strong>Datasets</strong> — the datasets included in the run, each shown with its version, variable, and unit.</span>
-        </li>
-        <li>
-          <span><strong>Spatial reference</strong> — the dataset used as the spatial reference (for example, the ISMN version).</span>
-        </li>
-        <li>
-          <span><strong>Load settings</strong> — reopens the Validate page pre-filled with this run's configuration, so you can repeat or adjust it.</span>
-        </li>
-        <li>
-          <span><strong>Status</strong> — the current state of the run, such as <em>Done</em> for a completed validation.</span>
-        </li>
-        <li>
-          <span><strong>Actions</strong> — the trash icon permanently removes the validation.</span>
-        </li>
-      </ul>
-
-      <div class="info-box">
-        Click a validation's row to open its full results page, where you
-        can explore the charts, metrics, and downloadable files.
-      </div>
-
-      <div class="divider"></div>
-
-      <h2 class="sub-head">Opening a validation result</h2>
-      <p>
-        Click a validation's row to open its full results page. The page is divided
-        into a summary, a result-files section with plots, and an interactive map.
-      </p>
-
-      <h2 class="sub-head">Summary</h2>
-      <p>
-        The <strong>Summary</strong> box at the top reports the run itself: the start
-        and finish time, and every dataset that was compared. For each dataset it
-        lists the version and variable used, the filters that were applied, and
-        whether the dataset served as the <em>temporal</em> or <em>spatial
-        reference</em>.
-      </p>
-
-      <p-image [src]="myResults1" alt="My validations page"
-         [preview]="true" styleClass="help-image" />
-
-      <h2 class="sub-head">Summary Statistics</h2>
-      <p>
-        The <strong>Summary statistics</strong> section reports the metrics
-        calculated for the validation. Each metric summarises how well the datasets
-        agree, across all locations. The following metrics are computed:
-      </p>
-      <ul class="check-list">
-        <li><strong>Pearson's r</strong> — Pearson correlation coefficient and p-value.</li>
-        <li><strong>Spearman's ρ</strong> — rank correlation coefficient and p-value.</li>
-        <li><strong>RMSD</strong> — root-mean-square deviation.</li>
-        <li><strong>Bias</strong> — difference of means (average error).</li>
-        <li><strong>ubRMSD</strong> — unbiased root-mean-square deviation.</li>
-        <li><strong>MSE</strong> — mean square error, with its correlation, bias, and variance components.</li>
-        <li><strong>RSS</strong> — residual sum of squares.</li>
-        <li><strong># observations</strong> — number of observations used in the comparison.</li>
-      </ul>
-      <div class="info-box">
-        The three <strong>TC</strong> metrics are only available when Triple
-        Collocation was enabled and three or more datasets were validated.
-      </div>
-
-      <h2 class="sub-head">Result files and plots</h2>
-      <p>
-        The <strong>Validation Result files</strong> section lets you inspect and
-        download the output. Two drop-downs control what is shown:
-      </p>
-      <ul class="check-list">
-        <li>
-          <i class="pi pi-chevron-down" aria-hidden="true"></i>
-          <span><strong>Select boxplot/map metric</strong> — choose which metric the boxplot and map display (e.g. observations, status, bias, rmse).</span>
-        </li>
-        <li>
-          <i class="pi pi-chevron-down" aria-hidden="true"></i>
-          <span><strong>Select boxplot classification</strong> — group the boxplot by a classification, or leave it unclassified (only for ISMN).</span>
-        </li>
-      </ul>
-      <p>
-        Use <strong>Download graphs</strong> to get all plots as a ZIP (PNG and SVG),
-        or <strong>Download NetCDF</strong> to get the result metrics file. The
-        <strong>Bulk Plots</strong> area below shows the generated boxplots and maps
-        for the selected metric.
-      </p>
-      <p-image [src]="myResults2" alt="My validations page"
-         [preview]="true" styleClass="help-image" />
-
-      <h2 class="sub-head">Interactive map</h2>
-      <p>
-        The <strong>Click &amp; Explore</strong> map shows the validation results
-        geographically. Each point is a location where the metric was computed, and
-        the colour scale at the bottom indicates its value. You can switch the
-        displayed metric, adjust layer opacity, change the base map (e.g. Terrain),
-        and capture or expand the view using the controls in the map corners.
-      </p>
-
-      <p-image [src]="myResults3" alt="My validations page"
-         [preview]="true" styleClass="help-image" />
-
-    </section>
-
-    <!-- ════════════════════════════════════════
-        PUBLISHED VALIDATIONS
-    ════════════════════════════════════════ -->
-    <section *ngIf="isActive('published-validations')" class="panel">
-      <h1 class="panel-title">Published validations</h1>
-      <p class="panel-sub">
-        The <a routerLink="/published-validations"><i class="pi pi-globe mr-1" aria-hidden="true"></i>Published validations </a>
-        page collects validation runs that their owners
-        have chosen to make publicly available by publishing them to
-        <a href="https://zenodo.org/" target="_blank" rel="noreferrer">Zenodo</a>.
-        Each published validation has a citable
-        <a href="https://www.doi.org/" target="_blank" rel="noreferrer">DOI</a>
-        and is not subject to automatic removal.
-      </p>
-
-      <h2 class="sub-head">The published validations page</h2>
-      <p>
-        This page works much like <a routerLink="/my-validations"><i class="pi pi-folder mr-1" aria-hidden="true"></i>My validations </a>:
-        published runs
-        are listed with their datasets, spatial reference, and date, and you can
-        search and filter the list in the same way. The difference is that it shows
-        publicly published validations from all users, not only your own.
-      </p>
-
-      <div class="info-box">
-        From this list you can <strong>pin</strong> a validation. A pinned
-        validation is kept in a separate section at the top of your
-        <strong>My validations</strong> page for quick access, so you can easily
-        return to results you refer to often — including published ones that are
-        not your own.
-      </div>
-
-      <div class="divider"></div>
-
-      <h2 class="sub-head">Publishing your own validation</h2>
-      <p class="panel-sub">
-        You can publish your result NetCDF to Zenodo under your own name to obtain
-        a citable DOI — no Zenodo account is required.
-      </p>
-
-      <p-image [src]="publishingDialog" alt="Publishing dialog"
-         [preview]="true" styleClass="help-image" />
-
-      <div class="step-list">
-        <div class="step">
-          <span class="step-num required">1</span>
-          <div class="step-body">
-            <h3>Open the publish dialog</h3>
-            <p>Click <strong>Publish</strong> on the validation results page. A dialog appears with pre-filled metadata.</p>
-          </div>
-        </div>
-        <div class="step">
-          <span class="step-num required">2</span>
-          <div class="step-body">
-            <h3>Review metadata requirements</h3>
-            <p>
-              <strong>Mandatory:</strong> Title, Description, Keywords (must include
-              <code>qa4sm</code>), and Name.<br>
-              <strong>Optional:</strong> Affiliation and
-              <a href="https://orcid.org/" target="_blank" rel="noreferrer">ORCID</a>.<br>
-              Changes to author details are <strong>not</strong> saved to your
-              profile — edit those on the Profile page.
-            </p>
-          </div>
-        </div>
-        <div class="step">
-          <span class="step-num required">3</span>
-          <div class="step-body">
-            <h3>Publish results</h3>
-            <p>
-              Click <strong>Publish results</strong>. The upload may take a few
-              minutes. If it fails, try again a few hours later. If the problem
-              persists, email support with the error message.
-            </p>
-          </div>
-        </div>
-      </div>
-
-      <div class="info-box">
-        <strong>Important:</strong> assigning a DOI means the result cannot easily
-        be unpublished or deleted — see
-        <a href="https://help.zenodo.org/" target="_blank" rel="noreferrer">Zenodo's FAQ</a>.
-        The file is stored on Zenodo under the QA4SM project account with your name
-        as author. If you prefer to use your own Zenodo account, download the
-        NetCDF and upload it yourself — use <code>qa4sm</code> as a keyword.
-      </div>
-
-    </section>
-
-        <!-- ════════════════════════════════════════
-        COMPARISON
-    ════════════════════════════════════════ -->
-    <section *ngIf="isActive('comparison')">
-      <h1>Validation comparison</h1>
-      <p>
-        Available since QA4SM v2.1, the comparison module allows a logged-in user
-        to compare existing validations — either their own or validations that have
-        been published. It is accessed via the 
-        <a routerLink="/comparison" target="_blank"><i class="pi pi-th-large mr-1" aria-hidden="true"></i>Compare validations</a>
-        button in the navigation bar.
-      </p>
-
-      <h2>Comparison modes</h2>
-      <p>
-        The module supports two modes. The mode is selected in the Dataset
-        Configuration component (see step 1).
-      </p>
-      <div class="two-col">
-        <div class="mode-card">
-          <p class="mode-title">Two validations</p>
-          <p>
-            Compares two separate validations that share the same reference dataset
-            and one common non-reference dataset.
-          </p>
-        </div>
-        <div class="mode-card">
-          <p class="mode-title">One validation, two datasets</p>
-          <p>
-            Compares two non-reference datasets used within a single validation.
-            Activated by checking <em>Multiple non-reference datasets</em>.
-          </p>
-        </div>
-      </div>
-
-      <h2 class="sub-head">Configuring a comparison</h2>
-      <p>
-        The comparison interface consists of three components — Dataset
-        Configuration, Validations selection, and Spatial extent — configured in
-        order:
-      </p>
-
-      <div class="step-list">
-        <div class="step">
-          <span class="step-num">1</span>
-          <div class="step-body">
-            <h3>Dataset configuration</h3>
-            <p>
-              Select the dataset that was used as the reference, including its
-              version and variable name, and choose the comparison mode. Checking
-              <em>Multiple non-reference datasets</em> switches to the
-              <em>one validation</em> comparison mode.
-            </p>
-            <figure><img [src]="datsetConfigurationComparison" alt="Dataset configuration for comparison" /></figure>
-          </div>
-        </div>
-        <div class="step">
-          <span class="step-num">2</span>
-          <div class="step-body">
-            <h3>Validations selection</h3>
-            <p>
-              This component updates with every change of the reference dataset and
-              lists the validations available for comparison. Add a selected
-              validation with the <strong>Add validation</strong> button; once the
-              maximum number has been added, the button is disabled. Added
-              validations appear below the selection box as red
-              <strong>Remove validation</strong> buttons, which remove the
-              corresponding validation from the list.
-            </p>
-            <figure><img [src]="validationSelectionsComparison" alt="Validation selection for comparison" /></figure>
-          </div>
-        </div>
-        <div class="step">
-          <span class="step-num">3</span>
-          <div class="step-body">
-            <h3>Spatial extent</h3>
-            <p>
-              Any two validations sharing the same reference dataset can be
-              compared. If the validations additionally share a common spatial
-              extent, you can choose whether the comparison is performed on all
-              points or only on the common ones. If the validations have no common
-              points, the <em>Include all points…</em> option is disabled.
-            </p>
-            <figure><img [src]="spatialExtentComparison" alt="Spatial extent options" /></figure>
-          </div>
-        </div>
-      </div>
-
-      <h2 class="sub-head">Comparison results</h2>
-      <p>
-        The comparison is started with the <strong>Compare</strong> button. It
-        produces four components:
-      </p>
-      <ul class="check-list">
-        <li>
-          <span>
-            <strong>Comparison summary</strong> — the summaries of the chosen
-            validations, or of the single validation when the
-            <em>one validation</em> mode was used.
-          </span>
-        </li>
-        <li>
-          <span>
-            <strong>Selected comparison extent</strong> — a plot showing the area
-            for which the comparison was performed.
-          </span>
-        </li>
-        <li>
-          <span>
-            <strong>Comparison statistics</strong> — a table of the validation
-            statistics calculated for both validations, together with the
-            differences between them.
-          </span>
-        </li>
-        <li>
-          <span>
-            <strong>Comparison plots</strong> — a metric-selection drop-down, plus
-            the plots described below.
-          </span>
-        </li>
-      </ul>
-
-      <div class="info-box">
-        <strong>Which plots are shown</strong> depends on the spatial extent:
-        <ul class="nested-list">
+      MY VALIDATIONS
+      ════════════════════════════════════════ -->
+    @if (isActive("my-validations")) {
+      <section>
+        <h1>My validations</h1>
+        <p>
+          The
+          <a routerLink="/my-validations"
+            ><i class="pi pi-folder mr-1" aria-hidden="true"></i>My validations
+          </a>
+          page lists all validation runs associated with your account, ordered
+          with the most recent first. Individual runs can be inspected, reused
+          as the basis for a new validation, or sorted via the search and filter
+          controls.
+        </p>
+        <p-image
+          [src]="myValidations"
+          alt="My validations page"
+          [preview]="true"
+          styleClass="help-image"
+        />
+        <h2 class="sub-head">Pinned validations</h2>
+        <p>
+          Validations you have pinned on the
+          <a routerLink="/published-validations"
+            ><i class="pi pi-globe mr-1" aria-hidden="true"></i>Published
+            validations
+          </a>
+          page appear in a separate section at the top of the page for quick
+          access, independent of the main list below. Each pinned entry shows
+          its name together with action buttons to open, download, or remove it.
+        </p>
+        <h2 class="sub-head">Searching and filtering</h2>
+        <p>
+          The header above the list shows how many validation runs were found.
+          Three controls let you narrow the list:
+        </p>
+        <ul class="check-list">
           <li>
-            If the compared validations have <em>no</em> common spatial extent — or
-            if <em>Include all points from the selected validations</em> was chosen
-            — the result is a boxplot of the selected metric for each validation.
+            <i class="pi pi-calendar" aria-hidden="true"></i>
+            <span
+              ><strong>Choose date range</strong> — show only validations run
+              within a selected period.</span
+            >
           </li>
           <li>
-            If the validations <em>do</em> share a common spatial extent, the
-            result is a boxplot of the metric for each validation together with the
-            difference between them, plus a map showing the differences in that
-            metric across all compared points.
+            <i class="pi pi-search" aria-hidden="true"></i>
+            <span
+              ><strong>Search by name</strong> — filter by the name you gave a
+              validation.</span
+            >
+          </li>
+          <li>
+            <i class="pi pi-search" aria-hidden="true"></i>
+            <span
+              ><strong>Search by dataset</strong> — filter by a dataset used in
+              the validation.</span
+            >
           </li>
         </ul>
-      </div>
-
-      <p>
-        All plots and the statistics table can be downloaded individually using the
-        buttons placed next to each object.
-      </p>
-
-      <div class="info-box">
-        <strong>Note:</strong> the comparison module is still under development and
-        runs on the fly. A comparison may fail if the validation result files are
-        too large. If this occurs, run smaller validations — reduced via spatial
-        subsetting — and compare those instead.
-      </div>
-    </section>
+        <h2 class="sub-head">The validations table</h2>
+        <p>Each row is one validation run. The columns are:</p>
+        <ul class="check-list">
+          <li>
+            <span
+              ><strong>Date</strong> — when the validation was run. Click the
+              column header to sort.</span
+            >
+          </li>
+          <li>
+            <span
+              ><strong>Name</strong> — the validation's name. Click the pencil
+              icon to rename it.</span
+            >
+          </li>
+          <li>
+            <span
+              ><strong>Datasets</strong> — the datasets included in the run,
+              each shown with its version, variable, and unit.</span
+            >
+          </li>
+          <li>
+            <span
+              ><strong>Spatial reference</strong> — the dataset used as the
+              spatial reference (for example, the ISMN version).</span
+            >
+          </li>
+          <li>
+            <span
+              ><strong>Load settings</strong> — reopens the Validate page
+              pre-filled with this run's configuration, so you can repeat or
+              adjust it.</span
+            >
+          </li>
+          <li>
+            <span
+              ><strong>Status</strong> — the current state of the run, such as
+              <em>Done</em> for a completed validation.</span
+            >
+          </li>
+          <li>
+            <span
+              ><strong>Actions</strong> — the trash icon permanently removes the
+              validation.</span
+            >
+          </li>
+        </ul>
+        <div class="info-box">
+          Click a validation's row to open its full results page, where you can
+          explore the charts, metrics, and downloadable files.
+        </div>
+        <div class="divider"></div>
+        <h2 class="sub-head">Opening a validation result</h2>
+        <p>
+          Click a validation's row to open its full results page. The page is
+          divided into a summary, a result-files section with plots, and an
+          interactive map.
+        </p>
+        <h2 class="sub-head">Summary</h2>
+        <p>
+          The <strong>Summary</strong> box at the top reports the run itself:
+          the start and finish time, and every dataset that was compared. For
+          each dataset it lists the version and variable used, the filters that
+          were applied, and whether the dataset served as the
+          <em>temporal</em> or <em>spatial reference</em>.
+        </p>
+        <p-image
+          [src]="myResults1"
+          alt="My validations page"
+          [preview]="true"
+          styleClass="help-image"
+        />
+        <h2 class="sub-head">Summary Statistics</h2>
+        <p>
+          The <strong>Summary statistics</strong> section reports the metrics
+          calculated for the validation. Each metric summarises how well the
+          datasets agree, across all locations. The following metrics are
+          computed:
+        </p>
+        <ul class="check-list">
+          <li>
+            <strong>Pearson's r</strong> — Pearson correlation coefficient and
+            p-value.
+          </li>
+          <li>
+            <strong>Spearman's ρ</strong> — rank correlation coefficient and
+            p-value.
+          </li>
+          <li><strong>RMSD</strong> — root-mean-square deviation.</li>
+          <li><strong>Bias</strong> — difference of means (average error).</li>
+          <li>
+            <strong>ubRMSD</strong> — unbiased root-mean-square deviation.
+          </li>
+          <li>
+            <strong>MSE</strong> — mean square error, with its correlation,
+            bias, and variance components.
+          </li>
+          <li><strong>RSS</strong> — residual sum of squares.</li>
+          <li>
+            <strong># observations</strong> — number of observations used in the
+            comparison.
+          </li>
+        </ul>
+        <div class="info-box">
+          The three <strong>TC</strong> metrics are only available when Triple
+          Collocation was enabled and three or more datasets were validated.
+        </div>
+        <h2 class="sub-head">Result files and plots</h2>
+        <p>
+          The <strong>Validation Result files</strong> section lets you inspect
+          and download the output. Two drop-downs control what is shown:
+        </p>
+        <ul class="check-list">
+          <li>
+            <i class="pi pi-chevron-down" aria-hidden="true"></i>
+            <span
+              ><strong>Select boxplot/map metric</strong> — choose which metric
+              the boxplot and map display (e.g. observations, status, bias,
+              rmse).</span
+            >
+          </li>
+          <li>
+            <i class="pi pi-chevron-down" aria-hidden="true"></i>
+            <span
+              ><strong>Select boxplot classification</strong> — group the
+              boxplot by a classification, or leave it unclassified (only for
+              ISMN).</span
+            >
+          </li>
+        </ul>
+        <p>
+          Use <strong>Download graphs</strong> to get all plots as a ZIP (PNG
+          and SVG), or <strong>Download NetCDF</strong> to get the result
+          metrics file. The <strong>Bulk Plots</strong> area below shows the
+          generated boxplots and maps for the selected metric.
+        </p>
+        <p-image
+          [src]="myResults2"
+          alt="My validations page"
+          [preview]="true"
+          styleClass="help-image"
+        />
+        <h2 class="sub-head">Interactive map</h2>
+        <p>
+          The <strong>Click &amp; Explore</strong> map shows the validation
+          results geographically. Each point is a location where the metric was
+          computed, and the colour scale at the bottom indicates its value. You
+          can switch the displayed metric, adjust layer opacity, change the base
+          map (e.g. Terrain), and capture or expand the view using the controls
+          in the map corners.
+        </p>
+        <p-image
+          [src]="myResults3"
+          alt="My validations page"
+          [preview]="true"
+          styleClass="help-image"
+        />
+      </section>
+    }
 
     <!-- ════════════════════════════════════════
-        USER DATA UPLOAD
+    PUBLISHED VALIDATIONS
     ════════════════════════════════════════ -->
-    <section *ngIf="isActive('my-datasets')">
-      <h1>My datasets</h1>
-      <p>
-        Upload your own soil moisture datasets to validate them against the
-        reference products available in QA4SM. Once uploaded, your dataset can be
-        selected on the Validate page just like the built-in datasets. Your data
-        stays private — no other user can see or access it. To get started, open the
-        <a routerLink="/my-datasets" target="_blank">
-          <i class="pi pi-upload" aria-hidden="true"></i>
-          Dataset upload/My datasets
-        </a> 
-        page from the navigation bar.
-      </p>
-
-      <div class="step-list">
-        <div class="step">
-          <span class="step-num">1</span>
-          <div class="step-body">
-            <h3>Select a file</h3>
-            <p>
-              Click <strong>Select file</strong> to
-              choose the file to upload. Only <code>.netCDF</code> or
-              <code>.zip</code> files can be selected, and both must follow the
-              <a routerLink="/user-data-guidelines" target="_blank">data format guidelines</a>.
-              A <code>.zip</code> may only contain <code>.netCDF</code>,
-              <code>.csv</code>, or <code>.yml</code> files — any other file type
-              will prevent the upload. You have <strong>5&nbsp;GB</strong> of
-              storage; contact the team if you need more.
-            </p>
-            <figure>
-              <img [src]="myuploads1" alt="Upload file" />
-            </figure>
+    @if (isActive("published-validations")) {
+      <section class="panel">
+        <h1 class="panel-title">Published validations</h1>
+        <p class="panel-sub">
+          The
+          <a routerLink="/published-validations"
+            ><i class="pi pi-globe mr-1" aria-hidden="true"></i>Published
+            validations
+          </a>
+          page collects validation runs that their owners have chosen to make
+          publicly available by publishing them to
+          <a href="https://zenodo.org/" target="_blank" rel="noreferrer"
+            >Zenodo</a
+          >. Each published validation has a citable
+          <a href="https://www.doi.org/" target="_blank" rel="noreferrer"
+            >DOI</a
+          >
+          and is not subject to automatic removal.
+        </p>
+        <h2 class="sub-head">The published validations page</h2>
+        <p>
+          This page works much like
+          <a routerLink="/my-validations"
+            ><i class="pi pi-folder mr-1" aria-hidden="true"></i>My validations </a
+          >: published runs are listed with their datasets, spatial reference,
+          and date, and you can search and filter the list in the same way. The
+          difference is that it shows publicly published validations from all
+          users, not only your own.
+        </p>
+        <div class="info-box">
+          From this list you can <strong>pin</strong> a validation. A pinned
+          validation is kept in a separate section at the top of your
+          <strong>My validations</strong> page for quick access, so you can
+          easily return to results you refer to often — including published ones
+          that are not your own.
+        </div>
+        <div class="divider"></div>
+        <h2 class="sub-head">Publishing your own validation</h2>
+        <p class="panel-sub">
+          You can publish your result NetCDF to Zenodo under your own name to
+          obtain a citable DOI — no Zenodo account is required.
+        </p>
+        <p-image
+          [src]="publishingDialog"
+          alt="Publishing dialog"
+          [preview]="true"
+          styleClass="help-image"
+        />
+        <div class="step-list">
+          <div class="step">
+            <span class="step-num required">1</span>
+            <div class="step-body">
+              <h3>Open the publish dialog</h3>
+              <p>
+                Click <strong>Publish</strong> on the validation results page. A
+                dialog appears with pre-filled metadata.
+              </p>
+            </div>
+          </div>
+          <div class="step">
+            <span class="step-num required">2</span>
+            <div class="step-body">
+              <h3>Review metadata requirements</h3>
+              <p>
+                <strong>Mandatory:</strong> Title, Description, Keywords (must
+                include <code>qa4sm</code>), and Name.<br />
+                <strong>Optional:</strong> Affiliation and
+                <a href="https://orcid.org/" target="_blank" rel="noreferrer"
+                  >ORCID</a
+                >.<br />
+                Changes to author details are <strong>not</strong> saved to your
+                profile — edit those on the Profile page.
+              </p>
+            </div>
+          </div>
+          <div class="step">
+            <span class="step-num required">3</span>
+            <div class="step-body">
+              <h3>Publish results</h3>
+              <p>
+                Click <strong>Publish results</strong>. The upload may take a
+                few minutes. If it fails, try again a few hours later. If the
+                problem persists, email support with the error message.
+              </p>
+            </div>
           </div>
         </div>
+        <div class="info-box">
+          <strong>Important:</strong> assigning a DOI means the result cannot
+          easily be unpublished or deleted — see
+          <a href="https://help.zenodo.org/" target="_blank" rel="noreferrer"
+            >Zenodo's FAQ</a
+          >. The file is stored on Zenodo under the QA4SM project account with
+          your name as author. If you prefer to use your own Zenodo account,
+          download the NetCDF and upload it yourself — use <code>qa4sm</code> as
+          a keyword.
+        </div>
+      </section>
+    }
 
-        <div class="step">
-          <span class="step-num">2</span>
-          <div class="step-body">
-            <h3>Provide metadata</h3>
+    <!-- ════════════════════════════════════════
+    COMPARISON
+    ════════════════════════════════════════ -->
+    @if (isActive("comparison")) {
+      <section>
+        <h1>Validation comparison</h1>
+        <p>
+          Available since QA4SM v2.1, the comparison module allows a logged-in
+          user to compare existing validations — either their own or validations
+          that have been published. It is accessed via the
+          <a routerLink="/comparison" target="_blank"
+            ><i class="pi pi-th-large mr-1" aria-hidden="true"></i>Compare
+            validations</a
+          >
+          button in the navigation bar.
+        </p>
+        <h2>Comparison modes</h2>
+        <p>
+          The module supports two modes. The mode is selected in the Dataset
+          Configuration component (see step 1).
+        </p>
+        <div class="two-col">
+          <div class="mode-card">
+            <p class="mode-title">Two validations</p>
             <p>
-              Once a valid file is selected, a metadata form appears. Enter a
-              <strong>dataset name</strong> and a <strong>version name</strong>.
-              Click <strong>Save names</strong> to confirm the metadata. This closes the
-              form but does <strong>not</strong> start the upload.
+              Compares two separate validations that share the same reference
+              dataset and one common non-reference dataset.
             </p>
-            <figure><img [src]="myuploads3" alt="Metadata form" /></figure>
+          </div>
+          <div class="mode-card">
+            <p class="mode-title">One validation, two datasets</p>
+            <p>
+              Compares two non-reference datasets used within a single
+              validation. Activated by checking
+              <em>Multiple non-reference datasets</em>.
+            </p>
           </div>
         </div>
-
-        <div class="step">
-          <span class="step-num">3</span>
-          <div class="step-body">
-            <h3>Save and upload</h3>
-            <p>
-              Click <strong>Upload</strong> to begin. A blue spinner shows the upload
-              progress. Depending on file size and connection
-              speed, this can take from a few seconds to tens of minutes. When the
-              transfer finishes, a message confirms the file has been uploaded and
-              still needs to be pre-processed.
-            </p>
-            <figure class="figure">
-              <img [src]="myuploads4" alt="Chosen file with upload button" />
-            </figure>
+        <h2 class="sub-head">Configuring a comparison</h2>
+        <p>
+          The comparison interface consists of three components — Dataset
+          Configuration, Validations selection, and Spatial extent — configured
+          in order:
+        </p>
+        <div class="step-list">
+          <div class="step">
+            <span class="step-num">1</span>
+            <div class="step-body">
+              <h3>Dataset configuration</h3>
+              <p>
+                Select the dataset that was used as the reference, including its
+                version and variable name, and choose the comparison mode.
+                Checking
+                <em>Multiple non-reference datasets</em> switches to the
+                <em>one validation</em> comparison mode.
+              </p>
+              <figure>
+                <img
+                  [src]="datsetConfigurationComparison"
+                  alt="Dataset configuration for comparison"
+                />
+              </figure>
+            </div>
+          </div>
+          <div class="step">
+            <span class="step-num">2</span>
+            <div class="step-body">
+              <h3>Validations selection</h3>
+              <p>
+                This component updates with every change of the reference
+                dataset and lists the validations available for comparison. Add
+                a selected validation with the
+                <strong>Add validation</strong> button; once the maximum number
+                has been added, the button is disabled. Added validations appear
+                below the selection box as red
+                <strong>Remove validation</strong> buttons, which remove the
+                corresponding validation from the list.
+              </p>
+              <figure>
+                <img
+                  [src]="validationSelectionsComparison"
+                  alt="Validation selection for comparison"
+                />
+              </figure>
+            </div>
+          </div>
+          <div class="step">
+            <span class="step-num">3</span>
+            <div class="step-body">
+              <h3>Spatial extent</h3>
+              <p>
+                Any two validations sharing the same reference dataset can be
+                compared. If the validations additionally share a common spatial
+                extent, you can choose whether the comparison is performed on
+                all points or only on the common ones. If the validations have
+                no common points, the <em>Include all points…</em> option is
+                disabled.
+              </p>
+              <figure>
+                <img
+                  [src]="spatialExtentComparison"
+                  alt="Spatial extent options"
+                />
+              </figure>
+            </div>
           </div>
         </div>
-
-        <div class="step">
-          <span class="step-num">4</span>
-          <div class="step-body">
-            <h3>Review the uploaded dataset</h3>
-            <p>
-              Once uploading and pre-processing are complete, a row with the
-              dataset's basic information appears. From this row you can edit the
-              dataset name and version name, and select a different variable if the
-              default one is incorrect or could not be retrieved. The
-              <strong>Remove dataset</strong> button deletes the uploaded file —
-              this is only possible if the dataset has not yet been used in any
+        <h2 class="sub-head">Comparison results</h2>
+        <p>
+          The comparison is started with the <strong>Compare</strong> button. It
+          produces four components:
+        </p>
+        <ul class="check-list">
+          <li>
+            <span>
+              <strong>Comparison summary</strong> — the summaries of the chosen
+              validations, or of the single validation when the
+              <em>one validation</em> mode was used.
+            </span>
+          </li>
+          <li>
+            <span>
+              <strong>Selected comparison extent</strong> — a plot showing the
+              area for which the comparison was performed.
+            </span>
+          </li>
+          <li>
+            <span>
+              <strong>Comparison statistics</strong> — a table of the validation
+              statistics calculated for both validations, together with the
+              differences between them.
+            </span>
+          </li>
+          <li>
+            <span>
+              <strong>Comparison plots</strong> — a metric-selection drop-down,
+              plus the plots described below.
+            </span>
+          </li>
+        </ul>
+        <div class="info-box">
+          <strong>Which plots are shown</strong> depends on the spatial extent:
+          <ul class="nested-list">
+            <li>
+              If the compared validations have <em>no</em> common spatial extent
+              — or if
+              <em>Include all points from the selected validations</em> was
+              chosen — the result is a boxplot of the selected metric for each
               validation.
-            </p>
-            <figure><img [src]="myuploads2" alt="Uploaded dataset row" /></figure>
+            </li>
+            <li>
+              If the validations <em>do</em> share a common spatial extent, the
+              result is a boxplot of the metric for each validation together
+              with the difference between them, plus a map showing the
+              differences in that metric across all compared points.
+            </li>
+          </ul>
+        </div>
+        <p>
+          All plots and the statistics table can be downloaded individually
+          using the buttons placed next to each object.
+        </p>
+        <div class="info-box">
+          <strong>Note:</strong> the comparison module is still under
+          development and runs on the fly. A comparison may fail if the
+          validation result files are too large. If this occurs, run smaller
+          validations — reduced via spatial subsetting — and compare those
+          instead.
+        </div>
+      </section>
+    }
+
+    <!-- ════════════════════════════════════════
+    USER DATA UPLOAD
+    ════════════════════════════════════════ -->
+    @if (isActive("my-datasets")) {
+      <section>
+        <h1>My datasets</h1>
+        <p>
+          Upload your own soil moisture datasets to validate them against the
+          reference products available in QA4SM. Once uploaded, your dataset can
+          be selected on the Validate page just like the built-in datasets. Your
+          data stays private — no other user can see or access it. To get
+          started, open the
+          <a routerLink="/my-datasets" target="_blank">
+            <i class="pi pi-upload" aria-hidden="true"></i>
+            Dataset upload/My datasets
+          </a>
+          page from the navigation bar.
+        </p>
+        <div class="step-list">
+          <div class="step">
+            <span class="step-num">1</span>
+            <div class="step-body">
+              <h3>Select a file</h3>
+              <p>
+                Click <strong>Select file</strong> to choose the file to upload.
+                Only <code>.netCDF</code> or <code>.zip</code> files can be
+                selected, and both must follow the
+                <a routerLink="/user-data-guidelines" target="_blank"
+                  >data format guidelines</a
+                >. A <code>.zip</code> may only contain <code>.netCDF</code>,
+                <code>.csv</code>, or <code>.yml</code> files — any other file
+                type will prevent the upload. You have
+                <strong>5&nbsp;GB</strong> of storage; contact the team if you
+                need more.
+              </p>
+              <figure>
+                <img [src]="myuploads1" alt="Upload file" />
+              </figure>
+            </div>
+          </div>
+          <div class="step">
+            <span class="step-num">2</span>
+            <div class="step-body">
+              <h3>Provide metadata</h3>
+              <p>
+                Once a valid file is selected, a metadata form appears. Enter a
+                <strong>dataset name</strong> and a
+                <strong>version name</strong>. Click
+                <strong>Save names</strong> to confirm the metadata. This closes
+                the form but does <strong>not</strong> start the upload.
+              </p>
+              <figure><img [src]="myuploads3" alt="Metadata form" /></figure>
+            </div>
+          </div>
+          <div class="step">
+            <span class="step-num">3</span>
+            <div class="step-body">
+              <h3>Save and upload</h3>
+              <p>
+                Click <strong>Upload</strong> to begin. A blue spinner shows the
+                upload progress. Depending on file size and connection speed,
+                this can take from a few seconds to tens of minutes. When the
+                transfer finishes, a message confirms the file has been uploaded
+                and still needs to be pre-processed.
+              </p>
+              <figure class="figure">
+                <img [src]="myuploads4" alt="Chosen file with upload button" />
+              </figure>
+            </div>
+          </div>
+          <div class="step">
+            <span class="step-num">4</span>
+            <div class="step-body">
+              <h3>Review the uploaded dataset</h3>
+              <p>
+                Once uploading and pre-processing are complete, a row with the
+                dataset's basic information appears. From this row you can edit
+                the dataset name and version name, and select a different
+                variable if the default one is incorrect or could not be
+                retrieved. The
+                <strong>Remove dataset</strong> button deletes the uploaded file
+                — this is only possible if the dataset has not yet been used in
+                any validation.
+              </p>
+              <figure>
+                <img [src]="myuploads2" alt="Uploaded dataset row" />
+              </figure>
+            </div>
+          </div>
+          <div class="step">
+            <span class="step-num">5</span>
+            <div class="step-body">
+              <h3>Use the dataset in a validation</h3>
+              <p>
+                Go to the <strong>Validate</strong> page and expand the dataset
+                drop-down — your uploaded dataset is listed there. Configure the
+                remaining validation settings and run it as usual.
+              </p>
+            </div>
           </div>
         </div>
-
-        <div class="step">
-          <span class="step-num">5</span>
-          <div class="step-body">
-            <h3>Use the dataset in a validation</h3>
-            <p>
-              Go to the <strong>Validate</strong> page and expand the dataset
-              drop-down — your uploaded dataset is listed there. Configure the
-              remaining validation settings and run it as usual.
-            </p>
-          </div>
+        <div class="info-box">
+          <strong>Note:</strong> validations that use private data cannot be
+          published. You can share such a validation with another user, but they
+          cannot re-run it without access to your dataset. An uploaded dataset
+          can only be removed while it has not been used in any validation.
         </div>
-      </div>
-
-      <div class="info-box">
-        <strong>Note:</strong> validations that use private data cannot be
-        published. You can share such a validation with another user, but they
-        cannot re-run it without access to your dataset. An uploaded dataset can
-        only be removed while it has not been used in any validation.
-      </div>
-    </section>
+      </section>
+    }
 
     <!-- ════════════════════════════════════════
-        UPLOAD HELP
+    UPLOAD HELP
     ════════════════════════════════════════ -->
-    <section *ngIf="isActive('upload-help')">
-      <h1>Uploading your own data</h1>
-      <p>
-        QA4SM lets you upload your own soil moisture datasets and validate them
-        against the reference products available on the platform — satellite
-        datasets, ERA model data, and ISMN monitoring stations.
-      </p>
-
-      <div class="info-box">
-        Your uploaded data is <strong>private</strong> — no other user can see,
-        access, or download it.
-      </div>
-
-      <h2>Accepted file types</h2>
-      <p>QA4SM accepts two upload formats:</p>
-      <ul class="check-list">
-        <li>
-          <i class="pi pi-file" aria-hidden="true"></i>
-          <span>
-            <strong>NetCDF image stacks</strong> — a single <code>.nc</code> or
-            <code>.nc4</code> file with three dimensions: latitude, longitude, and
-            time.
-          </span>
-        </li>
-        <li>
-          <i class="pi pi-file" aria-hidden="true"></i>
-          <span>
-            <strong>CSV time series</strong> — individual <code>.csv</code> files
-            bundled into a single <code>.zip</code> archive, optionally with a
-            <code>metadata.yml</code> file. Suited to irregular timestamps or
-            specific in-situ locations.
-          </span>
-        </li>
-      </ul>
-
-      <h2>Key requirements</h2>
-      <ul class="check-list">
-        <li>
-          <i class="pi pi-check-square" aria-hidden="true"></i>
-          <span>Files must include latitude, longitude, and time information.</span>
-        </li>
-        <li>
-          <i class="pi pi-check-square" aria-hidden="true"></i>
-          <span>Coordinates must follow the WGS84 system (longitude −180° to 180°, latitude −90° to 90°).</span>
-        </li>
-        <li>
-          <i class="pi pi-check-square" aria-hidden="true"></i>
-          <span>A ZIP archive must contain only <code>.csv</code> files and, optionally, a <code>metadata.yml</code> file — no nested folders or unrelated files.</span>
-        </li>
-        <li>
-          <i class="pi pi-check-square" aria-hidden="true"></i>
-          <span>At least one soil moisture variable must be present.</span>
-        </li>
-      </ul>
-
-      <div class="info-box">
-        Detailed format specifications — NetCDF structure, CSV file-naming
-        convention, metadata, and downloadable example files — are described in the
-        <a routerLink="/user-data-guidelines" target="_blank">user data guidelines</a>.
-      </div>
-
-      <h2 class="sub-head">Troubleshooting</h2>
-      <p>If an upload fails or your data cannot be processed, check the most common causes:</p>
-      <ul class="check-list">
-        <li>
-          <i class="pi pi-exclamation-circle" aria-hidden="true"></i>
-          <span><strong>Invalid file type</strong> — upload a <code>.nc</code>/<code>.nc4</code> file, or a <code>.zip</code> of CSV files; not other combinations.</span>
-        </li>
-        <li>
-          <i class="pi pi-exclamation-circle" aria-hidden="true"></i>
-          <span><strong>Incorrect ZIP structure</strong> — remove nested folders and unrelated files.</span>
-        </li>
-        <li>
-          <i class="pi pi-exclamation-circle" aria-hidden="true"></i>
-          <span><strong>Missing variables</strong> — make sure latitude, longitude, and time are all included.</span>
-        </li>
-        <li>
-          <i class="pi pi-exclamation-circle" aria-hidden="true"></i>
-          <span><strong>File too large</strong> — try a smaller dataset, or contact support.</span>
-        </li>
-      </ul>
-
-      <div class="info-box warning">
-        <strong>Please note:</strong> validations that use uploaded data cannot be
-        published, due to limited traceability. Data persistence is also not yet
-        guaranteed — future updates to QA4SM may require you to re-upload your
-        files. For datasets larger than several GB, contact
-        <a href="mailto:support@qa4sm.eu">support@qa4sm.eu</a> before uploading.
-      </div>
-    </section>
+    @if (isActive("upload-help")) {
+      <section>
+        <h1>Uploading your own data</h1>
+        <p>
+          QA4SM lets you upload your own soil moisture datasets and validate
+          them against the reference products available on the platform —
+          satellite datasets, ERA model data, and ISMN monitoring stations.
+        </p>
+        <div class="info-box">
+          Your uploaded data is <strong>private</strong> — no other user can
+          see, access, or download it.
+        </div>
+        <h2>Accepted file types</h2>
+        <p>QA4SM accepts two upload formats:</p>
+        <ul class="check-list">
+          <li>
+            <i class="pi pi-file" aria-hidden="true"></i>
+            <span>
+              <strong>NetCDF image stacks</strong> — a single
+              <code>.nc</code> or <code>.nc4</code> file with three dimensions:
+              latitude, longitude, and time.
+            </span>
+          </li>
+          <li>
+            <i class="pi pi-file" aria-hidden="true"></i>
+            <span>
+              <strong>CSV time series</strong> — individual
+              <code>.csv</code> files bundled into a single
+              <code>.zip</code> archive, optionally with a
+              <code>metadata.yml</code> file. Suited to irregular timestamps or
+              specific in-situ locations.
+            </span>
+          </li>
+        </ul>
+        <h2>Key requirements</h2>
+        <ul class="check-list">
+          <li>
+            <i class="pi pi-check-square" aria-hidden="true"></i>
+            <span
+              >Files must include latitude, longitude, and time
+              information.</span
+            >
+          </li>
+          <li>
+            <i class="pi pi-check-square" aria-hidden="true"></i>
+            <span
+              >Coordinates must follow the WGS84 system (longitude −180° to
+              180°, latitude −90° to 90°).</span
+            >
+          </li>
+          <li>
+            <i class="pi pi-check-square" aria-hidden="true"></i>
+            <span
+              >A ZIP archive must contain only <code>.csv</code> files and,
+              optionally, a <code>metadata.yml</code> file — no nested folders
+              or unrelated files.</span
+            >
+          </li>
+          <li>
+            <i class="pi pi-check-square" aria-hidden="true"></i>
+            <span>At least one soil moisture variable must be present.</span>
+          </li>
+        </ul>
+        <div class="info-box">
+          Detailed format specifications — NetCDF structure, CSV file-naming
+          convention, metadata, and downloadable example files — are described
+          in the
+          <a routerLink="/user-data-guidelines" target="_blank"
+            >user data guidelines</a
+          >.
+        </div>
+        <h2 class="sub-head">Troubleshooting</h2>
+        <p>
+          If an upload fails or your data cannot be processed, check the most
+          common causes:
+        </p>
+        <ul class="check-list">
+          <li>
+            <i class="pi pi-exclamation-circle" aria-hidden="true"></i>
+            <span
+              ><strong>Invalid file type</strong> — upload a
+              <code>.nc</code>/<code>.nc4</code> file, or a <code>.zip</code> of
+              CSV files; not other combinations.</span
+            >
+          </li>
+          <li>
+            <i class="pi pi-exclamation-circle" aria-hidden="true"></i>
+            <span
+              ><strong>Incorrect ZIP structure</strong> — remove nested folders
+              and unrelated files.</span
+            >
+          </li>
+          <li>
+            <i class="pi pi-exclamation-circle" aria-hidden="true"></i>
+            <span
+              ><strong>Missing variables</strong> — make sure latitude,
+              longitude, and time are all included.</span
+            >
+          </li>
+          <li>
+            <i class="pi pi-exclamation-circle" aria-hidden="true"></i>
+            <span
+              ><strong>File too large</strong> — try a smaller dataset, or
+              contact support.</span
+            >
+          </li>
+        </ul>
+        <div class="info-box warning">
+          <strong>Please note:</strong> validations that use uploaded data
+          cannot be published, due to limited traceability. Data persistence is
+          also not yet guaranteed — future updates to QA4SM may require you to
+          re-upload your files. For datasets larger than several GB, contact
+          <a href="mailto:support@qa4sm.eu">support@qa4sm.eu</a> before
+          uploading.
+        </div>
+      </section>
+    }
 
     <!-- ════════════════════════════════════════
-        PUBLIC API
+    PUBLIC API
     ════════════════════════════════════════ -->
-    <section *ngIf="isActive('api')">
-      <h1>Public API</h1>
-      <p>
-        The QA4SM Public API lets you work with the service from the command line
-        or your own scripts. You can submit validation jobs, track their progress,
-        and download results as soon as they are ready. Access is secured with your
-        personal API token.
-      </p>
-
-      <div class="info-box">
-        You can request a personal API token from your
-        <a routerLink="/user-profile" target="_blank">User Profile</a> page. The
-        token identifies your account — keep it private and do not share it.
-      </div>
-
-      <h2>Authentication</h2>
-      <p>
-        Every request must include your personal token in the
-        <code>Authorization</code> header, in the form
-        <code>Authorization: Token &lt;YOUR_USER_TOKEN&gt;</code>. Requests without
-        a valid token are rejected.
-      </p>
-
-      <h2>Submit a validation</h2>
-      <p>
-        Start a new validation by sending a <code>POST</code> request.
-        <code>&lt;CONFIG_JSON_FILE&gt;</code> is a JSON file that defines the
-        datasets, filters, time ranges, and metrics for the validation job.
-      </p>
-      <pre>$ curl -X POST \
-    -H "Authorization: Token &lt;YOUR_USER_TOKEN&gt;" \
-    -H "Content-Type: application/json" \
-    -d @&lt;CONFIG_JSON_FILE&gt; \
-    https://qa4sm.eu/api/start-validation-with-token</pre>
-
-      <h2>List your validation runs</h2>
-      <p>
-        Retrieve your validation runs with a <code>GET</code> request. The example
-        below formats  the response as a readable table showing each run's id, name, datasets, and progress.
-      </p>
-      <pre>$ curl -X GET \
-    -H "Authorization: Token &lt;YOUR_USER_TOKEN&gt;" \
-    https://qa4sm.eu/api/my-validation-runs-with-token | jq -r '
-    .validation_runs[] |
-    [.id, .name, (.datasets | join("; ")), .progress] |
-    @tsv
-    ' | column -t</pre>
-
-      <h2>Download results</h2>
-      <p>
-        Once a validation has finished, download its result files as a ZIP archive.
-        Replace <code>&lt;VALIDATION_RUN_ID&gt;</code> with the id of the run (as
-        returned by the previous request) and <code>&lt;OUTPUT_FILE&gt;</code> with
-        the name to save it under.
-      </p>
-      <pre>$ curl -X GET \
-    -H "Authorization: Token &lt;YOUR_USER_TOKEN&gt;" \
-    "https://qa4sm.eu/api/download-result-file-with-token/&lt;VALIDATION_RUN_ID&gt;/zip" \
-    --output &lt;OUTPUT_FILE&gt;.zip</pre>
-
-      <div class="info-box">
-        A typical workflow uses all three endpoints in sequence: submit a
-        validation, poll the run list until its progress reaches completion, then
-        download the result ZIP using the run id.
-      </div>
-    </section>
+    @if (isActive("api")) {
+      <section>
+        <h1>Public API</h1>
+        <p>
+          The QA4SM Public API lets you work with the service from the command
+          line or your own scripts. You can submit validation jobs, track their
+          progress, and download results as soon as they are ready. Access is
+          secured with your personal API token.
+        </p>
+        <div class="info-box">
+          You can request a personal API token from your
+          <a routerLink="/user-profile" target="_blank">User Profile</a> page.
+          The token identifies your account — keep it private and do not share
+          it.
+        </div>
+        <h2>Authentication</h2>
+        <p>
+          Every request must include your personal token in the
+          <code>Authorization</code> header, in the form
+          <code>Authorization: Token &lt;YOUR_USER_TOKEN&gt;</code>. Requests
+          without a valid token are rejected.
+        </p>
+        <h2>Submit a validation</h2>
+        <p>
+          Start a new validation by sending a <code>POST</code> request.
+          <code>&lt;CONFIG_JSON_FILE&gt;</code> is a JSON file that defines the
+          datasets, filters, time ranges, and metrics for the validation job.
+        </p>
+        <pre>
+$ curl -X POST \
+          -H "Authorization: Token &lt;YOUR_USER_TOKEN&gt;" \
+          -H "Content-Type: application/json" \
+          -d @&lt;CONFIG_JSON_FILE&gt; \
+        https://qa4sm.eu/api/start-validation-with-token</pre
+        >
+        <h2>List your validation runs</h2>
+        <p>
+          Retrieve your validation runs with a <code>GET</code> request. The
+          example below formats the response as a readable table showing each
+          run's id, name, datasets, and progress.
+        </p>
+        <pre>
+$ curl -X GET \
+          -H "Authorization: Token &lt;YOUR_USER_TOKEN&gt;" \
+          https://qa4sm.eu/api/my-validation-runs-with-token | jq -r '
+          .validation_runs[] |
+          [.id, .name, (.datasets | join("; ")), .progress] |
+          @tsv
+        ' | column -t</pre
+        >
+        <h2>Download results</h2>
+        <p>
+          Once a validation has finished, download its result files as a ZIP
+          archive. Replace <code>&lt;VALIDATION_RUN_ID&gt;</code> with the id of
+          the run (as returned by the previous request) and
+          <code>&lt;OUTPUT_FILE&gt;</code> with the name to save it under.
+        </p>
+        <pre>
+$ curl -X GET \
+          -H "Authorization: Token &lt;YOUR_USER_TOKEN&gt;" \
+          "https://qa4sm.eu/api/download-result-file-with-token/&lt;VALIDATION_RUN_ID&gt;/zip" \
+        --output &lt;OUTPUT_FILE&gt;.zip</pre
+        >
+        <div class="info-box">
+          A typical workflow uses all three endpoints in sequence: submit a
+          validation, poll the run list until its progress reaches completion,
+          then download the result ZIP using the run id.
+        </div>
+      </section>
+    }
 
     <!-- ════════════════════════════════════════
-        INFO
+    INFO
     ════════════════════════════════════════ -->
-    <section *ngIf="isActive('info')">
-      <h1>Info</h1>
-      <p>
-        Reference material and background information about the QA4SM service.
-        Each topic below has its own dedicated page with the full details.
-      </p>
-
-      <ul class="icon-list">
-        <li>
-          <a routerLink="/help" target="_blank">
-            <i class="pi pi-question" aria-hidden="true"></i>
-            <span>Help</span>
-          </a>
-          <span>
-            — this help section itself, with step-by-step
-            guidance on running validations, viewing results, comparing
-            validations, and uploading your own data.
-          </span>
-        </li>
-        <li>
-          <a routerLink="/api/user-manual" target="_blank">
-            <i class="pi pi-fw pi-book" aria-hidden="true"></i>
-            <span>User manual</span>
-          </a>
-          <span>
-            — the complete technical documentation of
-            the platform, linked at the bottom of the help menu.
-          </span>
-        </li>
-        <li>
-          <a routerLink="/customise-plots" target="_blank">
-            <i class="pi pi-fw pi-chart-line" aria-hidden="true"></i>
-            <span>Custom plots</span>
-          </a>
-          <span>
-            — a Jupyter Notebook tutorial
-            showing how to create and customise map plots from the NetCDF files
-            produced by a validation (titles, colormaps, value ranges, spatial
-            extent, plot size, and more).
-          </span>
-        </li>
-        <li>
-          <a routerLink="/datasets" target="_blank">
-            <i class="pi pi-fw pi-database" aria-hidden="true"></i>
-            Datasets
-          </a>
-          <span>
-            — the full list of soil moisture products
-            available for validation, with their versions, time ranges, and
-            available filters.
-          </span>
-        </li>
-        <li>
-          <a routerLink="/terms" target="_blank">
-            <i class="pi pi-fw pi-briefcase" aria-hidden="true"></i>
-            Terms of use
-          </a>
-          <span>
-            — the conditions for using the QA4SM
-            service, including data ownership, citation requirements, and the
-            privacy policy.
-          </span>
-        </li>
-      </ul>
-
-      <div class="info-box">
-        When publishing results produced with QA4SM, you must acknowledge and cite
-        the service together with the original data sources. Citation guidance is
-        given on the <a routerLink="/terms" target="_blank">Terms</a> page.
-      </div>
-    </section>
-
-
-
-
+    @if (isActive("info")) {
+      <section>
+        <h1>Info</h1>
+        <p>
+          Reference material and background information about the QA4SM service.
+          Each topic below has its own dedicated page with the full details.
+        </p>
+        <ul class="icon-list">
+          <li>
+            <a routerLink="/help" target="_blank">
+              <i class="pi pi-question" aria-hidden="true"></i>
+              <span>Help</span>
+            </a>
+            <span>
+              — this help section itself, with step-by-step guidance on running
+              validations, viewing results, comparing validations, and uploading
+              your own data.
+            </span>
+          </li>
+          <li>
+            <a routerLink="/api/user-manual" target="_blank">
+              <i class="pi pi-fw pi-book" aria-hidden="true"></i>
+              <span>User manual</span>
+            </a>
+            <span>
+              — the complete technical documentation of the platform, linked at
+              the bottom of the help menu.
+            </span>
+          </li>
+          <li>
+            <a routerLink="/customise-plots" target="_blank">
+              <i class="pi pi-fw pi-chart-line" aria-hidden="true"></i>
+              <span>Custom plots</span>
+            </a>
+            <span>
+              — a Jupyter Notebook tutorial showing how to create and customise
+              map plots from the NetCDF files produced by a validation (titles,
+              colormaps, value ranges, spatial extent, plot size, and more).
+            </span>
+          </li>
+          <li>
+            <a routerLink="/datasets" target="_blank">
+              <i class="pi pi-fw pi-database" aria-hidden="true"></i>
+              Datasets
+            </a>
+            <span>
+              — the full list of soil moisture products available for
+              validation, with their versions, time ranges, and available
+              filters.
+            </span>
+          </li>
+          <li>
+            <a routerLink="/terms" target="_blank">
+              <i class="pi pi-fw pi-briefcase" aria-hidden="true"></i>
+              Terms of use
+            </a>
+            <span>
+              — the conditions for using the QA4SM service, including data
+              ownership, citation requirements, and the privacy policy.
+            </span>
+          </li>
+        </ul>
+        <div class="info-box">
+          When publishing results produced with QA4SM, you must acknowledge and
+          cite the service together with the original data sources. Citation
+          guidance is given on the
+          <a routerLink="/terms" target="_blank">Terms</a> page.
+        </div>
+      </section>
+    }
   </main>
 </div>
