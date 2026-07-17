@@ -1,4 +1,5 @@
 // Background and font
+@use "sass:color"; 
 $background-color: #ffffff;
 $font-color-base: #333;
 $font-color-white: #ffffff;
@@ -6,9 +7,9 @@ $font-color-muted: #939493;
 $font-color-dark-mode: #f1f5f9;
 
 $base-color: #1BA595;
-$base-light: mix(white, $base-color, 88%);
-$base-dark: mix(rgb(0, 0, 0), $base-color, 70%);
-$base-dark-hover: mix(rgb(0, 0, 0), $base-color, 40%);
+$base-light: color.mix(white, $base-color, 88%);
+$base-dark: color.mix(rgb(0, 0, 0), $base-color, 70%);
+$base-dark-hover: color.mix(rgb(0, 0, 0), $base-color, 40%);
 
 $highlight-color: #F2B033;
 $base-color-hover: #168F83; 
