@@ -1312,7 +1312,7 @@ def untrack_celery_task(task_id):
         __logger.debug('Task {} already deleted from db.'.format(task_id))
 
 
-def run_validation(validation_id, val_type="temporal"):
+def run_validation(validation_id, val_type="temporal", min_obs=None):
 
     __logger.info("Starting validation: {}".format(validation_id))
     validation_run = ValidationRun.objects.get(pk=validation_id) 
@@ -1326,14 +1326,14 @@ def run_validation(validation_id, val_type="temporal"):
 
     # 2026-14-04: FIX UNTIL SOMEONE TAKES LOOK AT TEMPORAL XARRAY VALIDATION (MISSING VALUES)
     if val_type in ["both"]:
-        spatial_run = run_validation(validation_id, val_type="spatial")
+        spatial_run = run_validation(validation_id, val_type="spatial", min_obs=min_obs)
         validation_run.refresh_from_db(fields=['progress', 'progress_spatial'])
     
         if validation_run.progress == -1:
             __logger.info(f"Validation {validation_id} was cancelled after spatial, skipping temporal.")
             return (None, spatial_run)
         
-        temporal_run = run_validation(validation_id, val_type="temporal")
+        temporal_run = run_validation(validation_id, val_type="temporal", min_obs=min_obs)
         return (temporal_run, spatial_run)
     # ----------------------------------------------------------------------
     
