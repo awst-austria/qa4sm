@@ -1,66 +1,147 @@
 <main class="flex justify-content-center">
-<div class="reports-page">
-  <h2>Automated Validation Reports</h2>
+  <div class="reports-page">
+    <h2>Automated Validation Reports</h2>
+    <p class="page-intro">
+      Automatically generated quality-monitoring reports for selected datasets.
+      New reports are added as they become available; the sampling interval may
+      differ between report series.
+    </p>
 
-  <div class="series-select" *ngIf="seriesList.length > 1">
-    <p-floatLabel class="mb-4 mt-3">
-      <p-select
-        [inputId]="seriesSelectorId"
-        (onChange)="loadSeries($event.value)"
-        [options]="seriesList"
-        [(ngModel)]="selectedSeries"
-        [filter]="true"
-        [style]="{'width': '100%'}" />
-      <label for="{{seriesSelectorId}}">Report series</label>
-    </p-floatLabel>
-  </div>
+    @if (seriesList.length > 1) {
+      <div class="series-select">
+        <p-floatLabel class="mb-4 mt-3">
+          <p-select
+            [inputId]="seriesSelectorId"
+            (onChange)="onSeriesChange($event.value)"
+            [options]="seriesList"
+            [(ngModel)]="selectedSeries"
+            [filter]="true"
+            [style]="{ width: '100%' }"
+          />
+          <label for="{{ seriesSelectorId }}">Report series</label>
+        </p-floatLabel>
+      </div>
+    }
 
-  <h3 *ngIf="selectedSeries">{{ selectedSeries }}</h3>
+    @if (selectedSeries) {
+      <h3>{{ selectedSeries }}</h3>
 
-  <p *ngIf="loading">Loading reports…</p>
-
-  <p-accordion [multiple]="true" [(value)]="activeYears"
-               *ngIf="!loading && yearGroups.length">
-    <p-accordion-panel *ngFor="let group of yearGroups" [value]="group.year">
-
-      <p-accordion-header>
-        <span class="year-header">
-          <span class="year-label">{{ group.year }}</span>
-          <span class="year-badges">
-            <span class="badge g" *ngIf="indicatorCount(group, 'G') as n"
-                  title="Good">{{ n }}</span>
-            <span class="badge y" *ngIf="indicatorCount(group, 'Y') as n"
-                  title="Warning">{{ n }}</span>
-            <span class="badge r" *ngIf="indicatorCount(group, 'R') as n"
-                  title="Critical">{{ n }}</span>
-          </span>
+      <div class="legend" aria-label="Indicator legend">
+        <span class="legend-item">
+          <span class="dot g"></span>{{ indicatorLabels["G"] }}
         </span>
-      </p-accordion-header>
+        <span class="legend-item">
+          <span class="dot y"></span>{{ indicatorLabels["Y"] }}
+        </span>
+        <span class="legend-item">
+          <span class="dot r"></span>{{ indicatorLabels["R"] }}
+        </span>
+      </div>
+    }
 
-      <p-accordion-content>
-        <div class="month-grid">
-          <ng-container *ngFor="let report of group.months; let i = index">
-            <a *ngIf="report"
-               class="month-tile"
-               [class.g]="report.indicator === 'G'"
-               [class.y]="report.indicator === 'Y'"
-               [class.r]="report.indicator === 'R'"
-               [href]="reportUrl(report)"
-               target="_blank"
-               [title]="'Report ' + report.report_date_iso
-                        + ' — generated ' + formatCreation(report.creation_date)">
-              {{ monthNames[i] }}
-            </a>
-            <span *ngIf="!report" class="month-tile empty"
-                  title="No report for this month">
-              {{ monthNames[i] }}
-            </span>
-          </ng-container>
+    @if (loading) {
+      <p>Loading reports…</p>
+    }
+
+    @if (!loading && latestReport) {
+      <div class="latest-card">
+        <div class="latest-info">
+          <span
+            class="dot"
+            [class.g]="latestReport.indicator === 'G'"
+            [class.y]="latestReport.indicator === 'Y'"
+            [class.r]="latestReport.indicator === 'R'"
+            [class.none]="!latestReport.indicator"
+            [title]="indicatorTitle(latestReport)"
+          ></span>
+          <div>
+            <div class="latest-title">
+              Latest report — {{ latestReport.report_date_iso }}
+            </div>
+            <div class="meta">
+              {{ latestReport.filename }} · generated
+              {{ formatCreation(latestReport.creation_date) }}
+            </div>
+          </div>
         </div>
-      </p-accordion-content>
+        <div class="latest-actions">
+          <a class="action-link" [href]="reportUrl(latestReport)" target="_blank">
+            Open
+          </a>
+          <button
+            type="button"
+            class="action-button"
+            (click)="copyLink(latestUrl())"
+          >
+            {{ copiedUrl === latestUrl() ? "Link copied" : "Copy latest link" }}
+          </button>
+        </div>
+      </div>
+      <p class="hint">
+        The latest report link always points to the newest report of this series.
+      </p>
+    }
 
-    </p-accordion-panel>
-  </p-accordion>
+    @if (!loading && yearGroups.length) {
+      <p-accordion [multiple]="true" [(value)]="activeYears">
+        @for (group of yearGroups; track group.year) {
+          <p-accordion-panel [value]="group.year">
+            <p-accordion-header>
+              <span class="year-header">
+                <span class="year-label">{{ group.year }}</span>
+                <span class="report-count">
+                  {{ group.reports.length }}
+                  report{{ group.reports.length === 1 ? "" : "s" }}
+                </span>
+                <span class="year-badges">
+                  @if (indicatorCount(group, "G"); as n) {
+                    <span class="badge g" title="Good">{{ n }}</span>
+                  }
+                  @if (indicatorCount(group, "Y"); as n) {
+                    <span class="badge y" title="Warning">{{ n }}</span>
+                  }
+                  @if (indicatorCount(group, "R"); as n) {
+                    <span class="badge r" title="Critical">{{ n }}</span>
+                  }
+                </span>
+              </span>
+            </p-accordion-header>
+            <p-accordion-content>
+              <ul class="report-list">
+                @for (report of group.reports; track report.filename) {
+                  <li class="report-row">
+                    <span
+                      class="dot"
+                      [class.g]="report.indicator === 'G'"
+                      [class.y]="report.indicator === 'Y'"
+                      [class.r]="report.indicator === 'R'"
+                      [class.none]="!report.indicator"
+                      [title]="indicatorTitle(report)"
+                    ></span>
+                    <div class="report-main">
+                      <a [href]="reportUrl(report)" target="_blank">
+                        {{ report.filename }}
+                      </a>
+                      <span class="meta">
+                        report date {{ report.report_date_iso }} · generated
+                        {{ formatCreation(report.creation_date) }}
+                      </span>
+                    </div>
+                    <button
+                      type="button"
+                      class="action-button"
+                      (click)="copyLink(reportUrl(report))"
+                    >
+                      {{ copiedUrl === reportUrl(report) ? "Copied" : "Copy link" }}
+                    </button>
+                  </li>
+                }
+              </ul>
+            </p-accordion-content>
+          </p-accordion-panel>
+        }
+      </p-accordion>
+    }
 
   <p *ngIf="!loading && selectedSeries && !yearGroups.length">
     No reports available for this series.

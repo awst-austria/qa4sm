@@ -54,6 +54,7 @@ export const routes: Routes = [
   {path: 'json-config', component: JsonConfigComponent},
   {path: 'customise-plots', component: CustomisePlotsComponent},
   {path: 'reports', component: ReportsComponent},
+  {path: 'reports/:series', component: ReportsComponent},
   {path: '**', component: ErrorPageComponent}
 ];
 

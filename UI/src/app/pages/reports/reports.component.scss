@@ -1,11 +1,20 @@
 @use 'src/style.variables' as *;
 
-.reports-page{
-  width: min(1600px, 100%);   /* max width for large screens */
+.reports-page {
+  width: min(1100px, 100%); /* narrower — it's a list now, not a 12-col grid */
   padding: 0 1rem;
-  h2, h3 {
+
+  h2,
+  h3 {
     text-align: center;
   }
+}
+
+.page-intro {
+  text-align: center;
+  color: $font-color-muted;
+  margin: 0 auto 1rem;
+  max-width: 42rem;
 }
 
 .series-select {
@@ -13,10 +22,104 @@
   justify-content: center;
   margin-top: 1rem;
 
-  p-floatLabel, p-floatlabel {
-    width: min(24rem, 100%);  
+  p-floatLabel,
+  p-floatlabel {
+    width: min(24rem, 100%);
   }
 }
+
+/* --- shared indicator dot ---------------------------------------------- */
+
+.dot {
+  display: inline-block;
+  width: 0.9rem;
+  height: 0.9rem;
+  border-radius: 50%;
+  flex-shrink: 0;
+
+  &.g { background: $base-color; }
+  &.y { background: $highlight-color; }
+  &.r { background: $pronouced-button-color; }
+  &.none { background: var(--p-surface-300, #d1d5db); }
+}
+
+.meta {
+  color: $font-color-muted;
+  font-size: 0.85rem;
+}
+
+/* --- legend ------------------------------------------------------------ */
+
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1.5rem;
+  justify-content: center;
+  margin: 0.25rem 0 1.25rem;
+  font-size: 0.9rem;
+
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+}
+
+/* --- latest report card ------------------------------------------------ */
+
+.latest-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.75rem 1rem;
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--p-surface-300, #d1d5db);
+  border-radius: 8px;
+
+  .latest-info {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    min-width: 0;
+  }
+
+  .latest-title {
+    font-weight: 700;
+  }
+
+  .latest-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+}
+
+.hint {
+  color: $font-color-muted;
+  font-size: 0.85rem;
+  margin: 0.4rem 0 1.5rem;
+}
+
+.action-link,
+.action-button {
+  font: inherit;
+  font-size: 0.9rem;
+  padding: 0.35rem 0.75rem;
+  border: 1px solid var(--p-surface-400, #9ca3af);
+  border-radius: 6px;
+  background: none;
+  color: inherit;
+  text-decoration: none;
+  cursor: pointer;
+  white-space: nowrap;
+
+  &:hover {
+    background: var(--p-surface-100, #f3f4f6);
+  }
+}
+
+/* --- accordion year header --------------------------------------------- */
 
 .year-header {
   display: flex;
@@ -25,6 +128,11 @@
 
   .year-label {
     font-weight: 700;
+  }
+
+  .report-count {
+    color: $font-color-muted;
+    font-size: 0.85rem;
   }
 
   .year-badges {
@@ -38,7 +146,7 @@
     justify-content: center;
     min-width: 1.5rem;
     height: 1.5rem;
-    padding: 0 0.3rem;          // keeps two-digit numbers inside
+    padding: 0 0.3rem; // keeps two-digit numbers inside
     border-radius: 50%;
     font-size: 0.8rem;
     font-weight: 700;
@@ -50,38 +158,54 @@
   }
 }
 
-.month-grid {
-  display: grid;
-  grid-template-columns: repeat(12, 1fr);
-  gap: 0.4rem;
+/* --- report list (timeline style) -------------------------------------- */
 
-  @media (max-width: 800px) {
-    grid-template-columns: repeat(6, 1fr);
+.report-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  position: relative;
+
+  /* vertical timeline line running through the dots */
+  &::before {
+    content: '';
+    position: absolute;
+    left: calc(0.45rem - 1px); /* center of the 0.9rem dot */
+    top: 0.75rem;
+    bottom: 0.75rem;
+    width: 2px;
+    background: var(--p-surface-300, #d1d5db);
   }
 }
 
-.month-tile {
+.report-row {
   display: flex;
   align-items: center;
-  justify-content: center;
-  padding: 0.5rem 0;
-  border-radius: 6px;
-  font-weight: 400;
-  color: #fff;
-  text-decoration: none;
-  transition: transform 0.1s;
+  gap: 0.75rem;
+  padding: 0.45rem 0;
 
-  &:not(.empty):hover {
-    transform: scale(1.07);
+  .dot {
+    position: relative;
+    z-index: 1; /* sits on top of the timeline line */
   }
 
-  &.g { background: $base-color; }
-  &.y { background: $highlight-color; color: #333; }
-  &.r { background: $pronouced-button-color; }
+  .report-main {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
 
-  &.empty {
-    background: var(--p-surface-200, #e5e7eb);
-    color: $font-color-muted;
-    cursor: default;
+    a {
+      font-weight: 500;
+      text-decoration: none;
+      word-break: break-all;
+
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+  }
+
+  .action-button {
+    margin-left: auto;
   }
 }
