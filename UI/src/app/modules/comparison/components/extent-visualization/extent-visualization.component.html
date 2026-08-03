@@ -1,90 +1,105 @@
-<div *ngIf="showLoadingSpinner" class="text-center">
-  <qa-loading-spinner/>
-</div>
-<div *ngIf="!showLoadingSpinner && errorHappened" class="center alert flex py-2">
-  <p> Extent plot not available! </p>
-</div>
-
-<div *ngIf="!showLoadingSpinner && ! errorHappened" class="flex no-gutters pb-2">
-  <div *ngIf="img === 'Raise message to check box', else noError" class="w-12">
-    <p-panel class="validation-row">
-      <ng-template pTemplate="header">
-        <div class="text-center my-1" style="width: 92%">
-          <p class="my-0 font-weight-normal">Warning</p>
-        </div>
-      </ng-template>
-      <ng-template pTemplate="icons">
-        <label class="mb-0">
-          <span class="p-panel-header-icon pi pi-exclamation-triangle help-icon"></span>
-        </label>
-      </ng-template>
-      <div class="col">
-        <div class="pb-3">The selected validations have a non-overlapping extent, which means that there are no
-          common validation points. If you wish to perform the comparison, check the 'Include all points from the
-          selected validations' option in the 'Spatial extent' dialogue box and re-run the comparison. In this case
-          a boxplot only will be shown, comparing the distribution of values in the two validations.
-        </div>
-      </div>
-    </p-panel>
+@if (showLoadingSpinner) {
+  <div class="text-center">
+    <qa-loading-spinner />
   </div>
-  <ng-template #noError>
-    <div class="w-12">
-      <p-panel [toggleable]="true" [collapsed]="true">
-        <ng-template pTemplate="header">
-          <div class="text-center my-1" style="width: 92%">
-            <p class="my-0 font-weight-normal">Selected comparison extent</p>
-          </div>
-        </ng-template>
-        <ng-template pTemplate="icons">
-          <label class="mb-0 p-panel-header-icon "
-                 pTooltip="Representation of the comparison spatial extent selected through the 'Spatial extent' dialogue box."
-                 tooltipPosition="bottom">
-            <span class="pi pi-question-circle help-icon"></span>
-          </label>
-        </ng-template>
+}
+@if (!showLoadingSpinner && errorHappened) {
+  <div class="center alert flex py-2">
+    <p>Extent plot not available!</p>
+  </div>
+}
 
-        <div class="col">
-          <div class="pb-3">
-            {{ this.intersectionText ?
-            "The comparison is performed by considering only the reference grid points that are in the common " +
-            "spatial extent of the two validations, as specified in the 'Spatial extent' dialogue window. To include all " +
-            "points, check the box in the dialogue window." :
-            "The comparison is performed by considering all points belonging to the considered validations (this " +
-            "is the only option when the validations belong to the same run, e.g. multiple non-reference datasets)."
-            }}
-          </div>
-          <div class="flex center py-0">
-            <div class='w-auto'>
-              <p-image width="100%"
-                       [src]="sanitizePlotUrl(img)"
-                       [ngClass]="{'result-plot':true, 'pcol6': true}"
-                       preview="true"
-                       alt="An overview of the selected comparison extent">
-              </p-image>
+@if (!showLoadingSpinner && !errorHappened) {
+  <div class="flex no-gutters pb-2">
+    @if (img === "Raise message to check box") {
+      <div class="w-12">
+        <p-panel class="validation-row">
+          <ng-template pTemplate="header">
+            <div class="text-center my-1" style="width: 92%">
+              <p class="my-0 font-weight-normal">Warning</p>
+            </div>
+          </ng-template>
+          <ng-template pTemplate="icons">
+            <label class="mb-0">
+              <span
+                class="p-panel-header-icon pi pi-exclamation-triangle help-icon"
+              ></span>
+            </label>
+          </ng-template>
+          <div class="col">
+            <div class="pb-3">
+              The selected validations have a non-overlapping extent, which
+              means that there are no common validation points. If you wish to
+              perform the comparison, check the 'Include all points from the
+              selected validations' option in the 'Spatial extent' dialogue box
+              and re-run the comparison. In this case a boxplot only will be
+              shown, comparing the distribution of values in the two
+              validations.
             </div>
           </div>
-        </div>
-
-
-        <!--  buttons  -->
-        <div class="py-0">
-          <!--  Multiple file download  -->
-          <div class="py-0" style="text-align: right">
-            <a class="btn-action-large"
-               pButton
-               type="button"
-               icon="pi pi-download"
-               [href]=sanitizePlotUrl(img)
-               download="spatial_extent.png"
-               label="Download image"
-               title="Download the image as .png">
-            </a>
+        </p-panel>
+      </div>
+    } @else {
+      <div class="w-12">
+        <p-panel [toggleable]="true" [collapsed]="true">
+          <ng-template pTemplate="header">
+            <div class="text-center my-1" style="width: 92%">
+              <p class="my-0 font-weight-normal">Selected comparison extent</p>
+            </div>
+          </ng-template>
+          <ng-template pTemplate="icons">
+            <label
+              class="mb-0 p-panel-header-icon"
+              pTooltip="Representation of the comparison spatial extent selected through the 'Spatial extent' dialogue box."
+              tooltipPosition="bottom"
+            >
+              <span class="pi pi-question-circle help-icon"></span>
+            </label>
+          </ng-template>
+          <div class="col">
+            <div class="pb-3">
+              {{
+                this.intersectionText
+                  ? "The comparison is performed by considering only the reference grid points that are in the common " +
+                    "spatial extent of the two validations, as specified in the 'Spatial extent' dialogue window. To include all " +
+                    "points, check the box in the dialogue window."
+                  : "The comparison is performed by considering all points belonging to the considered validations (this " +
+                    "is the only option when the validations belong to the same run, e.g. multiple non-reference datasets)."
+              }}
+            </div>
+            <div class="flex center py-0">
+              <div class="w-auto">
+                <p-image
+                  width="100%"
+                  [src]="sanitizePlotUrl(img)"
+                  [ngClass]="{ 'result-plot': true, pcol6: true }"
+                  preview="true"
+                  alt="An overview of the selected comparison extent"
+                >
+                </p-image>
+              </div>
+            </div>
           </div>
-        </div>
-
-      </p-panel>
-      <!--  </p-panel>-->
-    </div>
-  </ng-template>
-</div>
-
+          <!--  buttons  -->
+          <div class="py-0">
+            <!--  Multiple file download  -->
+            <div class="py-0" style="text-align: right">
+              <a
+                class="btn-action-large"
+                pButton
+                type="button"
+                icon="pi pi-download"
+                [href]="sanitizePlotUrl(img)"
+                download="spatial_extent.png"
+                label="Download image"
+                title="Download the image as .png"
+              >
+              </a>
+            </div>
+          </div>
+        </p-panel>
+        <!--  </p-panel>-->
+      </div>
+    }
+  </div>
+}

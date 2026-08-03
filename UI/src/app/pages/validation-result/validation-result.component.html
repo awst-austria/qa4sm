@@ -1,65 +1,110 @@
 <main>
-  <div class="flex flex-column flex-wrap w-12 align-items-center justify-content-center">
-    <div *ngIf="(validationModel.validationRun$ | async) as validationRun"
-         class="flex flex-column align-content-center justify-content-center w-12">
-      <div *ngIf="validationRun && (validationModel.datasetConfigs$ | async) as configs"
-           class="flex flex-column align-items-center justify-content-center w-12">
-
-        <!-- RUNNING -->
-        <div *ngIf="validationRun.status === 'RUNNING' || validationRun.status === 'SCHEDULED'"
-            class="text-center mb-5 mt-4 w-12">
-          <h1>Validation Running...</h1>
-          <p class="lead text-muted">Your validation is still running. You'll be notified via e-mail once it's finished.</p>
-          <p class="lead text-muted">You don't have to keep this page open for the validation to run.</p>
-        </div>
-
-        <!-- FINISHED (includes cancelled and error) -->
-        <div *ngIf="validationRun.status === 'DONE' || validationRun.status === 'CANCELLED' || validationRun.status === 'ERROR'"
-            class="mb-5 mt-4 flex flex-column flex-wrap align-items-center justify-content-center xl:w-6 lg:w-8 w-10 gap-2">
-          <h1 class="text-center">Validation Results</h1>
-
-          <p-message *ngIf="validationRun.status === 'CANCELLED'" 
-                    severity="warn" 
+  <div
+    class="flex flex-column flex-wrap w-12 align-items-center justify-content-center"
+  >
+    @if (validationModel.validationRun$ | async; as validationRun) {
+      <div
+        class="flex flex-column align-content-center justify-content-center w-12"
+      >
+        @if (
+          validationRun && (validationModel.datasetConfigs$ | async);
+          as configs
+        ) {
+          <div
+            class="flex flex-column align-items-center justify-content-center w-12"
+          >
+            <!-- RUNNING -->
+            @if (
+              validationRun.status === "RUNNING" ||
+              validationRun.status === "SCHEDULED"
+            ) {
+              <div class="text-center mb-5 mt-4 w-12">
+                <h1>Validation Running...</h1>
+                <p class="lead text-muted">
+                  Your validation is still running. You'll be notified via
+                  e-mail once it's finished.
+                </p>
+                <p class="lead text-muted">
+                  You don't have to keep this page open for the validation to
+                  run.
+                </p>
+              </div>
+            }
+            <!-- FINISHED (includes cancelled and error) -->
+            @if (
+              validationRun.status === "DONE" ||
+              validationRun.status === "CANCELLED" ||
+              validationRun.status === "ERROR"
+            ) {
+              <div
+                class="mb-5 mt-4 flex flex-column flex-wrap align-items-center justify-content-center xl:w-6 lg:w-8 w-10 gap-2"
+              >
+                <h1 class="text-center">Validation Results</h1>
+                @if (validationRun.status === "CANCELLED") {
+                  <p-message
+                    severity="warn"
                     text="This validation was cancelled and may not contain complete results."
-                    class="w-12"/>
-
-          <p-message *ngIf="validationRun.status === 'ERROR'" 
-                    severity="error" 
+                    class="w-12"
+                  />
+                }
+                @if (validationRun.status === "ERROR") {
+                  <p-message
+                    severity="error"
                     text="This validation encountered an error."
-                    class="w-12"/>
+                    class="w-12"
+                  />
+                }
+                <qa-validation-summary
+                  [validationModel]="validationModel"
+                  [validationRun]="validationRun"
+                  (doRefresh)="update()"
+                />
+                @if (validationRun.status === "DONE") {
+                  @if (validationRun.output_file) {
+                    <qa-summary-statistics
+                      [validationRun]="validationRun"
+                      [configs]="configs"
+                    />
+                    <div
+                      class="flex flex-column w-12 align-content-center justify-content-center"
+                    >
+                      <qa-result-files [validation]="validationRun" />
+                    </div>
+                  }
+                  @if (validationRun.output_file_spatial) {
+                    <div
+                      class="flex flex-column w-12 align-content-center justify-content-center"
+                    >
+                      <qa-result-files-spatial [validation]="validationRun" />
+                    </div>
+                    <div
+                      class="flex flex-column w-12 align-content-center justify-content-center"
+                    >
+                      <qa-summary-statistics-spatial
+                        [validationRun]="validationRun"
+                      />
+                    </div>
+                  }
+                }
+              </div>
+            }
+          </div>
+        }
+      </div>
+    }
 
-          <qa-validation-summary [validationModel]="validationModel" [validationRun]="validationRun"
-                                 (doRefresh)="update()"/>
-
-            <ng-container *ngIf="validationRun.status === 'DONE'">
-              <ng-container *ngIf="validationRun.output_file">
-                <qa-summary-statistics [validationRun]="validationRun" [configs]="configs"/>
-                <div class="flex flex-column w-12 align-content-center justify-content-center">
-                  <qa-result-files [validation]="validationRun"/>
-                </div>
-              </ng-container>
-
-              <ng-container *ngIf="validationRun.output_file_spatial">
-                <div class="flex flex-column w-12 align-content-center justify-content-center">
-                  <qa-result-files-spatial [validation]="validationRun"/>
-                </div>
-                <div class="flex flex-column w-12 align-content-center justify-content-center">
-                  <qa-summary-statistics-spatial [validationRun]="validationRun"/>
-                </div>
-              </ng-container>
-            </ng-container>
-
+    @if (dataFetchError()) {
+      <div>
+        <div
+          class="flex flex-column align-content-center justify-content-center w-12"
+        >
+          <p class="lead text-muted">
+            Sorry, looks like the validation you are trying to open does not
+            exist anymore.
+          </p>
         </div>
       </div>
-    </div>
-
-    <div *ngIf="dataFetchError()">
-      <div class="flex flex-column align-content-center justify-content-center w-12">
-        <p class="lead text-muted">
-          Sorry, looks like the validation you are trying to open does not exist anymore.
-        </p>
-      </div>
-    </div>
+    }
   </div>
   <p-scrollTop styleClass="scroll-button"></p-scrollTop>
 </main>

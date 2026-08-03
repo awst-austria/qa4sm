@@ -1,255 +1,473 @@
 <main class="flex flex-column align-items-center justify-content-center">
   <div class="flex flex-column w-11 xl:w-10 mt-4">
-
-    <div *ngIf="hasNoSpaceAssigned">
-      <div class="text-center lead text-muted pt-3">
-        You have no space for uploading data assigned. Please contact our team (support(at)qa4sm.eu or via our
-        <a [routerLink]="['/contact-us']">contact form</a>) to solve this problem.
-      </div>
-    </div>
-
-    <div *ngIf="!hasNoSpaceAssigned && !maintenanceMode">
-      <div class="flex justify-content-center">
-        <h1 class="text-center">Upload your data</h1>
-      </div>
-
-      <div *ngIf="!settingsError else noSettingsFetched">
-        <div class="text-center lead text-muted pt-3">{{ getLimitMessage() }}</div>
-        <div class="flex flex-column pt-5 justify-content-center align-content-center">
-          <qa-user-file-upload/>
+    @if (hasNoSpaceAssigned) {
+      <div>
+        <div class="text-center lead text-muted pt-3">
+          You have no space for uploading data assigned. Please contact our team
+          (support(at)qa4sm.eu or via our
+          <a [routerLink]="['/contact-us']">contact form</a>) to solve this
+          problem.
         </div>
       </div>
-      <ng-template #noSettingsFetched>
+    }
+
+    @if (!hasNoSpaceAssigned && !maintenanceMode) {
+      <div>
         <div class="flex justify-content-center">
-          <p class="lead text-muted">Sorry, uploading data is not possible now.</p>
+          <h1 class="text-center">Upload your data</h1>
         </div>
-      </ng-template>
-
-      <div class="flex justify-content-center mb-3 mt-4">
-        <h1 class="text-center">Uploaded datasets</h1>
-      </div>
-
-      <div *ngIf="(userDatasets$ | async) as userDatasetList">
-        <div *ngIf="(dataManagementGroups$ | async) as dataManagementGroups">
-
-          <p-table
-            [value]="userDatasetList"
-            [styleClass]="'p-datatable-sm p-datatable-striped qa-datasets-table'"
-            [paginator]="userDatasetList.length > 10"
-            [rows]="10">
-
-            <ng-template pTemplate="emptymessage">
-              <tr>
-                <td colspan="6" class="text-center p-5">
-                  <div class="flex flex-column align-items-center gap-3">
-                    <i class="pi pi-folder-open" style="font-size: 2.5rem; color: var(--text-color-secondary)"></i>
-                    <span style="font-size: 1.1rem; color: var(--text-color-secondary)">You have not uploaded any data yet</span>
-                    <span class="text-muted text-sm">Click on the upload zone above to get started.</span>
-                  </div>
-                </td>
-              </tr>
-            </ng-template>
-
-            <ng-template pTemplate="header">
-              <tr>
-                <th>Upload date</th>
-                <th>Dataset</th>
-                <th class="text-center">Size</th>
-                <th>Validations</th>
-                <th>Shared</th>
-                <th class="text-center">Actions</th>
-              </tr>
-            </ng-template>
-
-            <ng-template pTemplate="body" let-userDataset>
-              <ng-container *ngIf="getMeta(userDataset.id) as meta">
-                <tr [ngClass]="{'opacity-60': userDataset.status === 'preprocessing'}">
-
-                  <!-- Upload date -->
-                  <td>{{ userDataset.upload_date | date:'yyyy-MM-dd' }}</td>
-
-                  <!-- Dataset  -->
-                   <td>
-                    <!-- Dataset name (inline edit) -->
-                    <div *ngIf="!meta.editDataset.opened; else editDatasetTpl">
-                      <span style="cursor:pointer"
-                        [pTooltip]="meta.datasetName() ? 'Click to rename' : 'Could not fetch dataset name'"
-                        tooltipPosition="bottom"
-                        (click)="toggle(userDataset.id, datasetFieldName, true)">
-                        <b>{{ meta.datasetName() }}</b>
-                        <span class="pi pi-pencil small-edit-icon ml-1"></span>
-                      </span>
-                    </div>
-                    <ng-template #editDatasetTpl>
-                      <div class="flex align-items-center gap-1">
-                        <input #newDatasetName type="text" pInputText
-                              [value]="meta.datasetName()"
-                              class="p-inputtext-sm"
-                              (keyup.enter)="updateMetadata(datasetFieldName, newDatasetName.value, userDataset)"
-                              (keyup.escape)="toggle(userDataset.id, datasetFieldName, false)"/>
-                        <button pButton icon="pi pi-check" class="p-button-text p-button-sm p-button-success"
-                                (click)="updateMetadata(datasetFieldName, newDatasetName.value, userDataset)"></button>
-                        <button pButton icon="pi pi-times" class="p-button-text p-button-sm p-button-danger"
-                                (click)="toggle(userDataset.id, datasetFieldName, false)"></button>
-                      </div>
-                    </ng-template>
-
-                    <!-- Version (inline edit) -->
-                    <div class="mt-1">
-                      <div *ngIf="!meta.editVersion.opened; else editVersionTpl">
-                        <span style="cursor:pointer"
-                          [pTooltip]="meta.versionName() ? 'Click to rename' : 'Could not fetch version name'"
-                          tooltipPosition="bottom"
-                          (click)="toggle(userDataset.id, versionFieldName, true)">
-                          <span class="text-muted">version: </span><b>{{ meta.versionName() }}</b>
-                          <span class="pi pi-pencil small-edit-icon ml-1"></span>
-                        </span>
-                      </div>
-                      <ng-template #editVersionTpl>
-                        <div class="flex align-items-center gap-1">
-                          <input #newVersionName type="text" pInputText
-                                [value]="meta.versionName()"
+        @if (!settingsError) {
+          <div>
+            <div class="text-center lead text-muted pt-3">
+              {{ getLimitMessage() }}
+            </div>
+            <div
+              class="flex flex-column pt-5 justify-content-center align-content-center"
+            >
+              <qa-user-file-upload />
+            </div>
+          </div>
+        } @else {
+          <div class="flex justify-content-center">
+            <p class="lead text-muted">
+              Sorry, uploading data is not possible now.
+            </p>
+          </div>
+        }
+        <div class="flex justify-content-center mb-3 mt-4">
+          <h1 class="text-center">Uploaded datasets</h1>
+        </div>
+        @if (userDatasets$ | async; as userDatasetList) {
+          <div>
+            @if (dataManagementGroups$ | async; as dataManagementGroups) {
+              <div>
+                <p-table
+                  [value]="userDatasetList"
+                  [styleClass]="'p-datatable-sm p-datatable-striped qa-datasets-table'"
+                  [paginator]="userDatasetList.length > 10"
+                  [rows]="10"
+                >
+                  <ng-template pTemplate="emptymessage">
+                    <tr>
+                      <td colspan="6" class="text-center p-5">
+                        <div class="flex flex-column align-items-center gap-3">
+                          <i
+                            class="pi pi-folder-open"
+                            style="
+                              font-size: 2.5rem;
+                              color: var(--text-color-secondary);
+                            "
+                          ></i>
+                          <span
+                            style="
+                              font-size: 1.1rem;
+                              color: var(--text-color-secondary);
+                            "
+                            >You have not uploaded any data yet</span
+                          >
+                          <span class="text-muted text-sm"
+                            >Click on the upload zone above to get
+                            started.</span
+                          >
+                        </div>
+                      </td>
+                    </tr>
+                  </ng-template>
+                  <ng-template pTemplate="header">
+                    <tr>
+                      <th>Upload date</th>
+                      <th>Dataset</th>
+                      <th class="text-center">Size</th>
+                      <th>Validations</th>
+                      <th>Shared</th>
+                      <th class="text-center">Actions</th>
+                    </tr>
+                  </ng-template>
+                  <ng-template pTemplate="body" let-userDataset>
+                    @if (getMeta(userDataset.id); as meta) {
+                      <tr
+                        [ngClass]="{
+                          'opacity-60': userDataset.status === 'preprocessing',
+                        }"
+                      >
+                        <!-- Upload date -->
+                        <td>
+                          {{ userDataset.upload_date | date: "yyyy-MM-dd" }}
+                        </td>
+                        <!-- Dataset  -->
+                        <td>
+                          <!-- Dataset name (inline edit) -->
+                          @if (!meta.editDataset.opened) {
+                            <div>
+                              <span
+                                style="cursor: pointer"
+                                [pTooltip]="
+                                  meta.datasetName()
+                                    ? 'Click to rename'
+                                    : 'Could not fetch dataset name'
+                                "
+                                tooltipPosition="bottom"
+                                (click)="
+                                  toggle(userDataset.id, datasetFieldName, true)
+                                "
+                              >
+                                <b>{{ meta.datasetName() }}</b>
+                                <span
+                                  class="pi pi-pencil small-edit-icon ml-1"
+                                ></span>
+                              </span>
+                            </div>
+                          } @else {
+                            <div class="flex align-items-center gap-1">
+                              <input
+                                #newDatasetName
+                                type="text"
+                                pInputText
+                                [value]="meta.datasetName()"
                                 class="p-inputtext-sm"
-                                (keyup.enter)="updateMetadata(versionFieldName, newVersionName.value, userDataset)"
-                                (keyup.escape)="toggle(userDataset.id, versionFieldName, false)"/>
-                          <button pButton icon="pi pi-check" class="p-button-text p-button-sm p-button-success"
-                                  (click)="updateMetadata(versionFieldName, newVersionName.value, userDataset)"></button>
-                          <button pButton icon="pi pi-times" class="p-button-text p-button-sm p-button-danger"
-                                  (click)="toggle(userDataset.id, versionFieldName, false)"></button>
-                        </div>
-                      </ng-template>
-                    </div>
-
-                    <!-- Variable (inline dropdown edit) -->
-                    <div class="mt-1">
-                      <div *ngIf="!meta.editVariable.opened; else editVariableTpl">
-                        <span style="cursor:pointer"
-                          [class]="meta.variable.shortName() !== '--none--' ? 'text-muted' : 'text-red'"
-                          [pTooltip]="meta.variable.shortName() !== '--none--' && meta.variable.shortName()
-                            ? 'Click to change variable.'
-                            : meta.variable.shortName() === '--none--'
-                              ? 'Could not retrieve variable name. Please choose one.'
-                              : 'Could not fetch variable name.'"
-                          tooltipPosition="bottom"
-                          (click)="toggle(userDataset.id, variableFieldName, true)">
-                          <span class="text-muted">variable: </span><b>{{ meta.variable.shortName() }}</b>
-                          <span *ngIf="meta.variable.unit()"> [{{ meta.variable.unit() }}]</span>
-                          <span class="pi pi-question-circle small-edit-icon ml-1"></span>
-                        </span>
-                      </div>
-                      <ng-template #editVariableTpl>
-                        <div class="flex align-items-center gap-1">
-                          <p-select
-                            [disabled]="!meta.variable.shortName()"
-                            [options]="userDataset.all_variables"
-                            [ngModel]="meta.variable.shortName()"
-                            (ngModelChange)="updateMetadata(variableFieldName, $event, userDataset)"
-                            [style]="{'width':'8rem'}"
-                            optionLabel="name"
-                            optionValue="name"
-                            placeholder="Choose"
-                            ngDefaultControl>
-                          </p-select>
-                          <button pButton icon="pi pi-times" class="p-button-text p-button-sm p-button-danger"
-                                  (click)="toggle(userDataset.id, variableFieldName, false)"></button>
-                        </div>
-                      </ng-template>
-                    </div>
-                  </td>
-                  
-                  <!-- Size / status -->
-                  <td class="text-center">
-                    <ng-container *ngIf="userDataset.status === 'preprocessing'">
-                      <p-tag severity="info">
-                        <i class="pi pi-spin pi-spinner mr-1" style="font-size:0.7rem"></i>
-                        Preprocessing
-                      </p-tag>
-                    </ng-container>
-                    <ng-container *ngIf="userDataset.status === 'failed'">
-                      <p-tag severity="danger" value="Failed"></p-tag>
-                      <div class="mt-1">
-                        <button pButton type="button"
+                                (keyup.enter)="
+                                  updateMetadata(
+                                    datasetFieldName,
+                                    newDatasetName.value,
+                                    userDataset
+                                  )
+                                "
+                                (keyup.escape)="
+                                  toggle(
+                                    userDataset.id,
+                                    datasetFieldName,
+                                    false
+                                  )
+                                "
+                              />
+                              <button
+                                pButton
+                                icon="pi pi-check"
+                                class="p-button-text p-button-sm p-button-success"
+                                (click)="
+                                  updateMetadata(
+                                    datasetFieldName,
+                                    newDatasetName.value,
+                                    userDataset
+                                  )
+                                "
+                              ></button>
+                              <button
+                                pButton
+                                icon="pi pi-times"
+                                class="p-button-text p-button-sm p-button-danger"
+                                (click)="
+                                  toggle(
+                                    userDataset.id,
+                                    datasetFieldName,
+                                    false
+                                  )
+                                "
+                              ></button>
+                            </div>
+                          }
+                          <!-- Version (inline edit) -->
+                          <div class="mt-1">
+                            @if (!meta.editVersion.opened) {
+                              <div>
+                                <span
+                                  style="cursor: pointer"
+                                  [pTooltip]="
+                                    meta.versionName()
+                                      ? 'Click to rename'
+                                      : 'Could not fetch version name'
+                                  "
+                                  tooltipPosition="bottom"
+                                  (click)="
+                                    toggle(
+                                      userDataset.id,
+                                      versionFieldName,
+                                      true
+                                    )
+                                  "
+                                >
+                                  <span class="text-muted">version: </span
+                                  ><b>{{ meta.versionName() }}</b>
+                                  <span
+                                    class="pi pi-pencil small-edit-icon ml-1"
+                                  ></span>
+                                </span>
+                              </div>
+                            } @else {
+                              <div class="flex align-items-center gap-1">
+                                <input
+                                  #newVersionName
+                                  type="text"
+                                  pInputText
+                                  [value]="meta.versionName()"
+                                  class="p-inputtext-sm"
+                                  (keyup.enter)="
+                                    updateMetadata(
+                                      versionFieldName,
+                                      newVersionName.value,
+                                      userDataset
+                                    )
+                                  "
+                                  (keyup.escape)="
+                                    toggle(
+                                      userDataset.id,
+                                      versionFieldName,
+                                      false
+                                    )
+                                  "
+                                />
+                                <button
+                                  pButton
+                                  icon="pi pi-check"
+                                  class="p-button-text p-button-sm p-button-success"
+                                  (click)="
+                                    updateMetadata(
+                                      versionFieldName,
+                                      newVersionName.value,
+                                      userDataset
+                                    )
+                                  "
+                                ></button>
+                                <button
+                                  pButton
+                                  icon="pi pi-times"
+                                  class="p-button-text p-button-sm p-button-danger"
+                                  (click)="
+                                    toggle(
+                                      userDataset.id,
+                                      versionFieldName,
+                                      false
+                                    )
+                                  "
+                                ></button>
+                              </div>
+                            }
+                          </div>
+                          <!-- Variable (inline dropdown edit) -->
+                          <div class="mt-1">
+                            @if (!meta.editVariable.opened) {
+                              <div>
+                                <span
+                                  style="cursor: pointer"
+                                  [class]="
+                                    meta.variable.shortName() !== '--none--'
+                                      ? 'text-muted'
+                                      : 'text-red'
+                                  "
+                                  [pTooltip]="
+                                    meta.variable.shortName() !== '--none--' &&
+                                    meta.variable.shortName()
+                                      ? 'Click to change variable.'
+                                      : meta.variable.shortName() === '--none--'
+                                        ? 'Could not retrieve variable name. Please choose one.'
+                                        : 'Could not fetch variable name.'
+                                  "
+                                  tooltipPosition="bottom"
+                                  (click)="
+                                    toggle(
+                                      userDataset.id,
+                                      variableFieldName,
+                                      true
+                                    )
+                                  "
+                                >
+                                  <span class="text-muted">variable: </span
+                                  ><b>{{ meta.variable.shortName() }}</b>
+                                  @if (meta.variable.unit()) {
+                                    <span> [{{ meta.variable.unit() }}]</span>
+                                  }
+                                  <span
+                                    class="pi pi-question-circle small-edit-icon ml-1"
+                                  ></span>
+                                </span>
+                              </div>
+                            } @else {
+                              <div class="flex align-items-center gap-1">
+                                <p-select
+                                  [disabled]="!meta.variable.shortName()"
+                                  [options]="userDataset.all_variables"
+                                  [ngModel]="meta.variable.shortName()"
+                                  (ngModelChange)="
+                                    updateMetadata(
+                                      variableFieldName,
+                                      $event,
+                                      userDataset
+                                    )
+                                  "
+                                  [style]="{ width: '8rem' }"
+                                  optionLabel="name"
+                                  optionValue="name"
+                                  placeholder="Choose"
+                                  ngDefaultControl
+                                >
+                                </p-select>
+                                <button
+                                  pButton
+                                  icon="pi pi-times"
+                                  class="p-button-text p-button-sm p-button-danger"
+                                  (click)="
+                                    toggle(
+                                      userDataset.id,
+                                      variableFieldName,
+                                      false
+                                    )
+                                  "
+                                ></button>
+                              </div>
+                            }
+                          </div>
+                        </td>
+                        <!-- Size / status -->
+                        <td class="text-center">
+                          @if (userDataset.status === "preprocessing") {
+                            <p-tag severity="info">
+                              <i
+                                class="pi pi-spin pi-spinner mr-1"
+                                style="font-size: 0.7rem"
+                              ></i>
+                              Preprocessing
+                            </p-tag>
+                          }
+                          @if (userDataset.status === "failed") {
+                            <p-tag severity="danger" value="Failed"></p-tag>
+                            <div class="mt-1">
+                              <button
+                                pButton
+                                type="button"
                                 icon="pi pi-info-circle"
                                 class="p-button-text p-button-sm p-button-danger p-0"
-                                (click)="showLogWindow(userDataset)">
-                        </button>
-                      </div>
-                    </ng-container>
-                    <ng-container *ngIf="userDataset.status !== 'preprocessing' && userDataset.status !== 'failed'">
-                      <span *ngIf="userDataset.file">{{ getTheFileSize(userDataset) }}</span>
-                      <span *ngIf="!userDataset.file" class="text-muted">File removed</span>
-                    </ng-container>
-                  </td>
-
-                  <!-- Validations -->
-                  <td>
-                    <ng-container *ngIf="userDataset.status !== 'failed'">
-                      <div *ngIf="userDataset.owner_validation_list.length || userDataset.number_of_other_users_validations; else noVal">
-                        <div *ngFor="let v of userDataset.owner_validation_list">
-                          <a class="font-semibold" routerLink="/validation-result/{{v.val_id}}"
-                             pTooltip="View validation">{{ v.val_name }}</a>
-                        </div>
-                        <div *ngIf="userDataset.number_of_other_users_validations" class="text-muted text-sm">
-                          +{{ userDataset.number_of_other_users_validations }} from other users
-                        </div>
-                      </div>
-                      <ng-template #noVal>
-                        <em class="text-muted">No validations yet</em>
-                      </ng-template>
-                    </ng-container>
-                    <ng-container *ngIf="userDataset.status === 'failed'">
-                      <p class="text-red m-0">{{ userDataset.error_message || 'No error message' }}</p>
-                    </ng-container>
-                  </td>
-
-                  <!-- Shared -->
-                  <td>
-                    <ng-container *ngIf="userDataset.status !== 'failed'">
-                      <ng-container *ngIf="getDatasetGroups(userDataset, dataManagementGroups) as groups">
-                        <div *ngIf="groups.length; else notShared">
-                          <div *ngFor="let g of groups">{{ g.name }}</div>
-                        </div>
-                        <ng-template #notShared>
-                          <em class="text-muted">Not shared</em>
-                        </ng-template>
-                      </ng-container>
-                    </ng-container>
-                  </td>
-
-                  <!-- Actions -->
-                  <td >
-                    <div class="flex gap-2 justify-content-center align-items-center">
-                      <button *ngIf="userDataset.file"
-                              pButton type="button"
-                              icon="pi pi-trash"
-                              class="p-button-danger p-button-text"
-                              [pTooltip]="userDataset.is_used_in_validation
-                                ? 'Remove file to free space. Validations remain accessible.'
-                                : 'Remove dataset'"
-                              (click)="openDeleteDialog(userDataset)">
-                      </button>
-                      <span *ngIf="!userDataset.file" class="text-muted text-sm">
-                        Row disappears when related validations are deleted
-                      </span>
-                    </div>
-                  </td>
-
-                </tr>
-              </ng-container>
-            </ng-template>
-
-          </p-table>
-
-        </div>
+                                (click)="showLogWindow(userDataset)"
+                              ></button>
+                            </div>
+                          }
+                          @if (
+                            userDataset.status !== "preprocessing" &&
+                            userDataset.status !== "failed"
+                          ) {
+                            @if (userDataset.file) {
+                              <span>{{ getTheFileSize(userDataset) }}</span>
+                            }
+                            @if (!userDataset.file) {
+                              <span class="text-muted">File removed</span>
+                            }
+                          }
+                        </td>
+                        <!-- Validations -->
+                        <td>
+                          @if (userDataset.status !== "failed") {
+                            @if (
+                              userDataset.owner_validation_list.length ||
+                              userDataset.number_of_other_users_validations
+                            ) {
+                              <div>
+                                @for (
+                                  v of userDataset.owner_validation_list;
+                                  track v
+                                ) {
+                                  <div>
+                                    <a
+                                      class="font-semibold"
+                                      routerLink="/validation-result/{{
+                                        v.val_id
+                                      }}"
+                                      pTooltip="View validation"
+                                      >{{ v.val_name }}</a
+                                    >
+                                  </div>
+                                }
+                                @if (
+                                  userDataset.number_of_other_users_validations
+                                ) {
+                                  <div class="text-muted text-sm">
+                                    +{{
+                                      userDataset.number_of_other_users_validations
+                                    }}
+                                    from other users
+                                  </div>
+                                }
+                              </div>
+                            } @else {
+                              <em class="text-muted">No validations yet</em>
+                            }
+                          }
+                          @if (userDataset.status === "failed") {
+                            <p class="text-red m-0">
+                              {{
+                                userDataset.error_message || "No error message"
+                              }}
+                            </p>
+                          }
+                        </td>
+                        <!-- Shared -->
+                        <td>
+                          @if (userDataset.status !== "failed") {
+                            @if (
+                              getDatasetGroups(
+                                userDataset,
+                                dataManagementGroups
+                              );
+                              as groups
+                            ) {
+                              @if (groups.length) {
+                                <div>
+                                  @for (g of groups; track g) {
+                                    <div>{{ g.name }}</div>
+                                  }
+                                </div>
+                              } @else {
+                                <em class="text-muted">Not shared</em>
+                              }
+                            }
+                          }
+                        </td>
+                        <!-- Actions -->
+                        <td>
+                          <div
+                            class="flex gap-2 justify-content-center align-items-center"
+                          >
+                            @if (userDataset.file) {
+                              <button
+                                pButton
+                                type="button"
+                                icon="pi pi-trash"
+                                class="p-button-danger p-button-text"
+                                [pTooltip]="
+                                  userDataset.is_used_in_validation
+                                    ? 'Remove file to free space. Validations remain accessible.'
+                                    : 'Remove dataset'
+                                "
+                                (click)="openDeleteDialog(userDataset)"
+                              ></button>
+                            }
+                            @if (!userDataset.file) {
+                              <span class="text-muted text-sm">
+                                Row disappears when related validations are
+                                deleted
+                              </span>
+                            }
+                          </div>
+                        </td>
+                      </tr>
+                    }
+                  </ng-template>
+                </p-table>
+              </div>
+            }
+          </div>
+        }
+        @if (datasetFetchError) {
+          <div class="center">
+            <p class="lead text-muted">
+              Sorry, we couldn't fetch your datasets. Please try again later.
+            </p>
+          </div>
+        }
       </div>
+    }
 
-      <div *ngIf="datasetFetchError" class="center">
-        <p class="lead text-muted">Sorry, we couldn't fetch your datasets. Please try again later.</p>
-      </div>
-
-    </div>
-
-    <qa-maintenance-mode *ngIf="maintenanceMode" [action]="'upload new files'"></qa-maintenance-mode>
+    @if (maintenanceMode) {
+      <qa-maintenance-mode [action]="'upload new files'"></qa-maintenance-mode>
+    }
     <p-scrollTop styleClass="scroll-button"></p-scrollTop>
   </div>
 </main>
@@ -259,10 +477,13 @@
   header="Log Information"
   [(visible)]="logWindowVisible"
   [modal]="true"
-  [style]="{width: '60vw'}"
+  [style]="{ width: '60vw' }"
   [dismissableMask]="true"
-  (onHide)="logTarget = null">
-  <pre class="text-white" style="white-space: pre-wrap;">{{ logTarget?.log_info || 'No logs available' }}</pre>
+  (onHide)="logTarget = null"
+>
+  <pre class="text-white" style="white-space: pre-wrap">{{
+    logTarget?.log_info || "No logs available"
+  }}</pre>
 </p-dialog>
 
 <!-- Delete dialog -->
@@ -272,26 +493,60 @@
   [modal]="true"
   [closable]="true"
   [dismissableMask]="true"
-  [style]="{width: '32rem'}"
-  (onHide)="closeDeleteDialog()">
+  [style]="{ width: '32rem' }"
+  (onHide)="closeDeleteDialog()"
+>
   <div class="flex flex-column gap-2">
-    <span>Do you really want to remove <b>{{ deleteTarget?.file }}</b>?</span>
-    <span *ngIf="deleteTarget?.is_used_in_validation && deleteTarget?.user_groups?.length === 0" class="text-muted">
-      This dataset has been used in validations. Removing it will make those validations unreproducible.
-    </span>
-    <span *ngIf="deleteTarget?.is_used_in_validation && deleteTarget?.user_groups?.length > 0" class="text-muted">
-      This dataset has been used in validations and shared with other users.
-      Removing it will make validations unreproducible and other users will lose access.
-    </span>
-    <span *ngIf="!deleteTarget?.is_used_in_validation && deleteTarget?.user_groups?.length > 0" class="text-muted">
-      This dataset is shared with other users. They will lose access after removal.
-    </span>
+    <span
+      >Do you really want to remove <b>{{ deleteTarget?.file }}</b
+      >?</span
+    >
+    @if (
+      deleteTarget?.is_used_in_validation &&
+      deleteTarget?.user_groups?.length === 0
+    ) {
+      <span class="text-muted">
+        This dataset has been used in validations. Removing it will make those
+        validations unreproducible.
+      </span>
+    }
+    @if (
+      deleteTarget?.is_used_in_validation &&
+      deleteTarget?.user_groups?.length > 0
+    ) {
+      <span class="text-muted">
+        This dataset has been used in validations and shared with other users.
+        Removing it will make validations unreproducible and other users will
+        lose access.
+      </span>
+    }
+    @if (
+      !deleteTarget?.is_used_in_validation &&
+      deleteTarget?.user_groups?.length > 0
+    ) {
+      <span class="text-muted">
+        This dataset is shared with other users. They will lose access after
+        removal.
+      </span>
+    }
   </div>
   <ng-template pTemplate="footer">
-    <button pButton type="button" class="p-button-text" label="Cancel"
-            (click)="closeDeleteDialog()" [disabled]="deleting"></button>
-    <button pButton type="button" class="p-button-text p-button-danger"
-            label="Delete" icon="pi pi-trash"
-            (click)="confirmDelete()" [loading]="deleting"></button>
+    <button
+      pButton
+      type="button"
+      class="p-button-text"
+      label="Cancel"
+      (click)="closeDeleteDialog()"
+      [disabled]="deleting"
+    ></button>
+    <button
+      pButton
+      type="button"
+      class="p-button-text p-button-danger"
+      label="Delete"
+      icon="pi pi-trash"
+      (click)="confirmDelete()"
+      [loading]="deleting"
+    ></button>
   </ng-template>
 </p-dialog>

@@ -17,7 +17,6 @@ import { MetricsPlotsDto } from '../../../core/services/validation-run/metrics-p
 import { LegendControl } from './control/legend-control';
 import { OpacitySliderControl } from './control/opacity-slider.control';
 import { ValidationrunService } from '../../../core/services/validation-run/validationrun.service';
-import { Popover } from 'primeng/popover';
 import VectorLayer from 'ol/layer/Vector';
 import VectorSource from 'ol/source/Vector';
 import Feature from 'ol/Feature';
@@ -60,7 +59,7 @@ type Projection = 'EPSG:4326' | 'EPSG:3857';
 @Component({
   selector: 'qa-interactive-map',
   standalone: true,
-  imports: [MapModule, SharedPrimeNgModule, Popover],
+  imports: [MapModule, SharedPrimeNgModule],
   templateUrl: './interactive-map.component.html',
   styleUrls: ['./interactive-map.component.scss']
 })

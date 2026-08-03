@@ -13,13 +13,10 @@
     "experimentalDecorators": true,
     "moduleResolution": "bundler",
     "importHelpers": true,
-    "target": "es2020",
     "module": "es2020",
-    "esModuleInterop": true,
-    "lib": [
-      "es2019",
-      "dom"
-    ]
+    "target": "ES2022",
+    "useDefineForClassFields": false,
+    "esModuleInterop": true
   },
   "angularCompilerOptions": {
     "enableI18nLegacyMessageIdFormat": false,
