@@ -1,6 +1,5 @@
 <div class="grid align-content-center">
   <div class="col" style="max-width: 100%">
-    
     <p-floatLabel class="mb-4 mt-3">
       <p-select
         [inputId]="datasetSelectorId"
@@ -13,8 +12,8 @@
         [group]="true"
         [filter]="true"
         filterBy="pretty_name"
-        [style]="{'width': '100%'}">
-
+        [style]="{ width: '100%' }"
+      >
         <ng-template let-group #group>
           <div class="flex align-items-center gap-2 group-header">
             <i [class]="group.icon"></i>
@@ -30,63 +29,84 @@
           <span>{{ item.pretty_name }}</span>
         </ng-template>
       </p-select>
-      <label for="{{datasetSelectorId}}">Dataset name</label>
+      <label for="{{ datasetSelectorId }}">Dataset name</label>
     </p-floatLabel>
   </div>
 </div>
 
-<div class="grid  align-content-center">
+<div class="grid align-content-center">
   <div class="col" style="max-width: 100%">
-    <p-floatLabel class="mb-4" *ngIf="(selectableDatasetVersions$|async) as selectedVersions">
-      <p-select [inputId]="versionSelectorId"
-                  [style]="{'width': '100%'}"
-                  [options]="selectedVersions"
-                  [(ngModel)]="selectionModel.selectedVersion"
-                  optionLabel="pretty_name"
-                  (onChange)="onVersionChange(selectedVersions)">
-
-        <ng-template let-item pTemplate="item">
-          <span>{{ item.pretty_name }}
-            <em class="text-muted" *ngIf="item.id === newestVersionId"> (newest version)</em>
-          </span>
-        </ng-template>
-        <ng-template let-item pTemplate="selectedItem">
-          <span>{{ item.pretty_name }}
-            <em class="text-muted" *ngIf="item.id === newestVersionId"> (newest version)</em>
-          </span>
-        </ng-template>
-      </p-select>
-      <label for="{{versionSelectorId}}">Dataset version <span *ngIf="newerVersionExists" class='warning-text'> (newer version available!) </span></label>
-    </p-floatLabel>
+    @if (selectableDatasetVersions$ | async; as selectedVersions) {
+      <p-floatLabel class="mb-4">
+        <p-select
+          [inputId]="versionSelectorId"
+          [style]="{ width: '100%' }"
+          [options]="selectedVersions"
+          [(ngModel)]="selectionModel.selectedVersion"
+          optionLabel="pretty_name"
+          (onChange)="onVersionChange(selectedVersions)"
+        >
+          <ng-template let-item pTemplate="item">
+            <span
+              >{{ item.pretty_name }}
+              @if (item.id === newestVersionId) {
+                <em class="text-muted"> (newest version)</em>
+              }
+            </span>
+          </ng-template>
+          <ng-template let-item pTemplate="selectedItem">
+            <span
+              >{{ item.pretty_name }}
+              @if (item.id === newestVersionId) {
+                <em class="text-muted"> (newest version)</em>
+              }
+            </span>
+          </ng-template>
+        </p-select>
+        <label for="{{ versionSelectorId }}"
+          >Dataset version
+          @if (newerVersionExists) {
+            <span class="warning-text"> (newer version available!) </span>
+          }
+        </label>
+      </p-floatLabel>
+    }
   </div>
 </div>
 
-<div class="grid  align-content-center">
+<div class="grid align-content-center">
   <div class="col" style="max-width: 100%">
     <p-floatLabel>
-      <p-select 
-        [inputId]="variableSelectorId" 
-        optionLabel="short_name" 
-        [style]="{'width': '100%'}"     
-        [options]="(selectableDatasetVariables$|async)"          
+      <p-select
+        [inputId]="variableSelectorId"
+        optionLabel="short_name"
+        [style]="{ width: '100%' }"
+        [options]="selectableDatasetVariables$ | async"
         [(ngModel)]="selectionModel.selectedVariable"
       >
         <ng-template let-item pTemplate="item">
           <span>
-            {{ item.display_name === 'none' ? item.pretty_name : item.display_name }}
-            [{{ item.unit ? item.unit : 'n.a.' }}]
+            {{
+              item.display_name === "none"
+                ? item.pretty_name
+                : item.display_name
+            }}
+            [{{ item.unit ? item.unit : "n.a." }}]
           </span>
         </ng-template>
-        
+
         <ng-template let-item pTemplate="selectedItem">
           <span>
-            {{ item.display_name === 'none' ? item.pretty_name : item.display_name }}
-            [{{ item.unit ? item.unit : 'n.a.' }}]
+            {{
+              item.display_name === "none"
+                ? item.pretty_name
+                : item.display_name
+            }}
+            [{{ item.unit ? item.unit : "n.a." }}]
           </span>
         </ng-template>
       </p-select>
-      <label for="{{variableSelectorId}}">Variable [units]</label>
+      <label for="{{ variableSelectorId }}">Variable [units]</label>
     </p-floatLabel>
   </div>
 </div>
-

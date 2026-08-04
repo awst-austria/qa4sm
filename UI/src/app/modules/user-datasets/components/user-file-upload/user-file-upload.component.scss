@@ -12,9 +12,14 @@
   align-items: center;
   gap: 0.5rem;
 
-  &:hover {
+  &:hover,
+  &--dragover {
     border-color: $base-color;
     background: $base-light;
+  }
+
+  &--dragover {
+    border-style: solid; 
   }
 
   &--disabled {
@@ -25,17 +30,20 @@
   &__icon {
     font-size: 2.5rem;
     color: $base-color;
+    pointer-events: none;
   }
 
   &__text {
     font-size: 1rem;
     font-weight: 500;
     color: $font-color-base;
+    pointer-events: none;
   }
 
   &__hint {
     font-size: 0.8rem;
     color: $font-color-base;
+    pointer-events: none;
   }
 }
 
@@ -66,7 +74,12 @@
 }
 
 @media (prefers-color-scheme: dark) {
-  .upload-zone:hover {
+  .upload-zone:hover,
+  .upload-zone--dragover {
     background: $base-dark-hover;
+  }
+  .upload-zone__text,
+  .upload-zone__hint{
+    color: white;
   }
 }
