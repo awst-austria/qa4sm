@@ -69,7 +69,7 @@ Luckily the angular dev. server has built-in reverse proxy functionality that ca
 such issues in the development environment. `src/proxy.conf.json` contains the necessary 
 configuration.  
 Using this reverse proxy the django api will also be available at `http://localhost:4200/api` 
-which will make the browsers happy. 
+which [versions.json](../validator/fixtures/versions.json)will make the browsers happy. 
 
 The reverse proxy starts automatically with `npm run start-with-path`, no extra command is needed.  
 However, it expects the django api at `http://localhost:8000/api`. If you have the django application
