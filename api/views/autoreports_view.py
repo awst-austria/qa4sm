@@ -1,6 +1,8 @@
 import os
 import re
 
+from collections import defaultdict
+
 from django.conf import settings
 from django.http import FileResponse, Http404, JsonResponse
 from django.shortcuts import redirect
@@ -9,12 +11,12 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny
 
 # <report_date>_<creation_date>[_<indicator>].pdf
-# e.g. 20260131_202606290613_G.pdf or 20260131_202606290613.pdf
-# The indicator is optional ("if provided in the filename") -> JSON null when absent.
+# e.g. 20260131_202606290613_G.pdf 
+
 REPORT_FILENAME_REGEX = re.compile(
-    r'^(?P<report_date>\d{8})_(?P<creation_date>\d{12})(?:_(?P<indicator>[GYR]))?\.pdf$'
+    r'^(?P<report_date>\d{8})_(?P<creation_date>\d{12})(?:_(?P<indicator>[A-Z]))?\.pdf$'
 )
-# series = directory name, e.g. SMOS_L2_v700; no slashes/dots -> no path traversal
+# series = directory name, e.g. SMOS_L2_v700; no slashes/dots 
 SERIES_NAME_REGEX = re.compile(r'^[A-Za-z0-9_.-]+$')
 
 
@@ -55,25 +57,34 @@ def _parse_report_filename(filename):
 def _collect_reports(series_dir):
     """
     Collect reports of a series directory, newest first.
-    If several reports exist for the same report_date, only the one with the
-    latest creation_date is kept.
+
+    Reports are grouped by report_date: a report date may have been processed
+    more than once, and the version with the latest creation_date is the
+    current one. Earlier versions are not dropped but attached under
+    'previous_versions' (newest first), so that URLs already published in the
+    "cite" section of a report stay discoverable in the UI, not just
+    reachable by direct link.
+
+    Report files are never removed by this API - the citation guarantee rests
+    on the files staying on disk.
     """
-    latest_per_date = {}
+    versions_per_date = defaultdict(list)
     for entry in os.scandir(series_dir):
         if not entry.is_file():
             continue
         report = _parse_report_filename(entry.name)
         if report is None:
             continue  # ignore files not following the naming convention
-        current = latest_per_date.get(report['report_date'])
-        if current is None or report['creation_date'] > current['creation_date']:
-            latest_per_date[report['report_date']] = report
+        versions_per_date[report['report_date']].append(report)
 
-    return sorted(
-        latest_per_date.values(),
-        key=lambda r: r['report_date'],
-        reverse=True,
-    )
+    reports = []
+    for versions in versions_per_date.values():
+        versions.sort(key=lambda r: r['creation_date'], reverse=True)
+        current, *previous = versions
+        reports.append({**current, 'previous_versions': previous})
+
+    reports.sort(key=lambda r: r['report_date'], reverse=True)
+    return reports
 
 
 @api_view(['GET'])
@@ -92,7 +103,12 @@ def get_report_series_list(request):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_reports(request, report_series):
-    """List reports of a series, newest first."""
+    """
+    List reports of a series, newest first.
+
+    One entry per report date - the most recently generated version, with any
+    earlier versions of the same report date under 'previous_versions'.
+    """
     series_dir = _get_series_dir_or_404(report_series)
     return JsonResponse(_collect_reports(series_dir), safe=False)
 
@@ -108,9 +124,9 @@ def get_latest_report(request, report_series):
 
         GET /api/autoreports/<series>/latest  ->  302 to the newest file
 
-    Redirecting (instead of serving the file directly) keeps the canonical
-    filename in the browser / downloaded file and lets per-file caching work.
-    CLI users need to follow redirects (curl -L).
+    Note that this URL is not a citable reference: it points at whatever is
+    newest at the time of the request. The "cite" section of a report
+    must use the per-file URL.
     """
     series_dir = _get_series_dir_or_404(report_series)
     reports = _collect_reports(series_dir)
@@ -127,7 +143,12 @@ def get_latest_report(request, report_series):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_report_file(request, report_series, filename):
-    """Serve a single report PDF inline."""
+    """
+    Serve a single report PDF inline.
+
+    Any file following the naming convention is served - published citation URLs must keep working after a report date
+    has been reprocessed.
+    """
     series_dir = _get_series_dir_or_404(report_series)
 
     # filename must follow the naming convention -> also blocks path traversal

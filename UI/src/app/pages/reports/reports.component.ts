@@ -15,7 +15,10 @@ interface AutoReport {
   report_date: string; // '20260131'
   creation_date: string; // '202606290613'
   report_date_iso: string; // '2026-01-31'
-  indicator: 'G' | 'Y' | 'R' | null; // null when the filename carries no indicator
+  indicator: string | null;
+  // Earlier generations of the same report date, newest first. Absent on the
+  // nested entries themselves.
+  previous_versions?: AutoReport[];
 }
 
 interface YearGroup {
@@ -45,10 +48,14 @@ export class ReportsComponent implements OnInit, OnDestroy {
   copiedUrl: string | null = null;
   private copyResetTimer?: ReturnType<typeof setTimeout>;
 
-  readonly indicatorLabels: Record<'G' | 'Y' | 'R', string> = {
+  // Order defines the order of the legend and of the year badges.
+  readonly indicatorKeys: string[] = ['G', 'Y', 'R', 'N'];
+
+  readonly indicatorLabels: Record<string, string> = {
     G: 'Good — no issues detected',
     Y: 'Warning — review recommended',
     R: 'Critical — action required',
+    N: 'Neutral — indicator not assigned yet',
   };
 
   readonly seriesSelectorId = 'report-series-selector';
@@ -85,6 +92,9 @@ export class ReportsComponent implements OnInit, OnDestroy {
     this.loading = true;
     this.http.get<AutoReport[]>(`/api/autoreports/${series}`).subscribe({
       next: (reports) => {
+        // The backend returns one entry per report date (the current version)
+        // already sorted newest first; sorting again keeps this component
+        // independent of that guarantee.
         const sorted = [...reports].sort((a, b) =>
           b.report_date.localeCompare(a.report_date),
         );
@@ -117,14 +127,34 @@ export class ReportsComponent implements OnInit, OnDestroy {
     return [...byYear.entries()].map(([year, reports]) => ({ year, reports }));
   }
 
-  indicatorCount(group: YearGroup, indicator: 'G' | 'Y' | 'R'): number {
+  /** Counts current versions only — the badges show the current assessment. */
+  indicatorCount(group: YearGroup, indicator: string): number {
     return group.reports.filter((r) => r.indicator === indicator).length;
   }
 
+  /** 'dot g' / 'dot n' / 'dot none' for unknown or missing indicators. */
+  dotClass(report: AutoReport): string {
+    return this.isKnown(report.indicator) ? `dot ${report.indicator!.toLowerCase()}` : 'dot none';
+  }
+
+  /** Dot for a known indicator key, used by the legend. */
+  legendDotClass(indicator: string): string {
+    return `dot ${indicator.toLowerCase()}`;
+  }
+
+  badgeClass(indicator: string): string {
+    return `badge ${indicator.toLowerCase()}`;
+  }
+
   indicatorTitle(report: AutoReport): string {
-    return report.indicator
-      ? this.indicatorLabels[report.indicator]
-      : 'No indicator provided';
+    if (!report.indicator) {
+      return 'No indicator provided';
+    }
+    return this.indicatorLabels[report.indicator] ?? `Unknown indicator “${report.indicator}”`;
+  }
+
+  private isKnown(indicator: string | null): boolean {
+    return !!indicator && this.indicatorKeys.includes(indicator);
   }
 
   formatCreation(creationDate: string): string {
@@ -149,7 +179,7 @@ export class ReportsComponent implements OnInit, OnDestroy {
       clearTimeout(this.copyResetTimer);
       this.copyResetTimer = setTimeout(() => (this.copiedUrl = null), 2000);
     } catch {
-      // clipboard unavailable 
+      // clipboard unavailable
     }
   }
 }

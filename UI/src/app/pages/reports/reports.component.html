@@ -27,15 +27,11 @@
       <h3>{{ selectedSeries }}</h3>
 
       <div class="legend" aria-label="Indicator legend">
-        <span class="legend-item">
-          <span class="dot g"></span>{{ indicatorLabels["G"] }}
-        </span>
-        <span class="legend-item">
-          <span class="dot y"></span>{{ indicatorLabels["Y"] }}
-        </span>
-        <span class="legend-item">
-          <span class="dot r"></span>{{ indicatorLabels["R"] }}
-        </span>
+        @for (key of indicatorKeys; track key) {
+          <span class="legend-item">
+            <span [class]="legendDotClass(key)"></span>{{ indicatorLabels[key] }}
+          </span>
+        }
       </div>
     }
 
@@ -46,14 +42,7 @@
     @if (!loading && latestReport) {
       <div class="latest-card">
         <div class="latest-info">
-          <span
-            class="dot"
-            [class.g]="latestReport.indicator === 'G'"
-            [class.y]="latestReport.indicator === 'Y'"
-            [class.r]="latestReport.indicator === 'R'"
-            [class.none]="!latestReport.indicator"
-            [title]="indicatorTitle(latestReport)"
-          ></span>
+          <span [class]="dotClass(latestReport)" [title]="indicatorTitle(latestReport)"></span>
           <div>
             <div class="latest-title">
               Latest report — {{ latestReport.report_date_iso }}
@@ -79,6 +68,7 @@
       </div>
       <p class="hint">
         The latest report link always points to the newest report of this series.
+        To cite a specific report, use its own link instead.
       </p>
     }
 
@@ -94,14 +84,12 @@
                   report{{ group.reports.length === 1 ? "" : "s" }}
                 </span>
                 <span class="year-badges">
-                  @if (indicatorCount(group, "G"); as n) {
-                    <span class="badge g" title="Good">{{ n }}</span>
-                  }
-                  @if (indicatorCount(group, "Y"); as n) {
-                    <span class="badge y" title="Warning">{{ n }}</span>
-                  }
-                  @if (indicatorCount(group, "R"); as n) {
-                    <span class="badge r" title="Critical">{{ n }}</span>
+                  @for (key of indicatorKeys; track key) {
+                    @if (indicatorCount(group, key); as n) {
+                      <span [class]="badgeClass(key)" [title]="indicatorLabels[key]">
+                        {{ n }}
+                      </span>
+                    }
                   }
                 </span>
               </span>
@@ -110,14 +98,7 @@
               <ul class="report-list">
                 @for (report of group.reports; track report.filename) {
                   <li class="report-row">
-                    <span
-                      class="dot"
-                      [class.g]="report.indicator === 'G'"
-                      [class.y]="report.indicator === 'Y'"
-                      [class.r]="report.indicator === 'R'"
-                      [class.none]="!report.indicator"
-                      [title]="indicatorTitle(report)"
-                    ></span>
+                    <span [class]="dotClass(report)" [title]="indicatorTitle(report)"></span>
                     <div class="report-main">
                       <a [href]="reportUrl(report)" target="_blank">
                         {{ report.filename }}
@@ -126,6 +107,35 @@
                         report date {{ report.report_date_iso }} · generated
                         {{ formatCreation(report.creation_date) }}
                       </span>
+
+                      @if (report.previous_versions?.length) {
+                        <details class="versions">
+                          <summary>
+                            {{ report.previous_versions?.length }} earlier
+                            version{{ report.previous_versions?.length === 1 ? "" : "s" }}
+                          </summary>
+                          <ul>
+                            @for (old of report.previous_versions ?? []; track old.filename) {
+                              <li>
+                                <span [class]="dotClass(old)" [title]="indicatorTitle(old)"></span>
+                                <a [href]="reportUrl(old)" target="_blank">
+                                  {{ old.filename }}
+                                </a>
+                                <span class="meta">
+                                  generated {{ formatCreation(old.creation_date) }}
+                                </span>
+                                <button
+                                  type="button"
+                                  class="action-button"
+                                  (click)="copyLink(reportUrl(old))"
+                                >
+                                  {{ copiedUrl === reportUrl(old) ? "Copied" : "Copy link" }}
+                                </button>
+                              </li>
+                            }
+                          </ul>
+                        </details>
+                      }
                     </div>
                     <button
                       type="button"
@@ -143,8 +153,8 @@
       </p-accordion>
     }
 
-  <p *ngIf="!loading && selectedSeries && !yearGroups.length">
-    No reports available for this series.
-  </p>
-</div>
+    @if (!loading && selectedSeries && !yearGroups.length) {
+      <p>No reports available for this series.</p>
+    }
+  </div>
 </main>
