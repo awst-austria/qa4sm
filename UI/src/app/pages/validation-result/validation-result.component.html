@@ -54,14 +54,14 @@
                     class="w-12"
                   />
                 }
-                <qa-validation-summary
+                <qa-validation-summary class="w-12"
                   [validationModel]="validationModel"
                   [validationRun]="validationRun"
                   (doRefresh)="update()"
                 />
                 @if (validationRun.status === "DONE") {
                   @if (validationRun.output_file) {
-                    <qa-summary-statistics
+                    <qa-summary-statistics class="w-12"
                       [validationRun]="validationRun"
                       [configs]="configs"
                     />
