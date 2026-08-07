@@ -1,11 +1,6 @@
 <main class="flex justify-content-center">
   <div class="reports-page">
     <h2>Automated Validation Reports</h2>
-    <p class="page-intro">
-      Automatically generated quality-monitoring reports for selected datasets.
-      New reports are added as they become available; the sampling interval may
-      differ between report series.
-    </p>
 
     @if (seriesList.length > 1) {
       <div class="series-select">
@@ -25,6 +20,16 @@
 
     @if (selectedSeries) {
       <h3>{{ selectedSeries }}</h3>
+
+      <p class="page-intro">
+        @for (segment of seriesIntro; track $index) {
+          @if (segment.href) {
+            <a [href]="segment.href" target="_blank" rel="noopener noreferrer">{{ segment.text }}</a>
+          } @else {
+            <span>{{ segment.text }}</span>
+          }
+        }
+      </p>
 
       <div class="legend" aria-label="Indicator legend">
         @for (key of indicatorKeys; track key) {

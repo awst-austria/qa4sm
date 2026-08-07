@@ -26,6 +26,11 @@ interface YearGroup {
   reports: AutoReport[]; // newest first; sampling may be irregular
 }
 
+interface IntroSegment {
+  text: string;
+  href?: string; // segment rendered as a link
+}
+
 @Component({
   selector: 'qa-reports',
   standalone: true,
@@ -60,6 +65,70 @@ export class ReportsComponent implements OnInit, OnDestroy {
 
   readonly seriesSelectorId = 'report-series-selector';
 
+  /** Series preselected when the URL doesn't name one (matched case-insensitively). */
+  readonly defaultSeriesHint = 'smos';
+
+  readonly genericIntro: IntroSegment[] = [
+    {
+      text:
+        'Automatically generated quality-monitoring reports for selected datasets. ' +
+        'New reports are added as they become available; the sampling interval may ' +
+        'differ between report series.',
+    },
+  ];
+
+  /** First matching rule wins; matched against the series name from /api/autoreports. */
+  readonly seriesIntros: { match: RegExp; intro: IntroSegment[] }[] = [
+    {
+      match: /^SMOS_L2/i,
+      intro: [
+        {
+          text:
+            'The SMOS L2 (v700) validation report series automatically monitors the ' +
+            'successful retrieval of ',
+        },
+        { text: 'L2 SMOS Soil Moisture', href: 'https://doi.org/10.57780/SM1-857c3d7' },
+        {
+          text:
+            ' on a monthly basis. New satellite measurements are automatically evaluated ' +
+            'with ISMN in situ near-real-time (NRT) fiducial reference measurements (FRMs) ' +
+            'and ERA5-Land reanalysis soil moisture values. A changing quality indicator ' +
+            '(yellow or red circles) indicates a lower performance compared to previous ' +
+            'validation epochs.',
+        },
+      ],
+    },
+    {
+      match: /^C3S\b/i,
+      intro: [
+        {
+          text:
+            'The C3S SM Quarterly validation report series automatically monitors the ' +
+            'successful production and publication of C3S Satellite Soil Moisture products ' +
+            'on the ',
+        },
+        { text: 'Copernicus Climate Data Store', href: 'https://doi.org/10.24381/cds.d7782f18' },
+        {
+          text:
+            ' each quarter. Key Performance Indicators (KPIs) are tracked against ' +
+            'Near-Real-Time (NRT) ISMN in situ measurements for multiple land cover classes. ' +
+            'A changing quality indicator (yellow or red circles) indicates a lower ' +
+            'performance compared to previous validation epochs.',
+        },
+      ],
+    },
+  ];
+
+  private introFor(series: string): IntroSegment[] {
+    return this.seriesIntros.find((rule) => rule.match.test(series))?.intro ?? this.genericIntro;
+  }
+
+  seriesIntro: IntroSegment[] = this.genericIntro;
+
+  private pickDefaultSeries(series: string[]): string {
+    return series.find((s) => s.toLowerCase().includes(this.defaultSeriesHint)) ?? series[0];
+  }
+
   ngOnInit(): void {
     this.http.get<string[]>('/api/autoreports').subscribe(series => {
       this.seriesList = series;
@@ -73,7 +142,8 @@ export class ReportsComponent implements OnInit, OnDestroy {
             this.loadSeries(requested);
           } else if (series.length) {
             // no or unknown series in the URL -> normalize to the first one
-            this.router.navigate(['/reports', series[0]], { replaceUrl: true });
+            // no or unknown series in the URL -> normalize to the preferred default
+            this.router.navigate(['/reports', this.pickDefaultSeries(series)], { replaceUrl: true });
           }
         });
     });
@@ -89,6 +159,7 @@ export class ReportsComponent implements OnInit, OnDestroy {
 
   loadSeries(series: string): void {
     this.selectedSeries = series;
+    this.seriesIntro = this.introFor(series);
     this.loading = true;
     this.http.get<AutoReport[]>(`/api/autoreports/${series}`).subscribe({
       next: (reports) => {
@@ -164,11 +235,11 @@ export class ReportsComponent implements OnInit, OnDestroy {
   }
 
   reportUrl(report: AutoReport): string {
-    return `/api/autoreports/${this.selectedSeries}/${report.filename}`;
+    return `/api/autoreports/${encodeURIComponent(this.selectedSeries ?? '')}/${report.filename}`;
   }
 
   latestUrl(): string {
-    return `/api/autoreports/${this.selectedSeries}/latest`;
+    return `/api/autoreports/${encodeURIComponent(this.selectedSeries ?? '')}/latest`;
   }
 
   async copyLink(path: string): Promise<void> {

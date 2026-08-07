@@ -16,8 +16,9 @@ from rest_framework.permissions import AllowAny
 REPORT_FILENAME_REGEX = re.compile(
     r'^(?P<report_date>\d{8})_(?P<creation_date>\d{12})(?:_(?P<indicator>[A-Z]))?\.pdf$'
 )
-# series = directory name, e.g. SMOS_L2_v700; no slashes/dots 
-SERIES_NAME_REGEX = re.compile(r'^[A-Za-z0-9_.-]+$')
+# series = directory name, e.g. SMOS_L2_v700 or 'C3S v202605 Quarterly';
+# no slashes, no leading/trailing whitespace
+SERIES_NAME_REGEX = re.compile(r'^[A-Za-z0-9][A-Za-z0-9 _.-]*$')
 
 
 def _autoreports_dir():
@@ -29,9 +30,17 @@ def _autoreports_dir():
 
 
 def _get_series_dir_or_404(report_series):
-    if not SERIES_NAME_REGEX.match(report_series) or report_series in ('.', '..'):
+    reports_dir = _autoreports_dir()
+    if not reports_dir or not SERIES_NAME_REGEX.match(report_series):
         raise Http404('Unknown report series')
-    series_dir = os.path.join(_autoreports_dir(), report_series)
+    if report_series != report_series.strip():
+        raise Http404('Unknown report series')
+
+    root = os.path.realpath(reports_dir)
+    series_dir = os.path.realpath(os.path.join(root, report_series))
+    # the resolved path must stay inside AUTOREPORTS_DIR
+    if os.path.commonpath([root, series_dir]) != root or series_dir == root:
+        raise Http404('Unknown report series')
     if not os.path.isdir(series_dir):
         raise Http404('Unknown report series')
     return series_dir

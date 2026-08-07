@@ -11,10 +11,15 @@
 }
 
 .page-intro {
-  text-align: center;
   color: $font-color-muted;
-  margin: 0 auto 1rem;
-  max-width: 42rem;
+  margin: 0 auto 1.25rem;
+  max-width: 46rem;
+  text-align: left;
+
+  a {
+    color: inherit;
+    text-decoration: underline;
+  }
 }
 
 .series-select {
