@@ -34,7 +34,7 @@ fonttools==4.61.0
 fsspec==2025.2.0
 GitPython==3.1.50
 gldas==0.7.3
-h2==4.3.0
+h2==4.4.1
 h5netcdf==1.4.1
 h5py==3.12.1
 hpack==4.1.0
