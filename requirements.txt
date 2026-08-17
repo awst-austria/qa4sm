@@ -91,7 +91,7 @@ six==1.17.0
 smos==0.4
 smap-io==0.8
 sortedcontainers==2.4.0
-sqlparse==0.5.4
+sqlparse==0.6.0
 tblib==3.0.0
 tomli==2.2.1
 toolz==1.0.0
