@@ -301,6 +301,14 @@
                               "
                             />
                           </div>
+                          @if (validationModel.datasetConfigurations[datasetIdx].ismnTolerancesFilter$ | async) {
+                          <div>
+                            <qa-ismn-tolerances-filter
+                              (tolerancesSelectionChanged)="onIsmnTolerancesSelectionChange($event)"
+                              [datasetModel]="validationModel.datasetConfigurations[datasetIdx].datasetModel"
+                              [filterModel$]="validationModel.datasetConfigurations[datasetIdx].ismnTolerancesFilter$"/>
+                          </div>
+                        }
                         }
                         <div style="width: 100%; text-align: right">
                           <button

@@ -1036,9 +1036,9 @@ export class InteractiveMapComponent implements AfterViewInit, OnDestroy {
       if (this.instrument) {
         let instrumentInfo = `Instrument: ${this.instrument}`;
         if (this.instrumentDepthFrom !== null && this.instrumentDepthTo !== null) {
-          instrumentInfo += ` (${this.instrumentDepthFrom.toFixed(1)}-${this.instrumentDepthTo.toFixed(1)} m)`;
+          instrumentInfo += ` (${this.instrumentDepthFrom.toFixed(2)}-${this.instrumentDepthTo.toFixed(2)} m)`;
         } else if (this.instrumentDepthFrom !== null) {
-          instrumentInfo += ` (${this.instrumentDepthFrom.toFixed(1)} m)`;
+          instrumentInfo += ` (${this.instrumentDepthFrom.toFixed(2)} m)`;
         }
         parts.push(instrumentInfo);
       }

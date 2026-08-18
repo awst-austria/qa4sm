@@ -96,21 +96,25 @@ export class MetricsComponent implements OnInit {
     || this.isSpatialOrBoth();
   }
 
-  // Activate spatial validation only if ISMN is selected
+  // The validation type is locked to 'temporal' when spatial validation isn't available
+  // (no ISMN dataset selected) or when ISMN sensor merging (tolerances filter) is enabled.
 
-  ISMN_isTrue(): boolean {
+  valTypeDisabled(): boolean {
     const datasets = this.validationModel().datasetConfigurations;
 
     const hasDatasetISMN = datasets.some(d => d.datasetModel.selectedDataset?.id === 4);
+    const ismnTolerancesEnabled = datasets.some(d => d.ismnTolerancesFilter$?.value?.enabled);
 
-    if (!hasDatasetISMN && this.validationModel().valType !== 'temporal') {
+    const lockToTemporal = !hasDatasetISMN || ismnTolerancesEnabled;
+
+    if (lockToTemporal && this.validationModel().valType !== 'temporal') {
       this.validationModel.update(model => {
         model.valType = 'temporal';
         return model;
       });
     }
 
-    return !hasDatasetISMN;
+    return lockToTemporal;
   }
 
   // Auxilary function to deactivate Stability or Intra-Annual metrics if ValType is set to spatial or both

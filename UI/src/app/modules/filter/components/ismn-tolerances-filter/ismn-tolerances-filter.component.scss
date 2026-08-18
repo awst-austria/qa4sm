@@ -1,0 +1,25 @@
+
+/* Container that stacks rows vertically */
+.depth-container {
+  display: grid;
+  gap: 1rem;
+}
+
+/* Each row is a two-column CSS Grid */
+.depth-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: center;
+  gap: 10px;
+}
+
+.depth-row label {
+  text-align: right;
+}
+
+/* Button centered horizontally */
+.depth-actions {
+  display: flex;
+  justify-content: center;
+  margin-top: 0.5rem;
+}

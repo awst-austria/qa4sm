@@ -8,6 +8,7 @@ import { DatasetVariableService } from '../../modules/core/services/dataset/data
 import {
   DatasetConfigModel,
   ISMN_DEPTH_FILTER_ID,
+  ISMN_TOLERANCES_FILTER_ID,
   ISMN_NETWORK_FILTER_ID,
   SMAP_L3_STATIC_WATER_FILTER_ID,
   SMAP_L3_V9_VWC_FILTER_ID,
@@ -237,6 +238,7 @@ export class ValidateComponent implements OnInit, AfterViewInit {
         new BehaviorSubject(null),
         new BehaviorSubject(null),
         new BehaviorSubject(null),
+        new BehaviorSubject(null),
         new BehaviorSubject(false),
         new BehaviorSubject(false),
         new BehaviorSubject(false),
@@ -272,6 +274,11 @@ export class ValidateComponent implements OnInit, AfterViewInit {
                 }
                 if (paramFilter.id === ISMN_DEPTH_FILTER_ID) {
                   datasetConfigModel.ismnDepthFilter$.value.parameters$.next(paramFilter.parameters);
+                }
+                if (paramFilter.id === ISMN_TOLERANCES_FILTER_ID) {
+                  // presence in a saved config means merging was activated
+                  datasetConfigModel.ismnTolerancesFilter$.value.enabled = true;
+                  datasetConfigModel.ismnTolerancesFilter$.value.parameters$.next(paramFilter.parameters);
                 }
                 if (paramFilter.id == SMAP_L3_V9_VWC_FILTER_ID){
                   datasetConfigModel.vegetationWaterFilter$.value.parameters$.next(paramFilter.parameters);
@@ -426,6 +433,7 @@ export class ValidateComponent implements OnInit, AfterViewInit {
       new BehaviorSubject(null),
       new BehaviorSubject(null),
       new BehaviorSubject(null),
+      new BehaviorSubject(null),
       new BehaviorSubject(spatialReference),
       new BehaviorSubject(temporalReference),
       new BehaviorSubject(false),
@@ -513,6 +521,7 @@ export class ValidateComponent implements OnInit, AfterViewInit {
     model.smosRfiFilter$.next(null);
     model.ismnNetworkFilter$.next(null);
     model.ismnDepthFilter$.next(null);
+    model.ismnTolerancesFilter$.next(null);
     model.smosChi2Filter$.next(null);
     model.vegetationWaterFilter$.next(null);
     model.staticWaterFilter$.next(null);
@@ -595,6 +604,22 @@ export class ValidateComponent implements OnInit, AfterViewInit {
               new BehaviorSubject<string>(filter.default_parameter)));
           } else {
             model.ismnDepthFilter$ = new BehaviorSubject<FilterModel>(new FilterModel(
+              filter,
+              false,
+              false,
+              new BehaviorSubject<string>(filter.default_parameter))
+            );
+          }
+        } else if (filter.id === ISMN_TOLERANCES_FILTER_ID) {
+          // optional filter: starts disabled, the user opts in to enable sensor merging
+          if (model.ismnTolerancesFilter$) {
+            model.ismnTolerancesFilter$.next(new FilterModel(
+              filter,
+              false,
+              false,
+              new BehaviorSubject<string>(filter.default_parameter)));
+          } else {
+            model.ismnTolerancesFilter$ = new BehaviorSubject<FilterModel>(new FilterModel(
               filter,
               false,
               false,
@@ -722,6 +747,10 @@ export class ValidateComponent implements OnInit, AfterViewInit {
 
   onIsmnDepthSelectionChange(selectedNetworks: string): void {
     this.updateMap();
+  }
+
+  onIsmnTolerancesSelectionChange(tolerances: string): void {
+    // tolerances only affect server-side sensor merging, not the displayed stations
   }
 
   onBasicFilterMapUpdate($event): void {
