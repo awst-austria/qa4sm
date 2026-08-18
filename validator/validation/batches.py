@@ -36,6 +36,34 @@ def get_depths_params(param_filters):
     return [depth_from, depth_to]
 
 
+# function to retrieve the ISMN sensor merging tolerances from the database
+def get_tolerances_params(param_filters):
+    """
+    Determine whether ISMN sensor merging is activated and, if so, the top and
+    bottom depth tolerances [m] to use.
+
+    The presence of the FIL_ISMN_TOLERANCES parametrised filter is the opt-in:
+    when it is set the sensors of a station are merged into a soil moisture
+    profile, when it is absent merging is disabled.
+
+    Returns:
+    -------
+    (merge_ismn_sensors, top_tol, bottom_tol): tuple[bool, float, float]
+    """
+    param_name_list = [pfil.filter.name for pfil in list(param_filters)]
+    if "FIL_ISMN_TOLERANCES" not in param_name_list:
+        return False, 0.0, 0.0
+
+    ind = param_name_list.index('FIL_ISMN_TOLERANCES')
+    tolerances = [float(tol) for tol in param_filters[ind].parameters.split(',')]
+    top_tol, bottom_tol = tolerances[0], tolerances[1]
+
+    if top_tol < 0 or bottom_tol < 0:
+        raise ValueError("the depth tolerances can not be negative")
+
+    return True, top_tol, bottom_tol
+
+
 def get_meta_filter_dict(filters) -> Union[dict, None]:
     """
     Convert sensor / station metadata based filters to dict used by the ISMN
@@ -167,12 +195,11 @@ def create_jobs(
 
     # if we've got ISMN data, process one network at a time
     elif isinstance(reader, ISMN_Interface):
-        depth_from, depth_to = get_depths_params(
-            dataset_config.parametrisedfilter_set.all()
+        param_filters = dataset_config.parametrisedfilter_set.all()
+        depth_from, depth_to = get_depths_params(param_filters)
+        merge_ismn_sensors, top_tol, bottom_tol = get_tolerances_params(
+            param_filters
         )
-        merge_ismn_sensors = True
-        top_tol = 0.1
-        bottom_tol = 0.1
 
         filter_meta_dict = get_meta_filter_dict(
             list(dataset_config.filters.all()))

@@ -3,15 +3,17 @@ import {BasicFilterComponent} from './components/basic-filter/basic-filter.compo
 import {IsmnNetworkFilterComponent} from './components/ismn-network-filter/ismn-network-filter.component';
 import {TreeModule} from 'primeng/tree';
 import {IsmnDepthFilterComponent} from './components/ismn-depth-filter/ismn-depth-filter.component';
+import {IsmnTolerancesFilterComponent} from './components/ismn-tolerances-filter/ismn-tolerances-filter.component';
 import { ThresholdFilterComponent } from './components/threshold-filter/threshold-filter.component';
 import { SharedPrimeNgModule } from 'src/app/shared.primeNg.module';
 
 @NgModule({
-  declarations: [BasicFilterComponent, IsmnNetworkFilterComponent, IsmnDepthFilterComponent, ThresholdFilterComponent],
+  declarations: [BasicFilterComponent, IsmnNetworkFilterComponent, IsmnDepthFilterComponent, IsmnTolerancesFilterComponent, ThresholdFilterComponent],
     exports: [
         BasicFilterComponent,
         IsmnNetworkFilterComponent,
         IsmnDepthFilterComponent,
+        IsmnTolerancesFilterComponent,
         ThresholdFilterComponent
     ],
     imports: [
