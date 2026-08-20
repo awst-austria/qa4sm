@@ -177,6 +177,20 @@ SMOS_SBPCA_sm = 'SMOS_SBPCA_sm'
 # insert it's shortname to the list
 NOT_AS_REFERENCE = []
 
+# WHITELIST - datasets whose depth layers may be merged into a single series ("Merge
+# Layers"). This is the outer of two independent gates, and it is deliberately
+# kept even though the inner one would mostly suffice: a variable also has to
+# be marked DataVariable.DepthKind.LAYER before it can take part in a merge.
+# Keeping the list means merging can be switched off for a whole dataset
+# without touching the fixtures repository.
+MERGEABLE_DATASETS = [
+    ERA5,
+    ERA5_LAND,
+    GLDAS,
+    CCI_RZSM,
+    C3S_RZSM,
+]
+
 # ValidationRun and Datasets fields for comparison when looking for a
 # validation with the same settings
 VR_FIELDS = [

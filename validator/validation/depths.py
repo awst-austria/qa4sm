@@ -1,0 +1,139 @@
+"""
+Depth-layer geometry for the "Merge Layers" feature.
+
+Pure functions over :class:`validator.models.DataVariable` objects — no database
+access, no Django queries — so they can be unit tested in isolation and reused
+both by the manual layer picker (where the user ticks whole layers) and by the
+cross-dataset layer matching (where a target range comes from another dataset
+and may cut a layer in half).
+
+All depths are in metres below the surface.
+"""
+
+# depths come from fixtures as floats (0.07, 0.28, ...), so comparisons of
+# layer boundaries need a tolerance rather than exact equality
+DEPTH_TOL = 1e-9
+
+
+def _bounds(variable):
+    """(depth_from, depth_to) of a variable, or raise if it has no depth."""
+    if variable.depth_from is None or variable.depth_to is None:
+        raise ValueError(
+            f"variable '{variable.short_name}' has no depth information")
+    if variable.depth_to <= variable.depth_from:
+        raise ValueError(
+            f"variable '{variable.short_name}' has depth_to <= depth_from "
+            f"({variable.depth_to} <= {variable.depth_from})")
+    return variable.depth_from, variable.depth_to
+
+
+def sort_by_depth(variables):
+    """Variables ordered by depth, shallowest first."""
+    return sorted(variables, key=lambda v: (v.depth_from, v.depth_to))
+
+
+def layers_to_range(variables):
+    """
+    The depth range covered by a set of selected layers.
+
+    This is the manual picking direction: the user ticks whole layers and the
+    range falls out of them. Returns ``None`` for an empty selection.
+
+    Parameters
+    ----------
+    variables: iterable of DataVariable
+        The selected layers. Every one must carry both depth bounds.
+
+    Returns
+    -------
+    (depth_from, depth_to): tuple of float, or None
+    """
+    variables = list(variables)
+    if not variables:
+        return None
+
+    bounds = [_bounds(v) for v in variables]
+    return min(b[0] for b in bounds), max(b[1] for b in bounds)
+
+
+def is_contiguous(variables):
+    """
+    Whether the selected layers form a gap-free, non-overlapping stack.
+
+    Non-contiguous selections are **allowed**. Picking GLDAS 0-10 plus 40-100
+    and skipping 10-40 is the user's call, and the merged value stays well
+    defined: the weights are the picked layers' own overlaps, so the mean
+    normalises over the 0.70 m actually selected and never over the gap.
+
+    What such a selection breaks is the *label*, not the number. Describing the
+    result as "0-100 cm" would claim 30 cm that contributed nothing. Use this to
+    choose how to describe a selection — a span when contiguous, the individual
+    members when not — never to decide whether to permit it.
+    """
+    variables = list(variables)
+    if len(variables) < 2:
+        return True
+
+    ordered = sort_by_depth(variables)
+    for shallower, deeper in zip(ordered, ordered[1:]):
+        _, upper_end = _bounds(shallower)
+        lower_start, _ = _bounds(deeper)
+        if abs(lower_start - upper_end) > DEPTH_TOL:
+            return False
+    return True
+
+
+def overlap(variable, depth_from, depth_to):
+    """
+    How much of ``variable``'s layer lies inside [depth_from, depth_to], in metres.
+
+    Zero when the layer is entirely outside the target. This is the quantity
+    every weight is built from: a layer contributes in proportion to how much of
+    the target interval it fills, which reduces to the plain layer thickness
+    whenever the layer sits wholly inside the target.
+    """
+    layer_from, layer_to = _bounds(variable)
+    return max(0.0, min(depth_to, layer_to) - max(depth_from, layer_from))
+
+
+def range_to_layers(depth_from, depth_to, variables):
+    """
+    The layers of a dataset that contribute to a target depth range.
+
+    This is the matching direction, and the mirror image of
+    :func:`layers_to_range`. It is unused by the manual picker — where the
+    target is by construction the union of the ticked layers, so every overlap
+    equals the full layer thickness — and becomes the engine of cross-dataset
+    layer matching, where a target taken from one dataset can cut a layer of
+    another in half.
+
+    Only variables marked as disjoint layers take part; aggregates such as
+    ``rzsm_1m`` (which spans 0-1 m and would double-count the layers it
+    subsumes) and variables without depths are skipped.
+
+    Parameters
+    ----------
+    depth_from, depth_to: float
+        The target range, in metres.
+    variables: iterable of DataVariable
+        Candidate variables, e.g. ``version.variables.all()``.
+
+    Returns
+    -------
+    list of (DataVariable, overlap_in_metres), shallowest first, excluding
+    layers that do not overlap the target at all.
+    """
+    if depth_to <= depth_from:
+        raise ValueError(
+            f"depth_to must be greater than depth_from "
+            f"({depth_to} <= {depth_from})")
+
+    layers = [v for v in variables if v.is_mergeable_layer]
+
+    contributing = []
+    for layer in sort_by_depth(layers):
+        ov = overlap(layer, depth_from, depth_to)
+        if ov > DEPTH_TOL:
+            contributing.append((layer, ov))
+
+    return contributing

@@ -71,5 +71,8 @@ class DatasetVariableSerializer(ModelSerializer):
                   'min_value',
                   'max_value',
                   'unit',
-                  'display_name'
+                  'display_name',
+                  'depth_from',
+                  'depth_to',
+                  'depth_kind'
                   ]
