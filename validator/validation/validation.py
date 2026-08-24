@@ -49,7 +49,8 @@ from validator.validation.graphics import generate_all_graphs
 from validator.validation.readers import create_reader, adapt_timestamp
 from validator.validation.util import mkdir_if_not_exists, first_file_in
 from validator.validation.globals import START_TIME, END_TIME, METADATA_TEMPLATE
-from validator.validation.adapters import StabilityMetricsAdapter, MergeSensorsAdapter
+from validator.validation.adapters import StabilityMetricsAdapter, MergeSensorsAdapter, LayerMergeAdapter
+from validator.validation.depths import merge_coefficients, merged_labels, merged_unit
 import qa4sm_reader
 from qa4sm_reader.intra_annual_temp_windows import TemporalSubWindowsCreator, NewSubWindow, TemporalSubWindowsFactory
 from qa4sm_reader.netcdf_transcription import Pytesmo2Qa4smResultsTranscriber
@@ -98,7 +99,8 @@ def _get_spatial_reference_reader(val_run) -> Tuple['Reader', str, dict]:
             filters=list(val_run.spatial_reference_configuration.filters.all()),
             param_filters=list(val_run.spatial_reference_configuration.parametrisedfilter_set.all()),
             dataset=val_run.spatial_reference_configuration.dataset,
-            variable=val_run.spatial_reference_configuration.variable)
+            variable=val_run.spatial_reference_configuration.variable,
+            merged_layers=val_run.spatial_reference_configuration.merged_layers)
 
     while hasattr(ref_reader, 'cls'):
         ref_reader = ref_reader.cls
@@ -188,21 +190,22 @@ def save_validation_config(validation_run):
 
                 # there is no error for variables!!, there were some inconsistency with short and pretty names,
                 # and it should be like that now
+                variable_name, variable_pretty_name, unit = \
+                    get_variable_naming(dataset_config)
+
                 ds.setncattr('val_dc_dataset' + str(i),
                              dataset_config.dataset.short_name)
                 ds.setncattr('val_dc_version' + str(i),
                              dataset_config.version.short_name)
-                ds.setncattr('val_dc_variable' + str(i),
-                             dataset_config.variable.pretty_name)
-                ds.setncattr('val_dc_unit' + str(i),
-                             dataset_config.variable.unit)
+                ds.setncattr('val_dc_variable' + str(i), variable_name)
+                ds.setncattr('val_dc_unit' + str(i), unit)
 
                 ds.setncattr('val_dc_dataset_pretty_name' + str(i),
                              dataset_config.dataset.pretty_name)
                 ds.setncattr('val_dc_version_pretty_name' + str(i),
                              dataset_config.version.pretty_name)
                 ds.setncattr('val_dc_variable_pretty_name' + str(i),
-                             dataset_config.variable.short_name)
+                             variable_pretty_name)
 
                 ds.setncattr('val_dc_filters' + str(i), filters)
 
@@ -267,6 +270,36 @@ def save_validation_config(validation_run):
         __logger.exception('Validation configuration could not be stored.')
 
 
+def get_variable_naming(dataset_config):
+    """
+    The variable name, pretty name and unit to write out for a configuration.
+
+    Returns exactly what the unmerged path always wrote unless this
+    configuration actually merges layers, in which case the depth range
+    replaces the single variable's names and an extensive unit becomes
+    volumetric — because the merge coefficients fold the kg/m² to m³/m³
+    conversion in. A single-layer GLDAS run still stores raw mass and must keep
+    saying kg/m², so this override is strictly conditional on merging.
+
+    Returns
+    -------
+    (variable_name, variable_pretty_name, unit): tuple of str
+        In netCDF attribute order, for 'val_dc_variable', for
+        'val_dc_variable_pretty_name' and for 'val_dc_unit' respectively. Note
+        those first two hold pretty and short names the opposite way round to
+        what their names suggest; that quirk predates this function.
+    """
+    variable = dataset_config.variable
+    merged_layers = dataset_config.merged_layers
+
+    if not merged_layers:
+        return variable.pretty_name, variable.short_name, variable.unit
+
+    variable_name, variable_pretty_name = merged_labels(merged_layers)
+    return (variable_name, variable_pretty_name,
+            merged_unit(merged_layers, variable.unit))
+
+
 def create_pytesmo_validation(validation_run, val_type="temporal"):
     ds_list = []
     ds_read_names = []
@@ -282,13 +315,16 @@ def create_pytesmo_validation(validation_run, val_type="temporal"):
         time_adapted_reader = adapt_timestamp(reader, dataset_config.dataset,
                                               dataset_config.version)
 
+        merged_layers = dataset_config.merged_layers
+
         reader, read_name, read_kwargs = \
             setup_filtering(
                 reader=time_adapted_reader,
                 filters=list(dataset_config.filters.all()),
                 param_filters=list(dataset_config.parametrisedfilter_set.all()),
                 dataset=dataset_config.dataset,
-                variable=dataset_config.variable)
+                variable=dataset_config.variable,
+                merged_layers=merged_layers)
 
         if (validation_run.spatial_reference_configuration
                 and (dataset_config.id
@@ -301,6 +337,22 @@ def create_pytesmo_validation(validation_run, val_type="temporal"):
             reader = MergeSensorsAdapter(
                 reader,
                 variable=dataset_config.variable.short_name,
+                read_name=read_name)
+
+        if merged_layers:
+            # fold the selected depth layers into the configured variable's
+            # own column. After filtering, so each layer's geophysical range
+            # mask is applied to its own raw values, and before the anomaly
+            # adapters, so any anomaly is computed on the merged profile
+            # rather than on a single layer.
+            columns, coefficients = merge_coefficients(
+                merged_layers, weighted=dataset_config.merge_weighted)
+            reader = LayerMergeAdapter(
+                reader,
+                func=None,  # unused, LayerMergeAdapter reads func_kwargs['c']
+                func_kwargs={'c': coefficients},
+                columns=columns,
+                new_name=dataset_config.variable.short_name,
                 read_name=read_name)
 
         if validation_run.anomalies == ValidationRun.MOVING_AVG_35_D:
@@ -1575,12 +1627,14 @@ def run_validation(validation_id, val_type="temporal"):
                             else:
                                 i = j
                                 j += 1
+                            variable_name, variable_pretty_name, _ = \
+                                get_variable_naming(dataset_config)
                             ds.setncattr('val_dc_dataset' + str(i), dataset_config.dataset.short_name)
                             ds.setncattr('val_dc_version' + str(i), dataset_config.version.short_name)
-                            ds.setncattr('val_dc_variable' + str(i), dataset_config.variable.pretty_name)
+                            ds.setncattr('val_dc_variable' + str(i), variable_name)
                             ds.setncattr('val_dc_dataset_pretty_name' + str(i), dataset_config.dataset.pretty_name)
                             ds.setncattr('val_dc_version_pretty_name' + str(i), dataset_config.version.pretty_name)
-                            ds.setncattr('val_dc_variable_pretty_name' + str(i), dataset_config.variable.short_name)
+                            ds.setncattr('val_dc_variable_pretty_name' + str(i), variable_pretty_name)
                         ds.val_scaling_method = validation_run.scaling_method
                         ds.val_anomalies = validation_run.anomalies
                 
@@ -1779,6 +1833,33 @@ def _compare_param_filters(new_param_filters, old_param_filters):
     return is_the_same
 
 
+def _compare_merged_layers(new_dataset, old_dataset):
+    """
+    Checking if the two configurations merge the same depth layers, the same
+    way.
+
+    Without this, two runs differing *only* in their layer selection compare as
+    identical and the user is told they have already run a validation they
+    never ran. Compared by variable id, since the merge is defined by which
+    columns take part, and the weighting flag is part of the result too: the
+    same layers weighted and unweighted give different numbers.
+    """
+    if new_dataset.merge_weighted != old_dataset.merge_weighted:
+        return False
+
+    new_ids = set(new_dataset.merged_variables.values_list('id', flat=True))
+    old_ids = set(old_dataset.merged_variables.values_list('id', flat=True))
+
+    # a selection of fewer than two layers is not a merge at all, so an empty
+    # set and a single leftover variable must compare equal
+    if len(new_ids) < 2:
+        new_ids = set()
+    if len(old_ids) < 2:
+        old_ids = set()
+
+    return new_ids == old_ids
+
+
 def _compare_filters(new_dataset, old_dataset):
     """
     Checking if filters are the same for given configuration, checks till finds the first failure or till the end
@@ -1853,7 +1934,8 @@ def _compare_datasets(new_run_config, old_run_config):
                         old_dataset, ds_fields[ds_ind]):
                 ds_ind += 1
             if ds_ind == max_ds_ind:
-                the_same = _compare_filters(new_dataset, old_dataset)
+                the_same = (_compare_merged_layers(new_dataset, old_dataset)
+                            and _compare_filters(new_dataset, old_dataset))
             else:
                 the_same = False
             conf_ind += 1
@@ -1972,6 +2054,9 @@ def copy_validationrun(run_to_copy, new_user):
             old_id = conf.id
             old_filters = conf.filters.all()
             old_param_filters = conf.parametrisedfilter_set.all()
+            # many-to-many relations are not carried over by the pk = None
+            # re-save below, so grab this before the copy like the filters
+            old_merged_variables = list(conf.merged_variables.all())
 
             # setting new scaling reference id
             if old_id == old_scaling_ref_id:
@@ -1984,6 +2069,7 @@ def copy_validationrun(run_to_copy, new_user):
 
             # setting filters
             new_conf.filters.set(old_filters)
+            new_conf.merged_variables.set(old_merged_variables)
             if len(old_param_filters) != 0:
                 for param_filter in old_param_filters:
                     param_filter.id = None

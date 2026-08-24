@@ -191,6 +191,18 @@ MERGEABLE_DATASETS = [
     C3S_RZSM,
 ]
 
+# Units in which the stored value is an *extensive* quantity: water mass per
+# unit area over the layer's whole thickness, not an intensive volumetric
+# fraction. Merging these has to divide by layer thickness first, otherwise a
+# thick layer is counted several times over.
+# Both spellings are accepted so that an ASCII edit in the fixtures repo cannot
+# silently turn the conversion off.
+EXTENSIVE_UNITS = {'kg/m²', 'kg/m2'}
+# what an extensive variable becomes once merged and normalised
+VOLUMETRIC_UNIT = 'm³/m³'
+# density of water, kg/m³ - converts kg/m² over a depth in m into m³/m³
+WATER_DENSITY = 1000.0
+
 # ValidationRun and Datasets fields for comparison when looking for a
 # validation with the same settings
 VR_FIELDS = [

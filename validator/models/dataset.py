@@ -48,6 +48,13 @@ class Dataset(models.Model):
         return self.short_name in NOT_AS_REFERENCE
 
     @property
+    def supports_layer_merging(self):
+        # outer of the two gates on merging; the inner one is
+        # DataVariable.is_mergeable_layer.
+        from validator.validation.globals import MERGEABLE_DATASETS
+        return self.short_name in MERGEABLE_DATASETS
+
+    @property
     def resolution_in_m(self):
         # we need the resolution in m in the distance lookup
         # as a default value we use 30km

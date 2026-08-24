@@ -2,6 +2,7 @@ import {
   DatasetComponentSelectionModel
 } from '../../modules/dataset/components/dataset/dataset-component-selection-model';
 import {FilterModel} from '../../modules/filter/components/basic-filter/filter-model';
+import {DatasetVariableDto} from '../../modules/core/services/dataset/dataset-variable.dto';
 import {ParametrisedFilterConfig, ValidationRunDatasetConfigDto} from './service/validation-run-config-dto';
 import {BehaviorSubject} from 'rxjs';
 
@@ -32,6 +33,15 @@ export class DatasetConfigModel {
               public filAscatsspFilter$: BehaviorSubject<FilterModel>,
               public filAscatSsmSensitivityFilter$: BehaviorSubject<FilterModel>,
               public highlighted$?: BehaviorSubject<boolean>,
+              // Appended after highlighted$ on purpose: every existing call
+              // site passes these fifteen positionally, so inserting earlier
+              // would silently shift highlighted$ into one of these.
+              // depth layers to fold into one series; fewer than two means no
+              // merging at all
+              public mergedVariables$: BehaviorSubject<DatasetVariableDto[]>
+                = new BehaviorSubject<DatasetVariableDto[]>([]),
+              public mergeWeighted$: BehaviorSubject<boolean>
+                = new BehaviorSubject<boolean>(true),
 
   ) {
   }
@@ -85,10 +95,19 @@ export class DatasetConfigModel {
       parameterisedFilters.push({id: FIL_ASCAT_SUBSURFACE_SCAT_PROB_ID, parameters: this.filAscatsspFilter$.value.parameters$.value});
     }
 
+    // fewer than two layers is not a merge, so send nothing at all and let the
+    // ordinary single-variable path apply
+    const mergedVariables = this.mergedVariables$.value;
+    const mergedVariableIds = mergedVariables.length > 1
+      ? mergedVariables.map(variable => variable.id)
+      : [];
+
     return {
       dataset_id: this.datasetModel.selectedDataset.id,
       variable_id: this.datasetModel.selectedVariable.id,
       version_id: this.datasetModel.selectedVersion.id,
+      merged_variable_ids: mergedVariableIds,
+      merge_weighted: this.mergeWeighted$.value,
       basic_filters: enabledBasicFilters,
       parametrised_filters: parameterisedFilters,
       is_spatial_reference: this.spatialReference$.value,

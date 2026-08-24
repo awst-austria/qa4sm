@@ -97,7 +97,10 @@
                             "
                             [removable]="true"
                             (changeDataset)="onDatasetChange($event)"
-                          />
+                          
+                      (changeVariable)="onVariableSelected(validationModel.datasetConfigurations[datasetIdx])"/>
+
+                    <qa-merge-layers [configModel]="validationModel.datasetConfigurations[datasetIdx]"/>
                         }
                         @for (
                           filter of item.basicFilters;

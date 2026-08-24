@@ -3,7 +3,44 @@ import numpy as np
 import pandas as pd
 from scipy.stats import theilslopes
 from pytesmo.validation_framework.metric_calculators_adapters import SubsetsMetricsAdapter
-from pytesmo.validation_framework.adapters import BasicAdapter
+from pytesmo.validation_framework.adapters import BasicAdapter, \
+    ColumnCombineAdapter
+
+
+class LayerMergeAdapter(ColumnCombineAdapter):
+    """
+    Folds several depth-layer columns of one dataset into a single series.
+
+    Same constructor as the parent, but ``_adapt`` does one matrix product
+    instead of a Python call per timestamp.
+
+    The coefficients in ``func_kwargs['c']`` are already fully normalised and
+    carry any kg/m² -> m³/m³ conversion, so the merge must not normalise again.
+    ``skipna=False`` keeps the required semantics: a timestamp survives only if
+    every contributing layer has data there.
+
+    Two deliberate departures from the parent, worth knowing before reusing
+    this: it calls ``BasicAdapter._adapt`` directly, because ``super()._adapt``
+    *is* the slow row-wise path; and it ignores ``func`` entirely, reading the
+    coefficients instead. It is the layer merge, not a general column combiner.
+    """
+
+    def _adapt(self, data):
+        data = BasicAdapter._adapt(self, data)
+
+        # keep the parent's contract for the empty case
+        if data.empty:
+            data[self.new_name] = None
+            return data
+
+        columns = data.columns if self.columns is None else self.columns
+        coefficients = self.func_kwargs['c']
+
+        data[self.new_name] = (data[columns] * coefficients).sum(
+            axis=1, skipna=False)
+
+        return data
+
 
 class MergeSensorsAdapter(BasicAdapter):
     """

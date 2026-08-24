@@ -19,6 +19,44 @@ class DatasetConfiguration(models.Model):
     is_temporal_reference = models.BooleanField(null=True)
     is_scaling_reference = models.BooleanField(null=True)
 
+    # depth layers of this dataset to fold into a single series on reading.
+    # Fewer than two entries means no merging at all, so every pre-existing
+    # configuration keeps behaving exactly as before.
+    merged_variables = models.ManyToManyField(DataVariable, blank=True,
+                                              related_name='merged_in_configs')
+    # False gives an equal-weight mean instead of weighting each layer by how
+    # much of the merged range it covers
+    merge_weighted = models.BooleanField(default=True)
+
+    @property
+    def merged_layers(self):
+        """
+        The depth layers this configuration actually merges, shallowest first.
+
+        Empty unless there are at least two, and both gates pass: the dataset
+        must be whitelisted and every variable must be a disjoint layer. Gating
+        here rather than at the call sites means a configuration that somehow
+        stored an ineligible selection degrades to no merging instead of
+        producing a wrong series.
+        """
+        from validator.validation.depths import sort_by_depth
+
+        if not self.dataset.supports_layer_merging:
+            return []
+
+        selected = list(self.merged_variables.all())
+        if len(selected) < 2:
+            return []
+        if not all(v.is_mergeable_layer for v in selected):
+            return []
+
+        return sort_by_depth(selected)
+
+    @property
+    def is_merged(self):
+        """Whether this configuration folds several depth layers into one."""
+        return bool(self.merged_layers)
+
     def __str__(self):
         return "Data set: {}, version: {}, variable: {}".format(
             self.dataset if hasattr(self, 'dataset') else "none",

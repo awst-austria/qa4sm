@@ -96,6 +96,127 @@ def overlap(variable, depth_from, depth_to):
     return max(0.0, min(depth_to, layer_to) - max(depth_from, layer_from))
 
 
+def is_extensive(variable):
+    """
+    Whether the stored value is a mass per unit area rather than a volumetric
+    fraction, and so has to be divided by the layer thickness before layers can
+    be combined. True for GLDAS (kg/m²), false for everything else so far.
+    """
+    from validator.validation.globals import EXTENSIVE_UNITS
+    return variable.unit in EXTENSIVE_UNITS
+
+
+def merge_coefficients(variables, weighted=True, target=None):
+    """
+    Per-column coefficients for folding several depth layers into one series.
+
+    The merge is a plain dot product over the *raw stored* values,
+    ``Σ(cᵢ · xᵢ)``, so these coefficients carry their own normalisation and any
+    unit conversion. Do not hand them to :func:`numpy.average`, which would
+    divide by ``Σc`` a second time.
+
+    For an intensive (volumetric) variable the stored value already is θᵢ::
+
+        cᵢ = wᵢ / Σw
+
+    For an extensive one (kg/m² over the layer's full thickness Δzᵢ) recovering
+    θᵢ divides by ``ρ_w · Δzᵢ``, and that fold-in is the only difference::
+
+        cᵢ = wᵢ / (ρ_w · Δzᵢ · Σw)
+
+    where ``wᵢ`` is the layer's overlap with the merged range when weighting is
+    on, and ``1/n`` when it is off. Note the thickness division stays either
+    way: an equal-weight mean of raw kg/m² values is not a soil moisture at all.
+
+    Parameters
+    ----------
+    variables: iterable of DataVariable
+        The layers to merge. Two or more, all carrying depth bounds.
+    weighted: bool, optional (default: True)
+        False gives every layer the same weight regardless of thickness.
+    target: (float, float), optional
+        Depth range to weight against. Defaults to the range the layers
+        themselves span, which is the manual-picking case — then every overlap
+        is the layer's own full thickness.
+
+    Returns
+    -------
+    (columns, coefficients): (list of str, list of float)
+        Column names in reader order and their coefficients, aligned.
+    """
+    from validator.validation.globals import WATER_DENSITY
+
+    ordered = sort_by_depth(variables)
+    if len(ordered) < 2:
+        raise ValueError('merging needs at least two layers, got '
+                         f'{len(ordered)}')
+
+    if target is None:
+        target = layers_to_range(ordered)
+
+    if weighted:
+        weights = [overlap(v, *target) for v in ordered]
+    else:
+        weights = [1.0 / len(ordered)] * len(ordered)
+
+    total = sum(weights)
+    if total <= 0:
+        raise ValueError('selected layers do not overlap the target range '
+                         f'{target}')
+
+    coefficients = []
+    for variable, weight in zip(ordered, weights):
+        coefficient = weight / total
+        if is_extensive(variable):
+            coefficient /= WATER_DENSITY * variable.thickness
+        coefficients.append(coefficient)
+
+    return [v.short_name for v in ordered], coefficients
+
+
+def depth_label(variables):
+    """
+    Human-readable depth description, in centimetres.
+
+    Contiguous picks get a single span (``"0-40 cm"``). Gapped picks are legal
+    but a span would overclaim the missing layers, so
+    they are described by their members instead (``"0-10, 40-100 cm"``).
+    """
+    ordered = sort_by_depth(variables)
+    if is_contiguous(ordered):
+        depth_from, depth_to = layers_to_range(ordered)
+        return '%g-%g cm' % (depth_from * 100, depth_to * 100)
+
+    spans = ['%g-%g' % (v.depth_from * 100, v.depth_to * 100) for v in ordered]
+    return '%s cm' % ', '.join(spans)
+
+
+def merged_labels(variables):
+    """
+    The two name strings a merged series is written out with.
+
+    Returns ``(pretty, short)`` for the ``val_dc_variable`` and
+    ``val_dc_variable_pretty_name`` netCDF attributes respectively.
+    This returns pretty and short names in
+    attribute order, so pass them straight through.
+    """
+    ordered = sort_by_depth(variables)
+    return ('%s (merged)' % depth_label(ordered),
+            '+'.join(v.short_name for v in ordered))
+
+
+def merged_unit(variables, current_unit):
+    """
+    The unit a merged series carries. Extensive inputs come out volumetric,
+    because :func:`merge_coefficients` folds the mass-to-θ conversion in;
+    everything else keeps the unit it already had.
+    """
+    from validator.validation.globals import VOLUMETRIC_UNIT
+    if any(is_extensive(v) for v in variables):
+        return VOLUMETRIC_UNIT
+    return current_unit
+
+
 def range_to_layers(depth_from, depth_to, variables):
     """
     The layers of a dataset that contribute to a target depth range.

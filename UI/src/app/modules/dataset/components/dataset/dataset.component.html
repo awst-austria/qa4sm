@@ -77,12 +77,13 @@
 <div class="grid align-content-center">
   <div class="col" style="max-width: 100%">
     <p-floatLabel>
-      <p-select
-        [inputId]="variableSelectorId"
-        optionLabel="short_name"
-        [style]="{ width: '100%' }"
-        [options]="selectableDatasetVariables$ | async"
+      <p-select 
+        [inputId]="variableSelectorId" 
+        optionLabel="short_name" 
+        [style]="{'width': '100%'}"     
+        [options]="(selectableDatasetVariables$|async)"
         [(ngModel)]="selectionModel.selectedVariable"
+        (onChange)="onVariableChange()"
       >
         <ng-template let-item pTemplate="item">
           <span>

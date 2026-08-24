@@ -27,6 +27,10 @@ export interface ValidationRunDatasetConfigDto {
   dataset_id: number;
   version_id: number;
   variable_id: number;
+  // depth layers folded into one series; empty or a single entry means no
+  // merging. The backend derives variable_id from this when it is set.
+  merged_variable_ids?: number[];
+  merge_weighted?: boolean;
   basic_filters: number[];
   parametrised_filters: ParametrisedFilterConfig[];
   is_spatial_reference: boolean;

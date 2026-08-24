@@ -249,6 +249,7 @@ export class ValidateComponent implements OnInit, AfterViewInit {
         new BehaviorSubject(false)
       );
       this.validationModel.datasetConfigurations.push(newDatasetConfigModel);
+      this.restoreMergedLayers(newDatasetConfigModel, datasetConfig);
       this.versionService.getVersionById(datasetConfig.version_id).subscribe({
         next: versionDto => {
           newDatasetConfigModel.datasetModel.selectedVersion = versionDto;
@@ -504,6 +505,27 @@ export class ValidateComponent implements OnInit, AfterViewInit {
   }
 
 
+  /**
+   * Puts a saved layer-merge selection back on the model when a validation is
+   * reloaded into the form. The backend has already dropped any layer that no
+   * longer belongs to the version, so anything arriving here is usable; fewer
+   * than two simply means the run did not merge.
+   */
+  private restoreMergedLayers(model: DatasetConfigModel,
+                              datasetConfig: ValidationRunDatasetConfigDto): void {
+    model.mergeWeighted$.next(datasetConfig.merge_weighted ?? true);
+
+    const mergedIds = datasetConfig.merged_variable_ids ?? [];
+    if (mergedIds.length < 2) {
+      model.mergedVariables$.next([]);
+      return;
+    }
+
+    forkJoin(mergedIds.map(id => this.variableService.getVariableById(id)))
+      .subscribe(variables => model.mergedVariables$.next(
+        variables.sort((a, b) => a.depth_from - b.depth_from)));
+  }
+
   private loadFiltersForModel(model: DatasetConfigModel, reloadingSettings = false): ReplaySubject<DatasetConfigModel> {
     const updatedModel$ = new ReplaySubject<DatasetConfigModel>();
 
@@ -714,6 +736,20 @@ export class ValidateComponent implements OnInit, AfterViewInit {
       } else {
         newReference[referenceType].next(true);
       }
+    }
+  }
+
+  /**
+   * Picking a variable from the dropdown by hand ends any layer merge for that
+   * dataset. While layers are merged the output column is derived from them, so
+   * a hand-picked variable and a merge selection cannot both be honoured -
+   * the backend would keep deriving the column from the ticks and quietly
+   * ignore the dropdown. Clearing the ticks makes the dropdown mean what it
+   * says again, and doubles as the way out of merging.
+   */
+  onVariableSelected(config: DatasetConfigModel): void {
+    if (config.mergedVariables$.value.length) {
+      config.mergedVariables$.next([]);
     }
   }
 

@@ -40,6 +40,12 @@ export class DatasetComponent implements OnInit {
   @Input() selectionModel: DatasetComponentSelectionModel;
   @Input() removable = false;
   @Output() changeDataset = new EventEmitter<DatasetComponentSelectionModel>();
+  /**
+   * Emitted only when the user picks a variable from the dropdown themselves.
+   * PrimeNG raises onChange on option selection, not on programmatic ngModel
+   * writes, so the layer merge setting this variable does not come back here.
+   */
+  @Output() changeVariable = new EventEmitter<DatasetComponentSelectionModel>();
 
   datasetSelectorId: string;
   versionSelectorId: string;
@@ -137,6 +143,10 @@ export class DatasetComponent implements OnInit {
   private onSelectableVariablesComplete(): void {
     this.changeDataset.emit(this.selectionModel);
     this.setSelectorsId();
+  }
+
+  onVariableChange(): void {
+    this.changeVariable.emit(this.selectionModel);
   }
 
   onVersionChange(versions: DatasetVersionDto[]): void {

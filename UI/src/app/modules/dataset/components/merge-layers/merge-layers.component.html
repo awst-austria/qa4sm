@@ -1,0 +1,65 @@
+<div *ngIf="available$ | async" class="merge-layers mt-3">
+
+  <div class="flex align-items-center gap-2 mb-2">
+    <span><b>Merge layers</b></span>
+    <span class="pi pi-question-circle help-field"
+          pTooltip="Combine several depth layers of this dataset into a single series.
+                    Each layer is weighted by its thickness, so a thicker layer counts
+                    proportionally more. A timestamp is kept only where every selected
+                    layer has data."
+          tooltipPosition="bottom">
+    </span>
+  </div>
+
+  <div *ngFor="let layer of selectableLayers$ | async"
+       class="flex align-items-center gap-2 py-1">
+    <p-checkbox [binary]="true"
+                [inputId]="'merge_' + layer.id"
+                [ngModel]="isSelected(layer)"
+                (ngModelChange)="toggle(layer)">
+    </p-checkbox>
+    <label [for]="'merge_' + layer.id" class="cursor-pointer flex-grow-1">
+      {{ layer.short_name }}
+      <span class="text-muted ml-2">{{ layerLabel(layer) }}</span>
+    </label>
+    <span class="layer-weight">{{ layerWeight(layer) }}</span>
+  </div>
+
+  <div *ngIf="isMerging()" class="merge-summary mt-2 p-2">
+    <div class="flex align-items-center gap-2">
+      <span class="pi pi-arrows-v"></span>
+      <span>Merged depth: <b>{{ mergedRangeLabel$ | async }}</b></span>
+    </div>
+
+    <div *ngIf="hasGap()" class="merge-gap-note mt-1">
+      <span class="pi pi-info-circle mr-1"></span>
+      These layers are not adjacent. The result is the thickness-weighted mean of
+      exactly the layers you picked; the skipped depths contribute nothing.
+    </div>
+
+    <div class="flex align-items-center gap-2 mt-2">
+      <p-checkbox [binary]="true"
+                  inputId="merge_weighted_{{ configModel.datasetModel.selectedVersion?.id }}"
+                  [ngModel]="configModel.mergeWeighted$ | async"
+                  (ngModelChange)="setWeighted($event)">
+      </p-checkbox>
+      <label for="merge_weighted_{{ configModel.datasetModel.selectedVersion?.id }}"
+             class="cursor-pointer">
+        Weight each layer by its thickness
+      </label>
+      <span class="pi pi-question-circle help-field"
+            pTooltip="On, a 30 cm layer counts three times as much as a 10 cm one.
+                      Off, every selected layer counts equally regardless of how much
+                      soil it represents."
+            tooltipPosition="bottom">
+      </span>
+    </div>
+
+    <div class="merge-output-note mt-2">
+      Written to <code>{{ outputLayer()?.short_name }}</code>, the shallowest
+      selected layer. The variable above follows your selection; choosing a
+      variable there by hand clears the merge.
+    </div>
+  </div>
+
+</div>
