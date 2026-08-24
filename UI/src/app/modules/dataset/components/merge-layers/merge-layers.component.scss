@@ -1,0 +1,28 @@
+@use 'src/style.variables' as *;
+
+.merge-layers {
+  font-size: 0.9rem;
+}
+
+.layer-weight {
+  color: $font-color-muted;
+  font-variant-numeric: tabular-nums;
+  min-width: 3rem;
+  text-align: right;
+}
+
+.merge-summary {
+  background: $base-color-transparent;
+  border-radius: 4px;
+}
+
+.merge-gap-note,
+.merge-output-note {
+  color: $font-color-muted;
+  font-size: 0.82rem;
+  line-height: 1.4;
+}
+
+.merge-output-note code {
+  color: $font-color-base;
+}

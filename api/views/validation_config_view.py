@@ -17,6 +17,7 @@ from api.views.validation_run_view import ValidationRunSerializer
 from validator.models import ValidationRun, DatasetConfiguration, DataFilter, ParametrisedFilter, Dataset, \
     DatasetVersion, DataVariable
 from validator.validation import run_validation, globals
+from validator.validation.depths import sort_by_depth
 from validator.validation.validation import compare_validation_runs
 import os
 
@@ -211,9 +212,21 @@ def get_validation_configuration(request, **kwargs):
                 })
                 version_id = max(dataset_versions.values_list('id', flat=True))
 
+            # merged layers survive a reload only while they still belong to
+            # the version, exactly like the variable check above. Dropping to
+            # fewer than two simply means no merging, which is a safe fallback.
+            merged_variable_ids = [
+                merged.id for merged in ds.merged_variables.all()
+                if merged in version_variables
+            ]
+            if len(merged_variable_ids) < 2:
+                merged_variable_ids = []
+
             ds_dict = {'dataset_id': dataset_id,
                        'version_id': version_id,
                        'variable_id': variable_id,
+                       'merged_variable_ids': merged_variable_ids,
+                       'merge_weighted': ds.merge_weighted,
                        'is_spatial_reference': ds.is_spatial_reference,
                        'is_temporal_reference': ds.is_temporal_reference,
                        'is_scaling_reference': ds.is_scaling_reference}
@@ -279,9 +292,61 @@ class DatasetConfigSerializer(serializers.Serializer):
     def create(self, validated_data):
         pass
 
+    def validate(self, attrs):
+        """
+        Keep the merge selection self-consistent and scoped to its own version.
+
+        The many-to-many points at DataVariable globally, so nothing otherwise
+        stops ERA5-Land's 'swvl1' being posted into an ERA5 configuration -
+        and since both datasets name that column identically, the merge would
+        quietly produce a plausible-looking wrong series instead of failing.
+
+        The output variable is then *derived* rather than trusted: it is the
+        shallowest merged layer. That removes any chance of the configured
+        variable falling outside the merge set, since it is taken from it.
+        """
+        merged_ids = attrs.get('merged_variable_ids') or []
+
+        # fewer than two layers is not a merge; keep the posted variable
+        if len(merged_ids) < 2:
+            attrs['merged_variable_ids'] = []
+            return attrs
+
+        version = DatasetVersion.objects.filter(
+            pk=attrs.get('version_id')).first()
+        if version is None:
+            raise serializers.ValidationError(
+                'Unknown version for a merged dataset configuration.')
+
+        allowed = {v.id: v for v in version.variables.all()}
+        foreign = [i for i in merged_ids if i not in allowed]
+        if foreign:
+            raise serializers.ValidationError(
+                f'Variables {foreign} do not belong to version '
+                f'{version.short_name} and cannot be merged into it.')
+
+        layers = [allowed[i] for i in merged_ids]
+        not_layers = [v.short_name for v in layers if not v.is_mergeable_layer]
+        if not_layers:
+            raise serializers.ValidationError(
+                f'Variables {not_layers} are not disjoint depth layers and '
+                f'cannot take part in a merge.')
+
+        dataset = Dataset.objects.filter(pk=attrs.get('dataset_id')).first()
+        if dataset is None or not dataset.supports_layer_merging:
+            raise serializers.ValidationError(
+                'Layer merging is not available for this dataset.')
+
+        attrs['variable_id'] = sort_by_depth(layers)[0].id
+
+        return attrs
+
     dataset_id = serializers.IntegerField(required=True)
     version_id = serializers.IntegerField(required=True)
     variable_id = serializers.IntegerField(required=True)
+    merged_variable_ids = serializers.ListField(
+        child=serializers.IntegerField(), required=False, default=list)
+    merge_weighted = serializers.BooleanField(required=False, default=True)
     basic_filters = serializers.ListField(child=serializers.IntegerField(), required=True)
     parametrised_filters = ParameterisedFilterConfigSerializer(many=True)
     is_spatial_reference = serializers.BooleanField(required=True)
@@ -398,8 +463,14 @@ class ValidationConfigurationSerializer(serializers.Serializer):
                                                                    is_temporal_reference=config.get(
                                                                        'is_temporal_reference'),
                                                                    is_scaling_reference=config.get(
-                                                                       'is_scaling_reference'))
+                                                                       'is_scaling_reference'),
+                                                                   merge_weighted=config.get(
+                                                                       'merge_weighted', True))
                 config_model.save()
+
+                merged_variable_ids = config.get('merged_variable_ids') or []
+                if merged_variable_ids:
+                    config_model.merged_variables.set(merged_variable_ids)
 
                 for filter_id in config.get('basic_filters'):
                     config_model.filters.add(DataFilter.objects.get(id=filter_id))
