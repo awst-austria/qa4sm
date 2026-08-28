@@ -33,4 +33,8 @@ export class DataCache<T> {
     }
     return false;
   }
+
+  public clear(): void {
+    this.cache.clear();
+  }
 }

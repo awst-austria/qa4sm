@@ -3,7 +3,7 @@ import {HttpClient, HttpParams} from '@angular/common/http';
 import {DatasetDto} from './dataset.dto';
 import {Observable, of} from 'rxjs';
 import {environment} from '../../../../../environments/environment';
-import {catchError, map, shareReplay, switchMap, tap} from 'rxjs/operators';
+import {catchError, map, shareReplay, skip, switchMap, tap} from 'rxjs/operators';
 import {DataCache} from '../../tools/DataCache';
 import {HttpErrorService} from '../global/http-error.service';
 import { UserDatasetsService } from 'src/app/modules/user-datasets/services/user-datasets.service';
@@ -32,6 +32,8 @@ export class DatasetService {
   constructor(private httpClient: HttpClient,
     private httpError: HttpErrorService,
     private userDatasets: UserDatasetsService) {
+      // The dataset list changes whenever the user uploads or deletes their own data.
+      this.userDatasets.doRefresh.pipe(skip(1)).subscribe(() => this.invalidateCache());
   }
 
   getAllDatasets(userData = false, excludeNoFiles = true): Observable<DatasetDto[]> {
@@ -103,6 +105,12 @@ export class DatasetService {
         catchError(err => this.httpError.handleError(err))
       );
     }
+  }
+  public invalidateCache(): void {
+    this.arrayRequestCache.clear();
+    this.userDataInfoCache.clear();
+    this.userFileInfoCache.clear();
+    this.singleRequestCache.clear();
   }
 
 }

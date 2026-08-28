@@ -107,9 +107,9 @@ export class UserFormComponent implements OnInit {
   }
 
   private onUpdateNext(data: UserData): void {
-    Object.assign(this.userService.currentUser, data)
-    this.doRefresh.emit(true);
-    this.formErrors = null;
+  this.userService.patchCurrentUser(data as Partial<UserDto>);
+  this.doRefresh.emit(true);
+  this.formErrors = null;
   }
 
   private onFormSubmitError(error: CustomHttpError): void {
@@ -158,8 +158,7 @@ export class UserFormComponent implements OnInit {
   }
 
   deactivateAccountNext(): void {
-    this.userService.currentUser = this.userService.emptyUser;
-    this.userService.authenticated.next(false);
+    this.userService.resetCurrentUser();     
     this.router.navigate(['/deactivate-user-complete'])
       .then(
         () => this.toastService.showSuccess('Your request has been sent.')

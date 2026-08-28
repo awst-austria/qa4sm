@@ -1,10 +1,10 @@
 import {Injectable} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 import {environment} from '../../../../../environments/environment';
-import {BehaviorSubject, EMPTY, Observable, of, Subject, throwError} from 'rxjs';
+import {BehaviorSubject, Observable, of, throwError} from 'rxjs';
 import {LoginDto} from './login.dto';
 import {UserDto} from './user.dto';
-import {catchError, map, tap} from 'rxjs/operators';
+import {catchError, filter, map, switchMap, tap} from 'rxjs/operators';
 import {HttpErrorService} from '../global/http-error.service';
 import {Router, Routes} from '@angular/router';
 
@@ -44,7 +44,34 @@ export class AuthService {
     is_superuser: false
   };
   public authenticated: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
-  public currentUser: UserDto = this.emptyUser;
+  
+  private currentUserSubject = new BehaviorSubject<UserDto>(this.emptyUser);
+  currentUser$: Observable<UserDto> = this.currentUserSubject.asObservable();
+
+  /** True once the initial session check has finished (successfully or not). */
+  private authCheckedSubject = new BehaviorSubject<boolean>(false);
+
+  /** Emits the current user, but only after the initial session check has completed. */
+  currentUserResolved$: Observable<UserDto> = this.authCheckedSubject.pipe(
+    filter(Boolean),
+    switchMap(() => this.currentUser$)
+  );
+
+  /** Synchronous snapshot — kept for backwards compatibility with existing call sites. */
+  get currentUser(): UserDto {
+    return this.currentUserSubject.value;
+  }
+
+  /** Resets the current user to the anonymous state without a server round-trip. */
+  public resetCurrentUser(): void {
+    this.currentUserSubject.next(this.emptyUser);
+    this.authenticated.next(false);
+  }
+
+  /** Merges partial user data into the current user and notifies subscribers. */
+  public patchCurrentUser(data: Partial<UserDto>): void {
+    this.currentUserSubject.next({ ...this.currentUserSubject.value, ...data });
+  }
 
   private unprotectedRoutes: string[] = [];
 
@@ -66,14 +93,14 @@ export class AuthService {
   }
 
   // todo: check if this method is actually needed
-  public init() {
+  public init(): void {
     this.httpClient.get<UserDto>(this.loginUrl)
-      .subscribe(
-        data => {
-          this.currentUser = data;
-          this.authenticated.next(true);
-        }
-      );
+      .pipe(catchError(() => of(null)))
+      .subscribe(user => {
+        this.currentUserSubject.next(user ?? this.emptyUser);
+        this.authenticated.next(!!user);
+        this.authCheckedSubject.next(true);
+      });
   }
 
   private initializeUnprotectedRoutes() {
@@ -121,7 +148,7 @@ export class AuthService {
       .post<UserDto>(this.loginUrl, credentials)
       .pipe(
         tap(user => {
-          this.currentUser = user;
+          this.currentUserSubject.next(user);
           this.authenticated.next(true);
           if ((currentRoute.startsWith('signup', 1)) || (currentRoute.startsWith('password-reset', 1))) {
             this.router.navigate(['/home']); 
@@ -141,7 +168,7 @@ export class AuthService {
       .post(this.logoutUrl, null)
       .pipe(
         map(() => {
-          this.currentUser = this.emptyUser; 
+          this.currentUserSubject.next(this.emptyUser);  
           this.authenticated.next(false);
           if (this.isProtectedRoute(currentRoute)) {
             this.router.navigate(['/home']); 
