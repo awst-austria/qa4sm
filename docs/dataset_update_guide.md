@@ -134,6 +134,8 @@ for your dataset in the service. Otherwise skip this step.
    the real user(s) in the admin panel, that should have exclusive access.
 ### Networks fixture (only for ISMN updates)
 - Add the pk value of the new ISMN version to the versions field of its respective ISMN-stations in the networks.json fixture file. Create new entries in case the new ISMN data contains new ISMN-stations.
+## Update globals variables
+Update the entries in globals.py in the validator/validation/globals.py file for your new dataset.
 ## Add reader
 If you add a new dataset, you have to define the reader. Theoretically, each version can can have a different reader, 
 although in practice, usually different versions of the same dataset also use the same reader (so you probably can skip this
