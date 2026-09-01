@@ -24,7 +24,7 @@ django==5.2.16
 django-countries==9.0.0
 django-rest-passwordreset==1.6.0
 django-widget-tweaks==1.5.0
-djangorestframework==3.17.1
+djangorestframework==3.17.2
 donfig==0.8.1.post1
 drf-yasg==1.21.15
 exceptiongroup==1.2.2
