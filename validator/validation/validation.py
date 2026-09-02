@@ -288,6 +288,11 @@ def get_variable_naming(dataset_config):
         'val_dc_variable_pretty_name' and for 'val_dc_unit' respectively. Note
         those first two hold pretty and short names the opposite way round to
         what their names suggest; that quirk predates this function.
+
+        'val_dc_variable_pretty_name' is the one that reaches the plots —
+        qa4sm-reader reads it (and 'val_dc_unit') and ignores 'val_dc_variable'
+        entirely — so the readable depth range goes there and the list of
+        contributing columns is kept in the other slot as provenance.
     """
     variable = dataset_config.variable
     merged_layers = dataset_config.merged_layers
@@ -295,7 +300,7 @@ def get_variable_naming(dataset_config):
     if not merged_layers:
         return variable.pretty_name, variable.short_name, variable.unit
 
-    variable_name, variable_pretty_name = merged_labels(merged_layers)
+    variable_pretty_name, variable_name = merged_labels(merged_layers)
     return (variable_name, variable_pretty_name,
             merged_unit(merged_layers, variable.unit))
 

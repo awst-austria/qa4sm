@@ -147,11 +147,18 @@ export class ValidationRunFacade {
       const ver = dicts.versions.get(cfg.version);
       const vr = dicts.variables.get(cfg.variable);
 
+      // cfg.variable is only the shallowest contributing layer when layers
+      // were merged, and its unit is the raw one, so neither describes the
+      // series that was actually validated - the server resolves both.
+      const isMerged = (cfg.merged_layers?.length ?? 0) > 1;
+
       return {
         dataset: ds?.pretty_name || ds?.short_name || `ID: ${cfg.dataset}`,
         version: ver?.pretty_name || ver?.short_name || `ID: ${cfg.version}`,
-        variable: vr?.pretty_name || vr?.short_name || `ID: ${cfg.variable}`,
-        unit: vr?.unit || ''
+        variable: isMerged
+          ? `${cfg.merge_depth_label} (merged)`
+          : (vr?.pretty_name || vr?.short_name || `ID: ${cfg.variable}`),
+        unit: cfg.variable_unit || vr?.unit || ''
       };
     };
 
