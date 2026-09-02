@@ -162,6 +162,19 @@
                     <span style="color: red">(Data set unavailable)</span>
                   }
                   <br />
+                  @if (config.isMerged) {
+                    <div>
+                      Merged layers ({{ config.merge_weighted ? 'weighted by thickness' : 'equal weight' }}):
+                      <ul>
+                        @for (layer of config.mergedLayers; track layer.short_name) {
+                          <li>
+                            {{ layer.short_name }}
+                            ({{ layer.depth_from * 100 }}&ndash;{{ layer.depth_to * 100 }} cm);
+                          </li>
+                        }
+                      </ul>
+                    </div>
+                  }
                   @if (
                     config.filters.length > 0 ||
                     config.parametrisedFilters.length > 0

@@ -8,6 +8,7 @@ from django.test import TestCase
 from django.utils import timezone
 from rest_framework import serializers
 
+from api.views.dataset_configuration_view import ConfigurationSerializer
 from api.views.validation_config_view import DatasetConfigSerializer
 from validator.models import (
     Dataset,
@@ -111,15 +112,17 @@ class TestMergeLayersDb(TestCase):
     def test_merged_naming_describes_the_depth(self):
         config = make_config(self.run, ERA5_VERSION, SWVL1, [SWVL1, SWVL2])
         name, pretty_name, unit = get_variable_naming(config)
-        assert name == '0-28 cm (merged)'
-        assert pretty_name == 'swvl1+swvl2'
+        # pretty_name is the slot qa4sm-reader actually plots, so the readable
+        # depth range goes there and the column list stays as provenance
+        assert pretty_name == '0-28 cm (merged)'
+        assert name == 'swvl1+swvl2'
         assert unit == 'm³/m³'
 
     def test_merged_gldas_is_relabelled_volumetric(self):
         config = make_config(self.run, GLDAS_VERSION, GLDAS_1,
                              [GLDAS_1, GLDAS_2])
-        name, _, unit = get_variable_naming(config)
-        assert name == '0-40 cm (merged)'
+        _, pretty_name, unit = get_variable_naming(config)
+        assert pretty_name == '0-40 cm (merged)'
         assert unit == 'm³/m³'
 
     # ------------------------------------------------------------ T1
@@ -157,6 +160,62 @@ class TestMergeLayersDb(TestCase):
         a = make_config(self.run, ERA5_VERSION, SWVL1)
         b = make_config(self.run, ERA5_VERSION, SWVL1, [SWVL1, SWVL2])
         assert not _compare_merged_layers(a, b)
+
+
+class TestConfigurationSerializer(TestCase):
+    """
+    What the results summary and the validation lists are shown. These fields
+    exist because resolving `variable` against the DataVariable table gives the
+    wrong answer for a merged run.
+    """
+    fixtures = ['variables', 'versions', 'datasets', 'filters', 'users']
+
+    def setUp(self):
+        self.user = User.objects.create(username='merge-tester')
+        self.run = ValidationRun.objects.create(user=self.user,
+                                                start_time=timezone.now())
+
+    def serialized(self, *args, **kwargs):
+        return ConfigurationSerializer(make_config(*args, **kwargs)).data
+
+    def test_unmerged_config_looks_exactly_as_before(self):
+        data = self.serialized(self.run, GLDAS_VERSION, GLDAS_1)
+        assert data['variable_unit'] == 'kg/m²'
+        assert data['merged_layers'] == []
+        assert data['merge_depth_label'] == ''
+
+    def test_merged_gldas_reports_the_converted_unit(self):
+        # the bug this was written for: the summary said kg/m² while the plot
+        # beside it said m³/m³
+        data = self.serialized(self.run, GLDAS_VERSION, GLDAS_1,
+                               [GLDAS_1, GLDAS_2])
+        assert data['variable_unit'] == 'm³/m³'
+
+    def test_merged_volumetric_keeps_its_unit(self):
+        data = self.serialized(self.run, ERA5_VERSION, SWVL1, [SWVL1, SWVL2])
+        assert data['variable_unit'] == 'm³/m³'
+
+    def test_merged_layers_are_listed_with_their_depths(self):
+        data = self.serialized(self.run, GLDAS_VERSION, GLDAS_1,
+                               [GLDAS_1, GLDAS_2])
+        assert [(l['short_name'], l['depth_from'], l['depth_to'])
+                for l in data['merged_layers']] == [
+            ('SoilMoi0_10cm_inst', 0.0, 0.1),
+            ('SoilMoi10_40cm_inst', 0.1, 0.4)]
+
+    def test_depth_label_spans_contiguous_picks(self):
+        data = self.serialized(self.run, ERA5_VERSION, SWVL1, [SWVL1, SWVL2])
+        assert data['merge_depth_label'] == '0-28 cm'
+
+    def test_depth_label_lists_gapped_picks(self):
+        data = self.serialized(self.run, GLDAS_VERSION, GLDAS_1,
+                               [GLDAS_1, 7])
+        assert data['merge_depth_label'] == '0-10, 40-100 cm'
+
+    def test_weighting_flag_is_exposed(self):
+        data = self.serialized(self.run, ERA5_VERSION, SWVL1, [SWVL1, SWVL2],
+                               weighted=False)
+        assert data['merge_weighted'] is False
 
 
 class TestDatasetConfigSerializer(TestCase):
