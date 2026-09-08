@@ -50,7 +50,7 @@ from validator.validation.readers import create_reader, adapt_timestamp
 from validator.validation.util import mkdir_if_not_exists, first_file_in
 from validator.validation.globals import START_TIME, END_TIME, METADATA_TEMPLATE
 from validator.validation.adapters import StabilityMetricsAdapter, MergeSensorsAdapter, LayerMergeAdapter
-from validator.validation.depths import merge_coefficients, merged_labels, merged_unit
+from validator.validation.depths import merge_coefficients, merged_labels, merged_unit, depth_file_label
 import qa4sm_reader
 from qa4sm_reader.intra_annual_temp_windows import TemporalSubWindowsCreator, NewSubWindow, TemporalSubWindowsFactory
 from qa4sm_reader.netcdf_transcription import Pytesmo2Qa4smResultsTranscriber
@@ -268,6 +268,35 @@ def save_validation_config(validation_run):
 
     except Exception:
         __logger.exception('Validation configuration could not be stored.')
+
+
+def apply_merged_naming(validation_run, filename):
+    """
+    Rewrite the variable part of a results file name for merged configurations.
+
+    pytesmo names its output after the '{index}-{dataset}.{column}' pairs it
+    validated, and for a merged configuration that column is only the shallowest
+    contributing layer — so the file would advertise one layer where the series
+    actually spans several. The depth range takes its place, giving e.g.
+    ``0-ISMN.soil_moisture_with_1-GLDAS.0-40cm_merged.nc``.
+
+    Substitution is keyed on dataset *and* column, because two datasets in one
+    run can use the same column name — ERA5 and ERA5-Land both call it 'swvl1' —
+    and only the merged one may be renamed. Returns the name unchanged when
+    nothing merges, which is every validation that predates the feature.
+    """
+    filename = str(filename)
+
+    for dataset_config in validation_run.dataset_configurations.all():
+        merged_layers = dataset_config.merged_layers
+        if not merged_layers:
+            continue
+        dataset = dataset_config.dataset.short_name
+        filename = filename.replace(
+            f'-{dataset}.{dataset_config.variable.short_name}',
+            f'-{dataset}.{depth_file_label(merged_layers)}')
+
+    return filename
 
 
 def get_variable_naming(dataset_config):
@@ -1610,7 +1639,14 @@ def run_validation(validation_id, val_type="temporal"):
                     restructured_results = sp_transcriber.get_transcribed_dataset()
 
 
-                    base = os.path.basename(validation_run.output_file_spatial.name).replace('.SPATIAL.nc', '_spatial_result.nc')
+                    # the raw pytesmo name is kept as-is for the cleanup below;
+                    # only the file being written out gets the merged naming
+                    raw_spatial_base = os.path.basename(
+                        validation_run.output_file_spatial.name)
+                    base = apply_merged_naming(
+                        validation_run,
+                        raw_spatial_base.replace('.SPATIAL.nc',
+                                                 '_spatial_result.nc'))
                     spatial_outname = os.path.join(run_dir, base)
                     
                     restructured_results.to_netcdf(spatial_outname)
@@ -1645,8 +1681,9 @@ def run_validation(validation_id, val_type="temporal"):
                 
                     sp_transcriber.compress(path=spatial_outname, compression='zlib', complevel=9)
 
-                    # Delete uncompressed version
-                    path_SPATIAL = os.path.join(run_dir, base.replace("_spatial_result.nc", ".SPATIAL.nc"))
+                    # Delete uncompressed version. Derived from the raw name,
+                    # not from base, which may have been renamed for a merge.
+                    path_SPATIAL = os.path.join(run_dir, raw_spatial_base)
                     if os.path.exists(path_SPATIAL):
                         os.remove(path_SPATIAL)
 
@@ -1684,11 +1721,29 @@ def run_validation(validation_id, val_type="temporal"):
                     restructured_results = transcriber.get_transcribed_dataset()
                     transcriber.output_file_name, transcriber.output_zarr_name = transcriber.build_outname(
                         run_dir, results.keys())
+
+                    # build_outname only sees the single column a merge was
+                    # written into, so name the outputs after the depth range
+                    # instead where layers were merged
+                    transcriber.output_file_name = apply_merged_naming(
+                        validation_run, transcriber.output_file_name)
+                    transcriber.output_zarr_name = apply_merged_naming(
+                        validation_run, transcriber.output_zarr_name)
+
                     transcriber.write_to_netcdf(transcriber.output_file_name)
                     transcriber.write_to_zarr_filtered(
                         path=transcriber.output_zarr_name,
                         tsw_value=DEFAULT_TSW
                     )
+
+                    # set_outfile recorded the raw pytesmo name, which the
+                    # transcriber has just replaced - and renamed, if anything
+                    # merged. Repoint the run at the files that now exist.
+                    validation_run.output_file.name = regex_sub(
+                        '/?' + OUTPUT_FOLDER + '/?', '',
+                        transcriber.output_file_name)
+                    validation_run.zarr_path = transcriber.output_zarr_name
+                    validation_run.save()
 
                     save_validation_config(validation_run)
 
