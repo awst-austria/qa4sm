@@ -169,7 +169,7 @@
                         @for (layer of config.mergedLayers; track layer.short_name) {
                           <li>
                             {{ layer.short_name }}
-                            ({{ layer.depth_from * 100 }}&ndash;{{ layer.depth_to * 100 }} cm);
+                            ({{ layer.depth_from * 100 | number:'1.0-1' }}&ndash;{{ layer.depth_to * 100 | number:'1.0-1' }} cm);
                           </li>
                         }
                       </ul>

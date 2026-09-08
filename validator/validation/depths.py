@@ -191,6 +191,17 @@ def depth_label(variables):
     return '%s cm' % ', '.join(spans)
 
 
+def depth_file_label(variables):
+    """
+    Filesystem-safe depth description, for naming result files.
+
+    ``"0-40cm_merged"``, or ``"0-10_40-100cm_merged"`` when the picked layers
+    are not adjacent. No spaces, commas or brackets, so it survives being
+    joined into a file name and read back off disk.
+    """
+    return depth_label(variables).replace(', ', '_').replace(' ', '') + '_merged'
+
+
 def merged_labels(variables):
     """
     The two name strings a merged series is written out with.

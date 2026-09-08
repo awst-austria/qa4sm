@@ -19,6 +19,7 @@ from validator.models import (
 )
 from validator.validation.validation import (
     _compare_merged_layers,
+    apply_merged_naming,
     get_variable_naming,
 )
 
@@ -160,6 +161,61 @@ class TestMergeLayersDb(TestCase):
         a = make_config(self.run, ERA5_VERSION, SWVL1)
         b = make_config(self.run, ERA5_VERSION, SWVL1, [SWVL1, SWVL2])
         assert not _compare_merged_layers(a, b)
+
+
+class TestOutputFileNaming(TestCase):
+    """
+    Result files are named after the columns pytesmo validated, so a merged run
+    would advertise the one layer the merge happened to be written into.
+    """
+    fixtures = ['variables', 'versions', 'datasets', 'filters', 'users']
+
+    def setUp(self):
+        self.user = User.objects.create(username='merge-tester')
+        self.run = ValidationRun.objects.create(user=self.user,
+                                                start_time=timezone.now())
+
+    def test_unmerged_names_are_untouched(self):
+        make_config(self.run, GLDAS_VERSION, GLDAS_1)
+        name = '0-ISMN.soil_moisture_with_1-GLDAS.SoilMoi0_10cm_inst.nc'
+        assert apply_merged_naming(self.run, name) == name
+
+    def test_merged_config_is_named_by_its_depth_range(self):
+        make_config(self.run, GLDAS_VERSION, GLDAS_1, [GLDAS_1, GLDAS_2])
+        assert apply_merged_naming(
+            self.run,
+            '0-ISMN.soil_moisture_with_1-GLDAS.SoilMoi0_10cm_inst.nc'
+        ) == '0-ISMN.soil_moisture_with_1-GLDAS.0-40cm_merged.nc'
+
+    def test_zarr_names_get_the_same_treatment(self):
+        make_config(self.run, GLDAS_VERSION, GLDAS_1, [GLDAS_1, GLDAS_2])
+        assert apply_merged_naming(
+            self.run,
+            '/out/3/0-ISMN.soil_moisture_with_1-GLDAS.SoilMoi0_10cm_inst.zarr'
+        ) == '/out/3/0-ISMN.soil_moisture_with_1-GLDAS.0-40cm_merged.zarr'
+
+    def test_spatial_names_get_the_same_treatment(self):
+        make_config(self.run, ERA5_VERSION, SWVL1, [SWVL1, SWVL2])
+        assert apply_merged_naming(
+            self.run, '0-ISMN.soil_moisture_with_1-ERA5.swvl1_spatial_result.nc'
+        ) == '0-ISMN.soil_moisture_with_1-ERA5.0-28cm_merged_spatial_result.nc'
+
+    def test_only_the_merged_dataset_is_renamed(self):
+        # ERA5 and ERA5-Land both name the column 'swvl1', so a substitution
+        # keyed on the column alone would rename the wrong one too
+        make_config(self.run, ERA5_VERSION, SWVL1, [SWVL1, SWVL2])
+        make_config(self.run, 62, 12)  # ERA5_LAND, not merged
+        assert apply_merged_naming(
+            self.run, '0-ERA5.swvl1_with_1-ERA5_LAND.swvl1.nc'
+        ) == '0-ERA5.0-28cm_merged_with_1-ERA5_LAND.swvl1.nc'
+
+    def test_gapped_pick_stays_filesystem_safe(self):
+        make_config(self.run, GLDAS_VERSION, GLDAS_1, [GLDAS_1, 7])
+        renamed = apply_merged_naming(
+            self.run, '0-ISMN.soil_moisture_with_1-GLDAS.SoilMoi0_10cm_inst.nc')
+        assert renamed == \
+            '0-ISMN.soil_moisture_with_1-GLDAS.0-10_40-100cm_merged.nc'
+        assert ' ' not in renamed and ',' not in renamed
 
 
 class TestConfigurationSerializer(TestCase):
