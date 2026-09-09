@@ -1,0 +1,271 @@
+@use 'src/style.variables' as *;
+
+.reports-page {
+  width: min(1100px, 100%); /* narrower — it's a list now, not a 12-col grid */
+  padding: 0 1rem;
+
+  h2,
+  h3 {
+    text-align: center;
+  }
+}
+
+.page-intro {
+  color: $font-color-muted;
+  margin: 0 auto 1.25rem;
+  max-width: 46rem;
+  text-align: left;
+
+  a {
+    color: inherit;
+    text-decoration: underline;
+  }
+}
+
+.series-select {
+  display: flex;
+  justify-content: center;
+  margin-top: 1rem;
+
+  p-floatLabel,
+  p-floatlabel {
+    width: min(24rem, 100%);
+  }
+}
+
+/* --- shared indicator dot ---------------------------------------------- */
+
+.dot {
+  display: inline-block;
+  width: 0.9rem;
+  height: 0.9rem;
+  border-radius: 50%;
+  flex-shrink: 0;
+
+  &.g { background: $base-color; }
+  &.y { background: $highlight-color; }
+  &.r { background: $pronouced-button-color; }
+  /* N = neutral: the run was processed, but no indicator has been assigned */
+  &.n { background: var(--p-surface-500, #6b7280); }
+  /* no indicator letter in the filename at all — lighter than N on purpose */
+  &.none { background: var(--p-surface-300, #d1d5db); }
+}
+
+.meta {
+  color: $font-color-muted;
+  font-size: 0.85rem;
+}
+
+/* --- legend ------------------------------------------------------------ */
+
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1.5rem;
+  justify-content: center;
+  margin: 0.25rem 0 1.25rem;
+  font-size: 0.9rem;
+
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+}
+
+/* --- latest report card ------------------------------------------------ */
+
+.latest-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.75rem 1rem;
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--p-surface-300, #d1d5db);
+  border-radius: 8px;
+
+  .latest-info {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    min-width: 0;
+  }
+
+  .latest-title {
+    font-weight: 700;
+  }
+
+  .latest-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+}
+
+.hint {
+  color: $font-color-muted;
+  font-size: 0.85rem;
+  margin: 0.4rem 0 1.5rem;
+}
+
+.action-link,
+.action-button {
+  font: inherit;
+  font-size: 0.9rem;
+  padding: 0.35rem 0.75rem;
+  border: 1px solid var(--p-surface-400, #9ca3af);
+  border-radius: 6px;
+  background: none;
+  color: inherit;
+  text-decoration: none;
+  cursor: pointer;
+  white-space: nowrap;
+
+  &:hover {
+    background: var(--p-surface-100, #f3f4f6);
+  }
+}
+
+/* --- accordion year header --------------------------------------------- */
+
+.year-header {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+
+  .year-label {
+    font-weight: 700;
+  }
+
+  .report-count {
+    color: $font-color-muted;
+    font-size: 0.85rem;
+  }
+
+  .year-badges {
+    display: flex;
+    gap: 0.35rem;
+  }
+
+  .badge {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 1.5rem;
+    height: 1.5rem;
+    padding: 0 0.3rem; // keeps two-digit numbers inside
+    border-radius: 50%;
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: #fff;
+
+    &.g { background: $base-color; }
+    &.y { background: $highlight-color; color: #333; }
+    &.r { background: $pronouced-button-color; }
+    &.n { background: var(--p-surface-500, #6b7280); }
+  }
+}
+
+/* --- report list (timeline style) -------------------------------------- */
+
+.report-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  position: relative;
+
+  /* vertical timeline line running through the dots */
+  &::before {
+    content: '';
+    position: absolute;
+    left: calc(0.45rem - 1px); /* center of the 0.9rem dot */
+    top: 0.75rem;
+    bottom: 0.75rem;
+    width: 2px;
+    background: var(--p-surface-300, #d1d5db);
+  }
+}
+
+.report-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.45rem 0;
+
+  > .dot {
+    position: relative;
+    z-index: 1; /* sits on top of the timeline line */
+  }
+
+  .report-main {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+
+    > a {
+      font-weight: 500;
+      text-decoration: none;
+      word-break: break-all;
+
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+  }
+
+  > .action-button {
+    margin-left: auto;
+  }
+}
+
+/* --- earlier versions of the same report date -------------------------- */
+
+.versions {
+  margin-top: 0.25rem;
+  font-size: 0.85rem;
+
+  summary {
+    color: $font-color-muted;
+    cursor: pointer;
+    width: fit-content;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+
+  ul {
+    list-style: none;
+    margin: 0.35rem 0 0.25rem;
+    padding: 0 0 0 0.75rem;
+    border-left: 2px solid var(--p-surface-200, #e5e7eb);
+  }
+
+  li {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.2rem 0;
+  }
+
+  .dot {
+    width: 0.65rem;
+    height: 0.65rem;
+  }
+
+  a {
+    text-decoration: none;
+    word-break: break-all;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+
+  .action-button {
+    font-size: 0.8rem;
+    padding: 0.2rem 0.5rem;
+  }
+}
