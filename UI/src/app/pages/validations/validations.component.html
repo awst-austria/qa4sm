@@ -49,9 +49,42 @@
         </p-floatLabel>
       </div>
     </form>
+    @if (selectedRows.length) {
+      <div class="bulk-bar flex align-items-center flex-wrap gap-2 my-3 p-2">
+        <span class="font-semibold">{{ selectedRows.length }} selected</span>
+
+        <button pButton type="button" icon="pi pi-trash"
+                [label]="'Delete (' + deletable.length + ')'"
+                severity="danger"
+                [text]="true"
+                size="small"
+                [disabled]="!deletable.length"
+                (click)="openBulkDialog('delete')"></button>
+
+        <button pButton type="button" icon="pi pi-box"
+        [label]="'Archive (' + archivable.length + ')'"
+        class="p-button-text p-button-sm"
+        [disabled]="!archivable.length"
+        (click)="openBulkDialog('archive')">
+        </button>
+
+        <button pButton type="button" icon="pi pi-calendar"
+                [label]="'Un-archive (' + unarchivable.length + ')'"
+                class="p-button-text p-button-sm"
+                [disabled]="!unarchivable.length"
+                (click)="openBulkDialog('unarchive')"></button>
+
+        <button pButton type="button" label="Clear" icon="pi pi-times"
+                class="p-button-text p-button-sm p-button-secondary"
+                (click)="selectedRows = []"></button>
+      </div>
+    }
 
     <p-table
       [value]="rows$ | async"
+      dataKey="id"
+      [(selection)]="selectedRows"
+      [rowSelectable]="isRowSelectable"
       [paginator]="true"
       [rows]="PAGE_SIZE"
       [lazy]="true"
@@ -66,7 +99,7 @@
     >
       <ng-template pTemplate="emptymessage">
         <tr>
-          <td colspan="7" class="text-center p-5">
+          <td colspan="8" class="text-center p-5">
             <div class="flex flex-column align-items-center gap-2">
               <i
                 class="pi pi-search-plus"
@@ -83,6 +116,9 @@
 
       <ng-template pTemplate="header">
         <tr>
+          <th style="width: 3rem">
+            <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
+          </th>
           <th pSortableColumn="start_time">
             Date <p-sortIcon field="start_time"></p-sortIcon>
           </th>
@@ -100,7 +136,7 @@
         </tr>
       </ng-template>
 
-      <ng-template pTemplate="body" let-rowData>
+      <ng-template pTemplate="body" let-rowData let-rowIndex="rowIndex">
         <tr
           class="clickable-row"
           (click)="ViewResults(rowData, $event)"
@@ -109,6 +145,14 @@
           [pTooltip]="'View results'"
           tooltipPosition="top"
         >
+          <td class="checkbox-cell" (click)="$event.stopPropagation()">
+            <p-tableCheckbox
+              [value]="rowData"
+              [index]="rowIndex"
+              [disabled]="!isSelectable(rowData)"
+            ></p-tableCheckbox>
+          </td>
+
           <td class="date-cell">
             {{ rowData.start_time | date: "yyyy-MM-dd" }}
           </td>
@@ -129,7 +173,6 @@
                     (keydown)="$event.stopPropagation()"
                     (keyup.enter)="saveEdit(rowData)"
                     (keyup.escape)="cancelEdit()"
-                    (blur)="onBlur(rowData)"
                     autoFocus
                   />
 
@@ -349,6 +392,44 @@
         (click)="confirmStop()"
         [loading]="stopping"
       ></button>
+    </ng-template>
+  </p-dialog>
+  <!-- p-dialog for bulk actions -->
+  <p-dialog
+    [header]="bulkHeader"
+    [(visible)]="bulkVisible"
+    [modal]="true"
+    [closable]="true"
+    [dismissableMask]="true"
+    [style]="{ width: '32rem' }"
+    (onHide)="closeBulkDialog()"
+  >
+    <div class="flex flex-column gap-2">
+      <span>
+        Do you really want to {{ bulkLabel }}
+        <b>{{ bulkTargets.length }}</b> validation(s)?
+      </span>
+
+      @if (bulkTargets.length < selectedRows.length) {
+        <span class="muted">
+          {{ selectedRows.length - bulkTargets.length }} of the selected rows will
+          be skipped — this action does not apply to them.
+        </span>
+      }
+
+      @if (bulkAction === 'delete') {
+        <span class="muted">This cannot be undone.</span>
+      }
+    </div>
+
+    <ng-template pTemplate="footer">
+      <button pButton type="button" class="p-button-text" label="Cancel"
+              (click)="closeBulkDialog()" [disabled]="bulkBusy"></button>
+      <button pButton type="button" label="Confirm"
+              [class]="bulkAction === 'delete'
+                ? 'p-button-text p-button-danger'
+                : 'p-button-text'"
+              (click)="confirmBulk()" [loading]="bulkBusy"></button>
     </ng-template>
   </p-dialog>
 </main>
