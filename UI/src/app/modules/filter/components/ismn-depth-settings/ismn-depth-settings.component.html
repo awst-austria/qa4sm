@@ -1,0 +1,131 @@
+<div class="ismn-depth-settings mt-3"
+     *ngIf="depthFilterModel$ | async as depthFilter">
+
+  <div class="flex align-items-center gap-2 mb-2">
+    <span><b>Measurement depth</b></span>
+    <!-- Explanations live in tooltips rather than inline: a tooltip renders in
+         an overlay, so however long it is it cannot widen the panel. The
+         filter's own help_text still describes the old click-to-open dialog,
+         so it is not used here. -->
+    <span class="pi pi-question-circle help-field"
+          pTooltip="Only ISMN measurements taken within this depth range are used.
+                    Applies to every station in the selected networks."
+          tooltipPosition="bottom">
+    </span>
+  </div>
+
+  <div class="depth-summary p-2">
+
+    <div class="flex align-items-center gap-2">
+      <span class="pi pi-arrows-v"></span>
+      <span>Selected depth: <b>{{ depthRangeLabel() }}</b></span>
+    </div>
+
+    <div class="flex align-items-end gap-3 mt-2 flex-wrap">
+      <div class="depth-field">
+        <label for="ismn_depth_from">Depth from</label>
+        <p-inputNumber inputId="ismn_depth_from"
+                       [(ngModel)]="depthFrom"
+                       (ngModelChange)="onDepthEdited()"
+                       (onBlur)="onDepthBlur()"
+                       [minFractionDigits]="1"
+                       [maxFractionDigits]="2"
+                       suffix=" m"
+                       [showButtons]="true"
+                       [step]="0.01"
+                       [min]="0">
+        </p-inputNumber>
+      </div>
+
+      <div class="depth-field">
+        <label for="ismn_depth_to">Depth to</label>
+        <p-inputNumber inputId="ismn_depth_to"
+                       [(ngModel)]="depthTo"
+                       (ngModelChange)="onDepthEdited()"
+                       (onBlur)="onDepthBlur()"
+                       [minFractionDigits]="1"
+                       [maxFractionDigits]="2"
+                       suffix=" m"
+                       [showButtons]="true"
+                       [step]="0.01"
+                       [min]="0">
+        </p-inputNumber>
+      </div>
+    </div>
+
+    <div *ngIf="hasInvalidRange()" class="depth-warning mt-2">
+      <span class="pi pi-exclamation-triangle mr-1"></span>
+      Depth to is above depth from. A validation cannot start with an inverted
+      range.
+    </div>
+
+    <!-- merging is only offered when the tolerances filter exists for this
+         dataset; its parameters are read from the model, not from here -->
+    <ng-container *ngIf="tolerancesFilterModel$ | async">
+      <div class="depth-divider mt-3"></div>
+
+      <div class="flex align-items-center gap-2 mt-3">
+        <p-checkbox [binary]="true"
+                    inputId="ismn_merge_stations"
+                    [ngModel]="isMergeEnabled()"
+                    (ngModelChange)="toggleMergeStations($event)">
+        </p-checkbox>
+        <label for="ismn_merge_stations" class="cursor-pointer">Merge stations across depths</label>
+        <span class="pi pi-question-circle help-field"
+              pTooltip="Each tolerance forms a band around its own depth boundary.
+                        A station qualifies only if it has a sensor in the top
+                        band and another in the bottom band. Those two, and every
+                        sensor between them, are averaged into a single profile
+                        - keeping only timestamps where all of the contributing
+                        sensors have data."
+              tooltipPosition="bottom">
+        </span>
+      </div>
+
+      <!-- A row of its own rather than trailing the toggle, so the two
+           tolerances always break onto a new line and line up with the depth
+           fields above instead of wrapping only when they run out of room. -->
+      <div *ngIf="isMergeEnabled()"
+           class="flex align-items-end gap-3 mt-2 flex-wrap">
+        <div class="depth-field">
+          <label for="ismn_top_tolerance">Top tolerance</label>
+          <p-inputNumber inputId="ismn_top_tolerance"
+                         [(ngModel)]="topTolerance"
+                         (ngModelChange)="onTolerancesEdited()"
+                         (onBlur)="onTolerancesBlur()"
+                         [minFractionDigits]="1"
+                         [maxFractionDigits]="2"
+                         suffix=" m"
+                         [showButtons]="true"
+                         [step]="0.01"
+                         [min]="0">
+          </p-inputNumber>
+        </div>
+
+        <div class="depth-field">
+          <label for="ismn_bottom_tolerance">Bottom tolerance</label>
+          <p-inputNumber inputId="ismn_bottom_tolerance"
+                         [(ngModel)]="bottomTolerance"
+                         (ngModelChange)="onTolerancesEdited()"
+                         (onBlur)="onTolerancesBlur()"
+                         [minFractionDigits]="1"
+                         [maxFractionDigits]="2"
+                         suffix=" m"
+                         [showButtons]="true"
+                         [step]="0.01"
+                         [min]="0">
+          </p-inputNumber>
+        </div>
+      </div>
+
+      <!-- Only the part that changes with the inputs. The prose that used to
+           sit here set the panel's width from its own content and stretched
+           the whole column on wide screens; it is in the tooltip above now. -->
+      <div *ngIf="isMergeEnabled()" class="depth-note mt-2">
+        Top band <b>{{ topBandLabel() }}</b>,
+        bottom band <b>{{ bottomBandLabel() }}</b>.
+      </div>
+    </ng-container>
+
+  </div>
+</div>

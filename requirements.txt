@@ -42,7 +42,7 @@ hyperframe==6.1.0
 idna==3.15
 importlib-metadata==8.6.1
 iniconfig==2.0.0
-ismn==1.5.1
+ismn @ git+https://github.com/daberer/ismn.git@master
 jinja2==3.1.5
 kiwisolver==1.4.8
 locket==1.0.0

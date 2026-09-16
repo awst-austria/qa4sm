@@ -1,0 +1,47 @@
+@use 'src/style.variables' as *;
+
+.ismn-depth-settings {
+  font-size: 0.9rem;
+}
+
+// same treatment as the merged-layers summary on the dataset panel, so the two
+// depth controls on this page read as one family
+.depth-summary {
+  background: $base-color-transparent;
+  border-radius: 4px;
+}
+
+.depth-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+
+  label {
+    color: $font-color-muted;
+    font-size: 0.78rem;
+  }
+
+  // Size the text field only and let the widget size itself around it, buttons
+  // included. 7.5rem is the original 6.5rem plus enough for the " m" suffix at
+  // two decimals.
+  ::ng-deep .p-inputnumber-input {
+    width: 7.5rem;
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+.depth-divider {
+  border-top: 1px solid rgba($base-color, 0.25);
+}
+
+.depth-note {
+  color: $font-color-muted;
+  font-size: 0.82rem;
+  line-height: 1.4;
+}
+
+.depth-warning {
+  color: $warning-text;
+  font-size: 0.82rem;
+  line-height: 1.4;
+}

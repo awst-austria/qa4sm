@@ -11,6 +11,12 @@
   text-align: right;
 }
 
+// heads the column of percentages; muted like the values, and a shade smaller
+// so it reads as a label rather than another row
+.layer-weight-header {
+  font-size: 0.78rem;
+}
+
 .merge-summary {
   background: $base-color-transparent;
   border-radius: 4px;
