@@ -4,10 +4,17 @@
     <span><b>Merge layers</b></span>
     <span class="pi pi-question-circle help-field"
           pTooltip="Combine several depth layers of this dataset into a single series.
-                    Each layer is weighted by its thickness, so a thicker layer counts
-                    proportionally more. A timestamp is kept only where every selected
-                    layer has data."
+                    Each layer is weighted by its thickness, by default, so a thicker 
+                    layer counts proportionally more. A timestamp is kept only where 
+                    every selected layer has data."
           tooltipPosition="bottom">
+    </span>
+    <!-- column heading for the percentages below. ml-auto pushes it to the
+         right edge, and sharing .layer-weight keeps it on the same 3rem
+         right-aligned column the values use. Only shown while there are
+         weights to head, which is the same condition that renders them. -->
+    <span *ngIf="isMerging()" class="layer-weight layer-weight-header ml-auto">
+      Weight
     </span>
   </div>
 
@@ -56,9 +63,7 @@
     </div>
 
     <div class="merge-output-note mt-2">
-      Written to <code>{{ outputLayer()?.short_name }}</code>, the shallowest
-      selected layer. The variable above follows your selection; choosing a
-      variable there by hand clears the merge.
+     
     </div>
   </div>
 
