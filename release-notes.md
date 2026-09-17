@@ -1,3 +1,10 @@
+QA4SM v4.2.0 - Release notes 2026-09-17
+======================================================
+# Updates
+1. Add Automated Validation Reports to Results section
+2. Add Multiple Validations management
+3. BugFix repeated datasets for non logged-in user
+
 QA4SM v4.1.2 - Release notes 2026-09-03
 ======================================================
 # Updates
