@@ -2,13 +2,13 @@ import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { DatasetService } from '../../../core/services/dataset/dataset.service';
 import { DatasetDto } from '../../../core/services/dataset/dataset.dto';
 
-import { Observable } from 'rxjs';
+import { combineLatest, Observable, of } from 'rxjs';
 import { DatasetVersionDto } from '../../../core/services/dataset/dataset-version.dto';
 import { DatasetVersionService } from '../../../core/services/dataset/dataset-version.service';
 import { DatasetComponentSelectionModel } from './dataset-component-selection-model';
 import { DatasetVariableDto } from '../../../core/services/dataset/dataset-variable.dto';
 import { DatasetVariableService } from '../../../core/services/dataset/dataset-variable.service';
-import { map, tap } from 'rxjs/operators';
+import { catchError, map, shareReplay, switchMap, tap } from 'rxjs/operators';
 import { ValidationRunConfigService } from '../../../../pages/validate/service/validation-run-config.service';
 import { AuthService } from '../../../core/services/auth/auth.service';
 
@@ -21,7 +21,7 @@ import { AuthService } from '../../../core/services/auth/auth.service';
 export class DatasetComponent implements OnInit {
 
   datasets$: Observable<DatasetDto[]>;
-  allDatasets$: Observable<DatasetDto[]>;
+
   groupedDatasets: { label: string; icon: string; items: DatasetDto[] }[] = [];
 
   selectableDatasetVersions$: Observable<DatasetVersionDto[]>;
@@ -41,6 +41,7 @@ export class DatasetComponent implements OnInit {
   @Input() removable = false;
   @Output() changeDataset = new EventEmitter<DatasetComponentSelectionModel>();
 
+
   datasetSelectorId: string;
   versionSelectorId: string;
   variableSelectorId: string;
@@ -57,24 +58,37 @@ export class DatasetComponent implements OnInit {
 
   ngOnInit(): void {
 
-    this.allDatasets$ = this.datasetService.getAllDatasets(true);
-
-    this.validationConfigService.listOfSelectedConfigs.subscribe(configs => {
-    const hasISMN = configs.some(c => c.datasetModel.selectedDataset?.short_name === 'ISMN');
-    const currentIsISMN = this.selectionModel.selectedDataset?.short_name === 'ISMN';
-
-    if (hasISMN && !currentIsISMN) {
-    // ISMN is already selected somewhere else, and the current card is not ISMN -> hide ISMN.
-    this.datasets$ = this.allDatasets$.pipe(
-      map(datasets => datasets.filter(d => d.pretty_name !== 'ISMN'))
+    // Re-fetched on every auth change: the server returns a different set
+    // depending on who is asking. shareReplay keeps it to one request per
+    // component instance rather than one per emission downstream.
+    const allDatasets$ = this.authService.currentUserResolved$.pipe(
+      switchMap(() => this.datasetService.getAllDatasets(true)),
+      catchError(() => of([] as DatasetDto[])),
+      shareReplay(1)
     );
-    } else {
-    // No restrictions on user/non-user — all user datasets can be selected.
-    this.datasets$ = this.allDatasets$;
-    }
-    this.datasets$.subscribe(datasets => this.buildGroupedDatasets(datasets));
 
-    });
+    // The visible dataset list depends both on which datasets are already selected
+    // (ISMN can only be picked once) and on who is logged in, so both sources are
+    // combined here. currentUserResolved$ only emits once the session check is done,
+    // which keeps the grouping from being built against an unknown user.
+    this.datasets$ = combineLatest([
+      allDatasets$,
+      this.validationConfigService.listOfSelectedConfigs,
+      this.authService.currentUserResolved$
+    ]).pipe(
+      map(([all, configs, user]) => {
+        const hasISMN = configs.some(c => c.datasetModel.selectedDataset?.short_name === 'ISMN');
+        const currentIsISMN = this.selectionModel.selectedDataset?.short_name === 'ISMN';
+
+        const datasets = (hasISMN && !currentIsISMN)
+          ? all.filter(d => d.pretty_name !== 'ISMN')
+          : all;
+
+        return { datasets, userId: user?.id ?? null };
+      }),
+      tap(({ datasets, userId }) => this.buildGroupedDatasets(datasets, userId)),
+      map(({ datasets }) => datasets)
+    );
 
     this.selectableDatasetVersions$ = this.datasetVersionService.getVersionsByDataset(this.selectionModel.selectedDataset.id).pipe(
       tap(datasetVersions => this.checkIfNewerVersionExists(datasetVersions))
@@ -83,10 +97,11 @@ export class DatasetComponent implements OnInit {
     this.selectableDatasetVariables$ = this.datasetVariableService.getVariablesByVersion(this.selectionModel.selectedVersion.id);
 
     this.setSelectorsId();
+
   }
 
    updateSelectableVersionsAndVariableAndEmmit(): void {
-    if (this.selectionModel.selectedDataset === undefined || this.selectionModel.selectedDataset.versions.length === 0) {
+    if (!this.selectionModel.selectedDataset?.versions?.length) {
       return;
     }
 
@@ -99,23 +114,28 @@ export class DatasetComponent implements OnInit {
     this.setSelectorsId();
   }
 
-  private buildGroupedDatasets(datasets: DatasetDto[]): void {
-    const currentUserId = this.authService.currentUser?.id; 
-    
-    const platform = datasets.filter(d => d.user === null || d.user === undefined);
-    const user     = datasets.filter(d => d.user === currentUserId);
-    const shared = datasets.filter(d => 
-      d.user !== null && 
-      d.user !== undefined && 
-      d.user !== currentUserId && 
-      d.is_shared > 0
-    );
-    this.groupedDatasets = [
-      platform.length ? { label: 'Platform datasets', icon: 'pi pi-database', items: platform } : null,
-      user.length     ? { label: 'User datasets',     icon: 'pi pi-user',     items: user }     : null,
-      shared.length   ? { label: 'Shared datasets',   icon: 'pi pi-share-alt',items: shared }   : null,
-    ].filter(Boolean);
+  private buildGroupedDatasets(datasets: DatasetDto[], currentUserId: number | null): void {
+    const platform: DatasetDto[] = [];
+    const user: DatasetDto[] = [];
+    const shared: DatasetDto[] = [];
 
+    for (const d of datasets) {
+      const ownerId = d.user ?? null;
+
+      if (ownerId === null) {
+        platform.push(d);
+      } else if (currentUserId !== null && ownerId === currentUserId) {
+        user.push(d);
+      } else if (d.is_shared > 0) {
+        shared.push(d);
+      }
+    }
+
+    this.groupedDatasets = [
+      platform.length ? { label: 'Platform datasets', icon: 'pi pi-database',  items: platform } : null,
+      user.length     ? { label: 'User datasets',     icon: 'pi pi-user',      items: user }     : null,
+      shared.length   ? { label: 'Shared datasets',   icon: 'pi pi-share-alt', items: shared }   : null,
+    ].filter(Boolean);
   }
 
   private onSelectableVersionsNext(versions): void {
@@ -145,13 +165,17 @@ export class DatasetComponent implements OnInit {
   }
 
   checkIfNewerVersionExists(versions: DatasetVersionDto[]): void {
-    this.newerVersionExists = Math.max(...versions.map(version => version.id)) > this.selectionModel.selectedVersion.id
-    this.newestVersionId = Math.max(...versions.map(version => version.id));
+    if (!versions?.length) {
+      this.newerVersionExists = false;
+      return;
+    }
+    const maxId = Math.max(...versions.map(version => version.id));
+    this.newerVersionExists = maxId > this.selectionModel.selectedVersion?.id;
+    this.newestVersionId = maxId;
   }
 
   setSelectorsId(): void {
-    const datasetIdentifier = `${this.selectionModel.selectedDataset?.id}_
-    ${this.selectionModel.selectedVersion?.id}_ ${this.selectionModel.selectedVariable?.id}`
+    const datasetIdentifier = `${this.selectionModel.selectedDataset?.id}_${this.selectionModel.selectedVersion?.id}_${this.selectionModel.selectedVariable?.id}`;
     this.datasetSelectorId = 'dataset_' + datasetIdentifier;
     this.versionSelectorId = 'version_' + datasetIdentifier;
     this.variableSelectorId = 'variable_' + datasetIdentifier;
