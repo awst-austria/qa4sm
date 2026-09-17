@@ -28,7 +28,7 @@ fi
 
 if [[ "$QA4SM_INSTANCE" == "TEST2" ]]; then
     git fetch origin
-    git switch interactive-maps-test || git checkout -b interactive-maps-test origin/interactive-maps-test
+    git switch merge_layers || git checkout -b merge_layers origin/merge_layers
 fi
 
 if [[ "$QA4SM_INSTANCE" == "PROD" ]]; then
