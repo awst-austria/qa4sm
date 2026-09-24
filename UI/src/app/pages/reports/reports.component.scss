@@ -1,12 +1,16 @@
 @use 'src/style.variables' as *;
 
 .reports-page {
-  width: min(1100px, 100%); /* narrower — it's a list now, not a 12-col grid */
+  width: min(1100px, 100%); 
   padding: 0 1rem;
 
   h2,
   h3 {
     text-align: center;
+  }
+  
+  h3 {
+    margin: 2rem 0 1.25rem; 
   }
 }
 
@@ -100,6 +104,22 @@
     display: flex;
     align-items: center;
     gap: 0.5rem;
+  }
+}
+
+.intro-accordion {
+  display: block;
+  width: min(40rem, 100%);
+  margin: 0 auto 1.25rem;
+
+  p-accordion-header {
+    justify-content: center;
+    gap: 0.5rem;
+  }
+
+  .page-intro {
+    margin: 0;
+    max-width: none;
   }
 }
 

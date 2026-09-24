@@ -1,3 +1,10 @@
+QA4SM v4.2.1 - Release notes 2026-09-24
+======================================================
+# Updates
+1. Add CCI RZSM rzsm_erd variable 
+2. Update automated reports page
+3. Update requirements.txt and package-lock.json
+
 QA4SM v4.2.0 - Release notes 2026-09-17
 ======================================================
 # Updates
