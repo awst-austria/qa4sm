@@ -19,17 +19,25 @@
     }
 
     @if (selectedSeries) {
-      <h3>{{ selectedSeries }}</h3>
 
-      <p class="page-intro">
-        @for (segment of seriesIntro; track $index) {
-          @if (segment.href) {
-            <a [href]="segment.href" target="_blank" rel="noopener noreferrer">{{ segment.text }}</a>
-          } @else {
-            <span>{{ segment.text }}</span>
-          }
-        }
-      </p>
+      <p-accordion class="intro-accordion">
+        <p-accordion-panel value="intro">
+          <p-accordion-header>What is this?</p-accordion-header>
+          <p-accordion-content>
+            <p class="page-intro">
+              @for (segment of seriesIntro; track $index) {
+                @if (segment.href) {
+                  <a [href]="segment.href" target="_blank" rel="noopener noreferrer">{{ segment.text }}</a>
+                } @else {
+                  <span>{{ segment.text }}</span>
+                }
+              }
+            </p>
+          </p-accordion-content>
+        </p-accordion-panel>
+      </p-accordion>
+
+      <h3>{{ selectedSeries }}</h3>
 
       <div class="legend" aria-label="Indicator legend">
         @for (key of indicatorKeys; track key) {
@@ -39,6 +47,11 @@
         }
       </div>
     }
+
+  
+    <div class="hint">
+      <p>If you are interested in setting up automated validation reports for your data production system, please contact support@qa4sm.eu</p>
+    </div>
 
     @if (loading) {
       <p>Loading reports…</p>
