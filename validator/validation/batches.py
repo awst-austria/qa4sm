@@ -260,7 +260,8 @@ def create_jobs(
                 min_depth=depth_from - top_tol,
                 max_depth=depth_to + bottom_tol,
                 filter_meta_dict=filter_meta_dict,
-                groupby='station',
+                # station names are not unique across networks
+                groupby=['network', 'station'],
             )
 
             # --- geographic subsetting at station level ---
@@ -272,7 +273,6 @@ def create_jobs(
                 s_lons.append(meta['longitude'][0][0])
                 s_lats.append(meta['latitude'][0][0])
 
-            stations = np.array(stations, dtype=object)
             s_lons, s_lats = np.array(s_lons), np.array(s_lats)
             dummy = np.arange(len(stations))
 
@@ -281,11 +281,13 @@ def create_jobs(
                 validation_run.min_lat, validation_run.min_lon,
                 validation_run.max_lat, validation_run.max_lon,
             )
-            stations = stations[index]
+            # keys are (network, station) tuples, index the list directly so
+            # numpy does not turn them into a 2D array
+            stations = [stations[i] for i in np.atleast_1d(index).ravel()]
 
             # --- depth/tolerance subsetting over the remaining stations ---
-            # build the primary -> other-sensors lookup for the read path
-            reader._merge_sensors = {}
+            # the merged sensors travel as 'other_ids' in the job metadata,
+            # execute_job registers them on the worker's reader
             jobs = []
             for station in stations:
                 result = reader.find_sensors_by_tolerance_station_selection(
@@ -297,8 +299,6 @@ def create_jobs(
                 if result is None:
                     continue
                 primary_id, meta = result
-                if meta.get('other_ids'):
-                    reader._merge_sensors[int(primary_id)] = list(meta['other_ids'])
                 jobs.append((
                     np.array([primary_id]),
                     np.array([meta['longitude']]),

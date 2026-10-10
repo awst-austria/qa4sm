@@ -365,8 +365,9 @@ def create_pytesmo_validation(validation_run, val_type="temporal"):
                 and (dataset_config.id
                      == validation_run.spatial_reference_configuration.id)
                 and dataset_config.dataset.short_name == ISMN):
-            # average merged sensors of a station (set up per-gpi from the
-            # 'other_ids' job metadata), after filters have been applied to
+            # average merged sensors of a station (registered per job from the
+            # 'other_ids' job metadata, see register_merged_sensors), after
+            # filters have been applied to
             # each sensor individually but before anomalies, so that any
             # anomaly is computed on the averaged soil moisture series
             reader = MergeSensorsAdapter(
@@ -614,6 +615,37 @@ def num_gpis_from_job(job):
     return num_gpis
 
 
+def register_merged_sensors(val, job):
+    """
+    Register the ISMN sensors to be averaged per primary sensor on the
+    reference reader of the validation, for the MergeSensorsAdapter.
+
+    The worker builds its own readers, so the merged sensors are taken from
+    the 'other_ids' in the job metadata (set in create_jobs when ISMN sensor
+    merging is activated). Jobs without metadata are left untouched.
+
+    Parameters
+    ----------
+    val: pytesmo.validation_framework.validation.Validation
+        Validation whose reference reader is used to read the job.
+    job: tuple
+        (gpis, lons, lats[, metadata]) as created by create_jobs.
+    """
+    if len(job) < 4:
+        return
+
+    base_reader = val.data_manager.datasets[
+        val.data_manager.reference_name]["class"]
+    while hasattr(base_reader, "cls"):
+        base_reader = base_reader.cls
+
+    base_reader._merge_sensors = {
+        int(gpi): list(meta["other_ids"])
+        for gpi, meta in zip(job[0], job[3])
+        if isinstance(meta, dict) and meta.get("other_ids")
+    }
+
+
 @shared_task(bind=True, max_retries=3)
 def execute_job(self, validation_id, job):
     task_id = execute_job.request.id
@@ -624,6 +656,7 @@ def execute_job(self, validation_id, job):
     try:
         validation_run = ValidationRun.objects.get(pk=validation_id)
         val = create_pytesmo_validation(validation_run, val_type="temporal")
+        register_merged_sensors(val, job)
 
         result = val.calc(*job,
                           rename_cols=False,

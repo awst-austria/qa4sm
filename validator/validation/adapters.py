@@ -46,8 +46,9 @@ class MergeSensorsAdapter(BasicAdapter):
     """
     Wraps the (filtered/adapted) ISMN reference reader. When reading a
     primary sensor that has merged sensors registered in `_merge_sensors`
-    on the underlying ISMN_Interface (set per-gpi by pytesmo's
-    Validation.calc from the `other_ids` job metadata), reads each merged
+    on the underlying ISMN_Interface (set per job by
+    validation.register_merged_sensors from the `other_ids` job metadata),
+    reads each merged
     sensor through the same filter/adapter chain and averages the
     requested variable across sensors, keeping only timestamps where all
     of them have data.
