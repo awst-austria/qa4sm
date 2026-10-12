@@ -6,7 +6,6 @@ import {ToastService} from '../../../core/services/toast/toast.service';
 import {SettingsService} from '../../../core/services/global/settings.service';
 import {LoginComponent} from 'src/app/modules/user/login/login.component';
 
-
 @Component({
     selector: 'qa-navigation-bar-header',
     templateUrl: './navigation-bar.component.html',
@@ -41,12 +40,18 @@ export class NavigationBarComponent implements OnInit {
     icon: 'pi pi-fw pi-globe',
     routerLink: ['published-validations']
   };
+  reportsMenuItem: MenuItem = {
+    label: 'Reports',
+    icon: 'pi pi-fw pi-file-pdf',
+    routerLink: ['reports']
+  };
   resultsMenuItem: MenuItem = {
     label: 'Results',
     icon: 'pi pi-fw pi-folder',
     items: [
       this.myResultsMenuItem,
       this.publishedResultsMenuItem,
+      this.reportsMenuItem,
     ]
   };
   compareResultsMenuItem: MenuItem = {
@@ -166,7 +171,7 @@ export class NavigationBarComponent implements OnInit {
       this.infoMenuItem,
       this.contactMenuItem,
       this.loginMenuItem,
-      this.userMenuItem
+      this.userMenuItem,
     ];
   }
 
@@ -184,7 +189,6 @@ export class NavigationBarComponent implements OnInit {
       }
     });
   }
-
 
   setPreviousUrl(prevUrl: string): void {
     this.authService.setPreviousUrl(prevUrl);

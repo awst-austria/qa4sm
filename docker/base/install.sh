@@ -3,6 +3,7 @@ set -e
 set -x
 export PIP_USE_PEP517=1
 export PIP_CONSTRAINT=/tmp/pip-constraints.txt
+export PIP_BUILD_CONSTRAINT=/tmp/pip-constraints.txt
 echo "setuptools<81" > "$PIP_CONSTRAINT"
 
 WEB_VAL_GIT_DIR="/tmp/qa4sm-git"

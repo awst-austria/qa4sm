@@ -28,6 +28,8 @@ interface SortState {
   order: number;
 }
 
+type BulkAction = 'delete' | 'archive' | 'unarchive';
+
 @Component({
   selector: 'qa-validations',
   standalone: true,
@@ -80,6 +82,7 @@ export class ValidationsComponent implements OnInit, OnDestroy {
   stopping = false;
 
   ngOnInit(): void {
+
 
     // Create Filters Reactive Form with fields: dateRange, Validation-run name, Dataset name
     this.filterForm = this.fb.group({
@@ -306,6 +309,98 @@ export class ValidationsComponent implements OnInit, OnDestroy {
           this.toastService.showErrorWithHeader('Error', 'Could not load settings.');
         }
       });
+  }
+
+  selectedRows: any[] = [];
+
+  isRowSelectable = (event: { data: any; index: number }): boolean =>
+    this.isSelectable(event.data);
+
+  isSelectable(row: any): boolean {
+    return !this.isLive(row) && !row.doi && !row.is_published;
+  }
+
+  // Bulk actions
+  bulkAction: BulkAction | null = null;
+  bulkVisible = false;
+  bulkBusy = false;
+
+  private eligibleFor(action: BulkAction): any[] {
+    return this.selectedRows.filter(r =>
+      action === 'unarchive' ? !!r.is_archived : !r.is_archived
+    );
+  }
+
+  get deletable(): any[]    { return this.eligibleFor('delete'); }
+  get archivable(): any[]   { return this.eligibleFor('archive'); }
+  get unarchivable(): any[] { return this.eligibleFor('unarchive'); }
+
+  get bulkTargets(): any[] {
+    return this.bulkAction ? this.eligibleFor(this.bulkAction) : [];
+  }
+
+  get bulkLabel(): string {
+    switch (this.bulkAction) {
+      case 'delete':    return 'permanently delete';
+      case 'archive':   return 'archive';
+      case 'unarchive': return 'un-archive';
+      default:          return '';
+    }
+  }
+
+  get bulkHeader(): string {
+    switch (this.bulkAction) {
+      case 'delete':    return 'Delete validations';
+      case 'archive':   return 'Archive validations';
+      case 'unarchive': return 'Un-archive validations';
+      default:          return '';
+    }
+  }
+
+  openBulkDialog(action: BulkAction): void {
+    this.bulkAction = action;
+    this.bulkVisible = true;
+  }
+
+  closeBulkDialog(): void {
+    this.bulkVisible = false;
+    this.bulkAction = null;
+  }
+
+  confirmBulk(): void {
+    const targets = this.bulkTargets;
+    if (!this.bulkAction || this.bulkBusy || !targets.length) return;
+
+    this.bulkBusy = true;
+    const ids = targets.map(r => r.id);
+    const action = this.bulkAction;
+
+    const request$ = action === 'delete'
+      ? this.validationrunService.removeMultipleValidation(ids)
+      : this.validationrunService.archiveMultipleValidation(ids, action === 'archive');
+
+    request$.pipe(take(1)).subscribe({
+      next: () => {
+        this.toastService.showSuccessWithHeader(
+          'Success',
+          `${ids.length} validation(s) updated.`
+        );
+        this.finishBulk();
+      },
+      error: () => {
+        this.toastService.showErrorWithHeader('Error', 'Bulk operation failed.');
+        this.bulkBusy = false;
+      }
+    });
+  }
+
+  private finishBulk(): void {
+    this.selectedRows = [];
+    this.closeBulkDialog();
+    this.facade.clearCache();
+    this.page$.next({ ...this.page$.value });
+    this.authService.init();
+    this.bulkBusy = false;
   }
 
   ngOnDestroy(): void {

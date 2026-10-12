@@ -1,92 +1,145 @@
-<div class="flex flex-column w-12 justify-content-center align-content-center gap-4">
+<div
+  class="flex flex-column w-12 justify-content-center align-content-center gap-4"
+>
+  <input
+    type="file"
+    class="file-input"
+    [accept]="allowedExtensions.join(',')"
+    (change)="onFileSelected($event)"
+    #fileUpload
+  />
 
-  <input type="file" class="file-input"
-         [accept]="allowedExtensions.join(',')"
-         (change)="onFileSelected($event)" #fileUpload>
-
-  <div class="upload-zone"
-       (click)="fileUpload.click()"
-       (dragover)="onDragOver($event)"
-       (dragleave)="onDragLeave($event)"
-       (drop)="onDrop($event)"
-       [class.upload-zone--disabled]="authService.currentUser.space_left === 0"
-       [class.upload-zone--dragover]="isDragOver">
+  <div
+    class="upload-zone"
+    (click)="fileUpload.click()"
+    (dragover)="onDragOver($event)"
+    (dragleave)="onDragLeave($event)"
+    (drop)="onDrop($event)"
+    [class.upload-zone--disabled]="authService.currentUser.space_left === 0"
+    [class.upload-zone--dragover]="isDragOver"
+  >
     <i class="pi pi-cloud-upload upload-zone__icon"></i>
-    <span class="upload-zone__text">{{ file ? file.name : 'Click or drag a file here' }}</span>
+    <span class="upload-zone__text">{{
+      file ? file.name : "Click or drag a file here"
+    }}</span>
     <span class="upload-zone__hint">Accepted: .zip, .nc, .nc4</span>
   </div>
 
-  <div *ngIf="isFileTooBig" class="warning text-center">
-    File too big. You have {{ getTheFileSize() }} available.
-  </div>
+  @if (isFileTooBig) {
+    <div class="warning text-center">
+      File too big. You have {{ getTheFileSize() }} available.
+    </div>
+  }
 
   <div class="text-center text-sm text-muted">
-    <b>Note: </b> To validate your data with in situ observations, consider uploading time series at
+    <b>Note: </b> To validate your data with in situ observations, consider
+    uploading time series at
     <a href="javascript:void(0);" (click)="getISMNList()">ISMN locations</a>
   </div>
-
 </div>
 
 <!-- Metadata + upload dialog (single step) -->
-<p-dialog id="user-data-form"
-          header="Upload your own data"
-          [(visible)]="dialogVisible"
-          [modal]="true"
-          [style]="{width: '28rem'}"
-          (onHide)="onDialogHide()">
-
+<p-dialog
+  id="user-data-form"
+  header="Upload your own data"
+  [(visible)]="dialogVisible"
+  [modal]="true"
+  [style]="{ width: '28rem' }"
+  (onHide)="onDialogHide()"
+>
   <div class="text-muted text-sm mb-3">
-    Please follow this file <a target="_blank" [routerLink]="['/user-data-guidelines']">standard</a>.
+    Please follow this file
+    <a target="_blank" [routerLink]="['/user-data-guidelines']">standard</a>.
   </div>
 
-  <div *ngIf="file" class="text-sm mb-3">
-    <span class="text-muted">File: </span><b>{{ file.name }}</b>
-  </div>
+  @if (file) {
+    <div class="text-sm mb-3">
+      <span class="text-muted">File: </span><b>{{ file.name }}</b>
+    </div>
+  }
 
   <form [formGroup]="metadataForm">
     <div class="flex flex-column gap-3">
-
       <div class="flex flex-column gap-1">
-        <label for="dataset-name" class="text-sm">Dataset name
-          <i class="pi pi-question-circle ml-1"
-             pTooltip="Required. Up to 30 characters. Letters, numbers, and @ + - _ only."></i>
+        <label for="dataset-name" class="text-sm"
+          >Dataset name
+          <i
+            class="pi pi-question-circle ml-1"
+            pTooltip="Required. Up to 30 characters. Letters, numbers, and @ + - _ only."
+          ></i>
         </label>
-        <input id="dataset-name" type="text" pInputText class="w-full"
-               formControlName="dataset_name">
+        <input
+          id="dataset-name"
+          type="text"
+          pInputText
+          class="w-full"
+          formControlName="dataset_name"
+        />
       </div>
 
       <div class="flex flex-column gap-1">
-        <label for="version-name" class="text-sm">Version name
-          <i class="pi pi-question-circle ml-1"
-             pTooltip="Required. Up to 30 characters. Letters, numbers, and @ + - _ only."></i>
+        <label for="version-name" class="text-sm"
+          >Version name
+          <i
+            class="pi pi-question-circle ml-1"
+            pTooltip="Required. Up to 30 characters. Letters, numbers, and @ + - _ only."
+          ></i>
         </label>
-        <input id="version-name" type="text" pInputText class="w-full"
-               formControlName="version_name">
+        <input
+          id="version-name"
+          type="text"
+          pInputText
+          class="w-full"
+          formControlName="version_name"
+        />
       </div>
-
     </div>
   </form>
 
   <ng-template pTemplate="footer">
-    <button pButton type="button" label="Cancel"
-            class="p-button-text"
-            (click)="closeDialog()">
-    </button>
-    <button pButton type="button" label="Upload"
-            icon="pi pi-upload"
-            [disabled]="!metadataForm.valid"
-            (click)="onSaveData()">
-    </button>
+    <button
+      pButton
+      type="button"
+      label="Cancel"
+      class="p-button-text"
+      (click)="closeDialog()"
+    ></button>
+    <button
+      pButton
+      type="button"
+      label="Upload"
+      icon="pi pi-upload"
+      [disabled]="!metadataForm.valid"
+      (click)="onSaveData()"
+    ></button>
   </ng-template>
 </p-dialog>
 
 <!-- Upload progress spinner -->
-<p-dialog id="uploading-data-spinner" [modal]="true" [showHeader]="false" [(visible)]="spinnerVisible"
-          class="text-center">
-  <span class="pi pi-spinner loading-spinner" title="We are uploading your data..."></span>
-  <div class="uploading-message">Do not close this tab. We are uploading your data and performing initial validation checks...</div>
-  <div *ngIf="(uploadProgress|async) < 100" class="uploading-message pt-3">Progress {{ uploadProgress|async }} %</div>
-  <div *ngIf="(uploadProgress|async) === 100" class="uploading-message pt-3">Your file has been uploaded. We still need
-    a few seconds to preprocess it..
+<p-dialog
+  id="uploading-data-spinner"
+  [modal]="true"
+  [showHeader]="false"
+  [(visible)]="spinnerVisible"
+  class="text-center"
+>
+  <span
+    class="pi pi-spinner loading-spinner"
+    title="We are uploading your data..."
+  ></span>
+  <div class="uploading-message">
+    Do not close this tab. We are uploading your data and performing initial
+    validation checks...
   </div>
+  @if ((uploadProgress | async) < 100) {
+    <div class="uploading-message pt-3">
+      Progress {{ uploadProgress | async }} %
+    </div>
+  }
+  @if ((uploadProgress | async) === 100) {
+    <div class="uploading-message pt-3">
+      Your file has been uploaded. We still need a few seconds to preprocess
+      it..
+    </div>
+  }
 </p-dialog>

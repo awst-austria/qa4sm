@@ -8,8 +8,6 @@ import { ValidateComponent } from './pages/validate/validate.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { NavigationBarModule } from './modules/navigation-bar/navigation-bar.module';
 
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-
 import { ErrorPageComponent } from './pages/error/error-page.component';
 import { ValidationResultComponent } from './pages/validation-result/validation-result.component';
 import { HTTP_INTERCEPTORS, provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
@@ -97,7 +95,6 @@ import { SummaryStatisticsSpatialComponent } from './modules/validation-result/c
         FormsModule,
         ReactiveFormsModule,
         BrowserModule,
-        BrowserAnimationsModule,
         AppRoutingModule,
         DatasetModule,
         NgbModule,

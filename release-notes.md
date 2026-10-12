@@ -1,3 +1,34 @@
+QA4SM v4.2.1 - Release notes 2026-09-24
+======================================================
+# Updates
+1. Add CCI RZSM rzsm_erd variable 
+2. Update automated reports page
+3. Update requirements.txt and package-lock.json
+
+QA4SM v4.2.0 - Release notes 2026-09-17
+======================================================
+# Updates
+1. Add Automated Validation Reports to Results section
+2. Add Multiple Validations management
+3. BugFix repeated datasets for non logged-in user
+
+QA4SM v4.1.2 - Release notes 2026-09-03
+======================================================
+# Updates
+1. Add CCI_v10 dataset
+
+QA4SM v4.1.1 - Release notes 2026-08-07
+======================================================
+# Updates
+1. Add c3S_v2026 dataset
+
+QA4SM v4.1.0 - Release notes 2026-08-04
+======================================================
+# Updates
+1. Update Angular and PrimeNG to 21.0
+2. Update Django to 5.2.16 LTS
+3. Fixed file upload drag and drop
+
 QA4SM v4.0.2 - Release notes 2026-05-28
 ======================================================
 # Updates

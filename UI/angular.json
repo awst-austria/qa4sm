@@ -29,6 +29,14 @@
             ],
             "tsConfig": "tsconfig.app.json",
             "aot": true,
+            "allowedCommonJsDependencies": [
+              "lerc",
+              "jszip",
+              "rbush",
+              "pbf",
+              "xml-utils"
+            ],
+
             "assets": [
               "src/favicon.png",
               "src/assets"

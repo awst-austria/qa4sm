@@ -26,6 +26,7 @@ SSL_SECURITY=""
 DOI_REGISTRATION_URL="https://zenodo.org/api/deposit/depositions"
 USER_DATA_DIR='/var/lib/qa4sm-web-val/valentina/data/user_data'
 USER_MANUAL_PATH='/var/lib/qa4sm-web-val/valentina/user_manual/user_manual.pdf'
+AUTOREPORTS_DIR='/var/lib/qa4sm-web-val/valentina/autoreports'
 
 # this token needs to be set as an evironment variable when this script is run
 # e.g. in the CI (Jenkins credentials or Travis secrets)
@@ -60,6 +61,7 @@ if [ "x$ENV" == "xjenkins" ]; then
     DOI_REGISTRATION_URL="https://sandbox.zenodo.org/api/deposit/depositions"
     USER_DATA_DIR="${DIRNAME}/testdata/user_data/"
     USER_MANUAL_PATH="${DIRNAME}/user_manual/user_manual.pdf"
+    AUTOREPORTS_DIR="${DIRNAME}/autoreports/"
 fi
 
 if [ "x$ENV" == "xdev" ]; then
@@ -70,6 +72,7 @@ if [ "x$ENV" == "xdev" ]; then
     DOI_REGISTRATION_URL="https://sandbox.zenodo.org/api/deposit/depositions"
     USER_DATA_DIR="${DIRNAME}/testdata/user_data/"
     USER_MANUAL_PATH="${DIRNAME}/user_manual/user_manual.pdf"
+    AUTOREPORTS_DIR="${DIRNAME}/autoreports/"
 fi
 
 if [ "x$ENV" == "xtest" ]; then
@@ -81,6 +84,7 @@ if [ "x$ENV" == "xtest" ]; then
     DOI_REGISTRATION_URL="https://sandbox.zenodo.org/api/deposit/depositions"
     USER_DATA_DIR="${DIRNAME}/testdata/user_data/"
     USER_MANUAL_PATH="${DIRNAME}/user_manual/user_manual.pdf"
+    AUTOREPORTS_DIR="${DIRNAME}/autoreports/"
 fi
 
 if [ "x$ENV" == "xtestenv" ]; then
@@ -90,9 +94,10 @@ if [ "x$ENV" == "xtestenv" ]; then
     DOI_REGISTRATION_URL="https://sandbox.zenodo.org/api/deposit/depositions"
     USER_DATA_DIR='/var/lib/qa4sm-web-val/valentina/data/user_data'
     USER_MANUAL_PATH='/var/lib/qa4sm-web-val/valentina/user_manual/user_manual.pdf'
+    AUTOREPORTS_DIR='/var/lib/qa4sm-web-val/valentina/autoreports'
 fi
 
 echo $DOI_ACCESS_TOKEN_ENV
 echo $ADMIN_ACCESS_TOKEN
 
-sed -e "s|^[ ]*USER_MANUAL_PATH = .*$|USER_MANUAL_PATH = '$USER_MANUAL_PATH'|g;s|^[ ]*USER_DATA_DIR = .*$|USER_DATA_DIR = '$USER_DATA_DIR'|g;s|^[ ]*DOI_ACCESS_TOKEN = .*$|DOI_ACCESS_TOKEN = '$DOI_ACCESS_TOKEN_ENV'|g;s|^[ ]*ADMIN_ACCESS_TOKEN = .*$|ADMIN_ACCESS_TOKEN = '$ADMIN_ACCESS_TOKEN'|g;s|^[ ]*DOI_REGISTRATION_URL = .*$|DOI_REGISTRATION_URL = '$DOI_REGISTRATION_URL'|g;s|^[ ]*SITE_URL = .*$|SITE_URL = '$SITE_URL'|g;s|^[ ]*EMAIL_HOST_PASSWORD = .*$|EMAIL_HOST_PASSWORD = '$EMAIL_PASSWORD'|g;s|^[ ]*DBSM = .*$|DBSM = '$DBSM'|g;s|^[ ]*DB_PASSWORD = .*$|DB_PASSWORD = '$DB_PASSWORD'|g;s|^[ ]*MEDIA_URL = .*$|MEDIA_URL = '$MEDIA_URL'|g;s|^[ ]*STATIC_URL = .*$|STATIC_URL = '$STATIC_URL'|g;s|^[ ]*FORCE_SCRIPT_NAME = .*$|FORCE_SCRIPT_NAME = '$FORCE_SCRIPT_NAME'|g;s|^[ ]*SECRET_KEY = .*$|SECRET_KEY = '$NEWKEY'|g;s|^[ ]*DEBUG =.*$|DEBUG = $DEBUGFLAG|g;s|^[ ]*LOG_FILE = .*$|LOG_FILE = '$LOGFILE'|g;s|^[ ]*ALLOWED_HOSTS =.*$|ALLOWED_HOSTS = ${ALLOWED_HOSTS}${SSL_SECURITY}|g;" $DIRNAME/settings_example_conf.py > $DIRNAME/valentina/settings_conf.py
+sed -e "s|^[ ]*AUTOREPORTS_DIR = .*$|AUTOREPORTS_DIR = '$AUTOREPORTS_DIR'|g;s|^[ ]*USER_MANUAL_PATH = .*$|USER_MANUAL_PATH = '$USER_MANUAL_PATH'|g;s|^[ ]*USER_DATA_DIR = .*$|USER_DATA_DIR = '$USER_DATA_DIR'|g;s|^[ ]*DOI_ACCESS_TOKEN = .*$|DOI_ACCESS_TOKEN = '$DOI_ACCESS_TOKEN_ENV'|g;s|^[ ]*ADMIN_ACCESS_TOKEN = .*$|ADMIN_ACCESS_TOKEN = '$ADMIN_ACCESS_TOKEN'|g;s|^[ ]*DOI_REGISTRATION_URL = .*$|DOI_REGISTRATION_URL = '$DOI_REGISTRATION_URL'|g;s|^[ ]*SITE_URL = .*$|SITE_URL = '$SITE_URL'|g;s|^[ ]*EMAIL_HOST_PASSWORD = .*$|EMAIL_HOST_PASSWORD = '$EMAIL_PASSWORD'|g;s|^[ ]*DBSM = .*$|DBSM = '$DBSM'|g;s|^[ ]*DB_PASSWORD = .*$|DB_PASSWORD = '$DB_PASSWORD'|g;s|^[ ]*MEDIA_URL = .*$|MEDIA_URL = '$MEDIA_URL'|g;s|^[ ]*STATIC_URL = .*$|STATIC_URL = '$STATIC_URL'|g;s|^[ ]*FORCE_SCRIPT_NAME = .*$|FORCE_SCRIPT_NAME = '$FORCE_SCRIPT_NAME'|g;s|^[ ]*SECRET_KEY = .*$|SECRET_KEY = '$NEWKEY'|g;s|^[ ]*DEBUG =.*$|DEBUG = $DEBUGFLAG|g;s|^[ ]*LOG_FILE = .*$|LOG_FILE = '$LOGFILE'|g;s|^[ ]*ALLOWED_HOSTS =.*$|ALLOWED_HOSTS = ${ALLOWED_HOSTS}${SSL_SECURITY}|g;" $DIRNAME/settings_example_conf.py > $DIRNAME/valentina/settings_conf.py

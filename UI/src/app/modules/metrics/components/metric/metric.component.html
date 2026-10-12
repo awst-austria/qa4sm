@@ -1,19 +1,25 @@
-<div class="flex flex-row gap-0" *ngIf="metricModel() as metricModel">
-  <div class="w-auto flex flex-row justify-content-center">
-    <p-checkbox
-      [inputId]="metricModel.name"
-      [ngModel]="metricModel.value"
-      (ngModelChange)="onValueChange($event)"
-      [binary]="true"
-      [disabled]="disabled()"
-    ></p-checkbox>
-    <label class="pl-2" for="{{metricModel.name}}"> {{metricModel.description}}</label>
+@if (metricModel(); as metricModel) {
+  <div class="flex flex-row gap-0">
+    <div class="w-auto flex flex-row justify-content-center">
+      <p-checkbox
+        [inputId]="metricModel.name"
+        [ngModel]="metricModel.value"
+        (ngModelChange)="onValueChange($event)"
+        [binary]="true"
+        [disabled]="disabled()"
+      ></p-checkbox>
+      <label class="pl-2" for="{{ metricModel.name }}">
+        {{ metricModel.description }}</label
+      >
+    </div>
+    <div class="w-1">
+      <label
+        class="p-panel-header-icon"
+        pTooltip="{{ metricModel.helperText }}"
+        tooltipPosition="bottom"
+      >
+        <span class="pi pi-question-circle ml-2"></span>
+      </label>
+    </div>
   </div>
-  <div class="w-1">
-    <label class="p-panel-header-icon"
-           pTooltip="{{metricModel.helperText}}"
-           tooltipPosition="bottom">
-      <span class="pi pi-question-circle ml-2"></span>
-    </label>
-  </div>
-</div>
+}
