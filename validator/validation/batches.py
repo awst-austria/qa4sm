@@ -6,7 +6,7 @@ import logging
 from ismn.interface import ISMN_Interface
 from pygeobase.io_base import GriddedBase
 
-from validator.models import DataFilter
+from validator.models import DataFilter, ValidationRun
 from validator.validation import globals
 from validator.validation.readers import ReaderWithTsExtension
 from smap_io.interface import ReaderWithExtension_SMAP
@@ -255,6 +255,14 @@ def create_jobs(
                     total_points += len(gpis)
 
         else:
+            # the merge list only reaches the reader in execute_job, the
+            # spatial validation would silently read the primary sensor only
+            if validation_run.val_type != ValidationRun.VAL_TYPE_TEMPORAL:
+                raise ValueError(
+                    "Merging ISMN sensors is only available for temporal "
+                    "validations, not for val_type "
+                    f"'{validation_run.val_type}'.")
+
             ids = reader.get_dataset_ids(
                 variable=dataset_config.variable.short_name,
                 min_depth=depth_from - top_tol,
@@ -287,18 +295,20 @@ def create_jobs(
 
             # --- depth/tolerance subsetting over the remaining stations ---
             # the merged sensors travel as 'other_ids' in the job metadata,
-            # execute_job registers them on the worker's reader
+            # execute_job registers them on the worker's reader. Stations that
+            # fail the selection are kept as placeholders flagged with
+            # 'selection_failed', which are read as empty and so reported as
+            # "not enough data"
             jobs = []
             for station in stations:
-                result = reader.find_sensors_by_tolerance_station_selection(
-                    ids[station],
-                    depth_top=depth_from, depth_bottom=depth_to,
-                    top_tol=top_tol, bottom_tol=bottom_tol,
-                    reshape_meta=reshape_meta,
-                )
-                if result is None:
-                    continue
-                primary_id, meta = result
+                primary_id, meta = \
+                    reader.find_sensors_by_tolerance_station_selection(
+                        ids[station],
+                        depth_top=depth_from, depth_bottom=depth_to,
+                        top_tol=top_tol, bottom_tol=bottom_tol,
+                        reshape_meta=reshape_meta,
+                        keep_failed=True,
+                    )
                 jobs.append((
                     np.array([primary_id]),
                     np.array([meta['longitude']]),
@@ -389,6 +399,15 @@ def create_upscaling_lut(
                 for other_points in other_points_jobs:
                     gpis, lons, lats = other_points[0], other_points[1], \
                     other_points[2]
+                    # stations that failed the ISMN tolerance selection are
+                    # only placeholders, they have no data to average
+                    if len(other_points) > 3:
+                        keep = [not (isinstance(meta, dict)
+                                     and meta.get('selection_failed'))
+                                for meta in other_points[3]]
+                        gpis, lons, lats = (np.asarray(gpis)[keep],
+                                            np.asarray(lons)[keep],
+                                            np.asarray(lats)[keep])
                     for gpi, lon, lat in zip(gpis, lons, lats):
                         # list all non-ref points under the same ref gpi
                         ref_gpi = ref_grid.find_nearest_gpi(lon, lat)[0]

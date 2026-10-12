@@ -366,7 +366,7 @@ def create_pytesmo_validation(validation_run, val_type="temporal"):
                      == validation_run.spatial_reference_configuration.id)
                 and dataset_config.dataset.short_name == ISMN):
             # average merged sensors of a station (registered per job from the
-            # 'other_ids' job metadata, see register_merged_sensors), after
+            # 'other_ids' job metadata, see register_station_selection), after
             # filters have been applied to
             # each sensor individually but before anomalies, so that any
             # anomaly is computed on the averaged soil moisture series
@@ -615,14 +615,20 @@ def num_gpis_from_job(job):
     return num_gpis
 
 
-def register_merged_sensors(val, job):
+def register_station_selection(val, job):
     """
-    Register the ISMN sensors to be averaged per primary sensor on the
-    reference reader of the validation, for the MergeSensorsAdapter.
+    Register the result of the ISMN station selection on the reference
+    reader of the validation, for the MergeSensorsAdapter:
 
-    The worker builds its own readers, so the merged sensors are taken from
-    the 'other_ids' in the job metadata (set in create_jobs when ISMN sensor
-    merging is activated). Jobs without metadata are left untouched.
+    * `_merge_sensors`: the sensors to be averaged per primary sensor,
+      from the 'other_ids' in the job metadata
+    * `_selection_failed`: the gpis of stations that failed the tolerance
+      selection, from 'selection_failed' in the job metadata. These are read
+      as empty, so that they are reported as "not enough data".
+
+    The worker builds its own readers, so this is taken from the job
+    metadata (set in create_jobs when ISMN sensor merging is activated).
+    Jobs without metadata are left untouched.
 
     Parameters
     ----------
@@ -644,6 +650,11 @@ def register_merged_sensors(val, job):
         for gpi, meta in zip(job[0], job[3])
         if isinstance(meta, dict) and meta.get("other_ids")
     }
+    base_reader._selection_failed = {
+        int(gpi)
+        for gpi, meta in zip(job[0], job[3])
+        if isinstance(meta, dict) and meta.get("selection_failed")
+    }
 
 
 @shared_task(bind=True, max_retries=3)
@@ -656,7 +667,7 @@ def execute_job(self, validation_id, job):
     try:
         validation_run = ValidationRun.objects.get(pk=validation_id)
         val = create_pytesmo_validation(validation_run, val_type="temporal")
-        register_merged_sensors(val, job)
+        register_station_selection(val, job)
 
         result = val.calc(*job,
                           rename_cols=False,

@@ -47,11 +47,14 @@ class MergeSensorsAdapter(BasicAdapter):
     Wraps the (filtered/adapted) ISMN reference reader. When reading a
     primary sensor that has merged sensors registered in `_merge_sensors`
     on the underlying ISMN_Interface (set per job by
-    validation.register_merged_sensors from the `other_ids` job metadata),
+    validation.register_station_selection from the `other_ids` job metadata),
     reads each merged
     sensor through the same filter/adapter chain and averages the
     requested variable across sensors, keeping only timestamps where all
     of them have data.
+    Gpis registered in `_selection_failed` (stations that failed the
+    tolerance selection) are read as empty, so that the validation reports
+    them as "not enough data".
     """
 
     def __init__(self, cls, variable, read_name=None):
@@ -74,6 +77,10 @@ class MergeSensorsAdapter(BasicAdapter):
         self._base_reader = base_reader
 
     def _read_merged(self, read_func, gpi, *args, **kwargs):
+        if int(gpi) in getattr(self._base_reader, "_selection_failed", set()):
+            return pd.DataFrame(columns=[self.variable],
+                                index=pd.DatetimeIndex([]), dtype=float)
+
         primary = read_func(gpi, *args, **kwargs)
 
         other_ids = getattr(self._base_reader, "_merge_sensors", {}).get(

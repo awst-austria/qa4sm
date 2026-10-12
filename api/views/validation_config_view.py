@@ -402,7 +402,19 @@ class ValidationConfigurationSerializer(serializers.Serializer):
             raise serializers.ValidationError('Scaling reference set, but the scaling method not.')
         elif scaling_ref_configs_num > 1 and attrs['scaling_method'] != 'none':
             raise serializers.ValidationError('More than one scaling reference provided.')
-        
+
+        # ISMN sensor merging is only implemented for temporal validations
+        val_type = attrs.get('val_type', ValidationRun.VAL_TYPE_TEMPORAL)
+        tolerances_id = DataFilter.objects.filter(
+            name='FIL_ISMN_TOLERANCES').values_list('id', flat=True).first()
+        merging = any(
+            pfil['id'] == tolerances_id
+            for config in attrs['dataset_configs']
+            for pfil in config.get('parametrised_filters', []))
+        if merging and val_type != ValidationRun.VAL_TYPE_TEMPORAL:
+            raise serializers.ValidationError(
+                'Merging ISMN sensors is only available for temporal validations.')
+
         # Only climatology may have dates
         anomalies_method = attrs.get('anomalies_method')
         if anomalies_method != ValidationRun.CLIMATOLOGY:
