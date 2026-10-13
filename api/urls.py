@@ -111,6 +111,7 @@ urlpatterns = [
     path('dataset-configuration', dataset_configuration, name='Configuration'),
     re_path(r'^dataset-configuration/(?P<validation_id>.+)$', dataset_configuration_by_validation, name='Configuration'),
     path('custom-tracked-run', custom_tracked_validation_runs, name='Copied custom run'),
+    path('custom-tracked-run', custom_tracked_validation_runs, name='Tracked custom run'),
     path('copy-validation', copy_validation_results, name='Copy validation results'),
     re_path(r'^copied-validation-record/(?P<id>.+)$', get_copied_validations, name='Copied run record'),
 
