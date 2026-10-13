@@ -41,7 +41,7 @@ from api.frontend_urls import get_angular_url
 from validator.mailer import send_val_done_notification
 from validator.models import CeleryTask, DatasetConfiguration, CopiedValidations
 from validator.models import ValidationRun, DatasetVersion
-from validator.validation.batches import create_jobs, create_upscaling_lut
+from validator.validation.batches import create_jobs, create_upscaling_lut, get_tolerances_params
 from validator.validation.filters import setup_filtering
 from validator.validation.globals import OUTPUT_FOLDER, IRREGULAR_GRIDS, VR_FIELDS, DS_FIELDS, ISMN, DEFAULT_TSW, \
     TEMPORAL_SUB_WINDOW_SEPARATOR, METRICS, TEMPORAL_SUB_WINDOWS, ONLY_WITH_REFERENCE
@@ -209,6 +209,13 @@ def save_validation_config(validation_run, val_type="temporal"):
                              variable_pretty_name)
 
                 ds.setncattr('val_dc_filters' + str(i), filters)
+
+                # the reader skips the metadata plots that are meaningless
+                # for merged stations (FRM class, instrument depth)
+                merge_ismn_sensors, _, _ = get_tolerances_params(
+                    dataset_config.parametrisedfilter_set.all())
+                if merge_ismn_sensors:
+                    ds.setncattr('val_dc_ismn_sensor_merging' + str(i), 'True')
 
                 actual_interval_from, actual_interval_to = _get_actual_time_range(
                     validation_run, dataset_config.version.id)

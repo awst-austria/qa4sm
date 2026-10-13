@@ -1,6 +1,11 @@
+import os
+import shutil
+import tempfile
 from datetime import datetime
 from types import SimpleNamespace
+from unittest import mock
 
+import netCDF4
 import numpy as np
 import pandas as pd
 import pytest
@@ -162,7 +167,7 @@ class TestCreateJobsSensorMerging(TestCase):
         assert meta['selection_failed'] is True
         assert meta['selection_reason'] == 'depth'
         assert meta['instrument'] == 'Tolerance selection failed'
-        assert meta['frm_class'] == 'Tolerance selection failed'
+        assert meta['frm_class'] == 'None'
         assert meta['other_ids'] == []
 
     def test_station_within_tolerance_is_merged(self):
@@ -180,3 +185,57 @@ class TestCreateJobsSensorMerging(TestCase):
 
         with pytest.raises(ValueError, match='temporal'):
             self.create_jobs('0.1,0.1')
+
+
+class TestSaveValidationConfigSensorMerging(TestCase):
+    """The results file flags merged ISMN sensors for qa4sm-reader."""
+    fixtures = ['variables', 'versions', 'datasets', 'filters', 'users']
+
+    def setUp(self):
+        self.out_dir = tempfile.mkdtemp()
+        self.addCleanup(shutil.rmtree, self.out_dir)
+        self.nc_name = 'results.nc'
+        with netCDF4.Dataset(os.path.join(self.out_dir, self.nc_name), 'w'):
+            pass
+
+        self.run = ValidationRun()
+        self.run.start_time = datetime.now(tzlocal())
+        self.run.output_file.name = self.nc_name
+        self.run.save()
+
+        version = DatasetVersion.objects.get(short_name='ISMN_V20180712_MINI')
+        self.config = DatasetConfiguration()
+        self.config.validation = self.run
+        self.config.dataset = Dataset.objects.get(short_name='ISMN')
+        self.config.version = version
+        self.config.variable = version.variables.first()
+        self.config.save()
+        self.run.spatial_reference_configuration = self.config
+        self.run.save()
+
+    def saved_attrs(self):
+        with mock.patch('validator.validation.validation.OUTPUT_FOLDER',
+                        self.out_dir):
+            val.validation.save_validation_config(self.run)
+        with netCDF4.Dataset(os.path.join(self.out_dir, self.nc_name)) as ds:
+            return {key: ds.getncattr(key) for key in ds.ncattrs()}
+
+    def test_merging_is_flagged(self):
+        ParametrisedFilter(
+            filter=DataFilter.objects.get(name='FIL_ISMN_TOLERANCES'),
+            parameters='0.1,0.1', dataset_config=self.config).save()
+
+        attrs = self.saved_attrs()
+
+        assert attrs['val_dc_ismn_sensor_merging0'] == 'True'
+
+    def test_no_flag_without_merging(self):
+        ParametrisedFilter(
+            filter=DataFilter.objects.get(name='FIL_ISMN_DEPTH'),
+            parameters='0.0,0.1', dataset_config=self.config).save()
+
+        attrs = self.saved_attrs()
+
+        # the configuration itself was written
+        assert attrs['val_dc_dataset0'] == 'ISMN'
+        assert 'val_dc_ismn_sensor_merging0' not in attrs
