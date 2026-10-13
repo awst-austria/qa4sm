@@ -2,10 +2,15 @@ import json
 
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
-from rest_framework.decorators import api_view, permission_classes, parser_classes
-from rest_framework.parsers import FileUploadParser
+
+from rest_framework.authentication import TokenAuthentication
+from rest_framework.decorators import (
+    api_view, authentication_classes, parser_classes, permission_classes, throttle_classes,
+)
+from rest_framework.parsers import FileUploadParser, MultiPartParser
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.serializers import ModelSerializer, Serializer
+from rest_framework.throttling import UserRateThrottle
 from rest_framework import serializers
 from django.utils import timezone
 from django.conf import settings
@@ -41,8 +46,8 @@ def create_variable_entry(variable_name,
         'pretty_name': variable_pretty_name,
         'help_text':
         f'Variable {variable_name} of dataset {dataset_name} provided by  user {user}.',
-        'min_value': max_value,
-        'max_value': min_value,
+        'min_value': min_value,
+        'max_value': max_value,
         'unit': variable_unit if variable_unit else 'n.a.'
     }
     variable_serializer = DatasetVariableSerializer(data=new_variable_data)
@@ -169,13 +174,131 @@ def preprocess_file(file_serializer, file_raw_path, user_path):
     return
 
 
+# ---------------------------------------------------------------------------
+# Upload helpers (shared by AngularSession- and token-authenticated endpoints)
+# ---------------------------------------------------------------------------
+
+def _parse_metadata(raw_metadata):
+    """
+    Parse the JSON metadata string sent with an upload.
+    Returns (metadata_dict, None) on success or (None, JsonResponse) on error.
+    """
+    if not raw_metadata:
+        return None, JsonResponse(
+            {"success": False, "error": "File metadata is missing."}, status=400)
+    try:
+        return json.loads(raw_metadata), None
+    except (json.JSONDecodeError, TypeError):
+        return None, JsonResponse(
+            {"success": False, "error": "File metadata is not valid JSON."}, status=400)
+
+
+def _handle_user_data_upload(request, file, metadata, filename):
+    """
+    Upload logic, called by either logged-in (session) or token-authenticated api users.
+    The callers are responsible only for extracting `file` and `metadata` from the request.
+    """
+    user = request.user.username
+    user_data_dir = getattr(settings, 'USER_DATA_DIR', '/tmp/user_data_dir/')
+    user_path = Path(user_data_dir) / user
+    user_path.mkdir(parents=True, exist_ok=True)
+
+    serializer = UserFileMetadataSerializer(data=metadata)
+
+    if not serializer.is_valid():
+        return JsonResponse({"success": False, "error": str(serializer.errors)}, status=500)
+
+    # Pretty names are optional (required=False in the serializer),
+    # so use .get(), otherwise a missing key raises KeyError -> HTTP 500
+    dataset_name = metadata[USER_DATA_DATASET_FIELD_NAME]
+    dataset_pretty_name = metadata.get(USER_DATA_DATASET_FIELD_PRETTY_NAME) or dataset_name
+    version_name = metadata[USER_DATA_VERSION_FIELD_NAME]
+    version_pretty_name = metadata.get(USER_DATA_VERSION_FIELD_PRETTY_NAME) or version_name
+
+    # needs file operation bc zip could also contain nc file (i.e.: internal case not relevant for users)
+    is_scattered = has_csv_in_zip(file)
+
+    # creating version entry
+
+    new_variable = create_variable_entry('none', 'none', 'none', dataset_pretty_name,
+                                         request.user, 'n.a.')
+    new_version = create_version_entry(version_name, version_pretty_name,
+                                       dataset_pretty_name, request.user,
+                                       new_variable)
+    new_dataset = create_dataset_entry(dataset_name, dataset_pretty_name,
+                                       new_version, request.user, is_scattered_data=is_scattered)
+
+    original_file_size = file.size
+    file_data = {
+        'file': file,
+        'original_file_size': original_file_size,
+        'file_name': filename,
+        'owner': request.user.pk,
+        'dataset': new_dataset.pk,
+        'version': new_version.pk,
+        'variable': new_variable.pk,
+        'upload_date': timezone.now(),
+        'user_groups': []
+    }
+
+    file_serializer = UploadFileSerializer(data=file_data)
+
+    if file_serializer.is_valid():
+        # saving file
+        try:
+            file_serializer.save()
+        except Exception:
+            __logger.exception('Could not save uploaded user file %s', filename)
+            new_dataset.delete()
+            new_variable.delete()
+            new_version.delete()
+            return JsonResponse(
+                {"success": False,
+                 'error': 'We could not save your file. Please try again later or contact our team.'},
+                status=500)
+
+        success, msg, check_status = run_upload_format_check(
+            file=file,
+            filename=filename,
+            file_uuid=file_serializer.data['id'],
+            user_path=user_path)
+        if not success:
+            # angular error flow handles both str or dict (userFileUpload)
+            return JsonResponse({"success": False, "error": str(msg)},
+                                status=check_status)
+
+        # need to get the path and assign it to the dataset as well as pass it to preprocessing function, so I don't
+        # have to open the db connection before file preprocessing.
+        file_raw_path = file_serializer.data['get_raw_file_path']
+        try:
+            preprocess_file(file_serializer, file_raw_path, user_path)
+        except Exception:
+            __logger.exception('Preprocessing failed for user file %s', filename)
+            return JsonResponse(
+                {"success": False,
+                 "error": "Preprocessing failed."},
+                status=500)
+
+        return JsonResponse(file_serializer.data, status=201, safe=False)
+    else:
+        print(file_serializer.errors)
+        return JsonResponse(file_serializer.errors, status=500, safe=False)
+
+
+class UploadWithTokenThrottle(UserRateThrottle):
+    # own scope -> own counter, not shared with other UserRateThrottle subclasses
+    scope = 'upload_with_token'
+    rate = '20/hour'
+
+
 # API VIEWS
 
 
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
 def update_metadata(request, file_uuid):
-    file_entry = get_object_or_404(UserDatasetFile, id=file_uuid)
+    # Only the owner may change metadata of a file.
+    file_entry = get_object_or_404(UserDatasetFile, id=file_uuid, owner=request.user)
     field_name = request.data[USER_DATA_FIELD_NAME]
     field_value = request.data[USER_DATA_FIELD_VALUE]
     current_variable = file_entry.variable
@@ -219,96 +342,56 @@ class UploadedFileError(BaseException):
 @permission_classes([IsAuthenticated])
 @parser_classes([FileUploadParser])
 def upload_user_data(request, filename):
-    user = request.user.username
-    user_data_dir = getattr(settings, 'USER_DATA_DIR', '/tmp/user_data_dir/')
-    user_path = Path(user_data_dir) / user
-    user_path.mkdir(parents=True, exist_ok=True)
+    """
+    Upload for logged-in users (Angular frontend, session cookie).
+    Body: raw file (FileUploadParser). Metadata: JSON in the 'fileMetadata' header.
+    """
+    file = request.FILES.get('file')
+    if file is None:
+        return JsonResponse({"success": False, "error": "No file provided."}, status=400)
 
-    file = request.FILES['file']
+    metadata, error_response = _parse_metadata(request.META.get('HTTP_FILEMETADATA'))
+    if error_response:
+        return error_response
 
-    #  get metadata
-    metadata = json.loads(request.META.get('HTTP_FILEMETADATA'))
+    return _handle_user_data_upload(request, file, metadata, filename)
 
-    serializer = UserFileMetadataSerializer(data=metadata)
 
-    if not serializer.is_valid():
-        return JsonResponse({"success": False, "error": str(serializer.errors)}, status=500)
+@api_view(['POST'])
+@authentication_classes([TokenAuthentication])
+@permission_classes([IsAuthenticated])
+@throttle_classes([UploadWithTokenThrottle])
+@parser_classes([MultiPartParser])
+def upload_user_data_with_token(request, filename):
+    """
+    Upload for public API users (scripts, notebooks, curl) with token authentication.
 
-    dataset_name = metadata[USER_DATA_DATASET_FIELD_NAME]
-    dataset_pretty_name = metadata[
-        USER_DATA_DATASET_FIELD_PRETTY_NAME] if metadata[
-            USER_DATA_DATASET_FIELD_PRETTY_NAME] else dataset_name
-    version_name = metadata[USER_DATA_VERSION_FIELD_NAME]
-    version_pretty_name = metadata[
-        USER_DATA_VERSION_FIELD_PRETTY_NAME] if metadata[
-            USER_DATA_VERSION_FIELD_PRETTY_NAME] else version_name
+    Body: multipart/form-data with
+        file      - the data file (.nc / .zip / .csv ...)
+        metadata  - JSON string, e.g.
+                    {"dataset_name": "MYDS", "dataset_pretty_name": "My dataset",
+                     "version_name": "v1", "version_pretty_name": "Version 1"}
+    (Metadata may alternatively be sent in the 'fileMetadata' header, like the frontend does.)
 
-    # needs file operation bc zip could also contain nc file (i.e.: internal case not relevant for users)
-    is_scattered = has_csv_in_zip(file)
+    Example:
+        curl -X POST \\
+             -H "Authorization: Token <your-token>" \\
+             -F "file=@my_data.zip" \\
+             -F 'metadata={"dataset_name":"MYDS","version_name":"v1"}' \\
+             https://qa4sm.eu/api/upload-user-data-with-token/my_data.zip
+    """
+    file = request.FILES.get('file')
+    if file is None:
+        return JsonResponse(
+            {"success": False, "error": 'No file provided. Send it as multipart/form-data field "file".'},
+            status=400)
 
-    # creating version entry
+    raw_metadata = request.data.get('metadata') or request.META.get('HTTP_FILEMETADATA')
+    metadata, error_response = _parse_metadata(raw_metadata)
+    if error_response:
+        return error_response
 
-    new_variable = create_variable_entry('none', 'none', 'none', dataset_pretty_name,
-                                         request.user, 'n.a.')
-    new_version = create_version_entry(version_name, version_pretty_name,
-                                       dataset_pretty_name, request.user,
-                                       new_variable)
-    new_dataset = create_dataset_entry(dataset_name, dataset_pretty_name,
-                                       new_version, request.user, is_scattered_data=is_scattered)
-
-    original_file_size = file.size
-    file_data = {
-        'file': file,
-        'original_file_size': original_file_size,
-        'file_name': filename,
-        'owner': request.user.pk,
-        'dataset': new_dataset.pk,
-        'version': new_version.pk,
-        'variable': new_variable.pk,
-        'upload_date': timezone.now(),
-        'user_groups': []
-    }
-
-    file_serializer = UploadFileSerializer(data=file_data)
-
-    if file_serializer.is_valid():
-        # saving file
-        try:
-            file_serializer.save()
-        except Exception as e:
-            new_dataset.delete()
-            new_variable.delete()
-            new_version.delete()
-            return JsonResponse(
-                {"success": False,
-                 'error':'We could not save your file. Please try again later or contact our team.'},
-                 status=500)
-
-        success, msg, status = run_upload_format_check(
-            file=file,
-            filename=filename,
-            file_uuid=file_serializer.data['id'],
-            user_path=user_path)
-        if not success:
-            # angular error flow handles both str or dict (userFileUpload)
-            return JsonResponse({"success": False, "error": str(msg)},
-                status=status)
-
-        # need to get the path and assign it to the dataset as well as pass it to preprocessing function, so I don't
-        # have to open the db connection before file preprocessing.
-        file_raw_path = file_serializer.data['get_raw_file_path']
-        try:
-            preprocess_file(file_serializer, file_raw_path, user_path)
-        except Exception as e:
-            return JsonResponse(
-            {"success": False,
-             "error": "Preprocessing failed."},
-            status=500)
-
-        return JsonResponse(file_serializer.data, status=201, safe=False)
-    else:
-        print(file_serializer.errors)
-        return JsonResponse(file_serializer.errors, status=500, safe=False)
+    return _handle_user_data_upload(request, file, metadata, filename)
 
 
 # SERIALIZERS

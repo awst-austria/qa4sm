@@ -33,7 +33,6 @@ from api.views.settings_view import backend_settings
 from api.views.upload_user_data_view import *
 from api.views.support_request_view import *
 from api.views.custom_dataset_view import *
-from rest_framework.authtoken import views
 from api.views.autocleanup_view import run_auto_cleanup_script
 from api.views.validation_run_view import validation_run_status
 from api.views.validation_run_view import validation_run_timing
@@ -64,107 +63,151 @@ urlpatterns = [
     #   WRONG: path('my-new-endpoint/', my_new_view, name='fancy stuff'),
     #
     re_path(r'^path_test/(?P<username>.+)$', path_var_get),
+
+    # ---------------------------------------------------------------------------
+    # 1. Authentication & user account
+    # ---------------------------------------------------------------------------
     path('auth/login', api_login, name='api-login'),
     path('auth/logout', api_logout, name='api-logout'),
+    path('sign-up', signup_post, name='Sign up'),
+    path('verify-email/<int:user_id>/<str:token>/', verify_email, name='verify_email'),
+    path('user-update', user_update, name='User update'),
+    path('user-delete', user_delete, name='User delete'),
+    path('password-update', password_update, name='Password Update'),
+    path('password-reset/', include('django_rest_passwordreset.urls', namespace='password-reset')),
+    path('request-api-token', request_api_token, name='request-api-token'),
+    path('get-api-token', get_api_token, name='get-api-token'),
+
+    # ---------------------------------------------------------------------------
+    # 2. Datasets, versions, variables, filters
+    # ---------------------------------------------------------------------------
     path('dataset', dataset, name='Datasets'),
     re_path(r'^dataset/(?P<id>.+)$', dataset_by_id),
     path('dataset-version', dataset_version, name='Dataset version'),
     re_path(r'^dataset-version/(?P<version_id>.+)$', dataset_version_by_id),
-    re_path(r'^dataset-version-by-dataset/(?P<dataset_id>.+)$', dataset_version_by_dataset,
-            name='Dataset version by dataset'),
+    re_path(r'^dataset-version-by-dataset/(?P<dataset_id>.+)$', dataset_version_by_dataset, name='Dataset version by dataset'),
+    re_path(r'^dataset-version-geojson/(?P<version_id>.+)/$', dataset_version_geojson_by_id),
+    path('update-dataset-version', update_dataset_version, name='Update Dataset Version'),
     path('dataset-variable', dataset_variable, name='Dataset variable'),
     re_path(r'^dataset-variable/(?P<variable_id>.+)$', dataset_variable_by_id),
-    re_path(r'^dataset-variable-by-version/(?P<version_id>.+)$', dataset_variable_by_version,
-            name='Dataset_variable_by_version'),
-    path('published-results', published_results, name='Published results'),
+    re_path(r'^dataset-variable-by-version/(?P<version_id>.+)$', dataset_variable_by_version, name='Dataset_variable_by_version'),
+    path('data-filter', data_filter, name='Dataset filters'),
+    re_path(r'^data-filter/(?P<version_id>.+)$', data_filter_by_datasetversion),
+    path('param-filter', data_parameterised_filter, name='Parameterised filter'),
+    path('ismn-network', get_ismn_networks, name='Get ISMN networks'),
+    path('get-ismn-list-file', get_ismn_list_file, name='Get ISMN csv file'),
+
+    # ---------------------------------------------------------------------------
+    # 3. Validation runs: start, stop, status, configuration 
+    # ---------------------------------------------------------------------------
+    path('start-validation', start_validation, name='Run new validation'),
+    path('stop-validation/<uuid:result_uuid>', stop_validation, name='Stop validation'),
+    path('scaling-methods', get_scaling_methods, name='Scaling methods'),
     path('validation-runs-status/<uuid:validation_id>', validation_run_status, name='Validation run status'),
     path('validation-runs-timing/<uuid:validation_id>', validation_run_timing, name='Validation run timing'),
     re_path(r'^validation-runs/(?P<id>.+)$', validation_run_by_id, name='Validation run by id'),
     re_path(r'^is-validation-finished/(?P<id>.+)$', is_validation_finished, name='Is validation finished'),
-    path('dataset-configuration', dataset_configuration, name='Configuration'),
-    re_path(r'^dataset-configuration/(?P<validation_id>.+)$', dataset_configuration_by_validation,
-            name='Configuration'),
-    path('data-filter', data_filter, name='Dataset filters'),
-    re_path(r'^data-filter/(?P<version_id>.+)$', data_filter_by_datasetversion),
-    path('globals', global_params, name='Global context'),
-    path('my-results', my_results, name='My results'),
     re_path(r'^validation-configuration/(?P<id>.+)$', get_validation_configuration, name='Validation configuration'),
-    path('start-validation', start_validation, name='Run new validation'),
-    path('start-validation-with-token', start_validation_with_token, name='Run token validation'),
-    path('param-filter', data_parameterised_filter, name='Parameterised filter'),
-    path('stop-validation/<uuid:result_uuid>', stop_validation, name='Stop validation'),
+    path('dataset-configuration', dataset_configuration, name='Configuration'),
+    re_path(r'^dataset-configuration/(?P<validation_id>.+)$', dataset_configuration_by_validation, name='Configuration'),
     path('custom-tracked-run', custom_tracked_validation_runs, name='Copied custom run'),
+    path('copy-validation', copy_validation_results, name='Copy validation results'),
+    re_path(r'^copied-validation-record/(?P<id>.+)$', get_copied_validations, name='Copied run record'),
+
+    # ---------------------------------------------------------------------------
+    # 4. Managing own results: rename, archive, publish, delete, track
+    # ---------------------------------------------------------------------------
+    path('change-validation-name/<uuid:result_uuid>/', change_name, name='Change name'),
+    path('archive-result/<uuid:result_uuid>/', archive_result, name='Archive results'),
+    path('archive-multiple-validations', archive_multiple_results, name='Archive Multiple Results'),
+    path('extend-result/<uuid:result_uuid>/', extend_result, name='Extend results'),
+    path('publishing-form', get_publishing_form, name='Get publishing form'),
+    path('publish-result/<uuid:result_uuid>/', publish_result, name='Publish result'),
+    path('delete-validation/<uuid:result_uuid>/', delete_result, name='Delete validation'),
+    path('delete-multiple-validations', delete_multiple_result, name='Delete Multiple Validations'),    
+    path('add-validation/<uuid:result_uuid>/', add_validation, name='Add validation'),
+    path('remove-validation/<uuid:result_uuid>/', remove_validation, name='Remove validation'),
+
+    # ---------------------------------------------------------------------------
+    # 5. Result files, plots, statistics
+    # ---------------------------------------------------------------------------
+    path('my-results', my_results, name='My results'),
+    path('published-results', published_results, name='Published results'),
+    path('download-result', get_results, name='Download results'),
+    path('get-metric-and-plots-names', get_metric_names_and_associated_files, name='Get metric and plots names'),
+    path('download-result-spatial', get_results_spatial, name='Download spatial results'),
+    path('get-metric-and-plots-names-spatial', get_metric_names_and_associated_files_spatial, name='Get spatial metric and plots names'),
+    path('get-graphic-files', get_graphic_files, name='Get graphic files'),
+    path('get-graphic-file', get_graphic_file, name='Get graphic file'),
+    path('summary-statistics', get_summary_statistics, name='Summary statistics'),
+    path('summary-statistics-spatial', get_summary_statistics_spatial, name='Summary statistics spatial'),
+    path('download-statistics-csv', get_csv_with_statistics, name='Download statistics csv'),
+   
+    # ---------------------------------------------------------------------------
+    # 6. Comparison of validations
+    # ---------------------------------------------------------------------------
+    path('validation-runs-for-comparison', get_validations_for_comparison, name='Get validations for comparison'),   
     path('table-comparison', get_comparison_table, name='Comparison table'),
     path('plots-comparison', get_comparison_plots_for_metric, name='Comparison plots'),
     path('image-comparison', get_spatial_extent, name='Extent image'),
     path('metrics-for-comparison', get_comparison_metrics, name='Comparison metrics'),
     path('download-comparison-table', download_comparison_table, name='Download comparison csv'),
-    path('delete-validation/<uuid:result_uuid>/', delete_result, name='Delete validation'),
-    path('change-validation-name/<uuid:result_uuid>/', change_name, name='Change name'),
-    path('archive-result/<uuid:result_uuid>/', archive_result, name='Archive results'),
-    path('extend-result/<uuid:result_uuid>/', extend_result, name='Extend results'),
-    path('publish-result/<uuid:result_uuid>/', publish_result, name='Publish result'),
-    path('add-validation/<uuid:result_uuid>/', add_validation, name='Add validation'),
-    path('remove-validation/<uuid:result_uuid>/', remove_validation, name='Remove validation'),
-    path('custom-tracked-run', custom_tracked_validation_runs, name='Tracked custom run'),
-    path('download-result', get_results, name='Download results'),
-    path('summary-statistics', get_summary_statistics, name='Summary statistics'),
-    path('summary-statistics-spatial', get_summary_statistics_spatial, name='Summary statistics spatial'),
-    path('download-statistics-csv', get_csv_with_statistics, name='Download statistics csv'),
-    path('uptime-ping', uptime_ping),
-    path('uptime-report', get_uptime),
-    path('get-graphic-files', get_graphic_files, name='Get graphic files'),
-    path('get-metric-and-plots-names', get_metric_names_and_associated_files, name='Get metric and plots names'),
-    path('validation-runs-for-comparison', get_validations_for_comparison, name='Get validations for comparison'),
-    path('country-list', get_list_of_countries, name='List of countries'),
-    path('sign-up', signup_post, name='Sign up'),
-    path('user-update', user_update, name='User update'),
-    path('user-delete', user_delete, name='User delete'),
-    path('settings', backend_settings, name="Settings"),
-    path('get-graphic-file', get_graphic_file, name='Get graphic file'),
-    path('publishing-form', get_publishing_form, name='Get publishing form'),
-    path('copy-validation', copy_validation_results, name='Copy validation results'),
-    re_path(r'^copied-validation-record/(?P<id>.+)$', get_copied_validations, name='Copied run record'),
-    path('password-reset/', include('django_rest_passwordreset.urls', namespace='password-reset')),
-    path('ismn-network', get_ismn_networks, name='Get ISMN networks'),
-    path('upload-user-data/<str:filename>/', upload_user_data, name='Upload user data'),
-    path('get-list-of-user-data-files', get_list_of_user_data_files, name='Get User Data Files'),
-    path('delete-entire-dataset/<str:file_uuid>/', delete_user_dataset_and_file, name='Delete User Data File'),
-    path('get-user-file-by-id/<uuid:file_uuid>/', get_user_data_file_by_id,
-         name='Get user file by ID'),
-    path('update-metadata/<uuid:file_uuid>/', update_metadata, name='Update metadata'),
-    path('scaling-methods', get_scaling_methods, name='Scaling methods'),
-    path('support-request', send_support_request, name='Support request'),
-    re_path(r'^dataset-version-geojson/(?P<version_id>.+)/$', dataset_version_geojson_by_id),
-    path('data-management-groups', get_data_management_groups, name='Get data management groups'),
-    path('manage-data-in-management-group', manage_data_in_group,
-         name='Add data to management groups'),
-    path('delete-only-datafile/<str:file_uuid>/', delete_dataset_file_only, name='Delete User Data File Only'),
-    path('delete-multiple-validations', delete_multiple_result, name='Delete Multiple Validations'),
-    path('user-manual', get_user_manual, name='Get user manual'),
-    path('get-ismn-list-file', get_ismn_list_file, name='Get ISMN csv file'),
-    path('archive-multiple-validations', archive_multiple_results, name='Archive Multiple Results'),
-    #path('api-obtain-token/', views.obtain_auth_token, name='Obtain token'),
-    path('request-api-token', request_api_token, name='request-api-token'),
-    path('get-api-token', get_api_token, name='get-api-token'),
-    path('update-dataset-version', update_dataset_version, name='Update Dataset Version'),
-    path('run-auto-cleanup', run_auto_cleanup_script, name='Run Auto Cleanup'),
-    path('password-update', password_update, name='Password Update'),
-    path('update-fixture-in-git', update_fixture_in_github, name='Update-Fixture'),
-    path('verify-email/<int:user_id>/<str:token>/', verify_email, name='verify_email'),
-    path('download-result-file-with-token/<uuid:validation_id>/<str:file_type>', download_result_file_with_token, name='Download result file with token'),
-    path('my-validation-runs-with-token', list_my_validation_runs_with_token, name='My validation runs with token'),
-    path('download-result-spatial', get_results_spatial, name='Download spatial results'),
-    path('get-metric-and-plots-names-spatial', get_metric_names_and_associated_files_spatial, name='Get spatial metric and plots names'),
+    
+    # ---------------------------------------------------------------------------
+    # 7. Interactive map (tiles, points, layer metadata)
+    # ---------------------------------------------------------------------------
     path('<uuid:validation_id>/tiles/<str:metric_name>/<str:layer_name>/<int:projection>/<int:z>/<int:x>/<int:y>.png', get_tile, name='get-tile'),
     path('<uuid:validation_id>/point/<str:metric_name>/<str:layer_name>', get_data_point, name='get-point-value'),
     path('<uuid:validation_id>/metadata/', get_validation_layer_metadata, name='validation_metadata'),
     path('<uuid:validation_id>/range/<str:metric_name>/<str:layer_name>/', get_layer_range, name='layer_range'),
     path('<uuid:validation_id>/bounds/', get_layer_bounds, name='layer_bounds'),
     path('<uuid:validation_id>/check-zarr/', check_zarr_exists, name='check-zarr'),
+
+    # ---------------------------------------------------------------------------
+    # 8. User data upload & management 
+    # ---------------------------------------------------------------------------
+    path('upload-user-data/<str:filename>/', upload_user_data, name='Upload user data'),
+    path('get-list-of-user-data-files', get_list_of_user_data_files, name='Get User Data Files'),
+    path('get-user-file-by-id/<uuid:file_uuid>/', get_user_data_file_by_id, name='Get user file by ID'),
+    path('update-metadata/<uuid:file_uuid>/', update_metadata, name='Update metadata'),
+    path('delete-entire-dataset/<str:file_uuid>/', delete_user_dataset_and_file, name='Delete User Data File'),
+    path('delete-only-datafile/<str:file_uuid>/', delete_dataset_file_only, name='Delete User Data File Only'),
+
+    path('data-management-groups', get_data_management_groups, name='Get data management groups'),
+    path('manage-data-in-management-group', manage_data_in_group, name='Add data to management groups'),        
+
+    # ---------------------------------------------------------------------------
+    # 9. Token API (scripts, notebooks, curl): header "Authorization: Token <key>"
+    # ---------------------------------------------------------------------------
+    path('start-validation-with-token', start_validation_with_token, name='Run token validation'),
+    path('my-validation-runs-with-token', list_my_validation_runs_with_token, name='My validation runs with token'),
+    path('download-result-file-with-token/<uuid:validation_id>/<str:file_type>', download_result_file_with_token, name='Download result file with token'),
+    path('upload-user-data-with-token/<str:filename>', upload_user_data_with_token, name='Upload user data with token'),          
+    
+    # ---------------------------------------------------------------------------
+    # 10. Automatic reports
+    # ---------------------------------------------------------------------------
     path('autoreports', get_report_series_list, name='autoreports-series'),
     path('autoreports/<str:report_series>', get_reports, name='autoreports-list'),
     path('autoreports/<str:report_series>/latest', get_latest_report, name='autoreport-latest'),
     path('autoreports/<str:report_series>/<str:filename>', get_report_file, name='autoreports-file'),
 
+    # ---------------------------------------------------------------------------
+    # 11. Info, support, health checks
+    # ---------------------------------------------------------------------------
+    path('settings', backend_settings, name="Settings"),
+    path('globals', global_params, name='Global context'),
+    path('country-list', get_list_of_countries, name='List of countries'),
+    path('user-manual', get_user_manual, name='Get user manual'),
+    path('uptime-ping', uptime_ping),
+    path('uptime-report', get_uptime),
+    path('support-request', send_support_request, name='Support request'),
+
+    # ---------------------------------------------------------------------------
+    # 12. Maintenance / admin
+    # ---------------------------------------------------------------------------
+    path('run-auto-cleanup', run_auto_cleanup_script, name='Run Auto Cleanup'),
+    path('update-fixture-in-git', update_fixture_in_github, name='Update-Fixture'),
+    
+    #path('api-obtain-token/', views.obtain_auth_token, name='Obtain token'),
 ]
