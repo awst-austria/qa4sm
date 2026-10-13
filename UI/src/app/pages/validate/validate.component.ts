@@ -61,6 +61,8 @@ import { CustomHttpError } from '../../modules/core/services/global/http-error.s
 
 
 const MAX_DATASETS_FOR_VALIDATION = 6;  // TODO: this should come from either config file or the database
+const ISMN_FRM_FILTER_NAME = 'FIL_ISMN_FRM_representative';
+const FRM_DEPTH_WARNING = 'FRMs not available below 10 cm depth.';
 
 //NOTE the maximum number of datasets is already defined in the backend, maybe it could be used here?
 // from validator.validation.globals import MAX_NUM_DS_PER_VAL_RUN;
@@ -417,6 +419,29 @@ export class ValidateComponent implements OnInit, AfterViewInit {
       }
     });
     return itDoes;
+  }
+
+  /**
+   * FRM classes are only assigned down to 10 cm, so restricting a dataset to
+   * representative sensors and merging its stations across depths exclude each
+   * other. While one is on, the other shows the same warning; the child
+   * disables its checkbox only while that checkbox is off, so a saved
+   * validation that has both on can still be untangled from either side.
+   */
+  basicFilterBlockedReason(config: DatasetConfigModel, filter: FilterModel): string | null {
+    if (filter.filterDto.name === ISMN_FRM_FILTER_NAME && config.ismnTolerancesFilter$.value?.enabled) {
+      return FRM_DEPTH_WARNING;
+    }
+    return null;
+  }
+
+  /** the other half of the rule above */
+  mergeStationsBlockedReason(config: DatasetConfigModel): string | null {
+    const frmFilter = config.basicFilters.find(filter => filter.filterDto.name === ISMN_FRM_FILTER_NAME);
+    if (frmFilter?.enabled) {
+      return FRM_DEPTH_WARNING;
+    }
+    return null;
   }
 
   addDatasetToValidate(defaultDatasetName = 'C3S_combined', defaultVersionName = undefined, userData = true,
@@ -811,7 +836,7 @@ export class ValidateComponent implements OnInit, AfterViewInit {
 
 
             config.basicFilters.forEach(filter => {
-              if (filter.filterDto.name === 'FIL_ISMN_FRM_representative' && filter.enabled) {
+              if (filter.filterDto.name === ISMN_FRM_FILTER_NAME && filter.enabled) {
                 filteredGeoJson = this.ismnFrmFilter(filteredGeoJson)
               }
             })

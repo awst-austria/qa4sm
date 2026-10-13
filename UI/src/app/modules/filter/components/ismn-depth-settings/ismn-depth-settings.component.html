@@ -68,9 +68,10 @@
         <p-checkbox [binary]="true"
                     inputId="ismn_merge_stations"
                     [ngModel]="isMergeEnabled()"
+                    [disabled]="isMergeBlocked()"
                     (ngModelChange)="toggleMergeStations($event)">
         </p-checkbox>
-        <label for="ismn_merge_stations" class="cursor-pointer">Merge stations across depths</label>
+        <label for="ismn_merge_stations" [class.cursor-pointer]="!isMergeBlocked()">Merge stations across depths</label>
         <span class="pi pi-question-circle help-field"
               pTooltip="Each tolerance forms a band around its own depth boundary.
                         A station qualifies only if it has a sensor in the top
@@ -80,6 +81,11 @@
                         sensors have data."
               tooltipPosition="bottom">
         </span>
+      </div>
+
+      <div *ngIf="mergeBlockedReason" class="depth-warning mt-2">
+        <span class="pi pi-exclamation-triangle mr-1"></span>
+        {{ mergeBlockedReason }}
       </div>
 
       <!-- A row of its own rather than trailing the toggle, so the two

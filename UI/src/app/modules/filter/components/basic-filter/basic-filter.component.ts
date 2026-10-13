@@ -11,6 +11,10 @@ export class BasicFilterComponent  {
 
   @Input() filterModel: FilterModel;
   @Input() isIncluded: boolean;
+  // set while another setting rules this filter out; it is shown as a warning
+  // and keeps the filter from being switched on, though never from being
+  // switched off
+  @Input() blockedReason: string | null = null;
   @Output() includeMutual = new EventEmitter<string>();
   @Output() mutuallyIncluded = new EventEmitter<string>();
   @Output() excludeMutual = new EventEmitter<string>();
@@ -35,6 +39,10 @@ export class BasicFilterComponent  {
     if (to_exclude !== null && this.filterModel.enabled) {
       this.excludeMutual.emit(to_exclude);
     }
+  }
+
+  isBlocked(): boolean {
+    return !!this.blockedReason && !this.filterModel.enabled;
   }
 
   checkIfUpdateMap(filter): void{

@@ -1,0 +1,8 @@
+@use 'src/style.variables' as *;
+
+// same look as the depth warnings in qa-ismn-depth-settings
+.filter-warning {
+  color: $warning-text;
+  font-size: 0.82rem;
+  line-height: 1.4;
+}

@@ -25,6 +25,10 @@ export class IsmnDepthSettingsComponent implements OnInit, OnDestroy {
   @Input() depthFilterModel$: BehaviorSubject<FilterModel>;
   @Input() tolerancesFilterModel$: BehaviorSubject<FilterModel>;
   @Input() datasetModel: DatasetComponentSelectionModel;
+  // set while another setting rules merging out (the validate page decides
+  // which); shown as a warning, and keeps merging from being switched on,
+  // though never from being switched off
+  @Input() mergeBlockedReason: string | null = null;
 
   @Output() depthSelectionChanged = new EventEmitter<string>();
   @Output() tolerancesSelectionChanged = new EventEmitter<string>();
@@ -141,6 +145,10 @@ export class IsmnDepthSettingsComponent implements OnInit, OnDestroy {
    */
   isMergeEnabled(): boolean {
     return this.tolerancesFilterModel$?.value?.enabled ?? false;
+  }
+
+  isMergeBlocked(): boolean {
+    return !!this.mergeBlockedReason && !this.isMergeEnabled();
   }
 
   /**

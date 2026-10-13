@@ -1,7 +1,7 @@
 <div class="grid no-gutters">
   <div class="col-11 flex flex-row">
     <p-checkbox [inputId]="filterModel.filterDto.id.toString()" [(ngModel)]="filterModel.enabled"
-                [disabled]="filterModel.readonly"
+                [disabled]="filterModel.readonly || isBlocked()"
                 [readonly]=filterModel.filterDto.readonly
                 [binary]="true"
                 (onChange)="includeFilters($event); excludeFilters($event); checkIfUpdateMap(filterModel.filterDto.name)"
@@ -13,5 +13,9 @@
   </div>
   <div [ngClass]="{'col-1': true, 'adjust-margin': isIncluded}">
     <span class="pi pi-question-circle" [pTooltip]="filterModel.filterDto.help_text"></span>
+  </div>
+  <div *ngIf="blockedReason" class="col-12 pt-0 filter-warning">
+    <span class="pi pi-exclamation-triangle mr-1"></span>
+    {{ blockedReason }}
   </div>
 </div>

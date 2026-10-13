@@ -112,6 +112,7 @@
                             [ngClass]="{'ml-1-icon': isIncluded(filter.filterDto.id, item.basicFilters)}"
                             [isIncluded]="isIncluded(filter.filterDto.id, item.basicFilters)"
                             [filterModel]="filter"
+                            [blockedReason]="basicFilterBlockedReason(item, filter)"
                             (excludeMutual)="includeFilter($event, item.basicFilters, false)"
                             (includeMutual)="includeFilter($event, item.basicFilters, filter.enabled)"
                             (updateMap)="onBasicFilterMapUpdate($event)"
@@ -171,7 +172,8 @@
                           (tolerancesSelectionChanged)="onIsmnTolerancesSelectionChange($event)"
                           [datasetModel]="validationModel.datasetConfigurations[datasetIdx].datasetModel"
                           [depthFilterModel$]="validationModel.datasetConfigurations[datasetIdx].ismnDepthFilter$"
-                          [tolerancesFilterModel$]="validationModel.datasetConfigurations[datasetIdx].ismnTolerancesFilter$"/>
+                          [tolerancesFilterModel$]="validationModel.datasetConfigurations[datasetIdx].ismnTolerancesFilter$"
+                          [mergeBlockedReason]="mergeStationsBlockedReason(validationModel.datasetConfigurations[datasetIdx])"/>
 
                         <div style="width: 100%;text-align: right">
                           <button
