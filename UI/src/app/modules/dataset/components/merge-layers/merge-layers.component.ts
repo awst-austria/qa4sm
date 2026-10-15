@@ -1,4 +1,5 @@
-import {Component, DoCheck, Input, OnInit} from '@angular/core';
+import {Component, DestroyRef, DoCheck, Input, OnInit} from '@angular/core';
+import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {Observable, BehaviorSubject, combineLatest} from 'rxjs';
 import {map} from 'rxjs/operators';
 
@@ -42,8 +43,11 @@ export class MergeLayersComponent implements OnInit, DoCheck {
   mergedRangeLabel$: Observable<string>;
   /** hides the whole panel unless this dataset has layers worth merging */
   available$: Observable<boolean>;
+  /** whether the layer list is unfolded; it starts folded behind the title */
+  expanded = false;
 
-  constructor(private datasetVariableService: DatasetVariableService) {
+  constructor(private datasetVariableService: DatasetVariableService,
+              private destroyRef: DestroyRef) {
   }
 
   ngOnInit(): void {
@@ -66,6 +70,18 @@ export class MergeLayersComponent implements OnInit, DoCheck {
     ]).pipe(
       map(([selected]) => this.describeSelection(selected))
     );
+
+    // A reloaded validation brings its ticks with it, and they arrive after
+    // init. Unfolding for them shows the merge the run will apply instead of
+    // leaving it folded away. Ticks made here can only come from an open
+    // panel, so this never fights the user.
+    this.configModel.mergedVariables$
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(selected => {
+        if (selected.length) {
+          this.expanded = true;
+        }
+      });
 
     this.loadLayers();
   }

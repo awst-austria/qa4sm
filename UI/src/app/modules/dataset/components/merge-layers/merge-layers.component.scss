@@ -4,6 +4,99 @@
   font-size: 0.9rem;
 }
 
+// a button for the disclosure, but it should still read as the plain bold
+// label it replaced rather than as a control
+.merge-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0;
+  border: none;
+  background: none;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+
+  &:hover .merge-chevron {
+    color: $base-color;
+  }
+
+  &:focus-visible {
+    outline: 2px solid $base-color;
+    outline-offset: 2px;
+    border-radius: 2px;
+  }
+}
+
+// one right-pointing chevron turned a quarter, rather than swapping icons,
+// so opening and closing animate
+.merge-chevron {
+  font-size: 0.7rem;
+  color: $font-color-muted;
+  transition: transform 0.2s ease, color 0.2s ease;
+}
+
+.merge-toggle.expanded .merge-chevron {
+  transform: rotate(90deg);
+}
+
+// reminder of an active merge while the panel is collapsed
+.merge-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.1rem 0.55rem;
+  border-radius: 999px;
+  background: $base-color-transparent;
+  color: $base-dark;
+  font-size: 0.78rem;
+  font-variant-numeric: tabular-nums;
+
+  .pi {
+    font-size: 0.7rem;
+  }
+}
+
+// The grid row animates between 0fr and 1fr, which opens the panel to its
+// natural height without measuring it. Visibility follows so the collapsed
+// checkboxes drop out of the tab order, flipping to hidden only once the
+// close has finished.
+.merge-body {
+  display: grid;
+  grid-template-rows: 0fr;
+  visibility: hidden;
+  transition: grid-template-rows 0.2s ease, visibility 0s linear 0.2s;
+
+  &.expanded {
+    grid-template-rows: 1fr;
+    visibility: visible;
+    transition: grid-template-rows 0.2s ease, visibility 0s linear 0s;
+  }
+}
+
+// overflow is what hides the rows mid-animation. The side padding, cancelled
+// by the margin, keeps the checkbox focus ring from being clipped with them.
+.merge-body-inner {
+  min-height: 0;
+  overflow: hidden;
+  padding: 0 4px;
+  margin: 0 -4px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .merge-chevron,
+  .merge-body,
+  .merge-body.expanded {
+    transition: none;
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  .merge-chip {
+    color: $font-color-dark-mode;
+  }
+}
+
 .layer-weight {
   color: $font-color-muted;
   font-variant-numeric: tabular-nums;

@@ -54,6 +54,7 @@ from validator.validation.depths import merge_coefficients, merged_labels, merge
 import qa4sm_reader
 from qa4sm_reader.intra_annual_temp_windows import TemporalSubWindowsCreator, NewSubWindow, TemporalSubWindowsFactory
 from qa4sm_reader.netcdf_transcription import Pytesmo2Qa4smResultsTranscriber
+import json
 
 __logger = logging.getLogger(__name__)
 
