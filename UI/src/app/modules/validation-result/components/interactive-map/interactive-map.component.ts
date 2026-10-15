@@ -8,6 +8,7 @@ import TileLayer from 'ol/layer/Tile';
 import TileGrid from 'ol/tilegrid/TileGrid';
 import { XYZ, TileWMS } from 'ol/source';
 import { transformExtent } from 'ol/proj';
+import { clamp } from 'ol/math';
 import { FullScreen, Control } from 'ol/control';
 import { SharedPrimeNgModule } from '../../../../shared.primeNg.module';
 import { WebsiteGraphicsService } from '../../../core/services/global/website-graphics.service';
@@ -53,6 +54,7 @@ const LEGEND_SEPARATOR_GAP = 8;
 const TILE_GRID_MAX_ZOOM = 18;
 const WEB_MERCATOR_EXTENT_MAX = 20037508.342789244;
 const WEB_MERCATOR_INITIAL_RESOLUTION = 156543.03392804097;
+const WEB_MERCATOR_MAX_LAT = 85.0511287798066;
 const MAP_FIT_PADDING = 200;
 
 type Projection = 'EPSG:4326' | 'EPSG:3857';
@@ -663,6 +665,15 @@ export class InteractiveMapComponent implements AfterViewInit, OnDestroy {
           let extent = data.extent;
           const backendCRS = data.crs || 'EPSG:4326';
           const viewProj = this.Map.getView().getProjection().getCode();
+          if (backendCRS === EPSG_4326) {
+            // Global datasets reach past the poles once padded; transformExtent turns
+            // such latitudes into NaN for EPSG:3857, and fitting to NaN blanks the map.
+            const maxLat = viewProj === 'EPSG:3857' ? WEB_MERCATOR_MAX_LAT : 90;
+            extent = [
+              clamp(extent[0], -180, 180), clamp(extent[1], -maxLat, maxLat),
+              clamp(extent[2], -180, 180), clamp(extent[3], -maxLat, maxLat)
+            ];
+          }
           if (backendCRS !== viewProj) {
             extent = transformExtent(extent, backendCRS, viewProj);
           }
