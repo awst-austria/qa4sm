@@ -31,10 +31,11 @@ import { ColorbarState } from './interfaces/colorbar-state.interface';
 
 // Constants
 const EPSG_4326 = 'EPSG:4326';
+const EPSG_3857 = 'EPSG:3857';
 const DEFAULT_OPACITY = 0.7;
 const DEFAULT_ZOOM = 2;
 const MIN_ZOOM = 0;
-const MAX_ZOOM = 15;
+const MAX_ZOOM = 18;
 const DEFAULT_TILE_SIZE = 256;
 const BASE_URL_EOX = 'https://tiles.maps.eox.at/wms';
 const BASE_URL_OSM = 'https://tile.openstreetmap.org/{z}/{x}/{y}.png';
@@ -96,7 +97,7 @@ export class InteractiveMapComponent implements AfterViewInit, OnDestroy {
   statusMetadata: any = null;
   selectedMetric: MetricsPlotsDto = {} as MetricsPlotsDto;
   metrics: MetricsPlotsDto[] = [];
-  public currentProjection: Projection = 'EPSG:4326';
+  public currentProjection: Projection = EPSG_3857;
   private baseLayer4326!: TileLayer<TileWMS>;
   private baseLayer3857!: TileLayer<XYZ>;
   private shouldFitToBounds = true;
@@ -246,7 +247,7 @@ export class InteractiveMapComponent implements AfterViewInit, OnDestroy {
         attributions: '© <a href="https://eox.at" target="_blank">EOX</a> & contributors',
         crossOrigin: 'anonymous'
       }),
-      visible: true
+      visible: false
     });
 
     this.baseLayer3857 = new TileLayer({
@@ -255,7 +256,7 @@ export class InteractiveMapComponent implements AfterViewInit, OnDestroy {
         attributions: '© <a href="https://openstreetmap.org" target="_blank">OSM</a>',
         crossOrigin: 'anonymous'
       }),
-      visible: false
+      visible: true
     });
 
     this.opacityControl = new OpacitySliderControl({
@@ -266,7 +267,7 @@ export class InteractiveMapComponent implements AfterViewInit, OnDestroy {
       target: 'imap',
       layers: [this.baseLayer4326, this.baseLayer3857],
       view: new View({
-        projection: EPSG_4326,
+        projection: EPSG_3857,
         center: [0, 0],
         zoom: DEFAULT_ZOOM,
         minZoom: MIN_ZOOM,
@@ -577,7 +578,7 @@ export class InteractiveMapComponent implements AfterViewInit, OnDestroy {
 
   private async updateTileLayer(
     layer: TiffLayer,
-    projection: Projection = 'EPSG:4326',
+    projection: Projection = EPSG_3857,
     fitToBounds = false,
     customRange?: { vmin: number; vmax: number }
   ) {
@@ -654,7 +655,7 @@ export class InteractiveMapComponent implements AfterViewInit, OnDestroy {
     }
   }
 
-  private fitToLayerBounds(validationId: string, projection: Projection = 'EPSG:4326'): void {
+  private fitToLayerBounds(validationId: string, projection: Projection = EPSG_3857): void {
     this.httpClient.get<{ extent: number[]; crs?: string }>(`/api/${validationId}/bounds/`)
       .subscribe({
         next: (data) => {
