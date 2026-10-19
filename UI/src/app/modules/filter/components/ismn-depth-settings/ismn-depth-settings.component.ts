@@ -1,9 +1,12 @@
-import {Component, EventEmitter, Input, OnDestroy, OnInit, Output} from '@angular/core';
+import {Component, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild} from '@angular/core';
+import {InputNumber} from 'primeng/inputnumber';
 import {BehaviorSubject, Subject} from 'rxjs';
 import {debounceTime, takeUntil} from 'rxjs/operators';
 
 import {FilterModel} from '../basic-filter/filter-model';
 import {DatasetComponentSelectionModel} from '../../../dataset/components/dataset/dataset-component-selection-model';
+
+type BandEdge = 'top' | 'bottom';
 
 /**
  * The ISMN measurement depth and, optionally, the sensor merging tolerances.
@@ -37,6 +40,17 @@ export class IsmnDepthSettingsComponent implements OnInit, OnDestroy {
   depthTo = 0.1;
   topTolerance = 0.1;
   bottomTolerance = 0.1;
+
+  // why the tolerances are not what the user last asked for: an edit held at
+  // the limit because the bands would have overlapped, or both tolerances cut
+  // down to fit a narrower depth range. Cleared by the next edit that goes
+  // through unchanged.
+  toleranceNotice: string | null = null;
+
+  // the widgets themselves, so a value held at the limit can be put back on
+  // screen (see showInInput)
+  @ViewChild('topToleranceInput') topToleranceInput: InputNumber;
+  @ViewChild('bottomToleranceInput') bottomToleranceInput: InputNumber;
 
   // the spinners fire on every step, and each committed depth reloads the
   // station map, so let the value settle before acting on it
@@ -95,11 +109,75 @@ export class IsmnDepthSettingsComponent implements OnInit, OnDestroy {
   }
 
   onDepthEdited(): void {
+    // a limit quoted from the old range no longer holds; if the new one is too
+    // narrow, committing it raises a notice of its own
+    this.toleranceNotice = null;
     this.depthEdited$.next();
   }
 
-  onTolerancesEdited(): void {
+  onTopToleranceEdited(value: number | null): void {
+    this.topTolerance = this.withinLimit('top', value, this.topToleranceInput);
     this.tolerancesEdited$.next();
+  }
+
+  onBottomToleranceEdited(value: number | null): void {
+    this.bottomTolerance = this.withinLimit('bottom', value, this.bottomToleranceInput);
+    this.tolerancesEdited$.next();
+  }
+
+  /**
+   * The two bands may meet but not overlap, so a tolerance can only grow into
+   * the room the other one leaves. An edit past that is held at the limit and
+   * explained, so a spinner held down stops at the last value that fits.
+   *
+   * This is done here rather than with the widget's own [max], which clamps
+   * without emitting anything and so leaves nothing to raise the warning on.
+   */
+  private withinLimit(edge: BandEdge, value: number | null,
+                      input: InputNumber | undefined): number | null {
+    const max = this.maxTolerance(edge);
+    if (value == null || max == null || this.toCm(value) <= this.toCm(max)) {
+      this.toleranceNotice = null;
+      return value;
+    }
+
+    const other: BandEdge = edge === 'top' ? 'bottom' : 'top';
+    const label = edge === 'top' ? 'Top' : 'Bottom';
+    this.toleranceNotice =
+      `${label} tolerance can be at most ${this.trim(max)} m here, or the ${edge} band ` +
+      `would overlap the ${other} band. Reduce the ${other} tolerance or widen the ` +
+      `depth range to make room.`;
+    this.showInInput(input, max);
+    return max;
+  }
+
+  /**
+   * The largest tolerance this edge can take without its band reaching into
+   * the other one: the depth range, less the other tolerance. Null while the
+   * range is inverted, which has a warning of its own and no room to share.
+   */
+  private maxTolerance(edge: BandEdge): number | null {
+    const range = this.rangeCm();
+    if (range < 0) {
+      return null;
+    }
+    const other = edge === 'top' ? this.bottomTolerance : this.topTolerance;
+    return Math.max(0, range - this.toCm(other)) / 100;
+  }
+
+  /**
+   * The widget has already drawn the value it was given, and the model
+   * binding will not redraw it when the bound value does not change - as it
+   * does not when a spinner is pressed while already at the limit - so put
+   * the limit on screen directly.
+   */
+  private showInInput(input: InputNumber | undefined, value: number): void {
+    if (!input?.input) {
+      return;
+    }
+    input.value = value;
+    input.input.nativeElement.value = input.formatValue(value);
+    input.input.nativeElement.setAttribute('aria-valuenow', String(value));
   }
 
   // Leaving a field commits straight away rather than waiting out the
@@ -125,6 +203,37 @@ export class IsmnDepthSettingsComponent implements OnInit, OnDestroy {
     const to = this.round(this.depthTo);
     model.parameters$.next(`${from},${to}`);
     this.depthSelectionChanged.emit(`${from};${to}`);
+    this.fitTolerancesToRange();
+  }
+
+  /**
+   * A narrower depth range can leave the two bands overlapping. Cut both
+   * tolerances down in proportion, rounding down, so they fit again and the
+   * split between them is kept.
+   *
+   * An empty or inverted range is left alone: that is mostly a field caught
+   * halfway through being retyped, and shrinking to fit it would zero the
+   * tolerances for good. The overlap and inverted-range warnings cover it
+   * if it is left that way.
+   */
+  private fitTolerancesToRange(): void {
+    if (!this.isMergeEnabled()) {
+      return;
+    }
+    const range = this.rangeCm();
+    const top = this.toCm(this.topTolerance);
+    const bottom = this.toCm(this.bottomTolerance);
+    if (range <= 0 || top + bottom <= range) {
+      return;
+    }
+    // whole centimetres throughout, so the division cannot land a hair below
+    // a whole number and be floored a step too far
+    this.topTolerance = Math.floor(top * range / (top + bottom)) / 100;
+    this.bottomTolerance = Math.floor(bottom * range / (top + bottom)) / 100;
+    this.toleranceNotice =
+      'The depth range is now too narrow for the tolerances, so both were ' +
+      'reduced to keep the bands from overlapping.';
+    this.commitTolerances();
   }
 
   private commitTolerances(): void {
@@ -162,6 +271,15 @@ export class IsmnDepthSettingsComponent implements OnInit, OnDestroy {
       return;
     }
     model.enabled = enabled;
+    if (enabled) {
+      // start from two bands that share the range evenly, each tolerance half
+      // of it rounded down to the 0.01 m the fields step in, so the bands meet
+      // in the middle at most and never overlap
+      const half = Math.floor(Math.max(0, this.rangeCm()) / 2) / 100;
+      this.topTolerance = half;
+      this.bottomTolerance = half;
+    }
+    this.toleranceNotice = null;
     this.commitTolerances();
   }
 
@@ -196,6 +314,28 @@ export class IsmnDepthSettingsComponent implements OnInit, OnDestroy {
   /** true when the range is inverted, which the backend refuses to run */
   hasInvalidRange(): boolean {
     return this.depthTo < this.depthFrom;
+  }
+
+  /**
+   * True when the bands overlap. Edits here cannot get there, but a
+   * validation saved before the bands were kept apart can come back like
+   * that - the old default was 0.1 m each on a 0-0.1 m range.
+   */
+  bandsOverlap(): boolean {
+    return this.toCm(this.topTolerance) + this.toCm(this.bottomTolerance) > this.rangeCm();
+  }
+
+  /** the depth range in whole centimetres, negative when it is inverted */
+  private rangeCm(): number {
+    return this.toCm(this.depthTo) - this.toCm(this.depthFrom);
+  }
+
+  /**
+   * Whole centimetres, which every value here is a whole number of, so the
+   * band arithmetic is exact. A cleared field (null) counts as 0.
+   */
+  private toCm(metres: number | null): number {
+    return Math.round((metres ?? 0) * 100);
   }
 
   private trim(metres: number): string {

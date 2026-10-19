@@ -166,7 +166,7 @@ class TestCreateJobsSensorMerging(TestCase):
         meta = kainaliu[0][3][0]
         assert meta['selection_failed'] is True
         assert meta['selection_reason'] == 'depth'
-        assert meta['instrument'] == 'Tolerance selection failed'
+        assert meta['instrument'] == 'Depth averaging failed'
         assert meta['frm_class'] == 'None'
         assert meta['other_ids'] == []
 

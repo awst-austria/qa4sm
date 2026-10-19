@@ -62,7 +62,7 @@ import { CustomHttpError } from '../../modules/core/services/global/http-error.s
 
 const MAX_DATASETS_FOR_VALIDATION = 6;  // TODO: this should come from either config file or the database
 const ISMN_FRM_FILTER_NAME = 'FIL_ISMN_FRM_representative';
-const FRM_DEPTH_WARNING = 'FRMs not available below 10 cm depth.';
+const FRM_DEPTH_WARNING = 'FRM-classification not available below 10 cm depth.';
 
 //NOTE the maximum number of datasets is already defined in the backend, maybe it could be used here?
 // from validator.validation.globals import MAX_NUM_DS_PER_VAL_RUN;

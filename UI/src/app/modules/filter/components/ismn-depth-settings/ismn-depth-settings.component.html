@@ -71,9 +71,12 @@
                     [disabled]="isMergeBlocked()"
                     (ngModelChange)="toggleMergeStations($event)">
         </p-checkbox>
-        <label for="ismn_merge_stations" [class.cursor-pointer]="!isMergeBlocked()">Merge stations across depths</label>
+        <label for="ismn_merge_stations" [class.cursor-pointer]="!isMergeBlocked()">Merge stations into profile average</label>
         <span class="pi pi-question-circle help-field"
               pTooltip="Each tolerance forms a band around its own depth boundary.
+                        The two bands may meet but never overlap, so together
+                        the tolerances can be at most the depth range; switching
+                        merging on gives each half of it.
                         A station qualifies only if it has a sensor in the top
                         band and another in the bottom band. Those two, and every
                         sensor between them, are averaged into a single profile
@@ -95,9 +98,12 @@
            class="flex align-items-end gap-3 mt-2 flex-wrap">
         <div class="depth-field">
           <label for="ismn_top_tolerance">Top tolerance</label>
-          <p-inputNumber inputId="ismn_top_tolerance"
-                         [(ngModel)]="topTolerance"
-                         (ngModelChange)="onTolerancesEdited()"
+          <!-- one-way in, so the handler sees the requested value and can
+               hold it at the limit before it reaches the model -->
+          <p-inputNumber #topToleranceInput
+                         inputId="ismn_top_tolerance"
+                         [ngModel]="topTolerance"
+                         (ngModelChange)="onTopToleranceEdited($event)"
                          (onBlur)="onTolerancesBlur()"
                          [minFractionDigits]="1"
                          [maxFractionDigits]="2"
@@ -110,9 +116,10 @@
 
         <div class="depth-field">
           <label for="ismn_bottom_tolerance">Bottom tolerance</label>
-          <p-inputNumber inputId="ismn_bottom_tolerance"
-                         [(ngModel)]="bottomTolerance"
-                         (ngModelChange)="onTolerancesEdited()"
+          <p-inputNumber #bottomToleranceInput
+                         inputId="ismn_bottom_tolerance"
+                         [ngModel]="bottomTolerance"
+                         (ngModelChange)="onBottomToleranceEdited($event)"
                          (onBlur)="onTolerancesBlur()"
                          [minFractionDigits]="1"
                          [maxFractionDigits]="2"
@@ -130,6 +137,20 @@
       <div *ngIf="isMergeEnabled()" class="depth-note mt-2">
         Top band <b>{{ topBandLabel() }}</b>,
         bottom band <b>{{ bottomBandLabel() }}</b>.
+      </div>
+
+      <div *ngIf="isMergeEnabled() && toleranceNotice" class="depth-warning mt-2">
+        <span class="pi pi-exclamation-triangle mr-1"></span>
+        {{ toleranceNotice }}
+      </div>
+
+      <!-- an inverted range overlaps by definition and is already warned
+           about above -->
+      <div *ngIf="isMergeEnabled() && !hasInvalidRange() && bandsOverlap()"
+           class="depth-warning mt-2">
+        <span class="pi pi-exclamation-triangle mr-1"></span>
+        The top and bottom bands overlap. Reduce a tolerance until they no
+        longer do.
       </div>
     </ng-container>
 
