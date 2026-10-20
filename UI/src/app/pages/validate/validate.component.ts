@@ -811,7 +811,10 @@ export class ValidateComponent implements OnInit, AfterViewInit {
   }
 
   onIsmnTolerancesSelectionChange(tolerances: string): void {
-    // tolerances only affect server-side sensor merging, not the displayed stations
+    // while merging is on, the tolerances widen the depth range the stations
+    // are searched in; ticking or unticking merging also lands here, which
+    // puts the widening in or takes it back out
+    this.updateMap();
   }
 
   onBasicFilterMapUpdate($event): void {
@@ -828,7 +831,7 @@ export class ValidateComponent implements OnInit, AfterViewInit {
             let filteredGeoJson: any = JSON.parse(value);
 
             if (config.ismnDepthFilter$.value != null) {
-              filteredGeoJson = this.ismnDepthFilter(config.ismnDepthFilter$.value.parameters$.value, filteredGeoJson);
+              filteredGeoJson = this.ismnDepthFilter(this.ismnSearchDepth(config), filteredGeoJson);
             }
             if (config.ismnNetworkFilter$.value != null) {
               filteredGeoJson = this.ismnNetworkFilter(config.ismnNetworkFilter$.value.parameters$.value, filteredGeoJson);
@@ -857,6 +860,26 @@ export class ValidateComponent implements OnInit, AfterViewInit {
       });
     });
 
+  }
+
+  /**
+   * The "from,to" depth range the backend searches for ISMN sensors in. While
+   * stations are merged into a profile average, it widens the chosen range by
+   * the top tolerance upwards (never above the surface) and by the bottom
+   * tolerance downwards, so the map shows the same candidate sensors.
+   */
+  private ismnSearchDepth(config: DatasetConfigModel): string {
+    const depth = config.ismnDepthFilter$.value.parameters$.value;
+    const tolerances = config.ismnTolerancesFilter$?.value;
+    if (!tolerances?.enabled) {
+      return depth;
+    }
+    const [from, to] = (depth ?? '').split(',').map(Number);
+    const [top, bottom] = (tolerances.parameters$.value ?? '').split(',').map(Number);
+    if ([from, to, top, bottom].some(isNaN)) {
+      return depth;
+    }
+    return `${Math.max(0, from - top)},${to + bottom}`;
   }
 
   private ismnDepthFilter(filter: string, geoJson: any): any {
