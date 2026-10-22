@@ -73,15 +73,10 @@
         </p-checkbox>
         <label for="ismn_merge_stations" [class.cursor-pointer]="!isMergeBlocked()">Merge stations into profile average</label>
         <span class="pi pi-question-circle help-field"
-              pTooltip="Each tolerance forms a band around its own depth boundary.
-                        The two bands may meet but never overlap, so together
-                        the tolerances can be at most the depth range; switching
-                        merging on gives each half of it.
-                        A station qualifies only if it has a sensor in the top
-                        band and another in the bottom band. Those two, and every
-                        sensor between them, are averaged into a single profile
-                        - keeping only timestamps where all of the contributing
-                        sensors have data."
+              pTooltip="The result is one time series per station. Stations need a sensor
+                        in both the top and bottom tolerance bands; these and all
+                        sensors between them are averaged into one profile, using
+                        only timestamps where every sensor has data."
               tooltipPosition="bottom">
         </span>
       </div>
