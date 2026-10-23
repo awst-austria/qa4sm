@@ -8,6 +8,7 @@ import TileLayer from 'ol/layer/Tile';
 import TileGrid from 'ol/tilegrid/TileGrid';
 import { XYZ, TileWMS } from 'ol/source';
 import { transformExtent } from 'ol/proj';
+import { clamp } from 'ol/math';
 import { FullScreen, Control } from 'ol/control';
 import { SharedPrimeNgModule } from '../../../../shared.primeNg.module';
 import { WebsiteGraphicsService } from '../../../core/services/global/website-graphics.service';
@@ -31,10 +32,11 @@ import { ColorbarState } from './interfaces/colorbar-state.interface';
 
 // Constants
 const EPSG_4326 = 'EPSG:4326';
+const EPSG_3857 = 'EPSG:3857';
 const DEFAULT_OPACITY = 0.7;
 const DEFAULT_ZOOM = 2;
 const MIN_ZOOM = 0;
-const MAX_ZOOM = 15;
+const MAX_ZOOM = 18;
 const DEFAULT_TILE_SIZE = 256;
 const BASE_URL_EOX = 'https://tiles.maps.eox.at/wms';
 const BASE_URL_OSM = 'https://tile.openstreetmap.org/{z}/{x}/{y}.png';
@@ -52,6 +54,7 @@ const LEGEND_SEPARATOR_GAP = 8;
 const TILE_GRID_MAX_ZOOM = 18;
 const WEB_MERCATOR_EXTENT_MAX = 20037508.342789244;
 const WEB_MERCATOR_INITIAL_RESOLUTION = 156543.03392804097;
+const WEB_MERCATOR_MAX_LAT = 85.0511287798066;
 const MAP_FIT_PADDING = 200;
 
 type Projection = 'EPSG:4326' | 'EPSG:3857';
@@ -96,7 +99,7 @@ export class InteractiveMapComponent implements AfterViewInit, OnDestroy {
   statusMetadata: any = null;
   selectedMetric: MetricsPlotsDto = {} as MetricsPlotsDto;
   metrics: MetricsPlotsDto[] = [];
-  public currentProjection: Projection = 'EPSG:4326';
+  public currentProjection: Projection = EPSG_3857;
   private baseLayer4326!: TileLayer<TileWMS>;
   private baseLayer3857!: TileLayer<XYZ>;
   private shouldFitToBounds = true;
@@ -246,7 +249,7 @@ export class InteractiveMapComponent implements AfterViewInit, OnDestroy {
         attributions: '© <a href="https://eox.at" target="_blank">EOX</a> & contributors',
         crossOrigin: 'anonymous'
       }),
-      visible: true
+      visible: false
     });
 
     this.baseLayer3857 = new TileLayer({
@@ -255,7 +258,7 @@ export class InteractiveMapComponent implements AfterViewInit, OnDestroy {
         attributions: '© <a href="https://openstreetmap.org" target="_blank">OSM</a>',
         crossOrigin: 'anonymous'
       }),
-      visible: false
+      visible: true
     });
 
     this.opacityControl = new OpacitySliderControl({
@@ -266,7 +269,7 @@ export class InteractiveMapComponent implements AfterViewInit, OnDestroy {
       target: 'imap',
       layers: [this.baseLayer4326, this.baseLayer3857],
       view: new View({
-        projection: EPSG_4326,
+        projection: EPSG_3857,
         center: [0, 0],
         zoom: DEFAULT_ZOOM,
         minZoom: MIN_ZOOM,
@@ -577,7 +580,7 @@ export class InteractiveMapComponent implements AfterViewInit, OnDestroy {
 
   private async updateTileLayer(
     layer: TiffLayer,
-    projection: Projection = 'EPSG:4326',
+    projection: Projection = EPSG_3857,
     fitToBounds = false,
     customRange?: { vmin: number; vmax: number }
   ) {
@@ -654,7 +657,7 @@ export class InteractiveMapComponent implements AfterViewInit, OnDestroy {
     }
   }
 
-  private fitToLayerBounds(validationId: string, projection: Projection = 'EPSG:4326'): void {
+  private fitToLayerBounds(validationId: string, projection: Projection = EPSG_3857): void {
     this.httpClient.get<{ extent: number[]; crs?: string }>(`/api/${validationId}/bounds/`)
       .subscribe({
         next: (data) => {
@@ -662,6 +665,15 @@ export class InteractiveMapComponent implements AfterViewInit, OnDestroy {
           let extent = data.extent;
           const backendCRS = data.crs || 'EPSG:4326';
           const viewProj = this.Map.getView().getProjection().getCode();
+          if (backendCRS === EPSG_4326) {
+            // Global datasets reach past the poles once padded; transformExtent turns
+            // such latitudes into NaN for EPSG:3857, and fitting to NaN blanks the map.
+            const maxLat = viewProj === 'EPSG:3857' ? WEB_MERCATOR_MAX_LAT : 90;
+            extent = [
+              clamp(extent[0], -180, 180), clamp(extent[1], -maxLat, maxLat),
+              clamp(extent[2], -180, 180), clamp(extent[3], -maxLat, maxLat)
+            ];
+          }
           if (backendCRS !== viewProj) {
             extent = transformExtent(extent, backendCRS, viewProj);
           }
@@ -1036,9 +1048,9 @@ export class InteractiveMapComponent implements AfterViewInit, OnDestroy {
       if (this.instrument) {
         let instrumentInfo = `Instrument: ${this.instrument}`;
         if (this.instrumentDepthFrom !== null && this.instrumentDepthTo !== null) {
-          instrumentInfo += ` (${this.instrumentDepthFrom.toFixed(1)}-${this.instrumentDepthTo.toFixed(1)} m)`;
+          instrumentInfo += ` (${this.instrumentDepthFrom.toFixed(2)}-${this.instrumentDepthTo.toFixed(2)} m)`;
         } else if (this.instrumentDepthFrom !== null) {
-          instrumentInfo += ` (${this.instrumentDepthFrom.toFixed(1)} m)`;
+          instrumentInfo += ` (${this.instrumentDepthFrom.toFixed(2)} m)`;
         }
         parts.push(instrumentInfo);
       }

@@ -37,6 +37,7 @@ from validator.models import CopiedValidations
 from validator.tests.auxiliary_functions import (
     generate_default_validation,
     generate_default_validation_triple_coll,
+    generate_spatial_validation_triple_coll,
     generate_ismn_upscaling_validation,
     generate_validation_smap_l3_v9,
 )
@@ -473,12 +474,286 @@ class TestValidation(TestCase):
             self.__logger.debug(f"{metric}: Plots are {len(overview_pngs)}, "
                                 f"should: {(n_datasets - 1)}")
 
+    def check_spatial_results(self,
+                      run,
+                      is_tcol_run=False,
+                      meta_plots=False): # 2026-06-09 stability metrics not yet implemented
+
+        try:
+            self._check_validation_configuration_consistency(run)
+        except Exception as exc:
+            assert False, f"'_check_validation_configuration raised and exception {exc}'"
+
+        assert run is not None
+        assert run.end_time is not None
+        assert run.end_time > run.start_time
+        assert run.total_times > 0
+        assert run.error_times >= 0
+        assert run.ok_times >= 0
+
+        assert run.output_file_spatial
+
+        outdir = os.path.dirname(run.output_file_spatial.path)
+
+        n_datasets = run.dataset_configurations.count()
+
+        tcol_metrics = self.tcol_metrics if is_tcol_run else []
+        non_metrics = ['gpi', 'lon', 'lat', 'tsw']
+        comm_metrics = ['n_obs', 'status']
+        pair_metrics = [
+            m for m in list(METRICS.keys()) if m.lower() not in comm_metrics
+        ]
+
+        # check netcdf output
+        length = -1
+        num_vars = -1
+        with ncDataset(run.output_file_spatial.path, mode='r') as ds:  #$$
+            assert ds.qa4sm_version == settings.APP_VERSION
+            assert ds.qa4sm_env_url == settings.ENV_FILE_URL_TEMPLATE.format(
+                settings.APP_VERSION)
+            assert str(run.id) in ds.url
+            assert settings.SITE_URL in ds.url
+
+            # check the metrics contained in the file
+            for metric in self.metrics + tcol_metrics:  # we dont test lon, lat, time etc.
+                ## This gets all variables in the netcdf file that start with the name of the current metric
+                if metric in non_metrics:
+                    continue
+                if metric in tcol_metrics:
+                    metric_vars = ds.get_variables_by_attributes(
+                        name=lambda v: regex_search(
+                            r'^{}(.+?_between|$)'.format(metric), v, IGNORECASE
+                        ) is not None)
+
+                    # since metric vars for the reference dataset are written to the file, we have to filter them out
+                    # essentially filters such metric vars out: {METRIC}_{DATASET_A}_between_{DATASET_A}_and_{WHATEVER}
+                    #TODO: this is a bit of a hack, we should find a better way to do handle these specific cases
+
+                    self_combination_pattern = r'^(.*?_)([^_]+)(_between_\2_and_.*)$'
+                    metric_vars = [
+                        tcmetric_var
+                        for tcmetric_var in metric_vars if not regex_match(
+                            self_combination_pattern, tcmetric_var.name)
+                    ]
+
+                else:
+                    metric_vars = ds.get_variables_by_attributes(
+                        name=lambda v: regex_search(
+                            r'^{}(_between|$)'.format(metric), v, IGNORECASE
+                        ) is not None)
+
+                self.__logger.debug(
+                    f'Metric variables for metric {metric} are {[m.name for m in metric_vars]}'
+                )
+
+                # check that all metrics have the same number of variables (depends on number of input datasets)
+                if metric == 'status':
+                    # for status we generate 1 plot for non-spatial-reference dataset and one for each tcol combination
+                    num_vars = (n_datasets -
+                                1) + is_tcol_run * comb(n_datasets - 1, 2)
+                elif (metric in comm_metrics) or (metric in non_metrics):
+                    num_vars = 1
+                elif metric in pair_metrics or metric:
+                    num_vars = n_datasets - 1
+                elif metric in tcol_metrics:
+                    # for this testcase CIs via bootstrapping are activated, so
+                    # for every metric there's the value and lower and upper CI
+                    # values.
+                    num_vars = (n_datasets - 1) * 3
+                else:
+                    raise ValueError(f"Unknown metric {metric}")
+
+                assert len(metric_vars
+                           ) > 0, 'No variables containing metric {}'.format(
+                               metric)
+                assert len(
+                    metric_vars
+                ) == num_vars, 'Number of variables for metric {} doesn\'t match number for other metrics'.format(
+                    metric)
+
+                # check the values of the variables for formal criteria (not empty, matches lenght of other variables, doesn't have too many NaNs)
+                for m_var in metric_vars:
+                    self.__logger.debug(f"\nChecking variable {m_var.name}")
+                    values = m_var[:]
+                    assert values is not None
+
+                    if length == -1:
+                        length = len(values)
+                        assert length > 0, 'Variable {} has no entries'.format(
+                            m_var.name)
+                    else:
+                        assert len(
+                            values
+                        ) == length, 'Variable {} doesn\'t match other variables in length'.format(
+                            m_var.name)
+                    self.__logger.debug(f'Length {m_var.name} are {length}')
+
+                    # NaNs should only occur if the validation failed somehow
+                    nan_ratio = np.sum(np.isnan(values.data)) / float(len(values))
+                    error_ratio = run.error_times / run.total_times
+                    if metric is not "err_std": # With low sample sizes err_std gets way more nans due to negative err_var
+                        assert nan_ratio <= error_ratio, 'Variable {} has too many NaNs. Ratio: {}'.format(
+                            metric, nan_ratio)
+
+            if run.interval_from is None:
+                assert ds.val_interval_from == "N/A", 'Wrong validation config attribute. [interval_from]'
+            else:
+                assert ds.val_interval_from == run.interval_from.strftime(
+                    '%Y-%m-%d %H:%M'
+                ), 'Wrong validation config attribute. [interval_from]'
+
+            if run.interval_to is None:
+                assert ds.val_interval_to == "N/A", 'Wrong validation config attribute. [interval_to]'
+            else:
+                assert ds.val_interval_to == run.interval_to.strftime(
+                    '%Y-%m-%d %H:%M'
+                ), 'Wrong validation config attribute. [interval_to]'
+
+            assert run.anomalies == ds.val_anomalies, 'Wrong validation config attribute. [anomalies]'
+            if run.anomalies == ValidationRun.CLIMATOLOGY:
+                assert ds.val_anomalies_from == run.anomalies_from.strftime(
+                    '%Y-%m-%d %H:%M'), 'Anomalies baseline start wrong'
+                assert ds.val_anomalies_to == run.anomalies_to.strftime(
+                    '%Y-%m-%d %H:%M'), 'Anomalies baseline end wrong'
+            else:
+                assert 'val_anomalies_from' not in ds.ncattrs(
+                ), 'Anomalies baseline period start should not be set'
+                assert 'val_anomalies_to' not in ds.ncattrs(
+                ), 'Anomalies baseline period end should not be set'
+
+            if all(x is not None for x in
+                   [run.min_lat, run.min_lon, run.max_lat, run.max_lon]):
+                assert ds.val_spatial_subset == "[{}, {}, {}, {}]".format(
+                    run.min_lat, run.min_lon, run.max_lat, run.max_lon)
+
+            i = 0
+            for dataset_config in run.dataset_configurations.all():
+
+                if (run.spatial_reference_configuration
+                        and (dataset_config.id
+                             == run.spatial_reference_configuration.id)):
+                    d_index = 0
+                else:
+                    i += 1
+                    d_index = i
+
+                ds_name = 'val_dc_dataset' + str(d_index)
+                stored_dataset = ds.getncattr(ds_name)
+                stored_version = ds.getncattr('val_dc_version' + str(d_index))
+                stored_variable = ds.getncattr('val_dc_variable' +
+                                               str(d_index))
+                stored_filters = ds.getncattr('val_dc_filters' + str(d_index))
+
+                stored_dataset_pretty = ds.getncattr(
+                    'val_dc_dataset_pretty_name' + str(d_index))
+                stored_version_pretty = ds.getncattr(
+                    'val_dc_version_pretty_name' + str(d_index))
+                stored_variable_pretty = ds.getncattr(
+                    'val_dc_variable_pretty_name' + str(d_index))
+
+                # check dataset, version, variable
+                assert stored_dataset == dataset_config.dataset.short_name, 'Wrong dataset config attribute. [dataset]'
+                assert stored_version == dataset_config.version.short_name, 'Wrong dataset config attribute. [version]'
+                assert stored_variable == dataset_config.variable.pretty_name, 'Wrong dataset config attribute. [variable]'
+
+                assert stored_dataset_pretty == dataset_config.dataset.pretty_name, 'Wrong dataset config attribute. [dataset pretty name]'
+                assert stored_version_pretty == dataset_config.version.pretty_name, 'Wrong dataset config attribute. [version pretty name]'
+                assert stored_variable_pretty == dataset_config.variable.short_name, 'Wrong dataset config attribute. [variable pretty name]'
+
+                # check filters
+                if not dataset_config.filters.all(
+                ) and not dataset_config.parametrisedfilter_set.all():
+                    assert stored_filters == 'N/A', 'Wrong dataset config filters (should be none)'
+                else:
+                    assert stored_filters, 'Wrong dataset config filters (shouldn\'t be empty)'
+                    for fil in dataset_config.filters.all():
+                        assert fil.description in stored_filters, 'Wrong dataset config filters'
+                    for pfil in dataset_config.parametrisedfilter_set.all():
+                        assert pfil.filter.description in stored_filters, 'Wrong dataset config parametrised filters'
+                        assert pfil.parameters in stored_filters, 'Wrong dataset config parametrised filters: no parameters'
+
+                # check reference
+                if dataset_config.id == run.spatial_reference_configuration.id:
+                    assert ds.val_ref == ds_name, 'Wrong validation config attribute. [spatial_reference_configuration]'
+
+                    if run.spatial_reference_configuration.dataset.short_name != "ISMN":
+                        assert ds.val_resolution == run.spatial_reference_configuration.dataset.resolution[
+                            "value"]
+                        assert ds.val_resolution_unit == run.spatial_reference_configuration.dataset.resolution[
+                            "unit"]
+
+                if run.scaling_ref and dataset_config.id == run.scaling_ref.id:
+                    assert ds.val_scaling_ref == ds_name, 'Wrong validation config attribute. [scaling_ref]'
+
+            assert ds.val_scaling_method == run.scaling_method, ' Wrong validation config attribute. [scaling_method]'
+
+        # check zipfile of graphics
+        zipfile = os.path.join(outdir, 'spatial_graphs.zip')
+        assert os.path.isfile(zipfile)
+        with ZipFile(zipfile, 'r') as myzip:
+            assert myzip.testzip() is None
+
+        # check diagrams
+        for metric in pair_metrics + comm_metrics + tcol_metrics:
+            """
+            For each pairwise metric: - 1 boxplot
+                                      - 1 timeseries plot
+            For each tcol metric: - n-1 timeseries plot
+                                  - n-1 boxplots
+            For status: - 1 status timeseries plot
+            """
+            if metric in ['status']:#
+                n_metric_plots = 1
+                continue
+
+            if metric in tcol_metrics:
+                n_metric_plots = (n_datasets - 1)
+            elif metric in pair_metrics + comm_metrics:
+                n_metric_plots = 1
+            else:
+                raise ValueError(f'Unknown metric: {metric}')
+
+            n_metadata_plots = 0 # 2026-06-12 For now no metadata plots for spatial validation, if this changes in the future have to change logic
+
+            patterns = [f'{DEFAULT_TSW}_boxplot_spatial_{metric}.png', f'{DEFAULT_TSW}_boxplot_spatial_{metric}_for_*.png']
+
+            self.__logger.debug(f"{patterns=}")
+
+            boxplot_pngs = [
+                x for x in os.listdir(os.path.join(outdir, DEFAULT_TSW, "spatial"))
+                if any([fnmatch.fnmatch(x, p) for p in patterns])
+            ]  #$$ testing the bulk case
+
+            self.__logger.debug(f"{boxplot_pngs=}")
+            self.__logger.debug(
+                f"{metric}: Plots are {len(boxplot_pngs)}, "
+                f"should: {n_metadata_plots} + {n_metric_plots}"
+                f"{out_metadata_plots}")
+
+            assert len(boxplot_pngs) == n_metadata_plots + n_metric_plots
+
+            if metric in tcol_metrics:
+                time_pngs = [
+                    x for x in os.listdir(os.path.join(outdir, DEFAULT_TSW, "spatial"))
+                    if fnmatch.fnmatch(x, f'{DEFAULT_TSW}_tsplot_{metric}_for_*.png')
+                ]
+            else:
+                time_pngs = [
+                    x for x in os.listdir(os.path.join(outdir, DEFAULT_TSW, "spatial"))
+                    if fnmatch.fnmatch(x, f'{DEFAULT_TSW}_tsplot_{metric}.png')
+                ]
+
+            self.__logger.debug(f"{time_pngs=}")
+            self.__logger.debug(f"{metric}: Plots are {len(time_pngs)}, "
+                                f"should: {(1)}")
+            
+            assert len(time_pngs) == n_metric_plots
 
     # delete output of test validations, clean up after ourselves
-    def delete_run(self, run):
+    def delete_run(self, run, val_type="temporal"):
         # let's see if the output file gets cleaned up when the model is deleted
 
-        ncfile = run.output_file.path
+        ncfile = run.output_file_spatial.path if val_type=="spatial" else run.output_file.path
         outdir = os.path.dirname(ncfile)
         assert os.path.isfile(ncfile)
         run.delete()
@@ -672,7 +947,7 @@ class TestValidation(TestCase):
         "ignore:No results for gpi:UserWarning",
         "ignore:read_ts is deprecated, please use read instead:DeprecationWarning",
         "ignore: Too few points are available to generate:UserWarning")
-    def test_validation_empty_network(self):
+    def test_validation_empty_network(self, val_type="temporal"):
         run = generate_default_validation()
         run.plots_save_metadata = 'never'
         run.user = self.testuser
@@ -706,7 +981,10 @@ class TestValidation(TestCase):
         run_id = run.id
 
         ## run the validation
-        val.run_validation(run_id)
+        if val_type=="temporal":
+            val.run_validation(run_id)
+        elif val_type=="spatial":
+            val.run_validation(run_id, val_type=val_type, min_obs=3)
 
         new_run = ValidationRun.objects.get(pk=run_id)
 
@@ -2817,3 +3095,143 @@ class TestValidation(TestCase):
         user_to_remove.delete()
         copied_runs = CopiedValidations.objects.all()
         assert len(copied_runs) == 0
+
+    ###################
+    ##    SPATIAL    ##
+    ###################
+    @pytest.mark.filterwarnings(
+    "ignore:No results for gpi:UserWarning",
+    "ignore:read_ts is deprecated, please use read instead:DeprecationWarning",
+    "ignore: Too few points are available to generate:UserWarning")
+    def test_spatial_validation(self, delete=True, val_type='spatial'):
+        """Tests a normal validation run between ISMN (spatial reference) and C3S_combined around Hawaii.
+
+        Parameters
+        ----------
+        delete: bool, default = True
+                Determines wheter the run is deleted after testing. Used for debugging.
+        """
+        run = generate_default_validation()
+
+        run.plots_save_metadata = 'always'
+        run.user = self.testuser
+
+        # run.scaling_ref = ValidationRun.SCALE_REF
+        run.scaling_method = ValidationRun.BETA_SCALING  # cdf matching
+        run.scaling_ref = run.spatial_reference_configuration
+        run.scaling_ref.is_scaling_reference = True
+        run.scaling_ref.save()
+
+        run.interval_from = datetime(2017, 1, 1, tzinfo=UTC)
+        run.interval_to = datetime(2018, 12, 31, tzinfo=UTC)
+
+        run.save()
+
+        self.__logger.debug(
+            f"Intra-Annual params: {run.intra_annual_type=}, {run.intra_annual_metrics=}, {run.intra_annual_overlap=}"
+        )
+
+        for i, config in enumerate(run.dataset_configurations.all()):
+            if config == run.spatial_reference_configuration:
+                config.filters.add(
+                    DataFilter.objects.get(name='FIL_ISMN_GOOD'))
+            else:
+                config.filters.add(
+                    DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
+
+            config.save()
+
+        pfilter = ParametrisedFilter(filter=DataFilter.objects.get(name='FIL_ISMN_NETWORKS'), parameters='SCAN', \
+                                     dataset_config=run.spatial_reference_configuration)
+        pfilter.save()
+        # add filterring according to depth_range with the default values:
+        pfilter = ParametrisedFilter(filter=DataFilter.objects.get(name="FIL_ISMN_DEPTH"), parameters="0.0,0.1", \
+                                     dataset_config=run.spatial_reference_configuration)
+        pfilter.save()
+
+        run_id = run.id
+
+        ## run the validation
+        val.run_validation(run_id, val_type=val_type, min_obs=3) #min_obs makes it work with hawaii data
+        new_run = ValidationRun.objects.get(pk=run_id)
+
+        # HAS TO BE CHANGED WHEN DECIDING ON TEST-PHASE, dependent on min_obs selection
+        # assert new_run.total_times == 9478  # find timeframe with no error times
+        # assert new_run.error_times == 252
+        # assert new_run.ok_times == 9226
+
+        self.check_spatial_results(new_run, is_tcol_run=False, meta_plots=True)
+        if delete:
+            self.delete_run(new_run, val_type=val_type)
+        else:
+            return new_run
+
+
+    # TODO: fails, if validation contains temporal sub-windows
+    @pytest.mark.filterwarnings(
+        "ignore:No results for gpi:UserWarning",
+        "ignore:read_ts is deprecated, please use read instead:DeprecationWarning",
+        "ignore: Too few points are available to generate:UserWarning")
+    def test_spatial_validation_tcol(self, delete=True, val_type='spatial'):
+        run = generate_spatial_validation_triple_coll()
+        run.plots_save_metadata = 'never'
+        run.user = self.testuser
+
+        # run.scaling_ref = ValidationRun.SCALE_REF
+        run.plots_save_metadata = 'never'
+        run.scaling_method = ValidationRun.BETA_SCALING  # cdf matching
+        run.scaling_ref = run.spatial_reference_configuration
+        run.scaling_ref.is_scaling_reference = True
+        run.scaling_ref.save()
+
+        run.interval_from = datetime(1978, 1, 1, tzinfo=UTC)
+        run.interval_to = datetime(2018, 12, 31, tzinfo=UTC)
+
+        run.save()
+
+        for config in run.dataset_configurations.all():
+            if config == run.spatial_reference_configuration:
+                config.filters.add(
+                    DataFilter.objects.get(name='FIL_ISMN_GOOD'))
+            else:
+                config.filters.add(
+                    DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
+
+            config.save()
+
+        pfilter = ParametrisedFilter(filter=DataFilter.objects.get(name='FIL_ISMN_NETWORKS'), parameters='SCAN', \
+                                     dataset_config=run.spatial_reference_configuration)
+        pfilter.save()
+
+        # add filterring according to depth_range with the default values:
+        pfilter = ParametrisedFilter(filter=DataFilter.objects.get(name="FIL_ISMN_DEPTH"), parameters="0.0,0.1", \
+                                     dataset_config=run.spatial_reference_configuration)
+        pfilter.save()
+
+        run_id = run.id
+
+        # run the validation
+        val.run_validation(run_id, val_type=val_type, min_obs=3)
+        new_run = ValidationRun.objects.get(pk=run_id)
+
+        # assert new_run.total_points == 9  # 9 ismn stations in hawaii testdata
+        # # at 5 locations the validation fails because not all datasets have data
+        # assert new_run.error_points == 5
+        # # the other 4 are okay
+        # assert new_run.ok_points == 4
+
+        self.check_spatial_results(new_run, is_tcol_run=True, meta_plots=False)
+        if delete:
+            self.delete_run(new_run, val_type=val_type)
+        else:
+            return new_run
+        
+    @pytest.mark.filterwarnings(
+        "ignore:No results for gpi:UserWarning",
+        "ignore:read_ts is deprecated, please use read instead:DeprecationWarning",
+        "ignore: Too few points are available to generate:UserWarning")    
+    def test_spatial_validation_empty_network(self):
+        self.test_validation_empty_network(val_type="spatial")
+
+
+    

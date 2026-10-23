@@ -6,7 +6,7 @@ import logging
 from ismn.interface import ISMN_Interface
 from pygeobase.io_base import GriddedBase
 
-from validator.models import DataFilter
+from validator.models import DataFilter, ValidationRun
 from validator.validation import globals
 from validator.validation.readers import ReaderWithTsExtension
 from smap_io.interface import ReaderWithExtension_SMAP
@@ -34,6 +34,34 @@ def get_depths_params(param_filters):
         raise ValueError("depth_to can not be less than depth_from")
 
     return [depth_from, depth_to]
+
+
+# function to retrieve the ISMN sensor merging tolerances from the database
+def get_tolerances_params(param_filters):
+    """
+    Determine whether ISMN sensor merging is activated and, if so, the top and
+    bottom depth tolerances [m] to use.
+
+    The presence of the FIL_ISMN_TOLERANCES parametrised filter is the opt-in:
+    when it is set the sensors of a station are merged into a soil moisture
+    profile, when it is absent merging is disabled.
+
+    Returns:
+    -------
+    (merge_ismn_sensors, top_tol, bottom_tol): tuple[bool, float, float]
+    """
+    param_name_list = [pfil.filter.name for pfil in list(param_filters)]
+    if "FIL_ISMN_TOLERANCES" not in param_name_list:
+        return False, 0.0, 0.0
+
+    ind = param_name_list.index('FIL_ISMN_TOLERANCES')
+    tolerances = [float(tol) for tol in param_filters[ind].parameters.split(',')]
+    top_tol, bottom_tol = tolerances[0], tolerances[1]
+
+    if top_tol < 0 or bottom_tol < 0:
+        raise ValueError("the depth tolerances can not be negative")
+
+    return True, top_tol, bottom_tol
 
 
 def get_meta_filter_dict(filters) -> Union[dict, None]:
@@ -167,19 +195,14 @@ def create_jobs(
 
     # if we've got ISMN data, process one network at a time
     elif isinstance(reader, ISMN_Interface):
-        depth_from, depth_to = get_depths_params(
-            dataset_config.parametrisedfilter_set.all()
+        param_filters = dataset_config.parametrisedfilter_set.all()
+        depth_from, depth_to = get_depths_params(param_filters)
+        merge_ismn_sensors, top_tol, bottom_tol = get_tolerances_params(
+            param_filters
         )
+
         filter_meta_dict = get_meta_filter_dict(
             list(dataset_config.filters.all()))
-
-        ids = reader.get_dataset_ids(
-            variable=dataset_config.variable.short_name,
-            min_depth=depth_from,
-            max_depth=depth_to,
-            filter_meta_dict=filter_meta_dict,
-            groupby='network',
-        )
 
         def reshape_meta(metadata):
             # reshape metadata dictionary to facilitate use
@@ -198,29 +221,101 @@ def create_jobs(
 
             return reshaped
 
-        jobs = []
-        for network, net_ids in ids.items():
-            lons, lats, meta_list = [], [], []
-            for idx in net_ids:
-                meta = reader.read_metadata(idx, format="dict")
-                meta = reshape_meta(meta)
-                lons.append(meta['longitude'])
-                lats.append(meta['latitude'])
-                meta_list.append(meta)
-            gpis = net_ids
-            gpis, lons, lats = np.array(gpis), np.array(lons), np.array(lats)
-
-            gpis, lons, lats, index = _geographic_subsetting(
-                gpis, lons, lats, validation_run.min_lat,
-                validation_run.min_lon, validation_run.max_lat,
-                validation_run.max_lon
+        if not merge_ismn_sensors:
+            ids = reader.get_dataset_ids(
+                variable=dataset_config.variable.short_name,
+                min_depth=depth_from,
+                max_depth=depth_to,
+                filter_meta_dict=filter_meta_dict,
+                groupby='network',
             )
 
-            meta_list = np.array(meta_list)[index]
+            jobs = []
+            for network, net_ids in ids.items():
+                lons, lats, meta_list = [], [], []
+                for idx in net_ids:
+                    meta = reader.read_metadata(idx, format="dict")
+                    meta = reshape_meta(meta)
+                    lons.append(meta['longitude'])
+                    lats.append(meta['latitude'])
+                    meta_list.append(meta)
+                gpis = net_ids
+                gpis, lons, lats = np.array(gpis), np.array(lons), np.array(lats)
 
-            if len(gpis) > 0:
-                jobs.append((gpis, lons, lats, meta_list))
-                total_points += len(gpis)
+                gpis, lons, lats, index = _geographic_subsetting(
+                    gpis, lons, lats, validation_run.min_lat,
+                    validation_run.min_lon, validation_run.max_lat,
+                    validation_run.max_lon
+                )
+
+                meta_list = np.array(meta_list)[index]
+
+                if len(gpis) > 0:
+                    jobs.append((gpis, lons, lats, meta_list))
+                    total_points += len(gpis)
+
+        else:
+            # the merge list only reaches the reader in execute_job, the
+            # spatial validation would silently read the primary sensor only
+            if validation_run.val_type != ValidationRun.VAL_TYPE_TEMPORAL:
+                raise ValueError(
+                    "Merging ISMN sensors is only available for temporal "
+                    "validations, not for val_type "
+                    f"'{validation_run.val_type}'.")
+
+            ids = reader.get_dataset_ids(
+                variable=dataset_config.variable.short_name,
+                min_depth=depth_from - top_tol,
+                max_depth=depth_to + bottom_tol,
+                filter_meta_dict=filter_meta_dict,
+                # station names are not unique across networks
+                groupby=['network', 'station'],
+            )
+
+            # --- geographic subsetting at station level ---
+            # all sensors of a station share a lon/lat, so one read per station
+            stations = list(ids.keys())
+            s_lons, s_lats = [], []
+            for station in stations:
+                meta = reader.read_metadata(ids[station][0], format="dict")
+                s_lons.append(meta['longitude'][0][0])
+                s_lats.append(meta['latitude'][0][0])
+
+            s_lons, s_lats = np.array(s_lons), np.array(s_lats)
+            dummy = np.arange(len(stations))
+
+            _, _, _, index = _geographic_subsetting(
+                dummy, s_lons, s_lats,
+                validation_run.min_lat, validation_run.min_lon,
+                validation_run.max_lat, validation_run.max_lon,
+            )
+            # keys are (network, station) tuples, index the list directly so
+            # numpy does not turn them into a 2D array
+            stations = [stations[i] for i in np.atleast_1d(index).ravel()]
+
+            # --- depth/tolerance subsetting over the remaining stations ---
+            # the merged sensors travel as 'other_ids' in the job metadata,
+            # execute_job registers them on the worker's reader. Stations that
+            # fail the selection are kept as placeholders flagged with
+            # 'selection_failed', which are read as empty and so reported as
+            # "not enough data"
+            jobs = []
+            for station in stations:
+                primary_id, meta = \
+                    reader.find_sensors_by_tolerance_station_selection(
+                        ids[station],
+                        depth_top=depth_from, depth_bottom=depth_to,
+                        top_tol=top_tol, bottom_tol=bottom_tol,
+                        reshape_meta=reshape_meta,
+                        keep_failed=True,
+                    )
+                jobs.append((
+                    np.array([primary_id]),
+                    np.array([meta['longitude']]),
+                    np.array([meta['latitude']]),
+                    np.array([meta]),
+                ))
+                total_points += 1
 
     else:
         raise ValueError(
@@ -304,6 +399,15 @@ def create_upscaling_lut(
                 for other_points in other_points_jobs:
                     gpis, lons, lats = other_points[0], other_points[1], \
                     other_points[2]
+                    # stations that failed the ISMN tolerance selection are
+                    # only placeholders, they have no data to average
+                    if len(other_points) > 3:
+                        keep = [not (isinstance(meta, dict)
+                                     and meta.get('selection_failed'))
+                                for meta in other_points[3]]
+                        gpis, lons, lats = (np.asarray(gpis)[keep],
+                                            np.asarray(lons)[keep],
+                                            np.asarray(lats)[keep])
                     for gpi, lon, lat in zip(gpis, lons, lats):
                         # list all non-ref points under the same ref gpi
                         ref_gpi = ref_grid.find_nearest_gpi(lon, lat)[0]

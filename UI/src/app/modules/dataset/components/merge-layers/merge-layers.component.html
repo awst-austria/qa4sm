@@ -1,0 +1,98 @@
+<div *ngIf="available$ | async" class="merge-layers mt-3 mb-3">
+
+  <div class="flex align-items-center gap-2">
+    <!-- the title doubles as the disclosure toggle. The help icon stays
+         outside it, so hovering for the tooltip never opens or shuts the panel. -->
+    <button type="button"
+            class="merge-toggle"
+            [class.expanded]="expanded"
+            [attr.aria-expanded]="expanded"
+            attr.aria-controls="merge_body_{{ configModel.datasetModel.selectedVersion?.id }}"
+            (click)="expanded = !expanded">
+      <span class="pi pi-chevron-right merge-chevron" aria-hidden="true"></span>
+      <b>Merge layers</b>
+    </button>
+    <span class="pi pi-question-circle help-field"
+          pTooltip="Combine several depth layers of this dataset into a single series.
+                    Each layer is weighted by its thickness, by default, so a thicker
+                    layer counts proportionally more. A timestamp is kept only where
+                    every selected layer has data."
+          tooltipPosition="bottom">
+    </span>
+    <!-- collapsed over an active merge, the ticks are out of sight but still
+         apply to the run, so the merged range stays on show here -->
+    <span *ngIf="!expanded && isMerging()" class="merge-chip ml-auto">
+      <span class="pi pi-arrows-v"></span>
+      {{ mergedRangeLabel$ | async }}
+    </span>
+    <!-- column heading for the percentages below. ml-auto pushes it to the
+         right edge, and sharing .layer-weight keeps it on the same 3rem
+         right-aligned column the values use. Only shown while there are
+         weights to head, which is the same condition that renders them. -->
+    <span *ngIf="expanded && isMerging()" class="layer-weight layer-weight-header ml-auto">
+      Weight
+    </span>
+  </div>
+
+  <div class="merge-body"
+       [class.expanded]="expanded"
+       id="merge_body_{{ configModel.datasetModel.selectedVersion?.id }}">
+    <div class="merge-body-inner">
+      <!-- the gap under the title lives in here rather than on the title row,
+           so it folds away with the rest of the panel -->
+      <div class="pt-2">
+
+        <div *ngFor="let layer of selectableLayers$ | async"
+             class="flex align-items-center gap-2 py-1">
+          <p-checkbox [binary]="true"
+                      [inputId]="'merge_' + layer.id"
+                      [ngModel]="isSelected(layer)"
+                      (ngModelChange)="toggle(layer)">
+          </p-checkbox>
+          <label [for]="'merge_' + layer.id" class="cursor-pointer flex-grow-1">
+            {{ layer.short_name }}
+            <span class="text-muted ml-2">{{ layerLabel(layer) }}</span>
+          </label>
+          <span class="layer-weight">{{ layerWeight(layer) }}</span>
+        </div>
+
+        <div *ngIf="isMerging()" class="merge-summary mt-2 p-2">
+          <div class="flex align-items-center gap-2">
+            <span class="pi pi-arrows-v"></span>
+            <span>Merged depth: <b>{{ mergedRangeLabel$ | async }}</b></span>
+          </div>
+
+          <div *ngIf="hasGap()" class="merge-gap-note mt-1">
+            <span class="pi pi-info-circle mr-1"></span>
+            These layers are not adjacent. The result is the thickness-weighted mean of
+            exactly the layers you picked; the skipped depths contribute nothing.
+          </div>
+
+          <div class="flex align-items-center gap-2 mt-2">
+            <p-checkbox [binary]="true"
+                        inputId="merge_weighted_{{ configModel.datasetModel.selectedVersion?.id }}"
+                        [ngModel]="configModel.mergeWeighted$ | async"
+                        (ngModelChange)="setWeighted($event)">
+            </p-checkbox>
+            <label for="merge_weighted_{{ configModel.datasetModel.selectedVersion?.id }}"
+                   class="cursor-pointer">
+              Weight each layer by its thickness
+            </label>
+            <span class="pi pi-question-circle help-field"
+                  pTooltip="On, a 30 cm layer counts three times as much as a 10 cm one.
+                            Off, every selected layer counts equally regardless of how much
+                            soil it represents."
+                  tooltipPosition="bottom">
+            </span>
+          </div>
+
+          <div class="merge-output-note mt-2">
+
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+</div>

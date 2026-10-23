@@ -122,8 +122,22 @@ Get the variables that need to be loaded for filtering the data on them.
 '''
 
 
-def get_used_variables(filters, dataset, variable):
-    variables = [variable.short_name]
+def layer_variables(variable, merged_layers=None):
+    """
+    The variables that a per-column filter has to be applied to.
+
+    Without merging this is just the configured variable, which keeps the
+    unmerged path behaving exactly as before. With merging, every contributing
+    layer needs its own mask applied to its own raw values *before* the merge
+    combines them: each GLDAS layer has a different valid range (0-100 / 0-300
+    / 0-600 / 0-1000 kg/m2), so one layer's bounds are simply wrong for another.
+    """
+    return list(merged_layers) if merged_layers else [variable]
+
+
+def get_used_variables(filters, dataset, variable, merged_layers=None):
+    layers = layer_variables(variable, merged_layers)
+    variables = [layer.short_name for layer in layers]
 
     if not filters:
         return variables
@@ -151,8 +165,9 @@ def get_used_variables(filters, dataset, variable):
 
             
             if fil.name == "FIL_GLDAS_UNFROZEN":
-                temp_variable = variable.short_name.replace("Moi", "TMP")
-                variables.append(temp_variable)
+                # one soil temperature column per merged layer
+                for layer in layers:
+                    variables.append(layer.short_name.replace("Moi", "TMP"))
                 variables.append('SWE_inst')
                 continue
 
@@ -297,10 +312,14 @@ def get_used_variables(filters, dataset, variable):
 
 
 def setup_filtering(reader, filters, param_filters, dataset,
-                    variable) -> tuple:
-    # figure out which variables we have to load because we want to use them
-    load_vars = get_used_variables(filters, dataset, variable)
-    load_vars.extend(get_used_variables(param_filters, dataset, variable))
+                    variable, merged_layers=None) -> tuple:
+    # figure out which variables we have to load because we want to use them.
+    # When layers are merged every one of them has to be read, not just the
+    # configured variable, because the reader's parameters get restricted to
+    # exactly this list below.
+    load_vars = get_used_variables(filters, dataset, variable, merged_layers)
+    load_vars.extend(
+        get_used_variables(param_filters, dataset, variable, merged_layers))
     __logger.debug(f"Loaded filter variables: {load_vars}")
 
     # restrict the variables that are read from file in the reader
@@ -389,15 +408,20 @@ def setup_filtering(reader, filters, param_filters, dataset,
                 inner_reader.activate_network(networks)
             continue
 
+    layers = layer_variables(variable, merged_layers)
+
     for fil in filters:
         __logger.debug(
             "Setting up filter {} for dataset {}.".format(fil.name, dataset))
 
         if fil.name == "FIL_ALL_VALID_RANGE":
-            masking_filters.append(
-                (variable.short_name, '>=', variable.min_value))
-            masking_filters.append(
-                (variable.short_name, '<=', variable.max_value))
+            # each layer is masked against its own bounds, on its own raw
+            # values, before the merge combines them
+            for layer in layers:
+                masking_filters.append(
+                    (layer.short_name, '>=', layer.min_value))
+                masking_filters.append(
+                    (layer.short_name, '<=', layer.max_value))
             continue
 
         if fil.name == "FIL_ISMN_GOOD":
@@ -435,10 +459,12 @@ def setup_filtering(reader, filters, param_filters, dataset,
             continue
 
         if fil.name == "FIL_GLDAS_UNFROZEN":
-            temp_variable = variable.short_name.replace("Moi", "TMP")
+            # snow water equivalent is a single column, the rest is per layer
             masking_filters.append(('SWE_inst', '<', 0.001))
-            masking_filters.append((variable.short_name, '>', 0.0))
-            masking_filters.append((temp_variable, '>', 1.))
+            for layer in layers:
+                masking_filters.append((layer.short_name, '>', 0.0))
+                masking_filters.append(
+                    (layer.short_name.replace("Moi", "TMP"), '>', 1.))
             continue
 
         if fil.name == "FIL_ASCAT_METOP_A":

@@ -3,7 +3,115 @@ import numpy as np
 import pandas as pd
 from scipy.stats import theilslopes
 from pytesmo.validation_framework.metric_calculators_adapters import SubsetsMetricsAdapter
+from pytesmo.validation_framework.adapters import BasicAdapter, \
+    ColumnCombineAdapter
 
+
+class LayerMergeAdapter(ColumnCombineAdapter):
+    """
+    Folds several depth-layer columns of one dataset into a single series.
+
+    Same constructor as the parent, but ``_adapt`` does one matrix product
+    instead of a Python call per timestamp.
+
+    The coefficients in ``func_kwargs['c']`` are already fully normalised and
+    carry any kg/m² -> m³/m³ conversion, so the merge must not normalise again.
+    ``skipna=False`` keeps the required semantics: a timestamp survives only if
+    every contributing layer has data there.
+
+    Two deliberate departures from the parent, worth knowing before reusing
+    this: it calls ``BasicAdapter._adapt`` directly, because ``super()._adapt``
+    *is* the slow row-wise path; and it ignores ``func`` entirely, reading the
+    coefficients instead. It is the layer merge, not a general column combiner.
+    """
+
+    def _adapt(self, data):
+        data = BasicAdapter._adapt(self, data)
+
+        # keep the parent's contract for the empty case
+        if data.empty:
+            data[self.new_name] = None
+            return data
+
+        columns = data.columns if self.columns is None else self.columns
+        coefficients = self.func_kwargs['c']
+
+        data[self.new_name] = (data[columns] * coefficients).sum(
+            axis=1, skipna=False)
+
+        return data
+
+
+class MergeSensorsAdapter(BasicAdapter):
+    """
+    Wraps the (filtered/adapted) ISMN reference reader. When reading a
+    primary sensor that has merged sensors registered in `_merge_sensors`
+    on the underlying ISMN_Interface (set per job by
+    validation.register_station_selection from the `other_ids` job metadata),
+    reads each merged
+    sensor through the same filter/adapter chain and averages the
+    requested variable across sensors, keeping only timestamps where all
+    of them have data.
+    Gpis registered in `_selection_failed` (stations that failed the
+    tolerance selection) are read as empty, so that the validation reports
+    them as "not enough data".
+    """
+
+    def __init__(self, cls, variable, read_name=None):
+        """
+        Parameters
+        ----------
+        cls: object
+            The fully filtered/adapted ISMN reader to wrap.
+        variable: str
+            Short name of the variable column to read and average.
+        read_name: str, optional
+            See :class:`pytesmo.validation_framework.adapters.BasicAdapter`.
+        """
+        super().__init__(cls, read_name=read_name)
+        self.variable = variable
+
+        base_reader = cls
+        while hasattr(base_reader, "cls"):
+            base_reader = base_reader.cls
+        self._base_reader = base_reader
+
+    def _read_merged(self, read_func, gpi, *args, **kwargs):
+        if int(gpi) in getattr(self._base_reader, "_selection_failed", set()):
+            return pd.DataFrame(columns=[self.variable],
+                                index=pd.DatetimeIndex([]), dtype=float)
+
+        primary = read_func(gpi, *args, **kwargs)
+
+        other_ids = getattr(self._base_reader, "_merge_sensors", {}).get(
+            int(gpi), [])
+        if not other_ids or primary is None or primary.empty \
+                or self.variable not in primary.columns:
+            return primary
+
+        dfs = [primary[[self.variable]]]
+        for other_id in other_ids:
+            other = read_func(other_id, *args, **kwargs)
+            if other is not None and not other.empty \
+                    and self.variable in other.columns:
+                dfs.append(other[[self.variable]])
+
+        if len(dfs) == 1:
+            return primary
+
+        # keep only timestamps where all sensors have data (exact match,
+        # no temporal tolerance), then average across sensors
+        merged = pd.concat(dfs, axis=1, join="inner")
+        averaged = merged.mean(axis=1)
+        return averaged.to_frame(self.variable)
+
+    def read(self, *args, **kwargs):
+        return self._read_merged(self.cls.read, *args, **kwargs)
+
+    def _adapt_custom(self, *args, **kwargs):
+        return self._read_merged(
+            getattr(self.cls, self.read_name), *args, **kwargs)
+    
 class StabilityMetricsAdapter(SubsetsMetricsAdapter):
     """
     Extend SubsetsMetricsAdapter to calculate additional stability metrics 

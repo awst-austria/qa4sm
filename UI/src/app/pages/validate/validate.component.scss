@@ -4,3 +4,15 @@
   background-color: $main-page-color-3;
   color: white;
 }
+
+// PrimeNG wraps panel and accordion bodies in CSS grid containers for their
+// open/close animation. A grid item defaults to min-width: auto, i.e. it will
+// not get narrower than its longest unbreakable content - a select label such
+// as "... (newest version)" - so on narrow screens the content overflowed the
+// Datasets panel instead of shrinking with it.
+:host ::ng-deep {
+  .p-panel-content-wrapper,
+  .p-accordioncontent-wrapper {
+    min-width: 0;
+  }
+}

@@ -41,7 +41,7 @@ from api.frontend_urls import get_angular_url
 from validator.mailer import send_val_done_notification
 from validator.models import CeleryTask, DatasetConfiguration, CopiedValidations
 from validator.models import ValidationRun, DatasetVersion
-from validator.validation.batches import create_jobs, create_upscaling_lut
+from validator.validation.batches import create_jobs, create_upscaling_lut, get_tolerances_params
 from validator.validation.filters import setup_filtering
 from validator.validation.globals import OUTPUT_FOLDER, IRREGULAR_GRIDS, VR_FIELDS, DS_FIELDS, ISMN, DEFAULT_TSW, \
     TEMPORAL_SUB_WINDOW_SEPARATOR, METRICS, TEMPORAL_SUB_WINDOWS, ONLY_WITH_REFERENCE
@@ -49,10 +49,12 @@ from validator.validation.graphics import generate_all_graphs
 from validator.validation.readers import create_reader, adapt_timestamp
 from validator.validation.util import mkdir_if_not_exists, first_file_in
 from validator.validation.globals import START_TIME, END_TIME, METADATA_TEMPLATE
-from validator.validation.adapters import StabilityMetricsAdapter
+from validator.validation.adapters import StabilityMetricsAdapter, MergeSensorsAdapter, LayerMergeAdapter
+from validator.validation.depths import merge_coefficients, merged_labels, merged_unit, depth_file_label
 import qa4sm_reader
 from qa4sm_reader.intra_annual_temp_windows import TemporalSubWindowsCreator, NewSubWindow, TemporalSubWindowsFactory
 from qa4sm_reader.netcdf_transcription import Pytesmo2Qa4smResultsTranscriber
+import json
 
 __logger = logging.getLogger(__name__)
 
@@ -98,7 +100,8 @@ def _get_spatial_reference_reader(val_run) -> Tuple['Reader', str, dict]:
             filters=list(val_run.spatial_reference_configuration.filters.all()),
             param_filters=list(val_run.spatial_reference_configuration.parametrisedfilter_set.all()),
             dataset=val_run.spatial_reference_configuration.dataset,
-            variable=val_run.spatial_reference_configuration.variable)
+            variable=val_run.spatial_reference_configuration.variable,
+            merged_layers=val_run.spatial_reference_configuration.merged_layers)
 
     while hasattr(ref_reader, 'cls'):
         ref_reader = ref_reader.cls
@@ -120,10 +123,11 @@ def set_outfile(validation_run, run_dir, val_type="temporal"):
             validation_run.zarr_path = ''        
 
 
-def save_validation_config(validation_run):
+def save_validation_config(validation_run, val_type="temporal"):
     try:
         with netCDF4.Dataset(os.path.join(OUTPUT_FOLDER,
-                                          validation_run.output_file.name),
+                                          validation_run.output_file.name if val_type =="temporal" 
+                                          else validation_run.output_file_spatial.name),
                              "a",
                              format="NETCDF4") as ds:
 
@@ -188,23 +192,31 @@ def save_validation_config(validation_run):
 
                 # there is no error for variables!!, there were some inconsistency with short and pretty names,
                 # and it should be like that now
+                variable_name, variable_pretty_name, unit = \
+                    get_variable_naming(dataset_config)
+
                 ds.setncattr('val_dc_dataset' + str(i),
                              dataset_config.dataset.short_name)
                 ds.setncattr('val_dc_version' + str(i),
                              dataset_config.version.short_name)
-                ds.setncattr('val_dc_variable' + str(i),
-                             dataset_config.variable.pretty_name)
-                ds.setncattr('val_dc_unit' + str(i),
-                             dataset_config.variable.unit)
+                ds.setncattr('val_dc_variable' + str(i), variable_name)
+                ds.setncattr('val_dc_unit' + str(i), unit)
 
                 ds.setncattr('val_dc_dataset_pretty_name' + str(i),
                              dataset_config.dataset.pretty_name)
                 ds.setncattr('val_dc_version_pretty_name' + str(i),
                              dataset_config.version.pretty_name)
                 ds.setncattr('val_dc_variable_pretty_name' + str(i),
-                             dataset_config.variable.short_name)
+                             variable_pretty_name)
 
                 ds.setncattr('val_dc_filters' + str(i), filters)
+
+                # the reader skips the metadata plots that are meaningless
+                # for merged stations (FRM class, instrument depth)
+                merge_ismn_sensors, _, _ = get_tolerances_params(
+                    dataset_config.parametrisedfilter_set.all())
+                if merge_ismn_sensors:
+                    ds.setncattr('val_dc_ismn_sensor_merging' + str(i), 'True')
 
                 actual_interval_from, actual_interval_to = _get_actual_time_range(
                     validation_run, dataset_config.version.id)
@@ -267,6 +279,70 @@ def save_validation_config(validation_run):
         __logger.exception('Validation configuration could not be stored.')
 
 
+def apply_merged_naming(validation_run, filename):
+    """
+    Rewrite the variable part of a results file name for merged configurations.
+
+    pytesmo names its output after the '{index}-{dataset}.{column}' pairs it
+    validated, and for a merged configuration that column is only the shallowest
+    contributing layer — so the file would advertise one layer where the series
+    actually spans several. The depth range takes its place, giving e.g.
+    ``0-ISMN.soil_moisture_with_1-GLDAS.0-40cm_merged.nc``.
+
+    Substitution is keyed on dataset *and* column, because two datasets in one
+    run can use the same column name — ERA5 and ERA5-Land both call it 'swvl1' —
+    and only the merged one may be renamed. Returns the name unchanged when
+    nothing merges, which is every validation that predates the feature.
+    """
+    filename = str(filename)
+
+    for dataset_config in validation_run.dataset_configurations.all():
+        merged_layers = dataset_config.merged_layers
+        if not merged_layers:
+            continue
+        dataset = dataset_config.dataset.short_name
+        filename = filename.replace(
+            f'-{dataset}.{dataset_config.variable.short_name}',
+            f'-{dataset}.{depth_file_label(merged_layers)}')
+
+    return filename
+
+
+def get_variable_naming(dataset_config):
+    """
+    The variable name, pretty name and unit to write out for a configuration.
+
+    Returns exactly what the unmerged path always wrote unless this
+    configuration actually merges layers, in which case the depth range
+    replaces the single variable's names and an extensive unit becomes
+    volumetric — because the merge coefficients fold the kg/m² to m³/m³
+    conversion in. A single-layer GLDAS run still stores raw mass and must keep
+    saying kg/m², so this override is strictly conditional on merging.
+
+    Returns
+    -------
+    (variable_name, variable_pretty_name, unit): tuple of str
+        In netCDF attribute order, for 'val_dc_variable', for
+        'val_dc_variable_pretty_name' and for 'val_dc_unit' respectively. Note
+        those first two hold pretty and short names the opposite way round to
+        what their names suggest; that quirk predates this function.
+
+        'val_dc_variable_pretty_name' is the one that reaches the plots —
+        qa4sm-reader reads it (and 'val_dc_unit') and ignores 'val_dc_variable'
+        entirely — so the readable depth range goes there and the list of
+        contributing columns is kept in the other slot as provenance.
+    """
+    variable = dataset_config.variable
+    merged_layers = dataset_config.merged_layers
+
+    if not merged_layers:
+        return variable.pretty_name, variable.short_name, variable.unit
+
+    variable_pretty_name, variable_name = merged_labels(merged_layers)
+    return (variable_name, variable_pretty_name,
+            merged_unit(merged_layers, variable.unit))
+
+
 def create_pytesmo_validation(validation_run, val_type="temporal"):
     ds_list = []
     ds_read_names = []
@@ -282,13 +358,46 @@ def create_pytesmo_validation(validation_run, val_type="temporal"):
         time_adapted_reader = adapt_timestamp(reader, dataset_config.dataset,
                                               dataset_config.version)
 
+        merged_layers = dataset_config.merged_layers
+
         reader, read_name, read_kwargs = \
             setup_filtering(
                 reader=time_adapted_reader,
                 filters=list(dataset_config.filters.all()),
                 param_filters=list(dataset_config.parametrisedfilter_set.all()),
                 dataset=dataset_config.dataset,
-                variable=dataset_config.variable)
+                variable=dataset_config.variable,
+                merged_layers=merged_layers)
+
+        if (validation_run.spatial_reference_configuration
+                and (dataset_config.id
+                     == validation_run.spatial_reference_configuration.id)
+                and dataset_config.dataset.short_name == ISMN):
+            # average merged sensors of a station (registered per job from the
+            # 'other_ids' job metadata, see register_station_selection), after
+            # filters have been applied to
+            # each sensor individually but before anomalies, so that any
+            # anomaly is computed on the averaged soil moisture series
+            reader = MergeSensorsAdapter(
+                reader,
+                variable=dataset_config.variable.short_name,
+                read_name=read_name)
+
+        if merged_layers:
+            # fold the selected depth layers into the configured variable's
+            # own column. After filtering, so each layer's geophysical range
+            # mask is applied to its own raw values, and before the anomaly
+            # adapters, so any anomaly is computed on the merged profile
+            # rather than on a single layer.
+            columns, coefficients = merge_coefficients(
+                merged_layers, weighted=dataset_config.merge_weighted)
+            reader = LayerMergeAdapter(
+                reader,
+                func=None,  # unused, LayerMergeAdapter reads func_kwargs['c']
+                func_kwargs={'c': coefficients},
+                columns=columns,
+                new_name=dataset_config.variable.short_name,
+                read_name=read_name)
 
         if validation_run.anomalies == ValidationRun.MOVING_AVG_35_D:
             reader = AnomalyAdapter(
@@ -514,6 +623,48 @@ def num_gpis_from_job(job):
     return num_gpis
 
 
+def register_station_selection(val, job):
+    """
+    Register the result of the ISMN station selection on the reference
+    reader of the validation, for the MergeSensorsAdapter:
+
+    * `_merge_sensors`: the sensors to be averaged per primary sensor,
+      from the 'other_ids' in the job metadata
+    * `_selection_failed`: the gpis of stations that failed the tolerance
+      selection, from 'selection_failed' in the job metadata. These are read
+      as empty, so that they are reported as "not enough data".
+
+    The worker builds its own readers, so this is taken from the job
+    metadata (set in create_jobs when ISMN sensor merging is activated).
+    Jobs without metadata are left untouched.
+
+    Parameters
+    ----------
+    val: pytesmo.validation_framework.validation.Validation
+        Validation whose reference reader is used to read the job.
+    job: tuple
+        (gpis, lons, lats[, metadata]) as created by create_jobs.
+    """
+    if len(job) < 4:
+        return
+
+    base_reader = val.data_manager.datasets[
+        val.data_manager.reference_name]["class"]
+    while hasattr(base_reader, "cls"):
+        base_reader = base_reader.cls
+
+    base_reader._merge_sensors = {
+        int(gpi): list(meta["other_ids"])
+        for gpi, meta in zip(job[0], job[3])
+        if isinstance(meta, dict) and meta.get("other_ids")
+    }
+    base_reader._selection_failed = {
+        int(gpi)
+        for gpi, meta in zip(job[0], job[3])
+        if isinstance(meta, dict) and meta.get("selection_failed")
+    }
+
+
 @shared_task(bind=True, max_retries=3)
 def execute_job(self, validation_id, job):
     task_id = execute_job.request.id
@@ -524,6 +675,7 @@ def execute_job(self, validation_id, job):
     try:
         validation_run = ValidationRun.objects.get(pk=validation_id)
         val = create_pytesmo_validation(validation_run, val_type="temporal")
+        register_station_selection(val, job)
 
         result = val.calc(*job,
                           rename_cols=False,
@@ -842,7 +994,7 @@ def compact_results(results):
             c_results[key][field_name] = np.array(entries, dtype=first_val.dtype)
     return c_results
 
-def spatial_validation_xr(val, ds_use, only_with_reference=True, handle_errors="ignore", validation_run=None):
+def spatial_validation_xr(val, ds_use, only_with_reference=True, handle_errors="ignore", validation_run=None, min_obs=None):
     """
     Performs a spatial validation by calculating metrics for every timestep.
 
@@ -861,6 +1013,9 @@ def spatial_validation_xr(val, ds_use, only_with_reference=True, handle_errors="
     only_with_reference: bool, optional (default: True)
         Only compute metrics for dataset combinations where the reference
         is included.
+    min_obs: int, optional (Default: None)
+        Minimum # of observations needed to calculate metrics between datasets
+        If 'None' it falls back to the min_obs defined in pytesmo.metric_calculators.py
 
     Returns
     -------
@@ -912,6 +1067,16 @@ def spatial_validation_xr(val, ds_use, only_with_reference=True, handle_errors="
             time_np = time_val.values
 
             for c, (c_list, metrics_calculator) in all_combinations.items():
+                if min_obs:
+                    # Changing minimum # of observations needed for calculation, if less throws status = 1
+                    # Mainly used for testing without needing large datasets
+                    if metrics_calculator.__func__ is PairwiseIntercomparisonMetrics.calc_metrics:
+                        metrics_calculator.__self__.min_obs = min_obs 
+                        # metrics_calculator.__self__.bootstrap_min_obs = min_obs 
+                    elif metrics_calculator.__func__ is TripleCollocationMetrics.calc_metrics:
+                        metrics_calculator.__self__.min_obs = min_obs 
+                        # metrics_calculator.__self__.bootstrap_min_obs = min_obs 
+
                 res_list = result.setdefault(c, [])
                 
                 # Efficient dropping and counting
@@ -986,7 +1151,7 @@ def spatial_validation_xr(val, ds_use, only_with_reference=True, handle_errors="
         c_results[key]["lon"] = list(ds_use.lon.values)
     return c_results
 
-def temporal_validation_xr(val, ds_use, only_with_reference=True, handle_errors="ignore", validation_run=None):
+def temporal_validation_xr(val, ds_use, only_with_reference=True, handle_errors="ignore", validation_run=None, min_obs=None):
     """
     Performs a temporal validation using an xarray by calculating metrics for every gpi.
 
@@ -1003,6 +1168,9 @@ def temporal_validation_xr(val, ds_use, only_with_reference=True, handle_errors=
     only_with_reference: bool, optional (default: False)
         Only compute metrics for dataset combinations where the reference
         is included.
+    min_obs: int, optional (Default: None)
+        Minimum # of observations needed to calculate metrics between datasets
+        If 'None' it falls back to the min_obs defined in pytesmo.metric_calculators.py
 
     Returns
     -------
@@ -1055,6 +1223,9 @@ def temporal_validation_xr(val, ds_use, only_with_reference=True, handle_errors=
             gpi_info = (gpi, lons[i], lats[i], gpi_meta) 
 
             for c, (c_list, metrics_calculator) in all_combinations.items():
+                if min_obs:
+                    metrics_calculator.__self__.min_obs = min_obs # Changing minimum # of observations needed for calculation, if less throws status = 1
+                
                 res_list = result.setdefault(c, [])
                 
                 df_comb = df_gpi[c_list].dropna()
@@ -1105,7 +1276,7 @@ def temporal_validation_xr(val, ds_use, only_with_reference=True, handle_errors=
     return c_results
 
 @shared_task(bind=True, max_retries=3)
-def run_xArray_validation(self, validation_id, gpi_tuple, val_type="both", min_obs=1, include_secondary_meta=False, only_with_reference=ONLY_WITH_REFERENCE):
+def run_xArray_validation(self, validation_id, gpi_tuple, val_type="both", min_obs=None, include_secondary_meta=False, only_with_reference=ONLY_WITH_REFERENCE):
     """
     Executes a pytesmo-based validation using xArray datasets.
 
@@ -1125,9 +1296,10 @@ def run_xArray_validation(self, validation_id, gpi_tuple, val_type="both", min_o
         'spatial' creates graphs for spatial validation.
         'temporal' creates graphs for temporal validation.
         'both' performs both spatial and temporal validation.
-    min_obs : int, optional
+    min_obs : int, optional (Default: None)
         Minimum number of valid samples (GPIs) required per timestamp 
-        to include it in the validation. Default is 10.
+        to include it in the validation. Default is 'None' which makes the
+        calculation fall back to min_obs values defined inpytesmo.metric_calculators.
     include_secondary_meta : bool, optional
         If True, calculates and adds secondary metadata dicts (land cover, 
         climate class, etc.). Default is False. NOT IMPLEMENTED
@@ -1177,18 +1349,18 @@ def run_xArray_validation(self, validation_id, gpi_tuple, val_type="both", min_o
             # ds_use = ds_all.where(ds_all.n_gpi>=min_obs, drop=True) # if you want to filter beforehand: should be filtered to min_obs in pytesmo, probably 10
             if any(np.array([len(ds_use[coord]) for coord in ds_use.dims]) < 1):
                 raise ValueError(f"No Timestamp with enough gpi observations")
-            spatial_result = spatial_validation_xr(val, ds_use, only_with_reference, validation_run=validation_run)
-            temporal_result = temporal_validation_xr(val, ds_all, only_with_reference, validation_run=validation_run)
+            spatial_result = spatial_validation_xr(val, ds_use, only_with_reference, validation_run=validation_run, min_obs=min_obs)
+            temporal_result = temporal_validation_xr(val, ds_all, only_with_reference, validation_run=validation_run, min_obs=min_obs)
             
         elif val_type == "spatial":
             ds_use = ds_all
             # ds_use = ds_all.where(ds_all.n_gpi>=min_obs, drop=True) # if you want to filter beforehand: should be filtered to min_obs in pytesmo, probably 10
             if any(np.array([len(ds_use[coord]) for coord in ds_use.dims]) < 1):
                 raise ValueError(f"No Timestamp with enough gpi observations")
-            spatial_result = spatial_validation_xr(val, ds_use, only_with_reference, validation_run=validation_run)
+            spatial_result = spatial_validation_xr(val, ds_use, only_with_reference, validation_run=validation_run, min_obs=min_obs)
             temporal_result = None
         elif val_type == "temporal": #Shouldn't be used, original implementation way faster
-            temporal_result = temporal_validation_xr(val, ds_use, only_with_reference, validation_run=validation_run)
+            temporal_result = temporal_validation_xr(val, ds_use, only_with_reference, validation_run=validation_run, min_obs=min_obs)
             spatial_result = None
         else:
             spatial_result = None
@@ -1291,7 +1463,7 @@ def untrack_celery_task(task_id):
         __logger.debug('Task {} already deleted from db.'.format(task_id))
 
 
-def run_validation(validation_id, val_type="temporal"):
+def run_validation(validation_id, val_type="temporal", min_obs=None):
 
     __logger.info("Starting validation: {}".format(validation_id))
     validation_run = ValidationRun.objects.get(pk=validation_id) 
@@ -1303,16 +1475,16 @@ def run_validation(validation_id, val_type="temporal"):
         validation_run.save()
         return
 
-    # 2026-14-04: FIX UNTIL SOMEONE TAKES LOOK AT TEMPORAL XARRAY VALIDATION
+    # 2026-14-04: FIX UNTIL SOMEONE TAKES LOOK AT TEMPORAL XARRAY VALIDATION (MISSING VALUES)
     if val_type in ["both"]:
-        spatial_run = run_validation(validation_id, val_type="spatial")
+        spatial_run = run_validation(validation_id, val_type="spatial", min_obs=min_obs)
         validation_run.refresh_from_db(fields=['progress', 'progress_spatial'])
     
         if validation_run.progress == -1:
             __logger.info(f"Validation {validation_id} was cancelled after spatial, skipping temporal.")
             return (None, spatial_run)
         
-        temporal_run = run_validation(validation_id, val_type="temporal")
+        temporal_run = run_validation(validation_id, val_type="temporal", min_obs=min_obs)
         return (temporal_run, spatial_run)
     # ----------------------------------------------------------------------
     
@@ -1370,7 +1542,7 @@ def run_validation(validation_id, val_type="temporal"):
             for j in jobs:
 
                 celery_job = run_xArray_validation.apply_async(
-                    args=[validation_id, j, val_type], queue=validation_run.user.username)
+                    args=[validation_id, j, val_type, min_obs], queue=validation_run.user.username)
                 async_results.append(celery_job)
                 job_table[celery_job.id] = j
                 track_celery_task(validation_run, celery_job.id)
@@ -1540,7 +1712,14 @@ def run_validation(validation_id, val_type="temporal"):
                     restructured_results = sp_transcriber.get_transcribed_dataset()
 
 
-                    base = os.path.basename(validation_run.output_file_spatial.name).replace('.SPATIAL.nc', '_spatial_result.nc')
+                    # the raw pytesmo name is kept as-is for the cleanup below;
+                    # only the file being written out gets the merged naming
+                    raw_spatial_base = os.path.basename(
+                        validation_run.output_file_spatial.name)
+                    base = apply_merged_naming(
+                        validation_run,
+                        raw_spatial_base.replace('.SPATIAL.nc',
+                                                 '_spatial_result.nc'))
                     spatial_outname = os.path.join(run_dir, base)
                     
                     restructured_results.to_netcdf(spatial_outname)
@@ -1550,31 +1729,16 @@ def run_validation(validation_id, val_type="temporal"):
                         '/?' + OUTPUT_FOLDER + '/?', '', spatial_outname)
                     validation_run.save()
 
+
                     # Copy attributes from temporal file to spatial file
                     # Add required attributes directly
-                    with netCDF4.Dataset(spatial_outname, 'a') as ds:
-                        ds.val_ref = 'val_dc_dataset0'
-                        j = 1
-                        for dataset_config in validation_run.dataset_configurations.all():
-                            if (validation_run.spatial_reference_configuration and
-                                    dataset_config.id == validation_run.spatial_reference_configuration.id):
-                                i = 0
-                            else:
-                                i = j
-                                j += 1
-                            ds.setncattr('val_dc_dataset' + str(i), dataset_config.dataset.short_name)
-                            ds.setncattr('val_dc_version' + str(i), dataset_config.version.short_name)
-                            ds.setncattr('val_dc_variable' + str(i), dataset_config.variable.pretty_name)
-                            ds.setncattr('val_dc_dataset_pretty_name' + str(i), dataset_config.dataset.pretty_name)
-                            ds.setncattr('val_dc_version_pretty_name' + str(i), dataset_config.version.pretty_name)
-                            ds.setncattr('val_dc_variable_pretty_name' + str(i), dataset_config.variable.short_name)
-                        ds.val_scaling_method = validation_run.scaling_method
-                        ds.val_anomalies = validation_run.anomalies
-                
+                    save_validation_config(validation_run, val_type="spatial")
+
                     sp_transcriber.compress(path=spatial_outname, compression='zlib', complevel=9)
 
-                    # Delete uncompressed version
-                    path_SPATIAL = os.path.join(run_dir, base.replace("_spatial_result.nc", ".SPATIAL.nc"))
+                    # Delete uncompressed version. Derived from the raw name,
+                    # not from base, which may have been renamed for a merge.
+                    path_SPATIAL = os.path.join(run_dir, raw_spatial_base)
                     if os.path.exists(path_SPATIAL):
                         os.remove(path_SPATIAL)
 
@@ -1612,11 +1776,29 @@ def run_validation(validation_id, val_type="temporal"):
                     restructured_results = transcriber.get_transcribed_dataset()
                     transcriber.output_file_name, transcriber.output_zarr_name = transcriber.build_outname(
                         run_dir, results.keys())
+
+                    # build_outname only sees the single column a merge was
+                    # written into, so name the outputs after the depth range
+                    # instead where layers were merged
+                    transcriber.output_file_name = apply_merged_naming(
+                        validation_run, transcriber.output_file_name)
+                    transcriber.output_zarr_name = apply_merged_naming(
+                        validation_run, transcriber.output_zarr_name)
+
                     transcriber.write_to_netcdf(transcriber.output_file_name)
                     transcriber.write_to_zarr_filtered(
                         path=transcriber.output_zarr_name,
                         tsw_value=DEFAULT_TSW
                     )
+
+                    # set_outfile recorded the raw pytesmo name, which the
+                    # transcriber has just replaced - and renamed, if anything
+                    # merged. Repoint the run at the files that now exist.
+                    validation_run.output_file.name = regex_sub(
+                        '/?' + OUTPUT_FOLDER + '/?', '',
+                        transcriber.output_file_name)
+                    validation_run.zarr_path = transcriber.output_zarr_name
+                    validation_run.save()
 
                     save_validation_config(validation_run)
 
@@ -1766,6 +1948,33 @@ def _compare_param_filters(new_param_filters, old_param_filters):
     return is_the_same
 
 
+def _compare_merged_layers(new_dataset, old_dataset):
+    """
+    Checking if the two configurations merge the same depth layers, the same
+    way.
+
+    Without this, two runs differing *only* in their layer selection compare as
+    identical and the user is told they have already run a validation they
+    never ran. Compared by variable id, since the merge is defined by which
+    columns take part, and the weighting flag is part of the result too: the
+    same layers weighted and unweighted give different numbers.
+    """
+    if new_dataset.merge_weighted != old_dataset.merge_weighted:
+        return False
+
+    new_ids = set(new_dataset.merged_variables.values_list('id', flat=True))
+    old_ids = set(old_dataset.merged_variables.values_list('id', flat=True))
+
+    # a selection of fewer than two layers is not a merge at all, so an empty
+    # set and a single leftover variable must compare equal
+    if len(new_ids) < 2:
+        new_ids = set()
+    if len(old_ids) < 2:
+        old_ids = set()
+
+    return new_ids == old_ids
+
+
 def _compare_filters(new_dataset, old_dataset):
     """
     Checking if filters are the same for given configuration, checks till finds the first failure or till the end
@@ -1840,7 +2049,8 @@ def _compare_datasets(new_run_config, old_run_config):
                         old_dataset, ds_fields[ds_ind]):
                 ds_ind += 1
             if ds_ind == max_ds_ind:
-                the_same = _compare_filters(new_dataset, old_dataset)
+                the_same = (_compare_merged_layers(new_dataset, old_dataset)
+                            and _compare_filters(new_dataset, old_dataset))
             else:
                 the_same = False
             conf_ind += 1
@@ -1959,6 +2169,9 @@ def copy_validationrun(run_to_copy, new_user):
             old_id = conf.id
             old_filters = conf.filters.all()
             old_param_filters = conf.parametrisedfilter_set.all()
+            # many-to-many relations are not carried over by the pk = None
+            # re-save below, so grab this before the copy like the filters
+            old_merged_variables = list(conf.merged_variables.all())
 
             # setting new scaling reference id
             if old_id == old_scaling_ref_id:
@@ -1971,6 +2184,7 @@ def copy_validationrun(run_to_copy, new_user):
 
             # setting filters
             new_conf.filters.set(old_filters)
+            new_conf.merged_variables.set(old_merged_variables)
             if len(old_param_filters) != 0:
                 for param_filter in old_param_filters:
                     param_filter.id = None

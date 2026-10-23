@@ -104,10 +104,11 @@ def get_layer_bounds(request, validation_id):
             lon_buffer = (max_lon - min_lon) * 0.01 or 0.1
             lat_buffer = (max_lat - min_lat) * 0.01 or 0.1
 
+            # Clip to valid lon/lat: global datasets would otherwise extend past the poles
             bounds_data = {
                 'extent': [
-                    min_lon - lon_buffer, min_lat - lat_buffer,
-                    max_lon + lon_buffer, max_lat + lat_buffer
+                    max(min_lon - lon_buffer, -180.0), max(min_lat - lat_buffer, -90.0),
+                    min(max_lon + lon_buffer, 180.0), min(max_lat + lat_buffer, 90.0)
                 ],
                 'center': [(min_lon + max_lon) / 2, (min_lat + max_lat) / 2],
                 'num_points':

@@ -117,6 +117,13 @@ export class ValidationSummaryComponent implements OnInit, OnDestroy {
           config => {
             const datasetInfo = datasets.find(ds => config.dataset === ds.id);
 
+            // For a merged run the stored variable is only the shallowest
+            // contributing layer, so naming it would claim one layer is the
+            // whole answer. Describe the depth range instead and list the
+            // layers underneath.
+            const mergedLayers = config.merged_layers ?? [];
+            const isMerged = mergedLayers.length > 1;
+
             return {
               ...config,
               dataset: datasetInfo?.pretty_name,
@@ -126,11 +133,19 @@ export class ValidationSummaryComponent implements OnInit, OnDestroy {
               version: versions.length ? versions.find(dsVersion =>
                 config.version === dsVersion.id).pretty_name : '...',
 
-              variable: variables.length ? variables.find(dsVar =>
-                config.variable === dsVar.id).short_name : '...',
+              variable: isMerged
+                ? `${config.merge_depth_label} (merged)`
+                : (variables.length ? variables.find(dsVar =>
+                  config.variable === dsVar.id).short_name : '...'),
 
-              variableUnit: variables.length ? variables.find(dsVar =>
-                config.variable === dsVar.id).unit : '...',
+              // the server resolves this; a merged GLDAS series is m³/m³ even
+              // though its DataVariable still says kg/m²
+              variableUnit: config.variable_unit
+                ?? (variables.length ? variables.find(dsVar =>
+                  config.variable === dsVar.id).unit : '...'),
+
+              mergedLayers,
+              isMerged,
 
               filters: dataFilters.length ?
                 config.filters.map(f => dataFilters.find(dsF => dsF.id === f).description) : [],

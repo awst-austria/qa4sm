@@ -177,6 +177,32 @@ SMOS_SBPCA_sm = 'SMOS_SBPCA_sm'
 # insert it's shortname to the list
 NOT_AS_REFERENCE = []
 
+# WHITELIST - datasets whose depth layers may be merged into a single series ("Merge
+# Layers"). This is the outer of two independent gates, and it is deliberately
+# kept even though the inner one would mostly suffice: a variable also has to
+# be marked DataVariable.DepthKind.LAYER before it can take part in a merge.
+# Keeping the list means merging can be switched off for a whole dataset
+# without touching the fixtures repository.
+MERGEABLE_DATASETS = [
+    ERA5,
+    ERA5_LAND,
+    GLDAS,
+    CCI_RZSM,
+    C3S_RZSM,
+]
+
+# Units in which the stored value is an *extensive* quantity: water mass per
+# unit area over the layer's whole thickness, not an intensive volumetric
+# fraction. Merging these has to divide by layer thickness first, otherwise a
+# thick layer is counted several times over.
+# Both spellings are accepted so that an ASCII edit in the fixtures repo cannot
+# silently turn the conversion off.
+EXTENSIVE_UNITS = {'kg/m²', 'kg/m2'}
+# what an extensive variable becomes once merged and normalised
+VOLUMETRIC_UNIT = 'm³/m³'
+# density of water, kg/m³ - converts kg/m² over a depth in m into m³/m³
+WATER_DENSITY = 1000.0
+
 # ValidationRun and Datasets fields for comparison when looking for a
 # validation with the same settings
 VR_FIELDS = [

@@ -13,23 +13,19 @@
     <div class="col-12">
       <div class="flex flex-row align-items-center gap-2">
         <p-floatLabel class="flex-1">
-          <p-select
-            id="valTypeSelector"
-            [options]="valTypeOptions"
-            [(ngModel)]="validationModel().valType"
-            optionLabel="label"
-            optionValue="value"
-            [disabled]="ISMN_isTrue()"
-            [style]="{ width: '100%' }"
-          >
+          <p-select id="valTypeSelector"
+                    [options]="valTypeOptions"
+                    [(ngModel)]="validationModel().valType"
+                    optionLabel="label"
+                    optionValue="value"
+                    [disabled]="valTypeDisabled()"
+                    [style]="{'width': '100%'}">
           </p-select>
           <label for="valTypeSelector">Validation type</label>
         </p-floatLabel>
-        <label
-          class="p-panel-header-icon"
-          pTooltip="Spatial validation is only available when ISMN is selected as a dataset"
-          tooltipPosition="bottom"
-        >
+        <label class="p-panel-header-icon"
+              pTooltip="Spatial validation is only available when ISMN is selected as a dataset. The type is locked to Temporal while ISMN sensor merging (tolerances filter) is enabled."
+              tooltipPosition="bottom">
           <span class="pi pi-question-circle"></span>
         </label>
       </div>

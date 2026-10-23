@@ -8,6 +8,7 @@ import { DatasetVariableService } from '../../modules/core/services/dataset/data
 import {
   DatasetConfigModel,
   ISMN_DEPTH_FILTER_ID,
+  ISMN_TOLERANCES_FILTER_ID,
   ISMN_NETWORK_FILTER_ID,
   SMAP_L3_STATIC_WATER_FILTER_ID,
   SMAP_L3_V9_VWC_FILTER_ID,
@@ -60,6 +61,8 @@ import { CustomHttpError } from '../../modules/core/services/global/http-error.s
 
 
 const MAX_DATASETS_FOR_VALIDATION = 6;  // TODO: this should come from either config file or the database
+const ISMN_FRM_FILTER_NAME = 'FIL_ISMN_FRM_representative';
+const FRM_DEPTH_WARNING = 'FRM-classification not available below 10 cm depth.';
 
 //NOTE the maximum number of datasets is already defined in the backend, maybe it could be used here?
 // from validator.validation.globals import MAX_NUM_DS_PER_VAL_RUN;
@@ -237,6 +240,7 @@ export class ValidateComponent implements OnInit, AfterViewInit {
         new BehaviorSubject(null),
         new BehaviorSubject(null),
         new BehaviorSubject(null),
+        new BehaviorSubject(null),
         new BehaviorSubject(false),
         new BehaviorSubject(false),
         new BehaviorSubject(false),
@@ -247,6 +251,7 @@ export class ValidateComponent implements OnInit, AfterViewInit {
         new BehaviorSubject(false)
       );
       this.validationModel.datasetConfigurations.push(newDatasetConfigModel);
+      this.restoreMergedLayers(newDatasetConfigModel, datasetConfig);
       this.versionService.getVersionById(datasetConfig.version_id).subscribe({
         next: versionDto => {
           newDatasetConfigModel.datasetModel.selectedVersion = versionDto;
@@ -272,6 +277,11 @@ export class ValidateComponent implements OnInit, AfterViewInit {
                 }
                 if (paramFilter.id === ISMN_DEPTH_FILTER_ID) {
                   datasetConfigModel.ismnDepthFilter$.value.parameters$.next(paramFilter.parameters);
+                }
+                if (paramFilter.id === ISMN_TOLERANCES_FILTER_ID) {
+                  // presence in a saved config means merging was activated
+                  datasetConfigModel.ismnTolerancesFilter$.value.enabled = true;
+                  datasetConfigModel.ismnTolerancesFilter$.value.parameters$.next(paramFilter.parameters);
                 }
                 if (paramFilter.id == SMAP_L3_V9_VWC_FILTER_ID){
                   datasetConfigModel.vegetationWaterFilter$.value.parameters$.next(paramFilter.parameters);
@@ -411,6 +421,29 @@ export class ValidateComponent implements OnInit, AfterViewInit {
     return itDoes;
   }
 
+  /**
+   * FRM classes are only assigned down to 10 cm, so restricting a dataset to
+   * representative sensors and merging its stations across depths exclude each
+   * other. While one is on, the other shows the same warning; the child
+   * disables its checkbox only while that checkbox is off, so a saved
+   * validation that has both on can still be untangled from either side.
+   */
+  basicFilterBlockedReason(config: DatasetConfigModel, filter: FilterModel): string | null {
+    if (filter.filterDto.name === ISMN_FRM_FILTER_NAME && config.ismnTolerancesFilter$.value?.enabled) {
+      return FRM_DEPTH_WARNING;
+    }
+    return null;
+  }
+
+  /** the other half of the rule above */
+  mergeStationsBlockedReason(config: DatasetConfigModel): string | null {
+    const frmFilter = config.basicFilters.find(filter => filter.filterDto.name === ISMN_FRM_FILTER_NAME);
+    if (frmFilter?.enabled) {
+      return FRM_DEPTH_WARNING;
+    }
+    return null;
+  }
+
   addDatasetToValidate(defaultDatasetName = 'C3S_combined', defaultVersionName = undefined, userData = true,
                        spatialReference = false, temporalReference = false, scalingReference = false): void {
     this.addDataset(this.validationModel.datasetConfigurations, defaultDatasetName, defaultVersionName, userData,
@@ -422,6 +455,7 @@ export class ValidateComponent implements OnInit, AfterViewInit {
     const model = new DatasetConfigModel(
       new DatasetComponentSelectionModel(null, null, null),
       null,
+      new BehaviorSubject(null),
       new BehaviorSubject(null),
       new BehaviorSubject(null),
       new BehaviorSubject(null),
@@ -496,6 +530,27 @@ export class ValidateComponent implements OnInit, AfterViewInit {
   }
 
 
+  /**
+   * Puts a saved layer-merge selection back on the model when a validation is
+   * reloaded into the form. The backend has already dropped any layer that no
+   * longer belongs to the version, so anything arriving here is usable; fewer
+   * than two simply means the run did not merge.
+   */
+  private restoreMergedLayers(model: DatasetConfigModel,
+                              datasetConfig: ValidationRunDatasetConfigDto): void {
+    model.mergeWeighted$.next(datasetConfig.merge_weighted ?? true);
+
+    const mergedIds = datasetConfig.merged_variable_ids ?? [];
+    if (mergedIds.length < 2) {
+      model.mergedVariables$.next([]);
+      return;
+    }
+
+    forkJoin(mergedIds.map(id => this.variableService.getVariableById(id)))
+      .subscribe(variables => model.mergedVariables$.next(
+        variables.sort((a, b) => a.depth_from - b.depth_from)));
+  }
+
   private loadFiltersForModel(model: DatasetConfigModel, reloadingSettings = false): ReplaySubject<DatasetConfigModel> {
     const updatedModel$ = new ReplaySubject<DatasetConfigModel>();
 
@@ -513,6 +568,7 @@ export class ValidateComponent implements OnInit, AfterViewInit {
     model.smosRfiFilter$.next(null);
     model.ismnNetworkFilter$.next(null);
     model.ismnDepthFilter$.next(null);
+    model.ismnTolerancesFilter$.next(null);
     model.smosChi2Filter$.next(null);
     model.vegetationWaterFilter$.next(null);
     model.staticWaterFilter$.next(null);
@@ -595,6 +651,22 @@ export class ValidateComponent implements OnInit, AfterViewInit {
               new BehaviorSubject<string>(filter.default_parameter)));
           } else {
             model.ismnDepthFilter$ = new BehaviorSubject<FilterModel>(new FilterModel(
+              filter,
+              false,
+              false,
+              new BehaviorSubject<string>(filter.default_parameter))
+            );
+          }
+        } else if (filter.id === ISMN_TOLERANCES_FILTER_ID) {
+          // optional filter: starts disabled, the user opts in to enable sensor merging
+          if (model.ismnTolerancesFilter$) {
+            model.ismnTolerancesFilter$.next(new FilterModel(
+              filter,
+              false,
+              false,
+              new BehaviorSubject<string>(filter.default_parameter)));
+          } else {
+            model.ismnTolerancesFilter$ = new BehaviorSubject<FilterModel>(new FilterModel(
               filter,
               false,
               false,
@@ -692,6 +764,20 @@ export class ValidateComponent implements OnInit, AfterViewInit {
     }
   }
 
+  /**
+   * Picking a variable from the dropdown by hand ends any layer merge for that
+   * dataset. While layers are merged the output column is derived from them, so
+   * a hand-picked variable and a merge selection cannot both be honoured -
+   * the backend would keep deriving the column from the ticks and quietly
+   * ignore the dropdown. Clearing the ticks makes the dropdown mean what it
+   * says again, and doubles as the way out of merging.
+   */
+  onVariableSelected(config: DatasetConfigModel): void {
+    if (config.mergedVariables$.value.length) {
+      config.mergedVariables$.next([]);
+    }
+  }
+
   onDatasetChange(datasetConfig: DatasetComponentSelectionModel): void {
     const isThereISMN = this.getISMN(this.validationModel.datasetConfigurations).length !== 0;
     this.validationModel.datasetConfigurations.forEach(config => {
@@ -724,6 +810,13 @@ export class ValidateComponent implements OnInit, AfterViewInit {
     this.updateMap();
   }
 
+  onIsmnTolerancesSelectionChange(tolerances: string): void {
+    // while merging is on, the tolerances widen the depth range the stations
+    // are searched in; ticking or unticking merging also lands here, which
+    // puts the widening in or takes it back out
+    this.updateMap();
+  }
+
   onBasicFilterMapUpdate($event): void {
     if ($event) {
       this.updateMap()
@@ -738,7 +831,7 @@ export class ValidateComponent implements OnInit, AfterViewInit {
             let filteredGeoJson: any = JSON.parse(value);
 
             if (config.ismnDepthFilter$.value != null) {
-              filteredGeoJson = this.ismnDepthFilter(config.ismnDepthFilter$.value.parameters$.value, filteredGeoJson);
+              filteredGeoJson = this.ismnDepthFilter(this.ismnSearchDepth(config), filteredGeoJson);
             }
             if (config.ismnNetworkFilter$.value != null) {
               filteredGeoJson = this.ismnNetworkFilter(config.ismnNetworkFilter$.value.parameters$.value, filteredGeoJson);
@@ -746,7 +839,7 @@ export class ValidateComponent implements OnInit, AfterViewInit {
 
 
             config.basicFilters.forEach(filter => {
-              if (filter.filterDto.name === 'FIL_ISMN_FRM_representative' && filter.enabled) {
+              if (filter.filterDto.name === ISMN_FRM_FILTER_NAME && filter.enabled) {
                 filteredGeoJson = this.ismnFrmFilter(filteredGeoJson)
               }
             })
@@ -767,6 +860,26 @@ export class ValidateComponent implements OnInit, AfterViewInit {
       });
     });
 
+  }
+
+  /**
+   * The "from,to" depth range the backend searches for ISMN sensors in. While
+   * stations are merged into a profile average, it widens the chosen range by
+   * the top tolerance upwards (never above the surface) and by the bottom
+   * tolerance downwards, so the map shows the same candidate sensors.
+   */
+  private ismnSearchDepth(config: DatasetConfigModel): string {
+    const depth = config.ismnDepthFilter$.value.parameters$.value;
+    const tolerances = config.ismnTolerancesFilter$?.value;
+    if (!tolerances?.enabled) {
+      return depth;
+    }
+    const [from, to] = (depth ?? '').split(',').map(Number);
+    const [top, bottom] = (tolerances.parameters$.value ?? '').split(',').map(Number);
+    if ([from, to, top, bottom].some(isNaN)) {
+      return depth;
+    }
+    return `${Math.max(0, from - top)},${to + bottom}`;
   }
 
   private ismnDepthFilter(filter: string, geoJson: any): any {
