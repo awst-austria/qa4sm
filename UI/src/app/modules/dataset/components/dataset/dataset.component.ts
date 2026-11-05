@@ -39,6 +39,11 @@ export class DatasetComponent implements OnInit {
 
   @Input() selectionModel: DatasetComponentSelectionModel;
   @Input() removable = false;
+  /**
+   * Locks the variable dropdown. Set while layer merging is on, when the output
+   * column follows the ticked layers rather than the dropdown.
+   */
+  @Input() variableDisabled = false;
   @Output() changeDataset = new EventEmitter<DatasetComponentSelectionModel>();
   /**
    * Emitted only when the user picks a variable from the dropdown themselves.

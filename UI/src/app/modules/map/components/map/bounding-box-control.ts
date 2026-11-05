@@ -46,8 +46,27 @@ export class BoundingBoxControl extends Control {
     this.boundingBox.minLon$.subscribe(next => this.updateBoundingBox());
   }
 
+  /** true while the user is drawing a new box with the pencil tool */
+  isDrawing(): boolean {
+    return this.bboxDraw != null;
+  }
+
+  override setMap(map: Map | null): void {
+    super.setMap(map);
+    // The subscriptions above fire as soon as they are created, which is before the control is attached to the
+    // map, so a bounding box that was already set by then (e.g. on a hard reload) is drawn here instead.
+    if (map) {
+      this.updateBoundingBox();
+    }
+  }
 
   private updateBoundingBox() {
+    const map = this.getMap();
+    if (!map) {
+      // not attached yet - setMap() draws the box once it is
+      return;
+    }
+
     // Since openlayers is not an angular component, events that are coming from it wont trigger an update in
     // templates. As a workaround we run an empty method in the ngZone which then triggers the template updates.
     // https://github.com/angular/angular/issues/35579
@@ -84,7 +103,7 @@ export class BoundingBoxControl extends Control {
       ];
 
       const bbox = new Polygon(boxCoordinates);
-      bbox.transform('EPSG:4326', this.getMap().getView().getProjection().getCode());
+      bbox.transform('EPSG:4326', map.getView().getProjection().getCode());
       this.boundingBoxSource.addFeature(new Feature<Geometry>(bbox));
     }
   }

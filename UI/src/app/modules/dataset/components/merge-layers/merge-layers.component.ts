@@ -1,5 +1,4 @@
-import {Component, DestroyRef, DoCheck, Input, OnInit} from '@angular/core';
-import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
+import {Component, DoCheck, Input, OnInit} from '@angular/core';
 import {Observable, BehaviorSubject, combineLatest} from 'rxjs';
 import {map} from 'rxjs/operators';
 
@@ -43,11 +42,8 @@ export class MergeLayersComponent implements OnInit, DoCheck {
   mergedRangeLabel$: Observable<string>;
   /** hides the whole panel unless this dataset has layers worth merging */
   available$: Observable<boolean>;
-  /** whether the layer list is unfolded; it starts folded behind the title */
-  expanded = false;
 
-  constructor(private datasetVariableService: DatasetVariableService,
-              private destroyRef: DestroyRef) {
+  constructor(private datasetVariableService: DatasetVariableService) {
   }
 
   ngOnInit(): void {
@@ -71,18 +67,8 @@ export class MergeLayersComponent implements OnInit, DoCheck {
       map(([selected]) => this.describeSelection(selected))
     );
 
-    // A reloaded validation brings its ticks with it, and they arrive after
-    // init. Unfolding for them shows the merge the run will apply instead of
-    // leaving it folded away. Ticks made here can only come from an open
-    // panel, so this never fights the user.
-    this.configModel.mergedVariables$
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe(selected => {
-        if (selected.length) {
-          this.expanded = true;
-        }
-      });
-
+    // A reloaded validation that merged switches the checkbox on itself (see
+    // restoreMergedLayers on the validate page), so the panel opens on its own.
     this.loadLayers();
   }
 
@@ -109,8 +95,12 @@ export class MergeLayersComponent implements OnInit, DoCheck {
     // dataset and version arrive.
     if (this.loadedKey !== null) {
       // a selection made against the old version would name columns that do
-      // not exist in the new one, so it cannot carry over
+      // not exist in the new one, so it cannot carry over. Merging goes off
+      // with it: the new dataset may have no layers, which hides this panel
+      // and would otherwise leave the variable dropdown locked with no way
+      // to unlock it.
       this.configModel.mergedVariables$.next([]);
+      this.configModel.mergeEnabled$.next(false);
     }
     this.loadLayers();
   }
@@ -185,6 +175,18 @@ export class MergeLayersComponent implements OnInit, DoCheck {
     }
   }
 
+  /**
+   * The "Merge layers" checkbox. Off is a real "do not merge", not a fold: the
+   * ticks are dropped, so nothing hidden can still reach the run, and the
+   * variable dropdown is handed back to the user.
+   */
+  setEnabled(enabled: boolean): void {
+    if (!enabled) {
+      this.configModel.mergedVariables$.next([]);
+    }
+    this.configModel.mergeEnabled$.next(enabled);
+  }
+
   setWeighted(weighted: boolean): void {
     this.configModel.mergeWeighted$.next(weighted);
   }
@@ -250,6 +252,11 @@ export class MergeLayersComponent implements OnInit, DoCheck {
 
   isMerging(): boolean {
     return this.configModel.mergedVariables$.value.length > 1;
+  }
+
+  /** merging is on but fewer than two layers are ticked; blocks the run */
+  isIncomplete(): boolean {
+    return this.configModel.isMergeIncomplete();
   }
 
   /**

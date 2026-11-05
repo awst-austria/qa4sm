@@ -96,6 +96,7 @@
                                 .datasetModel
                             "
                             [removable]="true"
+                            [variableDisabled]="item.mergeEnabled$ | async"
                             (changeDataset)="onDatasetChange($event)"
                             (changeVariable)="
                               onVariableSelected(

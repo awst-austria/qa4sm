@@ -33,7 +33,7 @@ import { ColorbarState } from './interfaces/colorbar-state.interface';
 // Constants
 const EPSG_4326 = 'EPSG:4326';
 const EPSG_3857 = 'EPSG:3857';
-const DEFAULT_OPACITY = 0.7;
+const DEFAULT_OPACITY = 1;
 const DEFAULT_ZOOM = 2;
 const MIN_ZOOM = 0;
 const MAX_ZOOM = 18;
@@ -926,16 +926,34 @@ export class InteractiveMapComponent implements AfterViewInit, OnDestroy {
 
     this.pointPopupVisible = false;
     const [x, y] = event.coordinate;
-    const z = this.Map.getView().getZoom();
+    const view = this.Map.getView();
+    const z = view.getZoom();
     const validationIdValue = this.validationId();
     if (!validationIdValue) return;
+
+    // The zoom of the tiles actually on screen, which the server needs to size
+    // the clickable area to the squares it drew. It is not the view zoom:
+    // OpenLayers shows the nearest tile level scaled, and in EPSG:4326 the
+    // view and tile grid are one level apart.
+    const source = this.currentTileLayer?.getSource();
+    const tileZ = source?.getTileGrid()?.getZForResolution(view.getResolution(), source.zDirection);
+
+    const params: Record<string, string> = {
+      x: x.toString(),
+      y: y.toString(),
+      z: z?.toString(),
+      projection: this.currentProjection.replace('EPSG:', '')
+    };
+    if (tileZ != null) {
+      params['tz'] = tileZ.toString();
+    }
 
     this.resetPointQueryState();
     this.pointQueryLoading = true;
 
     this.httpClient.get(
       `/api/${validationIdValue}/point/${this.currentLayer.metricName}/${this.currentLayer.name}`,
-      { params: { x: x.toString(), y: y.toString(), z: z?.toString(), projection: this.currentProjection.replace('EPSG:', '') } }
+      { params }
     ).subscribe({
       next: (response: any) => {
         this.pointQueryLoading = false;

@@ -4,7 +4,7 @@ import numpy as np
 from django.views.decorators.http import require_http_methods
 from django.core.cache import cache
 from django.http import JsonResponse, HttpResponse
-from .interactive_map_utils import get_transparent_tile, compute_norm_params, get_layernames, get_colormap_metadata, get_spread_and_buffer, get_colormap, get_cached_dataframe_with_index, build_status_legend_data, get_point_value
+from .interactive_map_utils import get_transparent_tile, compute_norm_params, get_layernames, get_colormap_metadata, get_marker_style, get_colormap, get_cached_dataframe_with_index, build_status_legend_data, get_point_value
 import io
 from pyproj import Transformer
 from PIL import Image
@@ -249,18 +249,11 @@ def get_tile(request, validation_id, metric_name, layer_name, projection, z, x, 
         tms = TMS_3857 if projection == 3857 else TMS_4326
         bbox = tms.xy_bounds(x, y, z)
 
-        # Get spread parameters based on data distribution
+        # Marker size and shape. Shared with the point lookup, which sizes its
+        # hit area from the same call - change it there, not here.
         resolution = get_plot_resolution(validation_id)
-        is_scattered = resolution['is_scattered']
-
-        if is_scattered:
-            spread_px, buffer_px, marker_shape = 5, 6, 'circle'
-            if z < 5:
-                spread_px, buffer_px, marker_shape = 4, 5, 'circle'
-        else:
-            spread_px, buffer_px = get_spread_and_buffer(
-                validation_id, z, resolution['plot_resolution'])
-            marker_shape = 'square'
+        spread_px, buffer_px, marker_shape = get_marker_style(
+            validation_id, z, resolution)
 
         # Calculate ranges and buffers
         x_range = bbox.right - bbox.left

@@ -4,6 +4,7 @@ from django.http import JsonResponse, HttpResponse
 from PIL import Image
 from django.core.cache import cache
 import io
+import math
 import re
 import matplotlib.cm as cm
 import xarray as xr
@@ -21,6 +22,23 @@ TRANSFORMER_TO_4326 = Transformer.from_crs("EPSG:3857",
 TRANSFORMER_TO_3857 = Transformer.from_crs("EPSG:4326",
                                            "EPSG:3857",
                                            always_xy=True)
+
+# The tile grids the map requests from: TMS_3857 / TMS_4326 in
+# interactive_map_view.py and createTileGridForProjection in the frontend's
+# interactive-map.component.ts. 256 px tiles; at z=0 one tile spans the whole
+# Web Mercator width, or 180 degrees in WorldCRS84Quad (two tiles side by side).
+TILE_SIZE_PX = 256
+WEB_MERCATOR_HALF_WIDTH = 20037508.342789244
+TILE_Z0_SPAN = {3857: 2 * WEB_MERCATOR_HALF_WIDTH, 4326: 180.0}
+WORLD_WIDTH = {3857: 2 * WEB_MERCATOR_HALF_WIDTH, 4326: 360.0}
+MAX_TILE_ZOOM = 30
+
+# How far past its spread a drawn marker reaches, in pixels from the point.
+# The black halo is spread one pixel wider than the colour. A square halo then
+# ends half a pixel past that last pixel's centre; datashader's circle keeps
+# pixels whose centre lies within radius + 0.5, so its edge sits one more half
+# pixel out.
+HIT_MARGIN_PX = {'square': 1.5, 'circle': 2.0}
 
 
 @lru_cache(maxsize=10)
@@ -434,6 +452,34 @@ def get_spread_and_buffer(validation_id, zoom_level, plot_resolution):
     return result
 
 
+def get_marker_style(validation_id, zoom_level, resolution):
+    """
+    How get_tile draws each data point at this tile zoom:
+    (spread_px, buffer_px, shape).
+
+    The point lookup sizes its hit area from this same call, so a marker is
+    clickable exactly where it is drawn. Change the drawing here, never in
+    get_tile alone, or the two drift apart again.
+
+    Scattered data (ISMN stations) gets small circles that grow a little with
+    zoom; gridded data gets squares sized to the grid resolution.
+    """
+    if resolution['is_scattered']:
+        if zoom_level < 5:
+            spread_px = 4
+        elif zoom_level < 8:
+            spread_px = 5
+        elif zoom_level < 11:
+            spread_px = 6
+        else:
+            spread_px = 7
+        return spread_px, spread_px + 1, 'circle'
+
+    spread_px, buffer_px = get_spread_and_buffer(
+        validation_id, zoom_level, resolution['plot_resolution'])
+    return spread_px, buffer_px, 'square'
+
+
 # 1. In-memory LRU cache for DataFrames (most recent validations)
 @lru_cache(
     maxsize=10)  # Keep last 10 validation_id + var_name combos in memory
@@ -505,88 +551,131 @@ def get_cached_dataframe_with_index(validation_id,
     return df, tree, coord_cols
 
 
+def tile_units_per_pixel(projection, tile_z):
+    """Size of one tile pixel in map units: metres in 3857, degrees in 4326."""
+    return TILE_Z0_SPAN[projection] / (TILE_SIZE_PX * 2**tile_z)
+
+
+def displayed_tile_zoom(request, view_zoom, projection):
+    """
+    The zoom level of the tiles actually on screen.
+
+    The frontend sends it as ``tz``. It is not the view zoom: OpenLayers draws
+    the nearest tile level and scales it, and in 4326 the view's z=0 spans
+    360 degrees while the tile grid's spans 180, so the two are one level apart.
+
+    Without ``tz`` (an older page still open), this reconstructs it the way
+    OpenLayers does with its default zDirection=0: it takes the tile resolution
+    nearest the view's, which switches to the finer level log2(4/3) ≈ 0.415 of
+    the way into a zoom step.
+    """
+    tile_z = request.GET.get('tz')
+    try:
+        tile_z = int(tile_z)
+    except (TypeError, ValueError):
+        offset = 1 if projection == 4326 else 0
+        tile_z = math.floor(view_zoom + offset + 1 - math.log2(4 / 3))
+    return min(max(tile_z, 0), MAX_TILE_ZOOM)
+
+
+def _format_point_value(layer_name, raw_value):
+    response_value = round(float(raw_value), 3)
+    if layer_name.startswith('status'):
+        response_value = QR_STATUS_DICT[int(raw_value)]
+    return str(response_value)
+
+
 def get_point_value(request, validation_id, layer_name, zarr_path, x, y, z,
                     projection):
     """
-    Get value at point using direct xarray operations.
-    Returns all candidates within threshold, with disambiguation info.
+    The data point(s) whose drawn marker contains the click.
+
+    The hit area is the marker the tile renderer drew for the tile on screen,
+    taken from the same get_marker_style call, so a click hits exactly where
+    colour is drawn, at every zoom. Markers are drawn in the tile projection,
+    so the test runs there too, on the KD-tree get_tile already built: a
+    gridded square is a Chebyshev (p=inf) ball, a scattered circle a Euclidean
+    one.
+
+    Gridded data returns only the nearest marker: grid cells do not overlap,
+    and where their squares do, that is the spread at low zoom, not a second
+    feature to choose. Scattered and ISMN data return every marker under the
+    click, nearest first, since stations can sit close together or share
+    coordinates (several sensors at one site).
     """
-    # Transform coordinates to EPSG:4326 if needed
-    if projection == 3857:
-        query_lon, query_lat = TRANSFORMER_TO_4326.transform(x, y)
-    elif projection == 4326:
-        query_lon, query_lat = x, y
-    else:
+    if projection not in (3857, 4326):
         return JsonResponse({'error': f'Unsupported projection: {projection}'},
                             status=400)
 
-    # Get resolution/distance threshold
     resolution = get_plot_resolution(validation_id)
-
-    if not resolution['is_scattered'] and not resolution["is_ismn"]:
-        max_distance_deg = resolution['plot_resolution'] * (2 / z)**0.25
-    else:
-        max_distance_deg = 4 / (z**1.75)
+    is_ismn = resolution['is_ismn']
+    is_point_data = resolution['is_scattered'] or is_ismn
 
     try:
-        ds = get_cached_zarr_dataset(zarr_path)
-
-        if layer_name not in ds.data_vars:
+        df, tree, _ = get_cached_dataframe_with_index(validation_id,
+                                                      layer_name, zarr_path,
+                                                      projection)
+        if df is None:
             return JsonResponse({'error': f'Variable {layer_name} not found'},
                                 status=404)
+        if len(df) == 0:
+            return JsonResponse({'error': 'No valid data at this location'},
+                                status=404)
 
-        lons = ds['lon'].values
-        lats = ds['lat'].values
+        # OpenLayers repeats the world sideways, so a click on a repeated copy
+        # comes in outside the projection's extent
+        world = WORLD_WIDTH[projection]
+        x = (x + world / 2) % world - world / 2
 
-        # Simple distance calculation in degrees
-        distances = np.sqrt((lons - query_lon)**2 + (lats - query_lat)**2)
+        tile_z = displayed_tile_zoom(request, z, projection)
+        spread_px, _, shape = get_marker_style(validation_id, tile_z,
+                                               resolution)
+        reach = (spread_px + HIT_MARGIN_PX[shape]) * tile_units_per_pixel(
+            projection, tile_z)
+        p_norm = np.inf if shape == 'square' else 2
 
-        # Find ALL points within threshold
-        within_threshold_mask = distances <= max_distance_deg
-        candidate_indices = np.where(within_threshold_mask)[0]
+        if is_point_data:
+            rows = np.asarray(
+                tree.query_ball_point([x, y], r=reach, p=p_norm,
+                                      return_sorted=True), dtype=int)
+            hit_xy = tree.data[rows]
+            # nearest on screen first, i.e. in the projection the markers are
+            # drawn in. The 'distance' field below stays in degrees, so in
+            # 3857 it need not be ascending. Stable, so sensors sharing a site
+            # keep their stored order.
+            order = np.argsort(np.hypot(hit_xy[:, 0] - x, hit_xy[:, 1] - y),
+                               kind='stable')
+            rows = rows[order]
+        else:
+            dist, row = tree.query([x, y], k=1, p=p_norm,
+                                   distance_upper_bound=reach)
+            rows = [int(row)] if np.isfinite(dist) else []
 
-        if len(candidate_indices) == 0:
+        if len(rows) == 0:
             return JsonResponse({'error': 'No data found at this location'},
                                 status=404)
 
-        # Sort candidates by distance (nearest first)
-        candidate_distances = distances[candidate_indices]
-        sorted_order = np.argsort(candidate_distances)
-        candidate_indices = candidate_indices[sorted_order]
+        if projection == 3857:
+            query_lon, query_lat = TRANSFORMER_TO_4326.transform(x, y)
+        else:
+            query_lon, query_lat = x, y
 
-        # Build candidate list
+        ds = get_cached_zarr_dataset(zarr_path) if is_ismn else None
         candidates = []
-        is_ismn = resolution['is_ismn']
-
-        for idx in candidate_indices:
-            idx = int(idx)
-
-            # Extract value and skip NaN
-            raw_value = float(ds[layer_name].isel(loc=idx).values)
-            if np.isnan(raw_value):
-                continue
-
-            response_value = round(raw_value, 3)
-            if layer_name.startswith('status'):
-                response_value = QR_STATUS_DICT[int(raw_value)]
-
+        for row in rows:
+            point = df.iloc[int(row)]
+            gpi = int(point['loc'])
+            lon, lat = float(point['lon']), float(point['lat'])
             candidate = {
-                'gpi': idx,
-                'value': str(response_value),
-                'lat': float(lats[idx]),
-                'lon': float(lons[idx]),
-                'distance': float(distances[idx])
+                'gpi': gpi,
+                'value': _format_point_value(layer_name, point['value']),
+                'lat': lat,
+                'lon': lon,
+                'distance': float(np.hypot(lon - query_lon, lat - query_lat))
             }
-
             if is_ismn:
-                _add_ismn_metadata(ds, idx, candidate)
-
+                _add_ismn_metadata(ds, gpi, candidate)
             candidates.append(candidate)
-
-        # No valid candidates after NaN filtering
-        if len(candidates) == 0:
-            return JsonResponse({'error': 'No valid data at this location'},
-                                status=404)
 
         return JsonResponse({
             'candidates': candidates,

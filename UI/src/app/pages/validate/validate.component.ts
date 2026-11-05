@@ -543,12 +543,17 @@ export class ValidateComponent implements OnInit, AfterViewInit {
     const mergedIds = datasetConfig.merged_variable_ids ?? [];
     if (mergedIds.length < 2) {
       model.mergedVariables$.next([]);
+      model.mergeEnabled$.next(false);
       return;
     }
 
+    // the ticks go on before the checkbox, so turning merging on never shows
+    // the "at least two layers" warning for an instant
     forkJoin(mergedIds.map(id => this.variableService.getVariableById(id)))
-      .subscribe(variables => model.mergedVariables$.next(
-        variables.sort((a, b) => a.depth_from - b.depth_from)));
+      .subscribe(variables => {
+        model.mergedVariables$.next(variables.sort((a, b) => a.depth_from - b.depth_from));
+        model.mergeEnabled$.next(true);
+      });
   }
 
   private loadFiltersForModel(model: DatasetConfigModel, reloadingSettings = false): ReplaySubject<DatasetConfigModel> {
@@ -769,12 +774,16 @@ export class ValidateComponent implements OnInit, AfterViewInit {
    * dataset. While layers are merged the output column is derived from them, so
    * a hand-picked variable and a merge selection cannot both be honoured -
    * the backend would keep deriving the column from the ticks and quietly
-   * ignore the dropdown. Clearing the ticks makes the dropdown mean what it
-   * says again, and doubles as the way out of merging.
+   * ignore the dropdown. The dropdown is locked while the "Merge layers"
+   * checkbox is on, so this is a safety net: clearing the merge makes the
+   * dropdown mean what it says again.
    */
   onVariableSelected(config: DatasetConfigModel): void {
     if (config.mergedVariables$.value.length) {
       config.mergedVariables$.next([]);
+    }
+    if (config.mergeEnabled$.value) {
+      config.mergeEnabled$.next(false);
     }
   }
 
@@ -1226,9 +1235,13 @@ export class ValidateComponent implements OnInit, AfterViewInit {
   disableValidateButton(validationModel): boolean {
     const noneVariable = validationModel.datasetConfigurations
       .filter(config => config.datasetModel?.selectedVariable?.short_name === '--none--').length !== 0;
+    const mergeIncomplete = validationModel.datasetConfigurations
+      .some((config: DatasetConfigModel) => config.isMergeIncomplete());
     let message = 'You can not start a validation, ';
     if (noneVariable) {
       message += 'because one of the chosen dataset has no variable assigned.'
+    } else if (mergeIncomplete) {
+      message += 'because layer merging is switched on with fewer than two layers ticked.'
     } else if (this.noIsmnPoints()) {
       message += 'because there are not ISMN points available for comparison.'
     } else if (this.noVersion()) {
@@ -1239,7 +1252,7 @@ export class ValidateComponent implements OnInit, AfterViewInit {
       message += 'because we could not fetch filters properly.'
     }
     this.validationDisabledMessage.next(message);
-    return noneVariable || this.noIsmnPoints() || this.noVariable() || this.noVersion() || this.noFilters()
+    return noneVariable || mergeIncomplete || this.noIsmnPoints() || this.noVariable() || this.noVersion() || this.noFilters()
   }
 
   public checkIsmnPoints(evt): void {

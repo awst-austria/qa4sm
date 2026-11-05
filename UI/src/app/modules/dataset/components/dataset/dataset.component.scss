@@ -4,6 +4,13 @@
   color: $warning-text;
 }
 
+// PrimeNG already mutes a disabled select's own text and background; this
+// fades the whole field, floating label included, so it reads as switched off
+.variable-disabled {
+  opacity: 0.55;
+  transition: opacity 0.2s ease;
+}
+
 .group-header {
   background: #f1f5f9;
   color: $font-color-base;

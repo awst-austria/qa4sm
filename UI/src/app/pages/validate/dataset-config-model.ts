@@ -42,8 +42,22 @@ export class DatasetConfigModel {
                 = new BehaviorSubject<DatasetVariableDto[]>([]),
               public mergeWeighted$: BehaviorSubject<boolean>
                 = new BehaviorSubject<boolean>(true),
+              // the "Merge layers" checkbox. While it is on the variable
+              // dropdown is locked, because the output column comes from the
+              // ticked layers instead
+              public mergeEnabled$: BehaviorSubject<boolean>
+                = new BehaviorSubject<boolean>(false),
 
   ) {
+  }
+
+  /**
+   * Merging is switched on but fewer than two layers are ticked. That is not a
+   * merge, and the locked dropdown does not reliably name the one ticked layer
+   * either, so the validation cannot start in this state.
+   */
+  public isMergeIncomplete(): boolean {
+    return this.mergeEnabled$.value && this.mergedVariables$.value.length < 2;
   }
 
   /**
@@ -98,7 +112,7 @@ export class DatasetConfigModel {
     // fewer than two layers is not a merge, so send nothing at all and let the
     // ordinary single-variable path apply
     const mergedVariables = this.mergedVariables$.value;
-    const mergedVariableIds = mergedVariables.length > 1
+    const mergedVariableIds = this.mergeEnabled$.value && mergedVariables.length > 1
       ? mergedVariables.map(variable => variable.id)
       : [];
 

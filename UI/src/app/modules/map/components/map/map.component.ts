@@ -214,7 +214,8 @@ export class MapComponent implements AfterViewInit, OnInit {
       controls: [new Attribution({collapsible: true})],
       view: this.view,
     });
-    this.Map.addControl(new BoundingBoxControl(this.Map, this.spatialSubset, this.toastService, this.zone));
+    const boundingBoxControl = new BoundingBoxControl(this.Map, this.spatialSubset, this.toastService, this.zone);
+    this.Map.addControl(boundingBoxControl);
     this.Map.addOverlay(tooltipOverlay);
 
     this.Map.addOverlay(tooltipOverlay);
@@ -236,6 +237,16 @@ export class MapComponent implements AfterViewInit, OnInit {
     
 
     this.Map.on('pointermove', (evt) =>{
+      // Hit detection reads pixels back from a canvas, which on GPU-accelerated browsers is slow enough to make the
+      // rectangle trail behind the cursor if it runs on every move. The cursor doesn't matter while panning or
+      // drawing a bounding box, so skip it then.
+      if (evt.dragging) {
+        return;
+      }
+      if (boundingBoxControl.isDrawing()) {
+        this.Map.getTargetElement().style.cursor = '';
+        return;
+      }
       const feature  = this.Map.forEachFeatureAtPixel(evt.pixel, (feature) => {
         return feature
       })
