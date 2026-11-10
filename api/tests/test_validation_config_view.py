@@ -1,5 +1,6 @@
 import logging
 import time
+from unittest.mock import patch
 
 from django.urls import reverse
 
@@ -89,6 +90,46 @@ class TestValidationConfigView(TransactionTestCase):
                               'intra_annual_type': '',
                               'intra_annual_overlap': None
                           }}
+
+    # no validation is actually computed in this test
+    @patch('api.views.validation_config_view.Process')
+    def test_existing_validation_check_skips_old_bias_runs(self, process_mock):
+        start_validation_url = reverse('Run new validation')
+        check_url = start_validation_url + '?check_for_existing_validation=true'
+        self.client.login(**self.auth_data)
+
+        # a finished run with exactly the settings of the form, computed with
+        # the old bias sign
+        response = self.client.post(start_validation_url, self.good_form, format='json')
+        assert response.status_code == 200
+        existing = ValidationRun.objects.get(pk=response.json()['id'])
+        existing.progress = 100
+        existing.output_file.name = str(existing.id) + '/foobar.nc'
+        existing.bias_candidate_minus_reference = False
+        existing.save()
+
+        # it is not offered for reuse, a new validation is started instead
+        n_runs = ValidationRun.objects.count()
+        response = self.client.post(check_url, self.good_form, format='json')
+        assert response.status_code == 200
+        assert 'is_there_validation' not in response.json()
+        new_run = ValidationRun.objects.get(pk=response.json()['id'])
+        assert new_run.bias_candidate_minus_reference is True
+        assert ValidationRun.objects.count() == n_runs + 1
+
+        # the same run with the new bias sign is offered, and the requested
+        # duplicate is discarded
+        existing.bias_candidate_minus_reference = True
+        existing.save()
+        n_runs = ValidationRun.objects.count()
+        response = self.client.post(check_url, self.good_form, format='json')
+        assert response.status_code == 200
+        assert response.json()['is_there_validation'] is True
+        assert response.json()['val_id'] == str(existing.id)
+        assert ValidationRun.objects.count() == n_runs
+
+        # two validations were started, the duplicate was not
+        assert process_mock.return_value.start.call_count == 2
 
     def test_start_validation(self):
         start_validation_url = reverse('Run new validation')

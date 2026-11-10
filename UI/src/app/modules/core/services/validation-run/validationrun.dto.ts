@@ -52,7 +52,10 @@ export class ValidationrunDto {
               public all_files_exist?: boolean,
               public zarr_path?: string,
               public output_file_spatial?: string,
-              public val_type?: string
+              public val_type?: string,
+              // true: BIAS is candidate - reference; false: older runs with
+              // reference - candidate
+              public bias_candidate_minus_reference?: boolean
             ) {
   }
 }

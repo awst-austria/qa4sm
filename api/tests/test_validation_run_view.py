@@ -216,6 +216,30 @@ class TestValidationRunView(TestCase):
         assert response.status_code == 200
         assert response.json()['original_run'] == str(self.run_2.id)
 
+    def test_bias_convention_flag(self):
+        run_by_id_url_name = 'Validation run by id'
+
+        # new runs report BIAS as candidate - reference, and the API exposes it
+        assert ValidationRun.objects.get(pk=self.run.id).bias_candidate_minus_reference is True
+        response = self.client.get(reverse(run_by_id_url_name, kwargs={'id': self.run.id}))
+        assert response.status_code == 200
+        assert response.json()['bias_candidate_minus_reference'] is True
+
+        # a copy keeps the flag of its original, because it gets the original's files
+        old_run = ValidationRun.objects.get(pk=self.run_2.id)
+        old_run.bias_candidate_minus_reference = False
+        old_run.save()
+        copied = copy_validationrun(ValidationRun.objects.get(pk=self.run_2.id), self.test_user)
+        copied_run = ValidationRun.objects.get(pk=copied['run_id'])
+        assert copied_run.id != self.run_2.id
+        assert copied_run.bias_candidate_minus_reference is False
+        response = self.client.get(reverse(run_by_id_url_name, kwargs={'id': copied_run.id}))
+        assert response.status_code == 200
+        assert response.json()['bias_candidate_minus_reference'] is False
+
+        # removes the output directory created by the copy
+        copied_run.delete()
+
 
 
 

@@ -26,6 +26,13 @@
             <div class="text-center">
               <h1 class="my-3">Validation comparison results</h1>
             </div>
+            @if (mixedBiasConvention) {
+              <p-message
+                severity="warn"
+                text="The selected validations use different bias conventions: older validations report BIAS as reference − candidate, newer ones as candidate − reference. BIAS values are therefore not directly comparable between them; all other metrics are unaffected."
+                class="w-12 mb-3"
+              />
+            }
             <qa-comparison-summary />
             <!--        visualize the validation extent-->
             <qa-extent-visualization (isError)="handleError($event)" />

@@ -49,7 +49,8 @@ from validator.validation.graphics import generate_all_graphs
 from validator.validation.readers import create_reader, adapt_timestamp
 from validator.validation.util import mkdir_if_not_exists, first_file_in
 from validator.validation.globals import START_TIME, END_TIME, METADATA_TEMPLATE
-from validator.validation.adapters import StabilityMetricsAdapter, MergeSensorsAdapter, LayerMergeAdapter
+from validator.validation.adapters import StabilityMetricsAdapter, MergeSensorsAdapter, LayerMergeAdapter, \
+    CandidateMinusReferencePairwiseMetrics
 from validator.validation.depths import merge_coefficients, merged_labels, merged_unit, depth_file_label
 import qa4sm_reader
 from qa4sm_reader.intra_annual_temp_windows import TemporalSubWindowsCreator, NewSubWindow, TemporalSubWindowsFactory
@@ -137,6 +138,12 @@ def save_validation_config(validation_run, val_type="temporal"):
                 settings.APP_VERSION)
             ds.url = settings.SITE_URL + get_angular_url(
                 'result', validation_run.id)
+            # sign convention of the BIAS variables, so that downloaded files
+            # describe themselves; files without it are reference - candidate
+            ds.bias_convention = (
+                'candidate - reference'
+                if validation_run.bias_candidate_minus_reference
+                else 'reference - candidate')
 
             try:
                 if hasattr(validation_run, 'spatial_reference_configuration'):
@@ -495,7 +502,8 @@ def create_pytesmo_validation(validation_run, val_type="temporal"):
     else:
         metadata_template = METADATA_TEMPLATE['other_ref']
 
-    _pairwise_metrics = PairwiseIntercomparisonMetrics(
+    # BIAS as candidate - reference, see CandidateMinusReferencePairwiseMetrics
+    _pairwise_metrics = CandidateMinusReferencePairwiseMetrics(
         metadata_template=metadata_template,
         calc_kendall=False,
     )
@@ -1070,10 +1078,12 @@ def spatial_validation_xr(val, ds_use, only_with_reference=True, handle_errors="
                 if min_obs:
                     # Changing minimum # of observations needed for calculation, if less throws status = 1
                     # Mainly used for testing without needing large datasets
-                    if metrics_calculator.__func__ is PairwiseIntercomparisonMetrics.calc_metrics:
-                        metrics_calculator.__self__.min_obs = min_obs 
-                        # metrics_calculator.__self__.bootstrap_min_obs = min_obs 
-                    elif metrics_calculator.__func__ is TripleCollocationMetrics.calc_metrics:
+                    # isinstance, so that subclasses (e.g.
+                    # CandidateMinusReferencePairwiseMetrics) are matched too
+                    if isinstance(metrics_calculator.__self__, PairwiseIntercomparisonMetrics):
+                        metrics_calculator.__self__.min_obs = min_obs
+                        # metrics_calculator.__self__.bootstrap_min_obs = min_obs
+                    elif isinstance(metrics_calculator.__self__, TripleCollocationMetrics):
                         metrics_calculator.__self__.min_obs = min_obs 
                         # metrics_calculator.__self__.bootstrap_min_obs = min_obs 
 

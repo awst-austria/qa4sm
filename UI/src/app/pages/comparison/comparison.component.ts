@@ -14,6 +14,9 @@ import {ToastService} from '../../modules/core/services/toast/toast.service';
 export class ComparisonComponent implements OnInit {
   comparisonModel: Validations2CompareModel;
   showComparisonResults = false;
+  // the selected validations mix the old (reference - candidate) and the new
+  // (candidate - reference) bias sign
+  mixedBiasConvention = false;
 
   constructor(private comparisonService: ComparisonService,
               private toastService: ToastService) {
@@ -33,7 +36,14 @@ export class ComparisonComponent implements OnInit {
       } else {
         this.showComparisonResults = false;
       }
+      this.mixedBiasConvention = ComparisonComponent.hasMixedBiasConvention(comparison);
     });
+  }
+
+  static hasMixedBiasConvention(comparison: Validations2CompareModel): boolean {
+    const conventions = new Set(comparison.selectedValidations.map(
+      validation => validation.bias_candidate_minus_reference === true));
+    return conventions.size > 1;
   }
 
   handleError(event): void {

@@ -2,6 +2,8 @@ import warnings
 import numpy as np
 import pandas as pd
 from scipy.stats import theilslopes
+from pytesmo.validation_framework.metric_calculators import \
+    PairwiseIntercomparisonMetrics
 from pytesmo.validation_framework.metric_calculators_adapters import SubsetsMetricsAdapter
 from pytesmo.validation_framework.adapters import BasicAdapter, \
     ColumnCombineAdapter
@@ -245,3 +247,41 @@ class StabilityMetricsAdapter(SubsetsMetricsAdapter):
                 warnings.warn(f"Failed to calculate Theil-Sen slope for {metric_name}: {e}")
 
         return stability_results
+
+
+class CandidateMinusReferencePairwiseMetrics(PairwiseIntercomparisonMetrics):
+    """
+    PairwiseIntercomparisonMetrics that reports BIAS as
+    mean(candidate) - mean(reference).
+
+    pytesmo computes BIAS as mean(first column) - mean(second column), and the
+    validation framework passes each pair sorted by dataset name, so the
+    spatial reference ("0-...") is always the first column. The bias and its
+    confidence interval are therefore negated here, after the parent has
+    computed them.
+
+    The input columns are deliberately not swapped instead: every other pairwise
+    metric is symmetric in its two inputs, but pytesmo's Welford covariance
+    update is not symmetric in floating point, so a swap would change R, RMSD,
+    urmsd and the mse terms in their last bits. Negating afterwards keeps them
+    bit-identical to the parent.
+
+    Wrapped by the intra-annual and stability adapters, the subset BIAS values
+    and the stability slope of BIAS follow the same convention.
+    """
+
+    def calc_metrics(self, data, gpi_info):
+        # parameter names must stay `data` and `gpi_info`, callers pass them as
+        # keywords
+        result = super().calc_metrics(data, gpi_info)
+
+        # new arrays, so neither the result template nor the parent's arrays
+        # are modified in place; NaN stays NaN
+        result["BIAS"] = -result["BIAS"]
+        if "BIAS_ci_lower" in result and "BIAS_ci_upper" in result:
+            lower = result["BIAS_ci_lower"]
+            upper = result["BIAS_ci_upper"]
+            result["BIAS_ci_lower"] = -upper
+            result["BIAS_ci_upper"] = -lower
+
+        return result

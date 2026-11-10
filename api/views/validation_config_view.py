@@ -55,7 +55,10 @@ def _start_validation_run(request):
     # https://stackoverflow.com/questions/8242837/django-multiprocessing-and-database-connections/10684672#10684672
 
     if check_for_existing_validation == 'true':
-        existing_runs = ValidationRun.objects.filter(progress=100).exclude(output_file=''). \
+        # runs computed with the old bias sign (reference - candidate) are not
+        # offered for reuse, a new run is computed instead
+        existing_runs = ValidationRun.objects.filter(
+            progress=100, bias_candidate_minus_reference=True).exclude(output_file=''). \
             order_by(Case(When(user=request.user, then=0), default=1), '-start_time')
         comparison_pub = compare_validation_runs(new_val_run, existing_runs, request.user)
 

@@ -160,6 +160,13 @@ class ValidationRun(models.Model):
     intra_annual_overlap = models.IntegerField(blank=True, null=True)
 
     stability_metrics = models.BooleanField(default=False)
+    # True: BIAS in the results is mean(candidate) - mean(reference).
+    # False: runs computed before that change, BIAS is
+    # mean(reference) - mean(candidate). Copies keep the flag of their original.
+    # Migration 0097 adds the field with False (all existing runs), 0098 makes
+    # True the default for new runs. Do not squash the two: the squash would
+    # merge them into one AddField(default=True) and mark old runs as new.
+    bias_candidate_minus_reference = models.BooleanField(default=True)
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='SCHEDULED')
 
     val_type = models.CharField(
