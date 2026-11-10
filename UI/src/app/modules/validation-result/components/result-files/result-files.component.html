@@ -116,6 +116,16 @@
               </div>
             </div>
             <hr class="flex w-11 pt-0 mt-0 featurette-divider" />
+
+            <!-- Bias note (sign changed in release 5.0) -->
+            @if (showLegacyBiasNote()) {
+              <p-message
+                severity="warn"
+                text="This validation reports BIAS as reference − candidate. Since Release 5, BIAS is reported as candidate − reference, so its sign is inverted compared to newer validations; all other metrics are unaffected."
+                class="w-12 mb-3"
+              />
+            }
+
             <div
               class="flex flex-row w-12 justify-content-center align-content-center md:text-4xl text-2xl text-muted"
             >

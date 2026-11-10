@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, signal, WritableSignal } from '@angular/core';
+import { Component, Input, OnInit, signal, WritableSignal, computed } from '@angular/core';
 import { EMPTY, Observable, of, tap } from 'rxjs';
 import { MetricsPlotsDto } from '../../../core/services/validation-run/metrics-plots.dto';
 import { ValidationrunService } from '../../../core/services/validation-run/validationrun.service';
@@ -40,6 +40,12 @@ export class ResultFilesComponent implements OnInit {
   fileError = signal(false);
   dataFetchError = signal(false);
   showInteractiveMap: boolean | null = null;
+
+  // Bias note (sign changed in release 5.0)
+  showLegacyBiasNote = computed(() =>
+    this.selectedMetric()?.metric_query_name?.toUpperCase() === 'BIAS'
+    && this.validation?.bias_candidate_minus_reference !== true
+  );
 
   constructor(private validationService: ValidationrunService,
     public plotService: WebsiteGraphicsService,

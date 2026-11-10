@@ -270,6 +270,8 @@ def get_validation_configuration(request, **kwargs):
             val_run_dict['changes'] = True
         
         val_run_dict['val_type'] = val_run.val_type
+        # False: run computed before the bias sign change (reference - candidate)
+        val_run_dict['bias_candidate_minus_reference'] = val_run.bias_candidate_minus_reference
         val_run_dict['settings_changes'] = changes_in_settings
         return JsonResponse(val_run_dict,
                             status=status.HTTP_200_OK, safe=False)

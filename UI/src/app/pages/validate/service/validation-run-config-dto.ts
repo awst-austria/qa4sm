@@ -20,6 +20,7 @@ export interface ValidationRunConfigDto {
   temporal_matching: number;
   val_type?: string;
   changes?: boolean;
+  bias_candidate_minus_reference?: boolean;
   settings_changes?: ConfigurationChanges;
 }
 

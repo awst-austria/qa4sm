@@ -93,6 +93,7 @@ export class ValidateComponent implements OnInit, AfterViewInit {
   noVersion = signal(false);
   noFilters = signal(false);
   validationDisabledMessage = new BehaviorSubject(''); // can not be signal, because it is used in html
+  loadedFromLegacyBiasRun = signal(false);
 
   defMaxLon = 48.3;
   defMinLon = -11.2;
@@ -182,6 +183,7 @@ export class ValidateComponent implements OnInit, AfterViewInit {
   }
 
   private onGetValidationConfigNext(valrun: ValidationRunConfigDto): void {
+    this.loadedFromLegacyBiasRun.set(valrun.bias_candidate_minus_reference !== true);
     this.modelFromValidationConfig(valrun);
 
     setTimeout(() => {
@@ -199,6 +201,7 @@ export class ValidateComponent implements OnInit, AfterViewInit {
   }
 
   private setDefaultDatasetSettings(): void {
+    this.loadedFromLegacyBiasRun.set(false);
     this.resetValidationModel();
     of({}).pipe(delay(0)).subscribe(() => {
       this.setDefaultGeographicalRange();

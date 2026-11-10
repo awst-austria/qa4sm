@@ -20,7 +20,17 @@
         </p>
       </div>
     }
-
+    @if (loadedFromLegacyBiasRun()) {
+      <div
+        class="flex flex-column flex-wrap xl:w-8 lg:w-9 w-10 justify-content-center align-content-center"
+      >
+        <p-message
+          severity="warn"
+          text="These settings were loaded from a validation run that reports BIAS as reference − candidate. New validations report BIAS as candidate − reference, so the original BIAS values cannot be reproduced exactly and are not directly comparable; all other metrics are unaffected."
+          class="w-12 mb-3"
+        />
+      </div>
+    }
     <div
       class="flex flex-column flex-wrap xl:w-8 lg:w-9 w-10 justify-content-center align-content-center"
     >
