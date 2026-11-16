@@ -32,7 +32,12 @@
             </p-accordion-header>
 
             <p-accordion-content>
-              @if (selectedDatasetModel[0]?.datasetModel?.selectedDataset) {
+              <!-- wait for the version too: qa-dataset reads selectedVersion.id
+                   in ngOnInit to load the variable list -->
+              @if (
+                selectedDatasetModel[0]?.datasetModel?.selectedDataset &&
+                selectedDatasetModel[0]?.datasetModel?.selectedVersion
+              ) {
                 <qa-dataset
                   [removable]="false"
                   (changeDataset)="onDatasetChange()"
