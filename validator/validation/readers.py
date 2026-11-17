@@ -9,7 +9,7 @@ from esa_cci_sm.interface import CCITs
 from gldas.interface import GLDASTs
 from ismn.interface import ISMN_Interface
 from ismn.custom import CustomSensorMetadataCsv
-from smap_io.interface import SMAPTs, SMAPL3_V9Reader, ReaderWithExtension_SMAP
+from smap_io.interface import SMAPTs, SMAPL3_V9Reader
 from smos.interface import SMOSTs
 from pynetcf.time_series import GriddedNcTs, GriddedNcIndexedRaggedTs
 from pygeogrids.netcdf import load_grid
@@ -72,6 +72,9 @@ class ReaderWithTsExtension:
         except Exception as e:
             logging.error(f"Extension reading failed for {args} {kwargs} with"
                           f"error: {e}")
+
+        if ts is not None:
+            ts = ts.sort_index()
 
         return ts
 
@@ -221,11 +224,11 @@ def create_reader(dataset, version) -> GriddedNcTs:
             'SMAP_V9_AM_PM'):
         smap_data_folder = path.join(folder_name, 'netcdf')
         smap_ext_folder_name = path.join(f"{folder_name}-ext", 'timeseries')
-        reader = ReaderWithExtension_SMAP(SMAPL3_V9Reader, smap_data_folder, smap_ext_folder_name,
-                                       ioclass_kws={'read_bulk': True},
-                                       grid=load_grid(path.join(smap_data_folder, "grid.nc")))
-        # reader = SMAPL3_V9Reader(smap_data_folder,
-        #                          ioclass_kws={'read_bulk': True})
+        reader = ReaderWithTsExtension(
+            SMAPL3_V9Reader, smap_data_folder, smap_ext_folder_name,
+            ioclass_kws={'read_bulk': True},
+            grid=load_grid(path.join(smap_data_folder, "grid.nc"))
+        )
 
     if dataset.short_name == globals.SMOS_SBPCA:
         if version.short_name == globals.SMOS_SBPCA_v724:
