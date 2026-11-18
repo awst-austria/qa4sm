@@ -1,3 +1,9 @@
+QA4SM v4.3.0 - Release notes 2026-11-18
+======================================================
+# Updates
+1. Fix smap reader with extension 
+2. Add dependabot config
+
 QA4SM v4.2.1 - Release notes 2026-09-24
 ======================================================
 # Updates
