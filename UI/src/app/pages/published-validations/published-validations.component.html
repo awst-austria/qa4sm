@@ -118,6 +118,8 @@
 
           <th>DOI</th>
 
+          <th>Load settings</th>
+
           <th>Pin</th>
         </tr>
       </ng-template>
@@ -179,6 +181,22 @@
             }
             @if (!rowData.doi) {
               <span>—</span>
+            }
+          </td>
+
+          <td class="settings-cell">
+            @if (isLogged$ | async) {
+              <button
+                pButton
+                type="button"
+                class="p-button-text p-button-secondary"
+                icon="pi pi-replay"
+                pTooltip="Load settings (redirects to validate page)"
+                tooltipPosition="left"
+                (click)="loadSettings(rowData, $event)"
+              ></button>
+            } @else {
+              <span class="muted">—</span>
             }
           </td>
 

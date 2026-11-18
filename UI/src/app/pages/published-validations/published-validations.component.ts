@@ -4,6 +4,7 @@ import { Router, RouterModule } from '@angular/router';
 import { Observable, BehaviorSubject, combineLatest, of, Subscription } from 'rxjs';
 import { catchError, debounceTime, distinctUntilChanged, map, shareReplay, startWith, tap, switchMap, take, filter } from 'rxjs/operators';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup } from '@angular/forms';
+import { HttpParams } from '@angular/common/http';
 
 // PrimeNG
 import { ButtonModule } from 'primeng/button';
@@ -15,6 +16,7 @@ import { TooltipModule } from 'primeng/tooltip';
 
 // Services
 import { ValidationRunFacade } from '../../modules/core/services/validation-run/validationrun.facade';
+import { ValidationrunService } from 'src/app/modules/core/services/validation-run/validationrun.service';
 import { AuthService } from '../../modules/core/services/auth/auth.service';
 import { ToastService } from 'src/app/modules/core/services/toast/toast.service';
 
@@ -59,7 +61,8 @@ export class PublishedValidationsComponent implements OnInit, OnDestroy {
     private facade: ValidationRunFacade,
     private authService: AuthService,
     private router: Router,
-    private toastService: ToastService
+    private toastService: ToastService,
+    private validationrunService: ValidationrunService
   ) {}
 
   ngOnInit(): void {
@@ -165,6 +168,26 @@ export class PublishedValidationsComponent implements OnInit, OnDestroy {
   // View Results page
   ViewResults(row: any) {
     this.router.navigate(['/validation-result', row.id]);
+  }
+
+  // Load settings of a published validation and redirect to validate page
+  loadSettings(row: any, event: Event): void {
+    event.stopPropagation();
+
+    const params = new HttpParams().set('validation_id', row.id);
+
+    this.validationrunService.copyValidation(params)
+      .pipe(take(1))
+      .subscribe({
+        next: (data: any) => {
+          const newId = data.run_id;
+          this.router.navigate(['/validate'], { queryParams: { validation_id: newId } });
+        },
+        error: (err) => {
+          console.error('Load settings error:', err);
+          this.toastService.showErrorWithHeader('Error', 'Could not load settings.');
+        }
+      });
   }
 
   ngOnDestroy(): void {
