@@ -1,0 +1,56 @@
+
+# Dependabot configuration
+# Docs: https://docs.github.com/en/code-security/dependabot/working-with-dependabot/dependabot-options-reference
+#
+# Goal: as few PRs as possible.
+# - Security updates (Python + npm) are bundled into ONE PR per ecosystem
+#   instead of one PR per package.
+# - Regular version updates are switched off for Python and npm
+#   (open-pull-requests-limit: 0); only security fixes come in.
+# - GitHub Actions get one grouped version-update PR per month.
+#
+# Note: Dependabot cannot merge different ecosystems into a single PR,
+# so the minimum is one PR per entry below.
+
+version: 2
+updates:
+  # Python dependencies (requirements.txt in repo root)
+  - package-ecosystem: "pip"
+    directory: "/"
+    schedule:
+      interval: "monthly"
+    # 0 = no regular version-update PRs, security updates only
+    open-pull-requests-limit: 0
+    groups:
+      python-security:
+        applies-to: security-updates
+        patterns:
+          - "*"
+
+  # Angular frontend (UI/package.json + package-lock.json)
+  - package-ecosystem: "npm"
+    directory: "/UI"
+    schedule:
+      interval: "monthly"
+    # 0 = no regular version-update PRs, security updates only
+    open-pull-requests-limit: 0
+    groups:
+      npm-security:
+        applies-to: security-updates
+        patterns:
+          - "*"
+
+  # Keep the versions of the GitHub Actions used in the workflows up to date
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "monthly"
+    groups:
+      github-actions:
+        applies-to: version-updates
+        patterns:
+          - "*"
+      github-actions-security:
+        applies-to: security-updates
+        patterns:
+          - "*"
