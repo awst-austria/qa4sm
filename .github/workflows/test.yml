@@ -28,13 +28,13 @@ jobs:
         python-version: ['3.12']
         os: ["ubuntu-latest"]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           submodules: true
-      - uses: actions/setup-python@v2
+      - uses: actions/setup-python@v7
         with:
           python-version: ${{ matrix.python-version }}
-      - uses: conda-incubator/setup-miniconda@v3
+      - uses: conda-incubator/setup-miniconda@v4
         with:
           miniconda-version: "latest"
           auto-update-conda: true
