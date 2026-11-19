@@ -3,7 +3,6 @@ import os
 from collections import OrderedDict
 
 from django.conf import settings
-from django.core.files import File
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404
 
@@ -296,6 +295,67 @@ def get_metric_names_and_associated_files(request):
 
     return JsonResponse(response, status=200, safe=False)
 
+# Only image files may be served through the graphic endpoints.
+ALLOWED_GRAPHIC_EXTENSIONS = {'.png', '.webp', '.jpg', '.jpeg', '.gif', '.svg'}
+STATIC_URL_PREFIX = '/static/'
+
+
+def _graphic_roots():
+    """Directories the graphic endpoints are allowed to read from (resolved, no symlinks)."""
+    return [
+        os.path.realpath(os.path.join(settings.BASE_DIR, 'validator', 'static')),
+        os.path.realpath(settings.MEDIA_ROOT),
+    ]
+
+
+def resolve_graphic_path(requested):
+    """
+    Map a client-supplied plot path to a real file on disk, or return None.
+
+    Accepted inputs are either '/static/<relative path>' (website images) or an
+    absolute path inside MEDIA_ROOT (validation plots, as built by
+    get_metric_names_and_associated_files*). Anything resolving outside these
+    roots (e.g. via '..' or symlinks), non-image files and missing files are
+    rejected.
+    """
+    if not requested or '\x00' in requested:
+        return None
+
+    if requested.startswith(STATIC_URL_PREFIX):
+        candidate = os.path.join(settings.BASE_DIR, 'validator', 'static',
+                                 requested[len(STATIC_URL_PREFIX):])
+    elif os.path.isabs(requested):
+        candidate = requested
+    else:
+        return None
+
+    real_path = os.path.realpath(candidate)
+
+    if os.path.splitext(real_path)[1].lower() not in ALLOWED_GRAPHIC_EXTENSIONS:
+        return None
+
+    for root in _graphic_roots():
+        try:
+            if os.path.commonpath([root, real_path]) == root:
+                break
+        except ValueError:
+            continue
+    else:
+        return None
+
+    if not os.path.isfile(real_path):
+        return None
+    return real_path
+
+
+def _encode_file(path):
+    with open(path, 'rb') as fh:
+        return base64.b64encode(fh.read()).decode('utf-8')
+
+
+FILE_NOT_AVAILABLE = 'File not available'
+
+
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_graphic_files(request):
@@ -303,15 +363,12 @@ def get_graphic_files(request):
     files = request.query_params.getlist('file', None)
     if not files:
         return JsonResponse({'message': 'No file names given'}, status=404, safe=False)
-    plots = []
-    for file in files:
-        if '/static/' in file:
-            file = file.replace('/static/', os.path.join(settings.BASE_DIR, 'validator/static/'))
-        open_file = open(file, 'rb')
-        image = File(open_file)
-        name = base64.b64encode(image.read())
-        open_file.close()
-        plots.append({'plot': name.decode('utf-8')})
+
+    resolved = [resolve_graphic_path(file) for file in files]
+    if any(path is None for path in resolved):
+        return JsonResponse({'message': FILE_NOT_AVAILABLE}, status=404, safe=False)
+
+    plots = [{'plot': _encode_file(path)} for path in resolved]
     return JsonResponse(plots, safe=False)
 
 
@@ -323,14 +380,12 @@ def get_graphic_file(request):
     file = request.query_params.get('file', None)
     if not file:
         return JsonResponse({'message': 'No file name given'}, status=404, safe=False)
-    if '/static/' in file:
-        file = file.replace('/static/', os.path.join(settings.BASE_DIR, 'validator/static/'))
-    open_file = open(file, 'rb')
-    image = File(open_file)
-    name = base64.b64encode(image.read())
-    open_file.close()
 
-    return JsonResponse({'plot': name.decode('utf-8')}, safe=True)
+    path = resolve_graphic_path(file)
+    if path is None:
+        return JsonResponse({'message': FILE_NOT_AVAILABLE}, status=404, safe=False)
+
+    return JsonResponse({'plot': _encode_file(path)}, safe=True)
 
 
 @api_view(['GET'])
