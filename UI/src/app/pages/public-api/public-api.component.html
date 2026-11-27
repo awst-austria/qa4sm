@@ -1,62 +1,115 @@
-<main class="flex flex-column align-items-center"> 
+<main class="flex flex-column align-items-center">
     <div class="flex flex-column w-11 lg:w-8 xl:w-6 justify-content-center align-content-center">
         <h1>Public API</h1>
         <p class="text-primary">
-            The QA4SM Public API makes it easy to work with the service from the command line or your own scripts.
-            You can submit validation jobs, track their progress, and download results as soon as they’re ready.
-            Access is secured with your personal API token.
-        </p>
+            The QA4SM Public API enables programmatic access to the service from the command line or custom scripts.
+            It supports upload of user datasets, submission of validation jobs, monitoring progress,
+            and download of validation results. Access is authenticated with a personal token.
+                    </p>
         <p class="text-primary">
-            You can request a personal API token from your 
+            You can request a personal API token from your
             <a routerLink="/user-profile">User Profile</a> page.
         </p>
-    
+
+        <!-- Python client -->
+        <h2>Python client</h2>
+        <p class="text-primary">
+            For Python users, the
+            <a href="https://github.com/awst-austria/qa4sm-api" target="_blank" rel="noopener noreferrer">qa4sm-api</a>
+            package provides a client library and a command line tool for the most common tasks: searching
+            datasets, downloading validation configurations, starting validations, and downloading results.
+        </p>
+
+        <textarea id="cmd-pip" class="sr-only" aria-hidden="true" style="position:absolute;left:-9999px;">
+pip install qa4sm-api
+qa4sm api setup
+qa4sm --help
+        </textarea>
+
+        <pre><code><span class="prompt">$</span> pip install qa4sm-api
+<span class="prompt">$</span> qa4sm api setup      # stores your API token in ~/.qa4smapirc
+<span class="prompt">$</span> qa4sm --help</code></pre>
+
+        <a class="copy-btn" (click)="copy('cmd-pip')"><i class="pi pi-fw pi-copy"></i> Copy</a>
+
+        <p class="text-primary">
+            See the
+            <a href="https://awst-austria.github.io/qa4sm-api/" target="_blank" rel="noopener noreferrer">package documentation</a>
+            for more examples. The examples below use plain <code>curl</code> and work without any installation.
+        </p>
+
         <h2>Usage</h2>
         <p class="text-primary">
             Here are some examples of how to use your personal API token to interact with the service.
             Each request must include your token in the Authorization header.
         </p>
-        <!-- Description of CONFIG_JSON_FILE -->
+
+        <!-- Upload user data -->
+        <p class="text-primary"><strong>Upload your own dataset:</strong></p>
         <p class="text-primary">
-            <a routerLink="/json-config">
-            <code>&lt;CONFIG_JSON_FILE&gt;</code> </a> 
+            The file (<code>.nc</code>, <code>.nc4</code>, or <code>.zip</code> with CSV files) must follow the
+            <a routerLink="/user-data-guidelines">upload guidelines</a>.
+            <code>dataset_name</code> and <code>version_name</code> are required (up to 30 characters each);
+            optionally, <code>dataset_pretty_name</code> and <code>version_pretty_name</code> can be added.
+            After preprocessing, the dataset appears on the
+            <a routerLink="/my-datasets">My datasets</a> page and can be used in validations.
+        </p>
+
+        <textarea id="cmd-upload" class="sr-only" aria-hidden="true" style="position:absolute;left:-9999px;">
+curl -X POST \
+-H "Authorization: Token &lt;YOUR_USER_TOKEN&gt;" \
+-F "file=&#64;&lt;FILE&gt;" \
+-F 'metadata={"dataset_name":"&lt;DATASET_NAME&gt;","version_name":"&lt;VERSION_NAME&gt;"}' \
+https://qa4sm.eu/api/upload-user-data-with-token/&lt;FILE&gt;
+        </textarea>
+
+        <pre><code><span class="prompt">$</span> curl -X POST \
+-H "Authorization: Token &lt;YOUR_USER_TOKEN&gt;" \
+-F "file=&#64;&lt;FILE&gt;" \
+-F 'metadata=&#123;"dataset_name":"&lt;DATASET_NAME&gt;","version_name":"&lt;VERSION_NAME&gt;"&#125;' \
+https://qa4sm.eu/api/upload-user-data-with-token/&lt;FILE&gt;</code></pre>
+
+        <a class="copy-btn" (click)="copy('cmd-upload')"><i class="pi pi-fw pi-copy"></i> Copy</a>
+
+        <p class="text-primary text-sm">
+            Replace <code>&lt;FILE&gt;</code> with the file name (e.g. <code>my_data.zip</code>) in both places.
+            A successful upload returns HTTP status <code>201</code>. Uploads are limited to 20 per hour.
+        </p>
+
+        <!-- Description of CONFIG_JSON_FILE -->
+        <p class="text-primary"><strong>Submit validation:</strong></p>
+        <p class="text-primary">
+            <a routerLink="/json-config"><code>&lt;CONFIG_JSON_FILE&gt;</code></a>
             is a JSON file that defines the datasets, filters, time ranges, and metrics for your validation job.
         </p>
-    
-        <p class="text-primary"><strong>Submit validation:</strong></p>
 
-        <!-- Hidden textarea (used for copy-to-clipboard) -->
         <textarea id="cmd-start-local" class="sr-only" aria-hidden="true" style="position:absolute;left:-9999px;">
-        curl -X POST \
-        -H "Authorization: Token <your user token here>" \
-        -H "Content-Type: application/json" \
-        -d @config.json \
-        https://qa4sm.eu/api/start-validation-with-token
-    </textarea>
+curl -X POST \
+-H "Authorization: Token &lt;YOUR_USER_TOKEN&gt;" \
+-H "Content-Type: application/json" \
+-d &#64;&lt;CONFIG_JSON_FILE&gt; \
+https://qa4sm.eu/api/start-validation-with-token
+        </textarea>
 
-        <!-- Visible command example -->
         <pre><code><span class="prompt">$</span> curl -X POST \
 -H "Authorization: Token &lt;YOUR_USER_TOKEN&gt;" \
 -H "Content-Type: application/json" \
 -d &#64;&lt;CONFIG_JSON_FILE&gt; \
 https://qa4sm.eu/api/start-validation-with-token</code></pre>
 
-        <!-- Copy button -->
-        <a class="copy-btn" (click)="copy('cmd-start-local')">
-            <i class="pi pi-fw pi-copy"></i> Copy
-        </a>
+        <a class="copy-btn" (click)="copy('cmd-start-local')"><i class="pi pi-fw pi-copy"></i> Copy</a>
 
-        <!-- API example -->
+        <!-- List runs -->
         <p class="text-primary"><strong>List your validation runs:</strong></p>
 
         <textarea id="cmd-list" class="sr-only" aria-hidden="true" style="position:absolute;left:-9999px;">
-        curl -X GET \
-    -H "Authorization: Token &lt;YOUR_USER_TOKEN&gt;" \
-    https://qa4sm.eu/api/my-validation-runs-with-token | jq -r '
-    .validation_runs[] |
-    [.id, .name, (.datasets | join("; ")), .progress] |
-    @tsv
-    ' | column -t
+curl -X GET \
+-H "Authorization: Token &lt;YOUR_USER_TOKEN&gt;" \
+https://qa4sm.eu/api/my-validation-runs-with-token | jq -r '
+.validation_runs[] |
+[.id, .name, (.datasets | join("; ")), .progress] |
+&#64;tsv
+' | column -t
         </textarea>
 
         <pre><code><span class="prompt">$</span> curl -X GET \
@@ -68,23 +121,22 @@ https://qa4sm.eu/api/my-validation-runs-with-token | jq -r '
 ' | column -t</code></pre>
 
         <a class="copy-btn" (click)="copy('cmd-list')"><i class="pi pi-fw pi-copy"></i> Copy</a>
-  
-        <!-- API example -->
+
+        <!-- Download -->
         <p class="text-primary"><strong>Download results (ZIP):</strong></p>
 
         <textarea id="cmd-download" class="sr-only" aria-hidden="true" style="position:absolute;left:-9999px;">
-        curl -X GET \
-        -H "Authorization: Token &lt;YOUR_USER_TOKEN&gt;" \
-        "https://qa4sm.eu/api/download-result-file-with-token/&lt;VALIDATION_RUN_ID&gt;/zip" \
-        --output &lt;OUTPUT_FILE&gt;.zip
+curl -X GET \
+-H "Authorization: Token &lt;YOUR_USER_TOKEN&gt;" \
+"https://qa4sm.eu/api/download-result-file-with-token/&lt;VALIDATION_RUN_ID&gt;/zip" \
+--output &lt;OUTPUT_FILE&gt;.zip
         </textarea>
 
         <pre><code><span class="prompt">$</span> curl -X GET \
 -H "Authorization: Token &lt;YOUR_USER_TOKEN&gt;" \
 "https://qa4sm.eu/api/download-result-file-with-token/&lt;VALIDATION_RUN_ID&gt;/zip" \
 --output &lt;OUTPUT_FILE&gt;.zip</code></pre>
-    
-        <a class="copy-btn" (click)="copy('cmd-download')"><i class="pi pi-fw pi-copy"></i> Copy</a>
 
+        <a class="copy-btn" (click)="copy('cmd-download')"><i class="pi pi-fw pi-copy"></i> Copy</a>
     </div>
 </main>
