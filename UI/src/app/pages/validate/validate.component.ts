@@ -233,6 +233,49 @@ export class ValidateComponent implements OnInit, AfterViewInit {
     return message.toString();
   }
 
+  private buildValidationConfig(): ValidationRunConfigDto {
+    // prepare the dataset dtos (dataset, version, variable and filter settings)
+    const datasets: ValidationRunDatasetConfigDto[] = this.validationModel.datasetConfigurations
+      .map(datasetConfig => datasetConfig.toValRunDatasetConfigDto());
+
+    // prepare metrics
+    const metricDtos: ValidationRunMetricConfigDto[] = this.validationModel.metrics
+      .map(metric => metric.toValidationRunMetricDto());
+
+    // build anomalies_from / anomalies_to
+    const anomaliesMethod = this.validationModel.anomalies.method$.getValue();
+    const fromYear = this.validationModel.anomalies.anomaliesFrom();
+    const toYear = this.validationModel.anomalies.anomaliesTo();
+
+    let anomaliesFrom: Date = null;
+    let anomaliesTo: Date = null;
+    if (anomaliesMethod === ANOMALIES_CLIMATOLOGY && fromYear && toYear) {
+      // Use UTC-based dates to avoid local→UTC shift
+      anomaliesFrom = new Date(Date.UTC(fromYear, 0, 1, 0, 0, 0));      // 1 Jan, 00:00 UTC
+      anomaliesTo   = new Date(Date.UTC(toYear, 11, 31, 23, 59, 59));   // 31 Dec, 23:59:59 UTC
+    }
+
+    return {
+      dataset_configs: datasets,
+      interval_from: this.validationModel.validationPeriodModel.intervalFrom$.getValue(),
+      interval_to: this.validationModel.validationPeriodModel.intervalTo$.getValue(),
+      min_lat: this.validationModel.spatialSubsetModel.minLat$.getValue(),
+      min_lon: this.validationModel.spatialSubsetModel.minLon$.getValue(),
+      max_lat: this.validationModel.spatialSubsetModel.maxLat$.getValue(),
+      max_lon: this.validationModel.spatialSubsetModel.maxLon$.getValue(),
+      metrics: metricDtos,
+      intra_annual_metrics: this.validationModel.intraAnnualMetrics,
+      anomalies_method: anomaliesMethod,
+      anomalies_from: anomaliesFrom,
+      anomalies_to: anomaliesTo,
+      scaling_method: this.validationModel.scalingMethod.methodName,
+      scale_to: '0',
+      name_tag: this.validationModel.nameTag$.getValue(),
+      temporal_matching: this.validationModel.temporalMatchingModel.size$.getValue(),
+      val_type: this.validationModel.valType
+    };
+  }
+
   private modelFromValidationConfig(validationRunConfig: ValidationRunConfigDto): void {
     // Prepare dataset config
     validationRunConfig.dataset_configs.forEach(datasetConfig => {
@@ -962,74 +1005,20 @@ export class ValidateComponent implements OnInit, AfterViewInit {
     return this.validationModel.datasetConfigurations.length >= MAX_DATASETS_FOR_VALIDATION;
   }
 
-  public startValidation(checkForExistingValidation: boolean): void {
+  downloadConfiguration(): void {
+    const date = new Date().toISOString().slice(0, 10);
+    this.validationConfigService.downloadConfiguration(
+      this.buildValidationConfig(), `qa4sm_config_${date}.json`);
+  }
 
+  public startValidation(checkForExistingValidation: boolean): void {
     if (!this.authService.authenticated.value) {
       this.toastService.showErrorWithHeader('Cannot start validation', 'You must be logged in to start a validation.');
       this.authService.switchLoginModal(true, 'Please log in to start validation');
       return;
     }
 
-    // prepare the dataset dtos (dataset, version, variable and filter settings)
-    const datasets: ValidationRunDatasetConfigDto[] = [];
-    this.validationModel.datasetConfigurations.forEach(datasetConfig => {
-      datasets.push(datasetConfig.toValRunDatasetConfigDto());
-    });
-
-    // prepare metrics
-    const metricDtos: ValidationRunMetricConfigDto[] = [];
-
-    this.validationModel.metrics.forEach(metric => {
-      metricDtos.push(metric.toValidationRunMetricDto());
-    });
-
-    this.validationModel.referenceConfigurations.spatial =
-      this.validationModel.datasetConfigurations.find(datasetConfig => datasetConfig.spatialReference$);
-    this.validationModel.referenceConfigurations.temporal =
-      this.validationModel.datasetConfigurations.find(datasetConfig => datasetConfig.temporalReference$);
-    this.validationModel.referenceConfigurations.scaling =
-      this.validationModel.datasetConfigurations.find(datasetConfig => datasetConfig.scalingReference$);
-
-
-    // build anomalies_from / anomalies_to
-    const anomaliesMethod = this.validationModel.anomalies.method$.getValue();
-    let anomaliesFrom: Date = null;
-    let anomaliesTo: Date = null;
-
-    const fromYear = this.validationModel.anomalies.anomaliesFrom();
-    const toYear   = this.validationModel.anomalies.anomaliesTo();
-
-    if (anomaliesMethod === ANOMALIES_CLIMATOLOGY && fromYear && toYear) {
-      // Use UTC-based dates to avoid local→UTC shift
-      anomaliesFrom = new Date(Date.UTC(fromYear, 0, 1, 0, 0, 0));          // 1 Jan, 00:00 UTC
-      anomaliesTo   = new Date(Date.UTC(toYear, 11, 31, 23, 59, 59));       // 31 Dec, 23:59:59 UTC
-    } else {
-      anomaliesFrom = null;
-      anomaliesTo   = null;
-    }
-
-
-
-    const newValidation: ValidationRunConfigDto = {
-      dataset_configs: datasets,
-      interval_from: this.validationModel.validationPeriodModel.intervalFrom$.getValue(),
-      interval_to: this.validationModel.validationPeriodModel.intervalTo$.getValue(),
-      min_lat: this.validationModel.spatialSubsetModel.minLat$.getValue(),
-      min_lon: this.validationModel.spatialSubsetModel.minLon$.getValue(),
-      max_lat: this.validationModel.spatialSubsetModel.maxLat$.getValue(),
-      max_lon: this.validationModel.spatialSubsetModel.maxLon$.getValue(),
-      metrics: metricDtos,
-      intra_annual_metrics: this.validationModel.intraAnnualMetrics,
-      anomalies_method: anomaliesMethod,
-      anomalies_from: anomaliesFrom,
-      anomalies_to: anomaliesTo,
-      scaling_method: this.validationModel.scalingMethod.methodName,
-      scale_to: '0',
-      name_tag: this.validationModel.nameTag$.getValue(),
-      temporal_matching: this.validationModel.temporalMatchingModel.size$.getValue(),
-      val_type: this.validationModel.valType
-    };
-    this.validationConfigService.startValidation(newValidation, checkForExistingValidation)
+    this.validationConfigService.startValidation(this.buildValidationConfig(), checkForExistingValidation)
       .subscribe(this.startValidationObserver);
   }
 

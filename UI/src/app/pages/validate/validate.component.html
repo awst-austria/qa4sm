@@ -347,7 +347,7 @@
           </div>
           <!-- Button -->
           <div class="w-10 p-2">
-            <div class="flex flex-row flex-wrap justify-content-center">
+            <div class="flex flex-column align-items-center gap-1">
               <span
                 pTooltip="{{
                   disableValidateButton(validationModel)
@@ -364,6 +364,16 @@
                 >
                 </p-button>
               </span>
+              <p-button
+                label="Download configuration"
+                icon="pi pi-download"
+                [text]="true"
+                size="small"
+                severity="secondary"
+                [disabled]="disableValidateButton(validationModel)"
+                pTooltip="Save these settings as a JSON file for the Public API or the qa4sm-api package"
+                (onClick)="downloadConfiguration()"
+              />
             </div>
           </div>
         </div>

@@ -9,6 +9,8 @@ import {Observable, Observer} from 'rxjs';
 import {GlobalParamsService} from '../../../core/services/global/global-params.service';
 import {ToastService} from '../../../core/services/toast/toast.service';
 import {CustomHttpError} from '../../../core/services/global/http-error.service';
+import {ValidationRunConfigService} from '../../../../pages/validate/service/validation-run-config.service';
+
 
 @Component({
     selector: 'qa-buttons',
@@ -45,7 +47,8 @@ export class ButtonsComponent implements OnInit {
               private validationService: ValidationrunService,
               public authService: AuthService,
               public globals: GlobalParamsService,
-              private toastService: ToastService) {
+              private toastService: ToastService,
+              private validationRunConfigService: ValidationRunConfigService) {
   }
 
   ngOnInit(): void {
@@ -203,4 +206,13 @@ export class ButtonsComponent implements OnInit {
     this.validationService.copyValidation(params)
       .subscribe(this.copyValidationObserver);
   }
+  downloadConfiguration(): void {
+    this.validationRunConfigService.getValidationConfig(this.validationRun.id).subscribe({
+      next: config => this.validationRunConfigService.downloadConfiguration(
+        config, `qa4sm_config_${this.validationRun.id}.json`),
+      error: () => this.toastService.showErrorWithHeader(
+        'Download failed', 'The configuration of this validation could not be retrieved.')
+    });
+  }
+  
 }

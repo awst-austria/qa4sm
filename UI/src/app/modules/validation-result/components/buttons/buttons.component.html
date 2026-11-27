@@ -276,7 +276,7 @@
             pButton
             type="button"
             icon="pi pi-times"
-            class="btn-action-large"
+            class="btn-action-large p-button-danger"
             pTooltip="Remove this validation run"
             [life]="globals.tooltipLifetime"
             label="Delete"
@@ -333,10 +333,20 @@
             [life]="globals.tooltipLifetime"
           >
           </a>
+          <button
+            pButton
+            type="button"
+            icon="pi pi-download"
+            class="btn-action-large"
+            label="Download configuration"
+            pTooltip="Save the settings as a JSON file for the Public API or the qa4sm-api package"
+            [life]="globals.tooltipLifetime"
+            (click)="downloadConfiguration()"
+          ></button>
         }
       </div>
     } @else {
-      <div style="float: right">
+      <div class="flex flex-row w-12 align-items-center justify-content-end flex-wrap gap-1">
         @if (
           isLogged &&
           validationRun.is_unpublished &&
@@ -354,7 +364,7 @@
           ></button>
         }
         @if (validationRun.contains_user_data) {
-          <em style="color: orangered"
+          <em class="w-12 text-right" style="color: orangered"
             >You can not copy nor reload this validation, because it contains
             data belonging to another user.</em
           >
@@ -375,6 +385,16 @@
             [life]="globals.tooltipLifetime"
           >
           </a>
+          <button
+            pButton
+            type="button"
+            icon="pi pi-download"
+            class="btn-action-large"
+            label="Download configuration"
+            pTooltip="Save the settings as a JSON file for the Public API or the qa4sm-api package"
+            [life]="globals.tooltipLifetime"
+            (click)="downloadConfiguration()"
+          ></button>
         }
         @if (
           isLogged && isTrackedByTheUser() && !validationRun.is_unpublished

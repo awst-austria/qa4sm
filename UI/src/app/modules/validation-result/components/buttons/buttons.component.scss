@@ -1,4 +1,10 @@
 @use 'src/style.variables' as *;
+:host ::ng-deep .p-button.btn-action-large {
+  display: inline-flex;
+  align-items: center;
+  height: 2.25rem;
+  white-space: nowrap;
+}
 
 .btn-bar {
   display: flex;

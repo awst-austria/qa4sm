@@ -46,6 +46,19 @@ export class ValidationRunConfigService {
       );
   }
 
+  /** Saves a validation configuration as a JSON file.*/
+  public downloadConfiguration(config: ValidationRunConfigDto, fileName: string): void {
+    // remove metadata describing the original run / the reload, not part of the configuration itself
+    const { changes, settings_changes, bias_candidate_minus_reference, ...cleanConfig } = config;
+    const blob = new Blob([JSON.stringify(cleanConfig, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = fileName;
+    link.click();
+    URL.revokeObjectURL(url);
+  }
+
   public getScalingMethods(): Observable<ScalingMethodDto[]> {
     return this.httpClient.get<ScalingMethodDto[]>(getScalingMethodsUrl)
       .pipe(
