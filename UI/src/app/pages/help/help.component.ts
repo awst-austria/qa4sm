@@ -19,13 +19,13 @@ export type HelpSection =
   | 'results'
   | 'my-validations'
   | 'published-validations'
+  | 'reports'
   | 'upload'
   | 'upload-help'
   | 'my-datasets'
   | 'comparison'
   | 'api'
-  | 'info'
-  | 'comparison';
+  | 'info';
 
 export interface NavItem {
   id: HelpSection | string;
@@ -63,6 +63,7 @@ export class HelpComponent {
       children: [
         { id: 'my-validations', label: 'My validations' },
         { id: 'published-validations', label: 'Published validations' },
+        { id: 'reports', label: 'Reports' },
       ],
     },
     {
@@ -102,6 +103,7 @@ export class HelpComponent {
   uploadingSpinner = plotsUrlPrefix + 'uploading_spinner.webp';
   dataRow = plotsUrlPrefix + 'data_row.webp';
   userDataOnTheList = plotsUrlPrefix + 'user_data_on_the_list.webp';
+  reportsPage = plotsUrlPrefix + 'reports.webp';
 
   constructor(private globalParamsService: GlobalParamsService) {}
 

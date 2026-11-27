@@ -69,12 +69,12 @@
         <h1>Welcome to QA4SM Help</h1>
         <p>
           QA4SM is a free online service for validating satellite soil moisture
-          data against ground-station observations and model references.
+          data against ISMN ground-station observations and model references.
         </p>
         <div class="info-box">
-          This help section walks you through every part of the platform — from
-          running your first validation to interpreting, sharing, and publishing
-          your results.
+          This help section provides guidance on the use of the QA4SM platform, covering
+          the setup and execution of validations and the interpretation, sharing,
+          and publication of their results.
         </div>
         <h2>What you'll find here</h2>
         <p class="mb-2">
@@ -91,8 +91,9 @@
           </li>
           <li>
             <span>
-              <strong>Results</strong> — where to find your validations and open
-              published validations from other users.
+              <strong>Results</strong> — where to find your validations, open
+              published validations from other users, and view automated
+              validation reports.
             </span>
           </li>
           <li>
@@ -103,16 +104,16 @@
           </li>
           <li>
             <span>
-              <strong>Compare Validations</strong> — how to compare two
-              validations side by side, or two datasets within a single
-              validation.
+              <strong>Compare Validations</strong> — how to compare the results of two validations, 
+              or of two non-reference datasets within a single validation.
             </span>
           </li>
           <li>
             <span>
-              <strong>Public API</strong> — how to run validations from the
-              command line or your own scripts: submitting jobs, tracking
-              progress, and downloading results using your personal API token
+              <strong>Public API</strong> —  how to use QA4SM from the command line or
+              custom scripts with a personal API token: uploading user
+              datasets, submitting validation jobs, monitoring their progress,
+              and downloading the results.
             </span>
           </li>
           <li>
@@ -788,6 +789,84 @@
       </section>
     }
 
+        <!-- ════════════════════════════════════════
+    REPORTS
+    ════════════════════════════════════════ -->
+    @if (isActive("reports")) {
+      <section>
+        <h1>Automated validation reports</h1>
+        <p>
+          The
+          <a routerLink="/reports" target="_blank"
+            ><i class="pi pi-file-pdf mr-1" aria-hidden="true"></i>Reports</a
+          >
+          page presents quality-monitoring reports that are generated
+          automatically for selected datasets. New reports are added as they
+          become available; the reporting interval may differ between report
+          series. For example, the SMOS L2 series monitors the SMOS Level 2
+          soil moisture retrieval on a monthly basis. The Reports page is public — no account is needed to view or download
+          reports.
+        </p>
+
+        <p-image
+          [src]="reportsPage"
+          alt="Automated validation reports page"
+          [preview]="true"
+          styleClass="help-image"
+        />
+      
+        <h2 class="sub-head">Choosing a report series</h2>
+        <p>
+          If more than one report series is available, select it from the
+          <strong>Report series</strong> drop-down. The
+          <strong>What is this?</strong> box explains what the selected series
+          monitors and which data it is based on.
+        </p>
+
+        <h2 class="sub-head">Latest report and archive</h2>
+        <ul class="check-list">
+          <li>
+            <i class="pi pi-file" aria-hidden="true"></i>
+            <span
+              ><strong>Latest report</strong> — the newest report of the series,
+              with its report date and an <strong>Open</strong> button. This link
+              always points to the most recent report, so use it to follow the
+              series over time.</span
+            >
+          </li>
+          <li>
+            <i class="pi pi-calendar" aria-hidden="true"></i>
+            <span
+              ><strong>Archive</strong> — all earlier reports, grouped by year. If a report was regenerated,
+              its earlier versions are listed under it.</span
+            >
+          </li>
+        </ul>
+        <div class="info-box">
+          <strong>Citing a report:</strong> the latest-report link changes
+          whenever a new report is published. To refer to a specific report,
+          use that report's own link from the archive.
+        </div>
+
+        <h2 class="sub-head">Quality indicator</h2>
+        <p>
+          Each report has a quality indicator:
+        </p>
+        <ul class="check-list">
+          <li><span><strong>Green</strong> — good, no issues detected.</span></li>
+          <li><span><strong>Yellow</strong> — warning, review recommended.</span></li>
+          <li><span><strong>Red</strong> — critical, action required.</span></li>
+          <li><span><strong>Neutral</strong> — indicator not assigned yet.</span></li>
+        </ul>
+
+        <div class="info-box">
+          Interested in automated validation reports for your own data
+          production system? Contact
+          <a href="mailto:support@qa4sm.eu">support@qa4sm.eu</a>.
+        </div>
+      </section>
+    }
+
     <!-- ════════════════════════════════════════
     COMPARISON
     ════════════════════════════════════════ -->
@@ -1331,9 +1410,9 @@ $ curl -X GET \
           </li>
         </ul>
         <div class="info-box">
-          When publishing results produced with QA4SM, you must acknowledge and
-          cite the service together with the original data sources. Citation
-          guidance is given on the
+          Results produced with QA4SM that are used in publications must be
+          acknowledged and referenced, together with the original data sources, as
+          required by the Terms of use. Citation guidance is provided on the
           <a routerLink="/terms" target="_blank">Terms</a> page.
         </div>
       </section>
