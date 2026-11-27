@@ -99,21 +99,22 @@ export class ReportsComponent implements OnInit, OnDestroy {
       ],
     },
     {
-      match: /^C3S\b/i,
+      match: /^C3S[\s_]/i,
       intro: [
         {
           text:
-            'The C3S SM Quarterly validation report series automatically monitors the ' +
-            'successful production and publication of C3S Satellite Soil Moisture products ' +
-            'on the ',
+            'The C3S v202605 quarterly automated validation report series monitors the ' +
+            'production of C3S SM ICDR extensions. New data are downloaded directly from the ',
         },
-        { text: 'Copernicus Climate Data Store', href: 'https://doi.org/10.24381/cds.d7782f18' },
+        { text: 'Copernicus Climate Data Store', href: 'https://cds.climate.copernicus.eu/' },
         {
           text:
-            ' each quarter. Key Performance Indicators (KPIs) are tracked against ' +
-            'Near-Real-Time (NRT) ISMN in situ measurements for multiple land cover classes. ' +
-            'A changing quality indicator (yellow or red circles) indicates a lower ' +
-            'performance compared to previous validation epochs.',
+            ' and automatically evaluated against ISMN in situ near-real-time (NRT) fiducial ' +
+            'reference measurements (FRMs) and ERA5-Land reanalysis soil moisture. Correlations ' +
+            'with ERA5-Land and ISMN are computed and compared with those from previous ' +
+            'validation epochs. C3S key performance indicators (KPIs) track the accuracy of the ' +
+            'surface SM products in terms of unbiased root-mean-square difference (ubRMSD) ' +
+            'against in situ measurements across different land cover regimes.',
         },
       ],
     },
