@@ -180,6 +180,12 @@ export class ValidationSummaryComponent implements OnInit, OnDestroy {
     return this.globalParamsService.globalContext.doi_prefix;
   }
 
+  copyId(id: string): void {
+    navigator.clipboard?.writeText(id)
+      .then(() => this.toastService.showSuccess('Validation ID copied to clipboard'))
+      .catch(() => this.toastService.showErrorWithHeader('Copy failed', 'Please copy the ID manually.'));
+  }
+
   toggleEditing(): void {
     this.hideElement.set(!this.hideElement());
   }

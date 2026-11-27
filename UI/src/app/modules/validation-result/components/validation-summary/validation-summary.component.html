@@ -113,6 +113,19 @@
           [ngClass]="{ 'for-comparison-list': forComparison }"
           class="md:mx-5 md:px-3 mx-1 px-1"
         >
+          <li>
+            Validation ID:
+            <code class="validation-id">{{ validationRun.id }}</code>
+            <button
+              pButton
+              type="button"
+              class="p-button-rounded p-button-text p-button-sm p-button-secondary"
+              icon="pi pi-copy"
+              pTooltip="Copy ID"
+              [life]="globalParamsService.tooltipLifetime"
+              (click)="copyId(validationRun.id)"
+            ></button>
+        </li>
           @if (validationRun.is_a_copy) {
             <li>
               Validation copied on
